@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteRule ^([a-zA-Z0-9]+)/$ index.php?type=$1
+RewriteRule ^([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/$ index.php?type=$1&meg=$2
+RewriteRule ^([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/$ index.php?type=$1&meg=$2&id1=$3
+RewriteRule ^([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/$ index.php?type=$1&meg=$2&id1=$3&id2=$4
+RewriteRule ^([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/([a-zA-Z0-9]+)/$ index.php?type=$1&meg=$2&id1=$3&id2=$4&id3=$5
+

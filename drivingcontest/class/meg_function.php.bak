@@ -1,0 +1,1026 @@
+<?php
+
+function connect($db) {
+    $serverName = "203.150.29.241\SQLEXPRESS,1433";
+    $userName = "sa";
+    $userPassword = 'tm$wa01';
+    $dbName = $db;
+    $connectionInfo = array("Database" => $dbName, "UID" => $userName, "PWD" => $userPassword, "MultipleActiveResultSets" => true, "CharacterSet" => 'UTF-8');
+    $conn = sqlsrv_connect($serverName, $connectionInfo);
+    return $conn;
+}
+
+function delMenu($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megMenu_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delRoleaccount($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megRoleaccount_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delRole($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megRole_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delRolemenu($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megRolemenu_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delSubmenu($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megSubmenu_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delStopwork($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megStopwork_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delTenko($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megTenko_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehiclechangehistory($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclechangehistory_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehicleinsured($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicleinsured_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehiclemaintenance($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclemaintenance_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehiclerepair($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclerepair_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehicletax($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletax_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehicleowner($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicleowner_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehiclepurchase($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclepurchase_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delVehicleattribute($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicleattribute_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function delWarningdata($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megWarningdata_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function delVehicletransportdocument($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletransportdocument_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function delVehicletransportplan($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletransportplan_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function delVehicletransportprice($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletransportprice_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function editDatevehicletransportplan($FLG,$CONDITION1,$FIELDNAME,$EDITTABLEOBJ) {
+    $conn = connect("RTMS");
+    $sql = "{call megEditdatevehicletransportplan_v2(?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($FIELDNAME, SQLSRV_PARAM_IN),
+        array($EDITTABLEOBJ, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+
+}
+function editVehicletransportplan($FLG,$CONDITION1,$FIELDNAME,$EDITTABLEOBJ) {
+    $conn = connect("RTMS");
+    $sql = "{call megEditvehicletransportplan_v2(?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($FIELDNAME, SQLSRV_PARAM_IN),
+        array($EDITTABLEOBJ, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+
+}
+function editVehicletransportprice($FLG,$CONDITION1,$FIELDNAME,$EDITTABLEOBJ) {
+    $conn = connect("RTMS");
+    $sql = "{call megEditvehicletransportprice_v2(?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($FIELDNAME, SQLSRV_PARAM_IN),
+        array($EDITTABLEOBJ, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function delCustomer($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megCustomer_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function delVehiclecostmodel($FLG, $CONDITION1) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclecostmodel_v2(?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehiclecostmodel($FLG,$CONDITION1,$MODELNAME,$CARTYPE,$OILTYPE,$CARLOAD,$CARNULL,$CARNOTNULL,$CARRUBBER,$CARENGINEOIL,$CARBRAKE,$CARBATTERY,$REMARK,$ACTIVESTATUS) {
+  
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclecostmodel_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($MODELNAME, SQLSRV_PARAM_IN),
+        array($CARTYPE, SQLSRV_PARAM_IN),
+        array($OILTYPE, SQLSRV_PARAM_IN),
+        array($CARLOAD, SQLSRV_PARAM_IN),
+        array($CARNULL, SQLSRV_PARAM_IN),
+        array($CARNOTNULL, SQLSRV_PARAM_IN),
+        array($CARRUBBER, SQLSRV_PARAM_IN),
+        array($CARENGINEOIL, SQLSRV_PARAM_IN),
+        array($CARBRAKE, SQLSRV_PARAM_IN),
+        array($CARBATTERY, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function insCustomer($FLG,$CONDITION1,$CUSTOMERCODE,$NAMETH,$NAMEENG,$BUSINESSTYPE,$COMPANYTYPE,$COMPANYSTATUS,$TAXCODE,$NATIONALITY,$RACE,$REGISTRATIONDATE,$CAPITAL,$PHONE,$FAX,$EMAILADDRESS1,$EMAILADDRESS2,$WEBSITE,$GRADE,$REMARK,$ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megCustomer_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($CUSTOMERCODE, SQLSRV_PARAM_IN),
+        array($NAMETH, SQLSRV_PARAM_IN),
+        array($NAMEENG, SQLSRV_PARAM_IN),
+        array($BUSINESSTYPE, SQLSRV_PARAM_IN),
+        array($COMPANYTYPE, SQLSRV_PARAM_IN),
+        array($COMPANYSTATUS, SQLSRV_PARAM_IN),
+        array($TAXCODE, SQLSRV_PARAM_IN),
+        array($NATIONALITY, SQLSRV_PARAM_IN),
+        array($RACE, SQLSRV_PARAM_IN),
+        array($REGISTRATIONDATE, SQLSRV_PARAM_IN),
+        array($CAPITAL, SQLSRV_PARAM_IN),
+        array($PHONE, SQLSRV_PARAM_IN),
+        array($FAX, SQLSRV_PARAM_IN),
+        array($EMAILADDRESS1, SQLSRV_PARAM_IN),
+        array($EMAILADDRESS2, SQLSRV_PARAM_IN),
+        array($WEBSITE, SQLSRV_PARAM_IN),
+        array($GRADE, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function insVehicletransportdocument($FLG,$CONDITION1,$VEHICLETRANSPORTPLANID,$DOCUMENTTYPE,$DOCUMENTNUMBER,$AMOUNT,$UNIT,$PRODUCTSTATUS,$OTHER1,$OTHER2,$ACTIVESTATUS,$REMARK) {
+  
+
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletransportdocument_v2(?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLETRANSPORTPLANID, SQLSRV_PARAM_IN),
+        array($DOCUMENTTYPE, SQLSRV_PARAM_IN),
+        array($DOCUMENTNUMBER, SQLSRV_PARAM_IN),
+        array($AMOUNT, SQLSRV_PARAM_IN),
+        array($UNIT, SQLSRV_PARAM_IN),
+        array($PRODUCTSTATUS, SQLSRV_PARAM_IN),
+        array($OTHER1, SQLSRV_PARAM_IN),
+        array($OTHER2, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehicletransportplan($FLG,$CONDITION1,$VEHICLEDESCID,$VEHICLEINFOID,$VEHICLETRANSPORTPRICEID,$CLUSTER,$DEALERCODE,$NAME,$BASE,$E1,$E2,$E3,$E4,$C1,$C2,$C3,$C4,$C5,$C6,$C7,$C8,$C9,$O1,$O2,$O3,$O4,$JOBSTART,$JOBEND,$EMPLOYEEID1,$EMPLOYEEID2,$JOBNO,$TRIPNO,$DATEINPUT,$DATEWORKING,$DATEWORKSUS,$ACTIVESTATUS,$REMARK) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletransportplan_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEDESCID, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($VEHICLETRANSPORTPRICEID, SQLSRV_PARAM_IN),
+        array($CLUSTER, SQLSRV_PARAM_IN),
+        array($DEALERCODE, SQLSRV_PARAM_IN),
+        array($NAME, SQLSRV_PARAM_IN),
+        array($BASE, SQLSRV_PARAM_IN),
+        array($E1, SQLSRV_PARAM_IN),
+        array($E2, SQLSRV_PARAM_IN),
+        array($E3, SQLSRV_PARAM_IN),
+        array($E4, SQLSRV_PARAM_IN),
+        array($C1, SQLSRV_PARAM_IN),
+        array($C2, SQLSRV_PARAM_IN),
+        array($C3, SQLSRV_PARAM_IN),
+        array($C4, SQLSRV_PARAM_IN),
+        array($C5, SQLSRV_PARAM_IN),
+        array($C6, SQLSRV_PARAM_IN),
+        array($C7, SQLSRV_PARAM_IN),
+        array($C8, SQLSRV_PARAM_IN),
+        array($C9, SQLSRV_PARAM_IN),
+        array($O1, SQLSRV_PARAM_IN),
+        array($O2, SQLSRV_PARAM_IN),
+        array($O3, SQLSRV_PARAM_IN),
+        array($O4, SQLSRV_PARAM_IN),
+        array($JOBSTART, SQLSRV_PARAM_IN),
+        array($JOBEND, SQLSRV_PARAM_IN),
+        array($EMPLOYEEID1, SQLSRV_PARAM_IN),
+        array($EMPLOYEEID2, SQLSRV_PARAM_IN),
+        array($JOBNO, SQLSRV_PARAM_IN),
+        array($TRIPNO, SQLSRV_PARAM_IN),
+        array($DATEINPUT, SQLSRV_PARAM_IN),
+        array($DATEWORKING, SQLSRV_PARAM_IN),
+        array($DATEWORKSUS, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN)
+      
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+function insVehicletransportprice($FLG, $CONDITION1, $CLUSTER, $DEATERCODE, $NAME, $SRBASE4L, $SRBASE8L, $GWBASE4L, $GWBASE8L, $BPBASE4L, $BPBASE8L, $E1, $E2, $E3, $E4, $C1, $C2, $C3, $C4,$C5,$C6,$C7,$C8,$C9, $O1, $O2, $O3, $O4, $ACTIVESTATUS, $REMARK) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletransportprice_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($CLUSTER, SQLSRV_PARAM_IN),
+        array($DEATERCODE, SQLSRV_PARAM_IN),
+        array($NAME, SQLSRV_PARAM_IN),
+        array($SRBASE4L, SQLSRV_PARAM_IN),
+        array($SRBASE8L, SQLSRV_PARAM_IN),
+        array($GWBASE4L, SQLSRV_PARAM_IN),
+        array($GWBASE8L, SQLSRV_PARAM_IN),
+        array($BPBASE4L, SQLSRV_PARAM_IN),
+        array($BPBASE8L, SQLSRV_PARAM_IN),
+        array($E1, SQLSRV_PARAM_IN),
+        array($E2, SQLSRV_PARAM_IN),
+        array($E3, SQLSRV_PARAM_IN),
+        array($E4, SQLSRV_PARAM_IN),
+        array($C1, SQLSRV_PARAM_IN),
+        array($C2, SQLSRV_PARAM_IN),
+        array($C3, SQLSRV_PARAM_IN),
+        array($C4, SQLSRV_PARAM_IN),
+        array($C5, SQLSRV_PARAM_IN),
+        array($C6, SQLSRV_PARAM_IN),
+        array($C7, SQLSRV_PARAM_IN),
+        array($C8, SQLSRV_PARAM_IN),
+        array($C9, SQLSRV_PARAM_IN),
+        array($O1, SQLSRV_PARAM_IN),
+        array($O2, SQLSRV_PARAM_IN),
+        array($O3, SQLSRV_PARAM_IN),
+        array($O4, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehicleinfo($FLG, $CONDITION1, $VEHICLEREGISNUMBER, $VEHICLEGROUPCODE, $VEHICLETYPECODE, $BRANDCODE, $GEARTYPECODE, $COLORCODE, $SERIES, $THAINAME, $ENGNAME, $HORSEPOWER, $CC, $MACHINENUMBER, $CHASSISNUMBER, $ENERGY, $WEIGHT, $AXLETYPE, $PISTON, $MAXIMUMLOAD, $USED, $VEHICLEBUYWHERE, $VEHICLEBUYDATE, $VEHICLEBUYPRICE, $VEHICLEBUYCONDITION, $VEHICLESTRUCTUREWHERE, $VEHICLESTRUCTUREDATE, $VEHICLESTRUCTUREPRICE, $VEHICLEREGISTERDATE, $VEHICLESPECIAL, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicleinfo_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEREGISNUMBER, SQLSRV_PARAM_IN),
+        array($VEHICLEGROUPCODE, SQLSRV_PARAM_IN),
+        array($VEHICLETYPECODE, SQLSRV_PARAM_IN),
+        array($BRANDCODE, SQLSRV_PARAM_IN),
+        array($GEARTYPECODE, SQLSRV_PARAM_IN),
+        array($COLORCODE, SQLSRV_PARAM_IN),
+        array($SERIES, SQLSRV_PARAM_IN),
+        array($THAINAME, SQLSRV_PARAM_IN),
+        array($ENGNAME, SQLSRV_PARAM_IN),
+        array($HORSEPOWER, SQLSRV_PARAM_IN),
+        array($CC, SQLSRV_PARAM_IN),
+        array($MACHINENUMBER, SQLSRV_PARAM_IN),
+        array($CHASSISNUMBER, SQLSRV_PARAM_IN),
+        array($ENERGY, SQLSRV_PARAM_IN),
+        array($WEIGHT, SQLSRV_PARAM_IN),
+        array($AXLETYPE, SQLSRV_PARAM_IN),
+        array($PISTON, SQLSRV_PARAM_IN),
+        array($MAXIMUMLOAD, SQLSRV_PARAM_IN),
+        array($USED, SQLSRV_PARAM_IN),
+        array($VEHICLEBUYWHERE, SQLSRV_PARAM_IN),
+        array($VEHICLEBUYDATE, SQLSRV_PARAM_IN),
+        array($VEHICLEBUYPRICE, SQLSRV_PARAM_IN),
+        array($VEHICLEBUYCONDITION, SQLSRV_PARAM_IN),
+        array($VEHICLESTRUCTUREWHERE, SQLSRV_PARAM_IN),
+        array($VEHICLESTRUCTUREDATE, SQLSRV_PARAM_IN),
+        array($VEHICLESTRUCTUREPRICE, SQLSRV_PARAM_IN),
+        array($VEHICLEREGISTERDATE, SQLSRV_PARAM_IN),
+        array($VEHICLESPECIAL, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN),
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehiclechangehistory($FLG, $CONDITION1, $VEHICLEINFOID, $VCHANGETYPESCODE, $CHANGEDATE, $CHANGECOST, $WHOPROCESS, $CURRENTSPAREPARTS, $CHANGETO, $PLACE, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclechangehistory_v2(?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($VCHANGETYPESCODE, SQLSRV_PARAM_IN),
+        array($CHANGEDATE, SQLSRV_PARAM_IN),
+        array($CHANGECOST, SQLSRV_PARAM_IN),
+        array($WHOPROCESS, SQLSRV_PARAM_IN),
+        array($CURRENTSPAREPARTS, SQLSRV_PARAM_IN),
+        array($CHANGETO, SQLSRV_PARAM_IN),
+        array($PLACE, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehicleinsured($FLG, $CONDITION1, $VEHICLEINFOID, $POLICYNUMBER, $INSUREDGROUP, $INSUREDTYPE, $PRICETOTAL, $SUMINSURED, $STARTDATE, $EXPIREDDATE, $INSUREDNAME, $BROKERNAME, $INSUREDCOMPANY, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicleinsured_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($POLICYNUMBER, SQLSRV_PARAM_IN),
+        array($INSUREDGROUP, SQLSRV_PARAM_IN),
+        array($INSUREDTYPE, SQLSRV_PARAM_IN),
+        array($PRICETOTAL, SQLSRV_PARAM_IN),
+        array($SUMINSURED, SQLSRV_PARAM_IN),
+        array($STARTDATE, SQLSRV_PARAM_IN),
+        array($EXPIREDDATE, SQLSRV_PARAM_IN),
+        array($INSUREDNAME, SQLSRV_PARAM_IN),
+        array($BROKERNAME, SQLSRV_PARAM_IN),
+        array($INSUREDCOMPANY, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehiclemaintenance($FLG, $CONDITION1, $VEHICLEINFOID, $MAINTENANCEDATE, $COMPLETEDATE, $MAINTENANCETYPE, $PLACE, $PRICE, $WHOPROCESS, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclemaintenance_v2(?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($MAINTENANCEDATE, SQLSRV_PARAM_IN),
+        array($COMPLETEDATE, SQLSRV_PARAM_IN),
+        array($MAINTENANCETYPE, SQLSRV_PARAM_IN),
+        array($PLACE, SQLSRV_PARAM_IN),
+        array($PRICE, SQLSRV_PARAM_IN),
+        array($WHOPROCESS, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehiclerepair($FLG, $CONDITION1, $VEHICLEINFOID, $REPAIRTYPECODE, $GARAGEREPAIRNUMBER, $GARAGENAME, $STARTDATE, $ENDDATE, $ACTUALENDDATE, $TOTALAMOUNT, $WHOPROCESS, $ACTIVESTATUS, $REASON, $REPAIRDETAIL, $REMARK) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclerepair_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($REPAIRTYPECODE, SQLSRV_PARAM_IN),
+        array($GARAGEREPAIRNUMBER, SQLSRV_PARAM_IN),
+        array($GARAGENAME, SQLSRV_PARAM_IN),
+        array($STARTDATE, SQLSRV_PARAM_IN),
+        array($ENDDATE, SQLSRV_PARAM_IN),
+        array($ACTUALENDDATE, SQLSRV_PARAM_IN),
+        array($TOTALAMOUNT, SQLSRV_PARAM_IN),
+        array($WHOPROCESS, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN),
+        array($REASON, SQLSRV_PARAM_IN),
+        array($REPAIRDETAIL, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehicletax($FLG, $CONDITION1, $VEHICLEINFOID, $TAXDATE, $EXPIREDDATE, $PRICE, $SERVICEFEE, $WHOPROCESS, $ACTIVESTATUS, $PLACE, $REMARK) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicletax_v2(?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($TAXDATE, SQLSRV_PARAM_IN),
+        array($EXPIREDDATE, SQLSRV_PARAM_IN),
+        array($PRICE, SQLSRV_PARAM_IN),
+        array($SERVICEFEE, SQLSRV_PARAM_IN),
+        array($WHOPROCESS, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN),
+        array($PLACE, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehicleowner($FLG, $CONDITION1, $VEHICLEINFOID, $OWNERCOMPANYCODE, $POSSESSCOMPANYCODE, $PROJECTTOUSE, $FIRSTDRIVER, $SECONDDRIVER, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicleowner_v2(?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($OWNERCOMPANYCODE, SQLSRV_PARAM_IN),
+        array($POSSESSCOMPANYCODE, SQLSRV_PARAM_IN),
+        array($PROJECTTOUSE, SQLSRV_PARAM_IN),
+        array($FIRSTDRIVER, SQLSRV_PARAM_IN),
+        array($SECONDDRIVER, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehiclepurchase($FLG, $CONDITION1, $VEHICLEINFOID, $SUPPLIERCODE, $LEASINGNAME, $PURCHASEDATE, $PEICE, $INTERESTRATE, $PAYMENTTIMES, $FIRSTPAYMENTDATEL, $LASTPAYMENTDATE, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehiclepurchase_v2(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($SUPPLIERCODE, SQLSRV_PARAM_IN),
+        array($LEASINGNAME, SQLSRV_PARAM_IN),
+        array($PURCHASEDATE, SQLSRV_PARAM_IN),
+        array($PEICE, SQLSRV_PARAM_IN),
+        array($INTERESTRATE, SQLSRV_PARAM_IN),
+        array($PAYMENTTIMES, SQLSRV_PARAM_IN),
+        array($FIRSTPAYMENTDATEL, SQLSRV_PARAM_IN),
+        array($LASTPAYMENTDATE, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function save_ownerdirver($FLG, $CONDITION1, $OWERDIRVER, $VALUES) {
+    $conn = connect("RTMS");
+    $sql = "{call megOwnerdirver_v2(?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($OWERDIRVER, SQLSRV_PARAM_IN),
+        array($VALUES, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insVehicleattribute($FLG, $CONDITION1, $VEHICLEINFOID, $FRONTIMAGE, $FRONTWIDTH, $FRONTLONG, $FRONTHIGH, $SIDEIMAGE, $SIDEWIDTH, $SIDELONG, $SIDEHIGH, $BACKIMAGE, $BACKWIDTH, $BACKTLONG, $BACKTHIGH, $STRUCFRONTIMAGE, $STRUCFRONTWIDTH, $STRUCFRONTLONG, $STRUCFRONTHIGH, $STRUCSIDEIMAGE, $STRUCSIDEWIDTH, $STRUCSIDELONG, $STRUCSIDEHIGH, $STRUCBACKIMAGE, $STRUCBACKWIDTH, $STRUCBACKTLONG, $STRUCBACKTHIGH, $INIMAGE, $ACTIVESTATUS, $REMARK) {
+    $conn = connect("RTMS");
+    $sql = "{call megVehicleattribute_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($VEHICLEINFOID, SQLSRV_PARAM_IN),
+        array($FRONTIMAGE, SQLSRV_PARAM_IN),
+        array($FRONTWIDTH, SQLSRV_PARAM_IN),
+        array($FRONTLONG, SQLSRV_PARAM_IN),
+        array($FRONTHIGH, SQLSRV_PARAM_IN),
+        array($SIDEIMAGE, SQLSRV_PARAM_IN),
+        array($SIDEWIDTH, SQLSRV_PARAM_IN),
+        array($SIDELONG, SQLSRV_PARAM_IN),
+        array($SIDEHIGH, SQLSRV_PARAM_IN),
+        array($BACKIMAGE, SQLSRV_PARAM_IN),
+        array($BACKWIDTH, SQLSRV_PARAM_IN),
+        array($BACKTLONG, SQLSRV_PARAM_IN),
+        array($BACKTHIGH, SQLSRV_PARAM_IN),
+        array($STRUCFRONTIMAGE, SQLSRV_PARAM_IN),
+        array($STRUCFRONTWIDTH, SQLSRV_PARAM_IN),
+        array($STRUCFRONTLONG, SQLSRV_PARAM_IN),
+        array($STRUCFRONTHIGH, SQLSRV_PARAM_IN),
+        array($STRUCSIDEIMAGE, SQLSRV_PARAM_IN),
+        array($STRUCSIDEWIDTH, SQLSRV_PARAM_IN),
+        array($STRUCSIDELONG, SQLSRV_PARAM_IN),
+        array($STRUCSIDEHIGH, SQLSRV_PARAM_IN),
+        array($STRUCBACKIMAGE, SQLSRV_PARAM_IN),
+        array($STRUCBACKWIDTH, SQLSRV_PARAM_IN),
+        array($STRUCBACKTLONG, SQLSRV_PARAM_IN),
+        array($STRUCBACKTHIGH, SQLSRV_PARAM_IN),
+        array($INIMAGE, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function save_warningdata($FLG, $CONDITION1, $TYPEWARNING, $SUBJECT, $DISCRIPTION, $FROMNAME, $AREA, $EMAILTO, $EMAILCC, $EMAILEXTRA, $WARNINGDAY, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megWarningdata_v2(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($TYPEWARNING, SQLSRV_PARAM_IN),
+        array($SUBJECT, SQLSRV_PARAM_IN),
+        array($DISCRIPTION, SQLSRV_PARAM_IN),
+        array($FROMNAME, SQLSRV_PARAM_IN),
+        array($AREA, SQLSRV_PARAM_IN),
+        array($EMAILTO, SQLSRV_PARAM_IN),
+        array($EMAILCC, SQLSRV_PARAM_IN),
+        array($EMAILEXTRA, SQLSRV_PARAM_IN),
+        array($WARNINGDAY, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function update_warningdata($FLG) {
+    $conn = connect("RTMS");
+    $sql = "{call megWarningdata_v2(?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insStopwork($FLG, $CONDITION1, $EMPLOYEEID, $STOPPROCESS, $REASON, $CARTYPE, $CARSTATUS, $VEHICLEREGISNUMBER, $THAINAME, $PARKINGN, $STARTTIME, $STOPTIME, $TENKOTIME, $DATEINPUT, $JOBINPUT, $TIMEINPUT, $JOBINPUT2, $TIMEINPUT2, $PRODUCTNUMBER) {
+    $conn = connect("RTMS");
+    $sql = "{call megStopwork_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($EMPLOYEEID, SQLSRV_PARAM_IN),
+        array($STOPPROCESS, SQLSRV_PARAM_IN),
+        array($REASON, SQLSRV_PARAM_IN),
+        array($CARTYPE, SQLSRV_PARAM_IN),
+        array($CARSTATUS, SQLSRV_PARAM_IN),
+        array($VEHICLEREGISNUMBER, SQLSRV_PARAM_IN),
+        array($THAINAME, SQLSRV_PARAM_IN),
+        array($PARKINGN, SQLSRV_PARAM_IN),
+        array($STARTTIME, SQLSRV_PARAM_IN),
+        array($STOPTIME, SQLSRV_PARAM_IN),
+        array($TENKOTIME, SQLSRV_PARAM_IN),
+        array($DATEINPUT, SQLSRV_PARAM_IN),
+        array($JOBINPUT, SQLSRV_PARAM_IN),
+        array($TIMEINPUT, SQLSRV_PARAM_IN),
+        array($JOBINPUT2, SQLSRV_PARAM_IN),
+        array($TIMEINPUT2, SQLSRV_PARAM_IN),
+        array($PRODUCTNUMBER, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insRole($FLG, $CONDITION1, $PREMISSIONSNAME, $REMARKROLE, $ACTIVESTATUSROLE) {
+    $conn = connect("RTMS");
+    $sql = "{call megRole_v2(?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($PREMISSIONSNAME, SQLSRV_PARAM_IN),
+        array($REMARKROLE, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUSROLE, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insPassword($FLG, $CONDITION1, $ROLEID,$PASSWORDNEW) {
+    $conn = connect("RTMS");
+    $sql = "{call megPassword_v2(?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+		array($ROLEID, SQLSRV_PARAM_IN),
+        array($PASSWORDNEW, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insMenu($FLG, $CONDITION1, $MENUNAME, $REMARKMENU, $ACTIVESTATUSMENU) {
+    $conn = connect("RTMS");
+    $sql = "{call megMenu_v2(?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($MENUNAME, SQLSRV_PARAM_IN),
+        array($REMARKMENU, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUSMENU, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insSubmenu($FLG, $CONDITION1, $MENUID, $SUBMENUNAME, $SUBMENUPATH, $REMARKSUBMENU, $ACTIVESTATUSSUBMENU) {
+    $conn = connect("RTMS");
+    $sql = "{call megSubmenu_v2(?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($MENUID, SQLSRV_PARAM_IN),
+        array($SUBMENUNAME, SQLSRV_PARAM_IN),
+        array($SUBMENUPATH, SQLSRV_PARAM_IN),
+        array($REMARKSUBMENU, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUSSUBMENU, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insRoleaccount($FLG, $CONDITION1, $ROLEID, $EMPLOYEEID, $REMARK, $ACTIVESTATUSACCOUNT) {
+    $conn = connect("RTMS");
+    $sql = "{call megRoleaccount_v2(?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($ROLEID, SQLSRV_PARAM_IN),
+        array($EMPLOYEEID, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUSACCOUNT, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insRolemenu($FLG, $CONDITION1, $ROLEID, $MENUID, $SUBMENUID,$PERMISSION, $REMARK, $ACTIVESTATUS) {
+    $conn = connect("RTMS");
+    $sql = "{call megRolemenu_v2(?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($ROLEID, SQLSRV_PARAM_IN),
+        array($MENUID, SQLSRV_PARAM_IN),
+        array($SUBMENUID, SQLSRV_PARAM_IN),
+		array($PERMISSION, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insTenko($FLG, $CONDITION1, $EMPLOYEEID, $SECTION, $ISSUE, $TENKO, $REFORMATION, $RESPONSIBLEPERSONID, $FINISHDATE, $DATEINPUT, $STATUS, $REMARK) {
+    $conn = connect("RTMS");
+    $sql = "{call megTenko_v2(?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($EMPLOYEEID, SQLSRV_PARAM_IN),
+        array($SECTION, SQLSRV_PARAM_IN),
+        array($ISSUE, SQLSRV_PARAM_IN),
+        array($TENKO, SQLSRV_PARAM_IN),
+        array($REFORMATION, SQLSRV_PARAM_IN),
+        array($RESPONSIBLEPERSONID, SQLSRV_PARAM_IN),
+        array($FINISHDATE, SQLSRV_PARAM_IN),
+        array($DATEINPUT, SQLSRV_PARAM_IN),
+        array($STATUS, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+
+function insEmployee($FLG, $CONDITION1, $CONDITION2, $CONDITION3, $CONDITION4, $CONDITION5, $TYPE_INS, $IMAGENAME, $FILENAME, $BLOODGROUP, $SEX, $PREFIXCODE, $FIRSTNAMETHAI, $LASTNAMETHAI, $FIRSTNAMEENG, $LASTNAMEENG, $BIRTHDAY, $WEIGHT, $HEIGHT, $NATIONALITY, $RACE, $RELIGION, $MOBILENUMBER1, $MOBILENUMBER2, $EMAILADDRESS, $ACTIVESTATUS_EMP, $CARDTYPECODE, $CARDNUMBER, $ISSUEDATE, $EXPIREDATE, $ISSUEPLACE, $ALERTDATE, $ALERTMESSAGE, $ALERTEMAILADDRESS, $ACTIVESTATUS_CARD, $EMPLOYEECODE, $COMPANYCODE, $DIVISIONCODE, $DEPARTMENTCODE, $POSITIONCODE, $STARTDATE, $ENDDATE, $REMARK, $ACTIVESTATUS_COMP, $COURSETYPECODE, $INSTITUTION, $AUTHENTICATE, $AUTHENTICATEYEAR, $COSTVALUES, $TRAININGREMARK, $ACTIVESTATUS_TRAINING, $ADDRESSTYPECODE, $ADDRESSNO, $VILLAGE, $FLOOR, $STREET, $SIDESTREET, $PHONE, $DISTRICTCODE, $PREFECTURECODE, $PROVINCECODE, $ZIPCODE, $FULLADDRESS, $DESCRIPTIONS, $ACTIVESTATUS_ADDRESS
+) {
+    $conn = connect("RTMS");
+    $sql = "{call megEmployee(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params = array(
+        array($FLG, SQLSRV_PARAM_IN),
+        array($CONDITION1, SQLSRV_PARAM_IN),
+        array($CONDITION2, SQLSRV_PARAM_IN),
+        array($CONDITION3, SQLSRV_PARAM_IN),
+        array($CONDITION4, SQLSRV_PARAM_IN),
+        array($CONDITION5, SQLSRV_PARAM_IN),
+        array($TYPE_INS, SQLSRV_PARAM_IN),
+        array($IMAGENAME, SQLSRV_PARAM_IN),
+        array($FILENAME, SQLSRV_PARAM_IN),
+        array($BLOODGROUP, SQLSRV_PARAM_IN),
+        array($SEX, SQLSRV_PARAM_IN),
+        array($PREFIXCODE, SQLSRV_PARAM_IN),
+        array($FIRSTNAMETHAI, SQLSRV_PARAM_IN),
+        array($LASTNAMETHAI, SQLSRV_PARAM_IN),
+        array($FIRSTNAMEENG, SQLSRV_PARAM_IN),
+        array($LASTNAMEENG, SQLSRV_PARAM_IN),
+        array($BIRTHDAY, SQLSRV_PARAM_IN),
+        array($WEIGHT, SQLSRV_PARAM_IN),
+        array($HEIGHT, SQLSRV_PARAM_IN),
+        array($NATIONALITY, SQLSRV_PARAM_IN),
+        array($RACE, SQLSRV_PARAM_IN),
+        array($RELIGION, SQLSRV_PARAM_IN),
+        array($MOBILENUMBER1, SQLSRV_PARAM_IN),
+        array($MOBILENUMBER2, SQLSRV_PARAM_IN),
+        array($EMAILADDRESS, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS_EMP, SQLSRV_PARAM_IN),
+        array($CARDTYPECODE, SQLSRV_PARAM_IN),
+        array($CARDNUMBER, SQLSRV_PARAM_IN),
+        array($ISSUEDATE, SQLSRV_PARAM_IN),
+        array($EXPIREDATE, SQLSRV_PARAM_IN),
+        array($ISSUEPLACE, SQLSRV_PARAM_IN),
+        array($ALERTDATE, SQLSRV_PARAM_IN),
+        array($ALERTEMAILADDRESS, SQLSRV_PARAM_IN),
+        array($ALERTMESSAGE, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS_CARD, SQLSRV_PARAM_IN),
+        array($EMPLOYEECODE, SQLSRV_PARAM_IN),
+        array($COMPANYCODE, SQLSRV_PARAM_IN),
+        array($DIVISIONCODE, SQLSRV_PARAM_IN),
+        array($DEPARTMENTCODE, SQLSRV_PARAM_IN),
+        array($POSITIONCODE, SQLSRV_PARAM_IN),
+        array($STARTDATE, SQLSRV_PARAM_IN),
+        array($ENDDATE, SQLSRV_PARAM_IN),
+        array($REMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS_COMP, SQLSRV_PARAM_IN),
+        array($COURSETYPECODE, SQLSRV_PARAM_IN),
+        array($INSTITUTION, SQLSRV_PARAM_IN),
+        array($AUTHENTICATE, SQLSRV_PARAM_IN),
+        array($AUTHENTICATEYEAR, SQLSRV_PARAM_IN),
+        array($COSTVALUES, SQLSRV_PARAM_IN),
+        array($TRAININGREMARK, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS_TRAINING, SQLSRV_PARAM_IN),
+        array($ADDRESSTYPECODE, SQLSRV_PARAM_IN),
+        array($ADDRESSNO, SQLSRV_PARAM_IN),
+        array($VILLAGE, SQLSRV_PARAM_IN),
+        array($FLOOR, SQLSRV_PARAM_IN),
+        array($STREET, SQLSRV_PARAM_IN),
+        array($SIDESTREET, SQLSRV_PARAM_IN),
+        array($PHONE, SQLSRV_PARAM_IN),
+        array($DISTRICTCODE, SQLSRV_PARAM_IN),
+        array($PREFECTURECODE, SQLSRV_PARAM_IN),
+        array($PROVINCECODE, SQLSRV_PARAM_IN),
+        array($ZIPCODE, SQLSRV_PARAM_IN),
+        array($FULLADDRESS, SQLSRV_PARAM_IN),
+        array($DESCRIPTIONS, SQLSRV_PARAM_IN),
+        array($ACTIVESTATUS_ADDRESS, SQLSRV_PARAM_IN)
+    );
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    sqlsrv_close($conn);
+    return $result['RS'];
+}
+?>
+
+

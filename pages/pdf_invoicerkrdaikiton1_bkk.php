@@ -1,0 +1,377 @@
+<?php
+
+date_default_timezone_set("Asia/Bangkok");
+require_once("../class/meg_function.php");
+require_once("../mpdf/autoload.php");
+$conn = connect("RTMS");
+$sumgmtweight = "";
+$sumcusweight = "";
+$sumamounttrip = "";
+$sumtotal = "";
+if ($_GET['datestart'] == "" || $_GET['dateend'] == "") {
+    $date_now = "";
+} else {
+    $date_now = $_GET['datestart'] . ' ถึง ' . $_GET['dateend'];
+}
+$sql_getDate = "{call megStopwork_v2(?)}";
+$params_getDate = array(
+    array('select_getdate', SQLSRV_PARAM_IN)
+);
+$query_getDate = sqlsrv_query($conn, $sql_getDate, $params_getDate);
+$result_getDate = sqlsrv_fetch_array($query_getDate, SQLSRV_FETCH_ASSOC);
+
+
+$condBilling1 = " AND a.INVOICECODE = '" . $_GET['invoicecode'] . "' ";
+$condBilling2 = "";
+
+$sql_seBillings = "{call megVehicletransportdocumentdriver_v2(?,?,?)}";
+$params_seBillings = array(
+    array('select_pdfvehicletransportdocumentdriver', SQLSRV_PARAM_IN),
+    array($condBilling1, SQLSRV_PARAM_IN),
+    array($condBilling2, SQLSRV_PARAM_IN)
+);
+$query_seBillings = sqlsrv_query($conn, $sql_seBillings, $params_seBillings);
+$result_seBillings = sqlsrv_fetch_array($query_seBillings, SQLSRV_FETCH_ASSOC);
+
+$condInvoice1 = " AND INVOICECODE = '" . $_GET['invoicecode'] . "'";
+$condInvoice2 = "";
+$sql_seInvoice = "{call megLoginvoice_v2(?,?,?)}";
+$params_seInvoice = array(
+    array('select_loginvoice', SQLSRV_PARAM_IN),
+    array($condInvoice1, SQLSRV_PARAM_IN),
+    array($condInvoice2, SQLSRV_PARAM_IN)
+);
+$query_seInvoice = sqlsrv_query($conn, $sql_seInvoice, $params_seInvoice);
+$result_seInvoice = sqlsrv_fetch_array($query_seInvoice, SQLSRV_FETCH_ASSOC);
+
+
+$condBillingchkret1 = " AND a.INVOICECODE = '" . $_GET['invoicecode'] . "' ";
+$condBillingchkret2 = " AND c.C8 = 'return'";
+$sql_seBillingchkret = "{call megVehicletransportdocumentdriver_v2(?,?,?)}";
+$params_seBillingchkret = array(
+    array('select_pdfvehicletransportdocumentdriver', SQLSRV_PARAM_IN),
+    array($condBillingchkret1, SQLSRV_PARAM_IN),
+    array($condBillingchkret2, SQLSRV_PARAM_IN)
+);
+
+
+
+$query_seBillingchkret = sqlsrv_query($conn, $sql_seBillingchkret, $params_seBillingchkret);
+$result_seBillingchkret = sqlsrv_fetch_array($query_seBillingchkret, SQLSRV_FETCH_ASSOC);
+
+
+//$invoicecode = create_invoice();
+
+$mpdf = new mPDF('th', 'A4', '0', '');
+$style = '
+<style>
+	body{
+		font-family: "Garuda";font-size:12px//เรียกใช้font Garuda สำหรับแสดงผล ภาษาไทย
+	}
+</style>';
+
+
+
+$table_header3 = '<table style="width: 100%;">
+    <thead>
+        <tr>
+            <td colspan="2" style="text-align:center"><b>ใบส่งสินค้า</b></td>
+    </thead>
+     <tbody>
+        <tr>
+            <td colspan="2">บริษัท ร่วมกิจรุ่งเรือง โลจิสติคส์ จำกัด (RUAMKIT RUNGRUENG LOGISTICS CO., LTD.)</td>
+       </tr>
+       <tr>
+            <td colspan="2">สำนักงานใหญ่ เลขที่ 51 หมู่ 4 ตำบลบ้านเก่า อำเภอพานทอง จังหวัดชลบุรี 20160</td>
+       </tr>
+       <tr>
+            <td colspan="2">โทรศัพท์ : 038-452824-5 โทรสาร : 038-210396</td>
+       </tr>
+     
+   
+       <tr>
+            <td colspan="2">&nbsp;</td>
+       </tr>
+      
+      
+      <tr>
+            <td style="width: 50%;">ลูกค้า บริษัท ไดกิ อลูมิเนียม อินดัสทรี (ประเทศไทย) จำกัด </td>
+            <td style="width: 50%;text-align:right">เลขที่ ' . $result_seInvoice['INVOICECODE'] . '</td>
+       </tr>
+       <tr>
+            <td style="width: 55%;">สำนักงานใหญ่ ที่อยู่ 700/99 ม.1 ต.บ้านเก่า <br>อ.พานทอง จ.ชลบุรี 20160</td>
+            <td style="width: 50%;text-align:right">วันที่ ' . $result_getDate['SYSDATE'] . '</td>
+       </tr>
+
+      
+    </tbody>
+</table>';
+
+$table_begin3 = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size:10;margin-top:8px;">';
+$thead3 = '<thead>
+ 
+        <tr style="border:1px solid #000;padding:4px;">
+       
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>ลำดับที่</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>วันที่</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>หมายเลข DO</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ทะเบียนรถ</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 15%;"><b>พนักงาน</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>เส้นทาง</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>QT.</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ราคา</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>จำนวนเงิน(บาท)</b></td>
+      </tr>
+    </thead><tbody>';
+
+$i = 1;
+$condBilling31 = " AND a.INVOICECODE = '" . $_GET['invoicecode'] . "' ";
+$condBilling32 = " AND c.C8 != 'return'";
+$sql_seBilling = "{call megVehicletransportdocumentdriver_v2(?,?,?)}";
+$params_seBilling = array(
+    array('select_pdfvehicletransportdocumentdriver', SQLSRV_PARAM_IN),
+    array($condBilling31, SQLSRV_PARAM_IN),
+    array($condBilling32, SQLSRV_PARAM_IN)
+);
+
+$query_seBilling = sqlsrv_query($conn, $sql_seBilling, $params_seBilling);
+while ($result_seBilling = sqlsrv_fetch_array($query_seBilling, SQLSRV_FETCH_ASSOC)) {
+    $condEmployeeehr1 = " AND (a.FnameT+' '+a.LnameT) = '" . $result_seBilling['EMPLOYEENAME1'] . "' ";
+    $sql_seEmployeeehr = "{call megEmployeeEHR_v2(?,?)}";
+    $params_seEmployeeehr = array(
+        array('select_employee', SQLSRV_PARAM_IN),
+        array($condEmployeeehr1, SQLSRV_PARAM_IN)
+    );
+    $query_seEmployeeehr = sqlsrv_query($conn, $sql_seEmployeeehr, $params_seEmployeeehr);
+    $result_seEmployeeehr = sqlsrv_fetch_array($query_seEmployeeehr, SQLSRV_FETCH_ASSOC);
+
+
+    $tbody3 .= '
+         
+        <tr style="border:1px solid #000;">
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $i . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['DATEVLIN_103'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['DOCUMENTCODE'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['THAINAME'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['EMPLOYEENAME1'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['JOBSTART'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">1.00</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($result_seBilling['ACTUALPRICE'], 2) . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($result_seBilling['ACTUALPRICE'], 2) . '</td>
+      </tr>
+    ';
+    $i++;
+    $sumtotal = $sumtotal + $result_seBilling['ACTUALPRICE'];
+}
+
+
+$tfoot3 = '</tbody><tfoot>
+     <tr style="border:1px solid #000;">
+        <td colspan="7" style="border-right:1px solid #000;padding:4px;text-align:center;">' . convert($sumtotal) . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;">รวมสุทธิ</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($sumtotal, 2) . '</td>
+       
+            </tr>
+    </tfoot>';
+
+
+$table_end3 = '</table>';
+
+$table_footer3 = '<table style="width: 100%;">
+    <tbody>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+      
+       <tr>
+   		 <td style="width: 10%;text-align:right">ผู้จัดทำ</td>
+            <td style="width: 25%;">........................................</td>
+         <td style="width: 10%;text-align:right">ผู้ตรวจสอบ</td>
+            <td style="width: 20%;">........................................</td>
+            <td style="width: 10%;text-align:right">ผู้อนุมัติ</td>
+            <td style="width: 25%;">........................................</td>
+       </tr>
+     
+        
+       
+    </tbody>
+</table>';
+
+
+
+
+$table_header4 = '<table style="width: 100%;">
+    <thead>
+        <tr>
+            <td colspan="2" style="text-align:center"><b>ใบส่งสินค้า</b></td>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan="2">บริษัท ร่วมกิจรุ่งเรือง (1993) จำกัด (RUAMKIT RUNGRUENG (1993) CO., LTD.)</td>
+       </tr>
+       <tr>
+            <td colspan="2">สำนักงานสาขาที่ 1 เลขที่ 51 หมู่ 4 ตำบลบ้านเก่า อำเภอพานทอง จังหวัดชลบุรี 20160 </td>
+       </tr>
+       <tr>
+            <td colspan="2">โทรศัพท์ : 038-452824-5 โทรสาร : 038-210396</td>
+       </tr>
+     
+   
+       <tr>
+            <td colspan="2">&nbsp;</td>
+       </tr>
+      
+      
+       <tr>
+            <td style="width: 50%;">บริษัท ไดกิ อลูมิเนียม อินดัสทรี (ประเทศไทย) จำกัด </td>
+            <td style="width: 50%;text-align:right">เลขที่ ' . $result_seInvoice['INVOICECODE'] . '</td>
+       </tr>
+       <tr>
+            <td style="width: 50%;">สำนักงานใหญ่ ที่อยู่  700/99 ม.1 ต.บ้านเก่า <br>อ.พานทอง  จ.ชลบุรี  20160 </td>
+            <td style="width: 50%;text-align:right">วันที่ ' . $result_getDate['SYSDATE'] . '</td>
+       </tr>
+
+       <tr>
+            <td style="width: 50%;">โทร. 038-468441 , 038-458862-3</td>
+            <td style="width: 50%;text-align:right">&nbsp;</td>
+       </tr>
+    </tbody>
+</table>';
+
+$table_begin4 = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size:10;margin-top:8px;">';
+$thead4 = '<thead>
+ 
+        <tr style="border:1px solid #000;padding:4px;">
+       
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>ลำดับที่</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>วันที่</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>หมายเลข DO</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ทะเบียนรถ</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 15%;"><b>พนักงาน</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>เส้นทาง</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>QT.</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ราคา</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>จำนวนเงิน(บาท)</b></td>
+      </tr>
+    </thead><tbody>';
+
+$i = 1;
+$condBilling41 = " AND a.INVOICECODE = '" . $_GET['invoicecode'] . "' ";
+$condBilling42 = " AND c.C8 = 'return'";
+$sql_seBilling4 = "{call megVehicletransportdocumentdriver_v2(?,?,?)}";
+$params_seBilling4 = array(
+    array('select_pdfvehicletransportdocumentdriver', SQLSRV_PARAM_IN),
+    array($condBilling41, SQLSRV_PARAM_IN),
+    array($condBilling42, SQLSRV_PARAM_IN)
+);
+
+
+
+$query_seBilling4 = sqlsrv_query($conn, $sql_seBilling4, $params_seBilling4);
+while ($result_seBilling4 = sqlsrv_fetch_array($query_seBilling4, SQLSRV_FETCH_ASSOC)) {
+    $condEmployeeehr1 = " AND (a.FnameT+' '+a.LnameT) = '" . $result_seBilling4['EMPLOYEENAME1'] . "' ";
+    $sql_seEmployeeehr = "{call megEmployeeEHR_v2(?,?)}";
+    $params_seEmployeeehr = array(
+        array('select_employee', SQLSRV_PARAM_IN),
+        array($condEmployeeehr1, SQLSRV_PARAM_IN)
+    );
+    $query_seEmployeeehr = sqlsrv_query($conn, $sql_seEmployeeehr, $params_seEmployeeehr);
+    $result_seEmployeeehr = sqlsrv_fetch_array($query_seEmployeeehr, SQLSRV_FETCH_ASSOC);
+
+
+    $tbody4 .= '
+         
+        <tr style="border:1px solid #000;">
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $i . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling4['DATEVLIN_103'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling4['DOCUMENTCODE'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling4['THAINAME'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling4['EMPLOYEENAME1'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling4['JOBSTART'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">1.00</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($result_seBilling4['ACTUALPRICE'], 2) . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($result_seBilling4['ACTUALPRICE'], 2) . '</td>
+      </tr>
+    ';
+    $i++;
+    $sumtotal = $sumtotal + $result_seBilling4['ACTUALPRICE'];
+}
+
+
+$tfoot4 = '</tbody><tfoot>
+     <tr style="border:1px solid #000;">
+        <td colspan="7" style="border-right:1px solid #000;padding:4px;text-align:center;">' . convert($sumtotal) . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;">รวมสุทธิ</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($sumtotal, 2) . '</td>
+       
+            </tr>
+    </tfoot>';
+
+
+$table_end4 = '</table>';
+
+$table_footer4 = '<table style="width: 100%;">
+    <tbody>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+       <tr>
+   		 <td colspan="4">&nbsp;</td>
+       </tr>
+      
+       <tr>
+   		 <td style="width: 10%;text-align:right">ผู้จัดทำ</td>
+            <td style="width: 25%;">........................................</td>
+         <td style="width: 10%;text-align:right">ผู้ตรวจสอบ</td>
+            <td style="width: 20%;">........................................</td>
+            <td style="width: 10%;text-align:right">ผู้อนุมัติ</td>
+            <td style="width: 25%;">........................................</td>
+       </tr>
+     
+        
+       
+    </tbody>
+</table>';
+
+$mpdf->WriteHTML($style);
+$mpdf->WriteHTML($table_header3);
+$mpdf->WriteHTML($table_begin3);
+$mpdf->WriteHTML($thead3);
+$mpdf->WriteHTML($tbody3);
+$mpdf->WriteHTML($tfoot3);
+$mpdf->WriteHTML($table_end3);
+$mpdf->WriteHTML($table_footer3);
+
+if($result_seBillingchkret)
+{
+$mpdf->AddPage();
+$mpdf->WriteHTML($table_header4);
+$mpdf->WriteHTML($table_begin4);
+$mpdf->WriteHTML($thead4);
+$mpdf->WriteHTML($tbody4);
+$mpdf->WriteHTML($tfoot4);
+$mpdf->WriteHTML($table_end4);
+$mpdf->WriteHTML($table_footer4);
+}
+
+$mpdf->Output();
+
+
+sqlsrv_close($conn);
+?>
+

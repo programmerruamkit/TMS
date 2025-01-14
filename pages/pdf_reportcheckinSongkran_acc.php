@@ -1,0 +1,137 @@
+<?php
+
+ini_set('memory_limit', '140M');
+require_once("../class/meg_function.php");
+require_once("../mpdf/autoload.php");
+ini_set('max_execution_time', 300);
+
+$conn = connect("RTMS");
+$condition2 = " AND Company_Code = '" . $_GET['companycode'] . "'";
+$sql_seComp = "{call megCompany_v2(?,?)}";
+$params_seComp = array(
+    array('select_company', SQLSRV_PARAM_IN),
+    array($condition2, SQLSRV_PARAM_IN)
+);
+$query_seComp = sqlsrv_query($conn, $sql_seComp, $params_seComp);
+$result_seComp = sqlsrv_fetch_array($query_seComp, SQLSRV_FETCH_ASSOC);
+
+$mpdf = new mPDF('th', 'A4-L', '0', '');
+$style = '
+<style>
+	body{
+		font-family: "Garuda";//เรียกใช้font Garuda สำหรับแสดงผล ภาษาไทย
+	}
+</style>';
+
+
+
+$table_begin1 = '<table width="100%" >
+<tbody>
+   <tr>
+      <td colspan="6" style="text-align:center;font-size:24px"><b>รายงานสงกรานต์ 2564</b></td>
+   </tr>
+   <tr>
+      <td colspan="6" style="text-align:center;font-size:24px"><b>ประจำวันที่ ' . $_GET['datestart'] . '</b></td>
+   </tr>
+</tbody>
+</table>';
+
+$table_begin2 = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size:12;">';
+$tr = '<thead>
+        <tr style="border:1px solid #000;" >
+            <td colspan="7" style="border-right:1px solid #000;padding:3px;text-align:left;">
+                <b>แผนก Accounting/Finance</b>
+            </td>
+            
+        </tr>
+        <tr style="border:1px solid #000;background-color: #ccc" >
+            <td rowspan=""  style="border-right:1px solid #000;padding:3px;text-align:center;">
+                <b>ลำดับ </b>
+            </td>
+            <td rowspan=""  style="border-right:1px solid #000;padding:3px;text-align:center;">
+                <b>รหัสพนักงาน</b>
+            </td>
+            <td rowspan=""  style="border-right:1px solid #000;padding:3px;text-align:center;">
+                <b>ชื่อ-สกุล</b>
+            </td>
+            <td rowspan="" style="border-right:1px solid #000;padding:3px;text-align:center;">
+                <b>ละติจูด</b>
+            </td>
+            <td rowspan="" style="border-right:1px solid #000;padding:3px;text-align:center;">
+                <b>ลองจิจูด
+            </td>
+            <td rowspan=""  style="border-right:1px solid #000;padding:3px;text-align:center;">
+                <b>ที่อยู่ในการเช็คอิน</b>
+            </td>
+            <td rowspan=""  style="border-right:1px solid #000;padding:3px;text-align:center;">
+                <b>วันที่ในการเช็คอิน</b>
+            </td>
+            
+
+        </tr>
+
+    </thead>';
+
+$i = 1;
+$sumpallet = "";
+$sumcompen = "";
+$sumall = "";
+$sumresult = "";
+
+
+$sql_sePlan = "SELECT a.ORGANIZATIONID,a.AREA,a.COMPANYCODE,a.DEPARTMENTCODE,a.SECTIONCODE,a.EMPLOYEECODE,
+        a.ACTIVESTATUS,b.DEPARTMENTNAME,c.SECTIONNAME,(d.FnameT+' '+d.LnameT) AS nameT
+        FROM [dbo].[ORGANIZATION] a 
+        INNER JOIN [dbo].[DEPARTMENT_NEW] b ON b.DEPARTMENTCODE = a.DEPARTMENTCODE AND b.COMPANYCODE = a.COMPANYCODE
+        INNER JOIN [dbo].[SECTION_NEW] c ON c.DEPARTMENTCODE = b.DEPARTMENTCODE AND c.SECTIONCODE = a.SECTIONCODE
+        INNER JOIN [dbo].[EMPLOYEEEHR2] d ON d.PersonCode = a.EMPLOYEECODE
+        WHERE b.DEPARTMENTCODE ='02' AND c.SECTIONCODE IN ('01','02')
+        AND a.AREA ='" . $_GET['area'] . "'
+        AND d.EndDate IS NULL
+        ORDER BY a.EMPLOYEECODE ASC";
+$query_sePlan = sqlsrv_query($conn, $sql_sePlan, $params_sePlan);
+while ($result_sePlan = sqlsrv_fetch_array($query_sePlan, SQLSRV_FETCH_ASSOC)) {
+
+
+    $sql_seCheckIN = "SELECT TOP 1 LATIUDE AS 'LAT',LONGITUDE AS 'LONG',[ADDRESS] AS 'ADDRESS',CREATEDATE
+                    ,CONVERT(NVARCHAR(10),CONVERT(DATETIME,CREATEDATE),103)+' '+CONVERT(NVARCHAR(5),CONVERT(TIME,CREATEDATE)) AS 'DATE' 
+                    FROM [dbo].[NEWYEARCHECKIN]
+                    WHERE EMPLOYEECODE ='" . $result_sePlan['EMPLOYEECODE'] . "'
+                    AND CONVERT(DATE,CREATEDATE) = CONVERT(DATE,'" . $_GET['datestart'] . "',103)
+                    ORDER BY CREATEDATE DESC";
+    $query_seCheckIN = sqlsrv_query($conn, $sql_seCheckIN, $params_seCheckIN);
+    $result_seCheckIN = sqlsrv_fetch_array($query_seCheckIN, SQLSRV_FETCH_ASSOC);
+
+
+    if ($result_seCheckIN['LAT'] == '' && $result_seCheckIN['LONG'] == '' && $result_seCheckIN['ADDRESS'] == '') {
+        $color = "background-color: #FF9966";
+    } else {
+        $color = "";
+    }
+    $td .= '<tbody>
+                  <tr style="border:1px solid #000;" >
+                    <td style="border-right:1px solid #000;padding:3px;text-align:center;' . $color . '" >' . $i . '</td>
+                    <td style="border-right:1px solid #000;padding:3px;text-align:left;' . $color . '" >' . $result_sePlan['EMPLOYEECODE'] . '</td>
+                    <td style="border-right:1px solid #000;padding:3px;text-align:left;' . $color . '" >' . $result_sePlan['nameT'] . '</td>
+                    <td style="border-right:1px solid #000;padding:3px;text-align:left;' . $color . '" >' . $result_seCheckIN['LAT'] . '</td>
+                    <td style="border-right:1px solid #000;padding:3px;text-align:left;' . $color . '" >' . $result_seCheckIN['LONG'] . '</td>
+                    <td style="border-right:1px solid #000;padding:3px;text-align:left;' . $color . '" >' . $result_seCheckIN['ADDRESS'] . '</td>
+                    <td style="border-right:1px solid #000;padding:3px;text-align:left;' . $color . '" >' . $result_seCheckIN['DATE'] . '</td>
+                </tr>
+                    </tbody>';
+
+
+
+    $i++;
+}
+
+$table_end = '</table>';
+$mpdf->WriteHTML($style);
+$mpdf->WriteHTML($table_begin1);
+$mpdf->WriteHTML($table_begin2);
+$mpdf->WriteHTML($tr);
+$mpdf->WriteHTML($td);
+$mpdf->WriteHTML($table_end);
+$mpdf->Output();
+sqlsrv_close($conn);
+

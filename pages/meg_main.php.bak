@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>กลุ่มร่วมกิจรุ่งเรือง</title>
+        <link href="/../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+        <link href="/../dist/css/sb-admin-2.css" rel="stylesheet">
+
+        <link href="/../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <style>
+
+            .navbar-default {
+
+                border-color: #ffcb0b;
+            }
+            #page-wrapper {
+
+                border-left: 1px solid #ffcb0b;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div id="wrapper">
+
+            <!-- Navigation -->
+            <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0;">
+
+                <?php
+                include '../pages/meg_header.php';
+                include '../pages/meg_leftmenu.php';
+                ?>
+
+            </nav>
+
+            <div id="page-wrapper" style="color: #666">
+                <div class="row" >
+                    &nbsp;
+                </div>
+                <div class="row" >
+                    &nbsp;
+                </div>
+                <div class="row" >
+                    &nbsp;
+                </div>
+                <div class="row" >
+                    <div class="col-md-2" ></div>
+                    <div class="col-md-8" >
+                        <div >
+                            <img class="mySlides w3-animate-fading" src="/../images/working1.jpg" style="width: 100%">
+                            <img class="mySlides w3-animate-fading" src="/../images/working2.jpg" style="width: 100%">
+                            <img class="mySlides w3-animate-fading" src="/../images/working3.jpg" style="width: 100%">
+                            <img class="mySlides w3-animate-fading" src="/../images/working4.jpg" style="width: 100%">
+                            <img class="mySlides w3-animate-fading" src="/../images/working5.jpg" style="width: 100%">
+                        </div>
+
+                        <script>
+                            var myIndex = 0;
+                            carousel();
+
+                            function carousel() {
+                                var i;
+                                var x = document.getElementsByClassName("mySlides");
+                                for (i = 0; i < x.length; i++) {
+                                    x[i].style.display = "none";
+                                }
+                                myIndex++;
+                                if (myIndex > x.length) {
+                                    myIndex = 1
+                                }
+                                x[myIndex - 1].style.display = "block";
+                                setTimeout(carousel, 9000);
+                            }
+                        </script>
+                    </div>
+                    <div class="col-md-2" >&nbsp;</div>
+                </div>
+                
+               
+
+
+            </div>
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="/../vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="/../vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="/../vendor/raphael/raphael.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/../dist/js/sb-admin-2.js"></script>
+
+</body>
+
+</html>

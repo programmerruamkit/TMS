@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<?php
+session_start();
+date_default_timezone_set("Asia/Bangkok");
+require_once("../class/meg_function.php");
+$conn = connect("RTMS");
+
+$condition2 = "";
+$condition3 = "";
+
+if ($_POST['search'] != "") {
+    $condition3 = ($_SESSION["PREMISSIONSNAME"] == "SUBPERADMIN" || $_SESSION["PREMISSIONSNAME"] == "ADMIN") ? " AND a.DESCRIPTIONS = '" . $_POST['srtype'] . "' AND (a.FIRSTNAMETHAI LIKE '%" . $_POST['search'] . "%' OR a.LASTNAMETHAI LIKE '%" . $_POST['search'] . "%' OR a.EMPLOYEECODE LIKE '%" . $_POST['search'] . "%') " : " AND a.DESCRIPTIONS = '" . $_POST['srtype'] . "' AND (a.FIRSTNAMETHAI LIKE '%" . $_POST['search'] . "%' OR a.LASTNAMETHAI LIKE '%" . $_POST['search'] . "%' OR a.EMPLOYEECODE LIKE '%" . $_POST['search'] . "%') AND a.EMPLOYEEID = ".$_SESSION["EMPLOYEEID"];
+} else {
+    if ($_POST['srtype'] != "") {
+        $condition2 = ($_SESSION["PREMISSIONSNAME"] == "SUBPERADMIN" || $_SESSION["PREMISSIONSNAME"] == "ADMIN") ? " AND a.DESCRIPTIONS = '" . $_POST['srtype'] . "'" : " AND a.DESCRIPTIONS = '" . $_POST['srtype'] . "' AND a.EMPLOYEEID = ".$_SESSION["EMPLOYEEID"];
+    }
+}
+$condition1 = $condition2 . $condition3;
+$sql_srEmp = "{call megStopwork_v2(?,?)}";
+$params_srEmp = array(
+    array('select_employee', SQLSRV_PARAM_IN),
+    array($condition1, SQLSRV_PARAM_IN)
+);
+
+$query_srEmp = sqlsrv_query($conn, $sql_srEmp, $params_srEmp);
+while ($result_srEmp = sqlsrv_fetch_array($query_srEmp, SQLSRV_FETCH_ASSOC)) {
+    ?>
+    <div class="col-lg-3 col-md-3">
+        <div class="panel" style="background-color: #FFF;color: #337ab7;border-color: #31708f">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-2" style="padding-right: 0px;padding-left: 5px">
+                        <img src="../tmlspictures/employees/<?= $result_srEmp['EMPLOYEECODE'] ?>.jpg" style="width: 60px;height: 60px;"><font style="font-size: 10px"><?= $result_srEmp['EMPLOYEECODE'] ?>
+                    </div>
+                    <div class="col-xs-10 text-right" style="padding-right: 5px;padding-left: 0px">
+                        <div class="huge"></font> <font style="font-size: 12px"><?= $result_srEmp['NAME'] ?></font></div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <span class="pull-left">เมนูย่อย</span>
+
+                <span class="pull-right"> 
+                                                         <?php
+                                                         $condition1 = " AND a.MENUID = 9 AND b.EMPLOYEEID =" . $_SESSION["EMPLOYEEID"];
+                                                        $sql_seSubmenu = "{call megEmployeelistmenu_v2(?,?)}";
+                                                        $params_seSubmenu = array(
+                                                            array('select_employeelismenu', SQLSRV_PARAM_IN),
+                                                            array($condition1, SQLSRV_PARAM_IN)
+                                                        );
+
+                                                        $query_seSubmenu1 = sqlsrv_query($conn, $sql_seSubmenu, $params_seSubmenu);
+                                                        $result_seSubmenu1 = sqlsrv_fetch_array($query_seSubmenu1, SQLSRV_FETCH_ASSOC);
+                                                        echo $result_seSubmenu1['SUBMENUID'];
+                                                        if ($result_seSubmenu1['SUBMENUID'] != "") {
+                                                            ?>
+                                                            <a href="#" role="button" class="btn btn-default btn-circle" data-toggle="popover" title="" data-content="
+                                                            <?php
+                                                            $query_seSubmenu = sqlsrv_query($conn, $sql_seSubmenu, $params_seSubmenu);
+                                                            while ($result_seSubmenu = sqlsrv_fetch_array($query_seSubmenu, SQLSRV_FETCH_ASSOC)) {
+                                                                ?>
+                                                                   <a href='<?= $result_seSubmenu['PATH'] ?>&vehicleinfoid=<?= $result_seCar['VEHICLEINFOID'] ?>&meg=edit' class='list-group-item'><?= $result_seSubmenu['REMARK'] ?></a><br>
+                                                                <?php
+                                                            }
+                                                            ?>
+                                                               "><i class="fa fa-list"></i></a>
+                                                               <?php
+                                                           }
+                                                           ?>
+                                                    </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+?>

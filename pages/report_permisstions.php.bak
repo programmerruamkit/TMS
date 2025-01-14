@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<?php
+session_start();
+date_default_timezone_set("Asia/Bangkok");
+require_once("../class/meg_function.php");
+$conn = connect("RTMS");
+/*
+  if ($_GET['accountid'] != "") {
+  $condition1 = " AND a.ACCOUNTID = " . $_GET['accountid'] . "";
+  $sql_getEmpid = "{call megAccount_v2(?,?)}";
+  $params_getEmpid = array(
+  array('select_account', SQLSRV_PARAM_IN),
+  array($condition1, SQLSRV_PARAM_IN)
+  );
+  $query_getEmpid = sqlsrv_query($conn, $sql_getEmpid, $params_getEmpid);
+  $result_getEmpid = sqlsrv_fetch_array($query_getEmpid, SQLSRV_FETCH_ASSOC);
+  }
+ * 
+ */
+/*
+  $condition1 = ($_GET['employeeid'] != "") ? " AND a.EMPLOYEEID = " . $_GET['employeeid'] . "" : "";
+  $sql_getAccount = "{call megStopwork_v2(?,?)}";
+  $params_getAccount = array(
+  array('select_employee', SQLSRV_PARAM_IN),
+  array($condition1, SQLSRV_PARAM_IN)
+  );
+  $query_getAccount = sqlsrv_query($conn, $sql_getAccount, $params_getAccount);
+  $result_getAccount = sqlsrv_fetch_array($query_getAccount, SQLSRV_FETCH_ASSOC); */
+?>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>กลุ่มร่วมกิจรุ่งเรือง</title>
+        <link href="/../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+        <link href="/../vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
+        <link href="/../vendor/datatables-responsive/dataTables.responsive.css" rel="stylesheet">
+        <link href="/../dist/css/sb-admin-2.css" rel="stylesheet">
+        <link href="/../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script>
+            $(function () {
+                $('[data-toggle="popover"]').popover({
+                    html: true,
+                    content: function () {
+                        return $('#popover-content').html();
+                    }
+                });
+            })
+        </script>
+        <style>
+
+            .navbar-default {
+
+                border-color: #ffcb0b;
+            }
+            #page-wrapper {
+
+                border-left: 1px solid #ffcb0b;
+            }
+            .popover-content {
+                padding: 10px 10px;
+                width: 200px;
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <div id="wrapper">
+
+            <!-- Navigation -->
+            <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <?php
+                include '../pages/meg_header.php';
+                include '../pages/meg_leftmenu.php';
+                ?>
+            </nav>
+
+            <div id="page-wrapper" >
+                <div class="row" >
+                    <div class="col-lg-12">
+
+                        <h2 class="page-header"><i class="glyphicon glyphicon-user"></i>  
+                            <?php
+                            switch ($_GET['type']) {
+                                case "reqaccount": {
+                                        echo "รายการขอใช้งานระบบ";
+                                    }
+                                    break;
+                                case "roleaccount": {
+                                        echo "ข้อมูลผู้ใช้งาน";
+                                    }
+                                    break;
+                                case "role": {
+                                        echo "ข้อมูลสิทธิ์";
+                                    }
+                                    break;
+                                case "rolemenu": {
+                                        echo "ข้อมูลเมนู";
+                                    }
+                                    break;
+                                default : {
+                                        echo "ข้อมูลพนักงาน";
+                                    }
+                                    break;
+                            }
+                            ?>
+
+                        </h2>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="background-color: #e7e7e7">
+
+                                <?php
+                                if ($_GET['type'] == "roleaccount") {
+                                    echo "<a href='http://203.150.29.241:8080/demo/pages/roleemployee/report/'>ข้อมูลพนักงาน</a> / ข้อมูลผู้ใช้งาน";
+                                    $link = "<a href='http://203.150.29.241:8080/demo/pages/roleemployee/report/'>ข้อมูลพนักงาน</a>";
+                                    $_SESSION["link"] = $link;
+                                } else if ($_GET['type'] == "roleemployee") {
+                                    echo "<a href='http://203.150.29.241:8080/demo/pages/role/'></a>ข้อมูลพนักงาน";
+                                    $link = "<a href='http://203.150.29.241:8080/demo/pages/role/'></a>ข้อมูลพนักงาน";
+                                    $_SESSION["link"] = $link;
+                                } else if ($_GET['type'] == "rolemenu") {
+                                    echo "<a href='http://203.150.29.241:8080/demo/pages/role/'>ข้อมูลสิทธิ์</a> /  เมนู";
+                                    $link = "<a href='http://203.150.29.241:8080/demo/pages/role/'>ข้อมูลสิทธิ์</a>";
+                                    $_SESSION["link"] = $link;
+                                } else if ($_GET['type'] == "reqaccount") {
+                                    echo "รายการขอใช้งานระบบ";
+                                } else if ($_GET['type'] == "password") {
+
+                                    echo "แก้ไขข้อมูล";
+                                    $link = "<a href='http://203.150.29.241:8080/demo/pages/password/report/'>แก้ไขข้อมูล</a>";
+                                    $_SESSION["link"] = $link;
+                                } else {
+                                    echo "ข้อมูลสิทธิ์";
+                                    $link = "<a href='http://203.150.29.241:8080/demo/pages/role/report/'>ข้อมูลสิทธิ์</a>";
+                                    $_SESSION["link"] = $link;
+                                }
+                                ?>
+                            </div>
+                            <!-- /.panel-heading -->
+
+                            <div class="panel-body">
+                                <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                                    <?php
+                                    if ($_GET['type'] == "rolemenu") {
+                                        ?>
+                                        <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                            <?php
+                                            $condition1 = " AND a.ROLEID = " . $_GET['id1'];
+                                            $sql_seMenu = "{call megRolemenu_v2(?,?)}";
+                                            $params_seMenu = array(
+                                                array('select_rolemenu', SQLSRV_PARAM_IN),
+                                                array($condition1, SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seMenu1 = sqlsrv_query($conn, $sql_seMenu, $params_seMenu);
+                                            $result_seMenu1 = sqlsrv_fetch_array($query_seMenu1, SQLSRV_FETCH_ASSOC);
+                                            ?>
+                                            <thead>
+                                                <tr>
+                                                    <th>ชื่อเมนูหลัก</th>
+													<th>ชื่อเมนูย่อย</th>
+													<th>สิทธิ์</th>
+													<th>หมายเหตุ</th>
+													<th>สถานะการใช้งาน</th>
+                                                    <th style="text-align: center"><a href="http://203.150.29.241:8080/demo/pages/<?= $_GET['type'] ?>/add/<?= $_GET['id1'] ?>/"><li class="fa fa-plus-square"></li> เพิ่มเมนู</a></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $query_seMenu = sqlsrv_query($conn, $sql_seMenu, $params_seMenu);
+                                                while ($result_seMenu = sqlsrv_fetch_array($query_seMenu, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <tr class="odd gradeX">
+                                                       
+                                                        <td><?= $result_seMenu['MENUNAME'] ?></td>
+                                                        <td><?= $result_seMenu['SUBMENUNAME'] ?></td>
+														<td><?= $result_seMenu['PERMISSIONS'] ?></td>
+                                                        <td><?= $result_seMenu['REMARK'] ?></td>
+                                                        <td><?php echo ($result_seMenu['ACTIVESTATUS'] == "1") ? "ใช้งาน" : "ไม่ใช้งาน"; ?></td>
+                                                        <td style="text-align: center">
+                                                            <a href="http://203.150.29.241:8080/demo/pages/<?= $_GET['type'] ?>/edit/<?= $result_seMenu['ROLEID'] ?>/<?= $result_seMenu['ROLEMENUID'] ?>/" title="แก้ไขข้อมูล" type="button" class="btn btn-default  btn-circle"><span class="glyphicon glyphicon-wrench"></span></a>
+                                                            <button onclick="delete_rolemenu(<?= $result_seMenu['ROLEMENUID'] ?>);" title="ลบข้อมูล" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-remove"></span></button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                        <?php
+                                    }
+                                    ?>
+                                    <?php
+                                    if ($_GET['type'] == "role") {
+                                        ?>
+                                        <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                            <?php
+                                            //$condition1 = ($_SESSION["PREMISSIONSNAME"] == "SUBPERADMIN") ? "" : " AND a.PREMISSIONSNAME = 'USER'";
+											$condition1="";
+                                            $sql_seRole = "{call megRole_v2(?,?)}";
+                                            $params_seRole = array(
+                                                array('select_role', SQLSRV_PARAM_IN),
+                                                array($condition1, SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seRole1 = sqlsrv_query($conn, $sql_seRole, $params_seRole);
+                                            $result_seRole1 = sqlsrv_fetch_array($query_seRole1, SQLSRV_FETCH_ASSOC);
+                                            ?>
+                                            <thead>
+                                                <tr>
+													
+                                                    <th>ชื่อสิทธิ์</th>
+                                                    <th>หมายเหตุ</th>
+                                                    <th>สถานะการใช้งาน</th>
+                                                    <th style="text-align: center">ข้อมูลย่อย</th>
+                                                   
+                                                        <th style="text-align: center"><a href="http://203.150.29.241:8080/demo/pages/<?= $_GET['type'] ?>/add/"><li class="fa fa-plus-square"></li> เพิ่มสิทธิ์</a></th>
+                                                      
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $query_seRole = sqlsrv_query($conn, $sql_seRole, $params_seRole);
+                                                while ($result_seRole = sqlsrv_fetch_array($query_seRole, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <tr class="odd gradeX">
+														
+                                                        <td><?= $result_seRole['ROLENAME'] ?></td>
+                                                        <td><?= $result_seRole['REMARK'] ?></td>
+                                                        <td><?php echo ($result_seRole['ACTIVESTATUS'] == "1") ? "ใช้งาน" : "ไม่ใช้งาน"; ?></td>
+                                                        <td style="text-align: center">
+                                                            <a href="#" role="button" class="btn btn-default btn-circle" data-toggle="popover" title="" data-content="
+															
+															<a href='http://203.150.29.241:8080/demo/pages/rolemenu/report/<?= $result_seRole['ROLEID'] ?>/' class='list-group-item'>เลือกเมนู</a>"><i class="fa fa-list"></i></a>
+                                                        </td>
+                                                        <td style="text-align: center">
+                                                            <a href="http://203.150.29.241:8080/demo/pages/<?= $_GET['type'] ?>/edit/<?= $result_seRole['ROLEID'] ?>/" title="แก้ไขข้อมูล" type="button" class="btn btn-default  btn-circle"><span class="glyphicon glyphicon-wrench"></span></a>
+                                                            <button onclick="delete_role(<?= $result_seRole['ROLEID'] ?>);" title="ลบข้อมูล" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-remove"></span></button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                        <?php
+                                    }
+                                   
+                           
+                                    if ($_GET['type'] == "roleaccount") {
+                                        ?>
+                                        <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                            <?php
+                                            $condition1 = ($_GET['id2'] != "") ? " AND a.ACTIVESTATUS = 1 AND a.ROLEACCOUNTID = " . $_GET['id2'] : " AND a.ACTIVESTATUS = 1  AND a.EMPLOYEEID = " . $_GET['id1'];
+                                            $sql_seAccount = "{call megRoleaccount_v2(?,?)}";
+                                            $params_seAccount = array(
+                                                array('select_roleaccount', SQLSRV_PARAM_IN),
+                                                array($condition1, SQLSRV_PARAM_IN)
+                                            );
+
+                                            $query_seAccount1 = sqlsrv_query($conn, $sql_seAccount, $params_seAccount);
+                                            $result_seAccount1 = sqlsrv_fetch_array($query_seAccount1, SQLSRV_FETCH_ASSOC);
+                                            ?>
+                                            <thead>
+                                                <tr>
+                                                    <th>รหัสพนักงาน</th>
+                                                    <th>ชื่อ-นามสกุล</th>
+                                                    <th>Username</th>
+                                                    <th>Password</th>
+													<th>สิทธิ์</th>
+                                                    <th>หมายเหตุ</th>
+                                                    <th>สถานะการใช้งาน</th>
+                                                    <th style="text-align: center"><a href="http://203.150.29.241:8080/demo/pages/<?= $_GET['type'] ?>/add/<?= $_GET['id1'] ?>/"><li class="fa fa-plus-square"></li> เพิ่มผู้ใช้งาน</a></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $query_seAccount = sqlsrv_query($conn, $sql_seAccount, $params_seAccount);
+                                                while ($result_seAccount = sqlsrv_fetch_array($query_seAccount, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <tr>
+                                                        <td><?= $result_seAccount['EMPLOYEECODE'] ?></td>
+                                                        <td><?= $result_seAccount['EMPLOYEENAME'] ?></td>
+                                                        <td><?= $result_seAccount['USERNAME'] ?></td>
+                                                        <td><?= $result_seAccount['PASSWORD'] ?></td>
+														<td><?= $result_seAccount['PASSWORD'] ?></td>
+                                                        <td><?= $result_seAccount['REMARK'] ?></td>
+                                                        <td><?php echo ($result_seAccount['ACTIVESTATUS'] == "1") ? "ใช้งาน" : "ไม่ใช้งาน"; ?></td>
+                                                        <td style="text-align: center">
+                                                            <a href="http://203.150.29.241:8080/demo/pages/<?= $_GET['type'] ?>/edit/<?= $result_seAccount['EMPLOYEEID'] ?>/<?= $result_seAccount['ROLEACCOUNTID'] ?>/" title="แก้ไขข้อมูล" type="button" class="btn btn-default  btn-circle"><span class="glyphicon glyphicon-wrench"></span></a>
+                                                            <button onclick="delete_roleaccount(<?= $result_seAccount['ROLEACCOUNTID'] ?>);" title="ลบข้อมูล" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-remove"></span></button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                        <?php
+                                    }
+                                    ?>
+                                    <?php
+                                    if ($_GET['type'] == "roleemployee") {
+								
+                                        ?>
+                                        <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>รหัสพนักงาน</th>
+                                                    <th>ชื่อ-นามสกุล</th>
+                                                    <th>เบอร์โทรศัพท์</th>
+                                                    <th>อีเมลล์</th>
+                                                    <th style="text-align: center">ข้อมูลย่อย</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $sql_seEmp = "{call megEmployee_v2(?,?)}";
+                                                $params_seEmp = array(
+                                                    array('select_employee', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seEmp = sqlsrv_query($conn, $sql_seEmp, $params_seEmp);
+                                                while ($result_seEmp = sqlsrv_fetch_array($query_seEmp, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <tr class="odd gradeX">
+                                                        <td><?= $result_seEmp['EMPLOYEECODE'] ?></td>
+                                                        <td><?= $result_seEmp['NAME'] ?></td>
+                                                        <td><?= $result_seEmp['MOBILENUMBER2'] ?></td>
+                                                        <td><?= $result_seEmp['EMAILADDRESS'] ?></td>
+                                                        <td style="text-align: center">
+                                                            <a href="#" role="button" class="btn btn-default btn-circle" data-toggle="popover" title="" data-content="<a href='http://203.150.29.241:8080/demo/pages/roleaccount/report/<?= $result_seEmp['EMPLOYEEID'] ?>/' class='list-group-item'>ชื่อเข้าใช้งาน</a>"><i class="fa fa-list"></i></a>
+                                                        </td>
+
+
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script src="/../vendor/jquery/jquery.min.js"></script>
+            <script src="/../vendor/bootstrap/js/bootstrap.min.js"></script>
+            <script src="/../vendor/metisMenu/metisMenu.min.js"></script>
+            <script src="/../vendor/datatables/js/jquery.dataTables.min.js"></script>
+            <script src="/../vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+            <script src="/../vendor/datatables-responsive/dataTables.responsive.js"></script>
+            <script src="/../dist/js/sb-admin-2.js"></script>
+
+            <script>
+                                                        $(document).ready(function () {
+                                                            $('#dataTables-example').DataTable({
+                                                                responsive: true,
+                                                                order: [[0, "desc"]]
+                                                            });
+                                                        });
+            </script>
+
+
+    </body>
+
+    <script>
+
+        function delete_roleaccount(val)
+        {
+            var confirmation = confirm("ต้องการลบข้อมูล ?");
+
+            if (confirmation) {
+                $.ajax({
+                    type: 'post',
+                    url: 'http://203.150.29.241:8080/demo/pages/meg_data.php',
+                    data: {
+                        txt_flg: "delete_roleaccount", roleaccountid: val
+                    },
+                    success: function () {
+                        alert('ลบข้อมูลเรียบร้อยแล้ว');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+        function delete_role(val)
+        {
+            var confirmation = confirm("ต้องการลบข้อมูล ?");
+
+            if (confirmation) {
+                $.ajax({
+                    type: 'post',
+                    url: 'http://203.150.29.241:8080/demo/pages/meg_data.php',
+                    data: {
+                        txt_flg: "delete_role", roleid: val
+                    },
+                    success: function () {
+                        alert('ลบข้อมูลเรียบร้อยแล้ว');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+        function delete_rolemenu(val)
+        {
+            var confirmation = confirm("ต้องการลบข้อมูล ?");
+
+            if (confirmation) {
+                $.ajax({
+                    type: 'post',
+                    url: 'http://203.150.29.241:8080/demo/pages/meg_data.php',
+                    data: {
+                        txt_flg: "delete_rolemenu", rolemenuid: val
+                    },
+                    success: function () {
+                        alert('ลบข้อมูลเรียบร้อยแล้ว');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+
+</html>
+<?php
+sqlsrv_close($conn);
+?>

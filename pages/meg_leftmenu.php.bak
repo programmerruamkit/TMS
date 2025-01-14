@@ -1,0 +1,59 @@
+<?php
+session_start();
+date_default_timezone_set("Asia/Bangkok");
+require_once("../class/meg_function.php");
+$conn = connect("RTMS");
+
+if (!isset($_SESSION["USERNAME"]) || !isset($_SESSION["PASSWORD"])) {
+    header("location:meg_logout.php");
+}
+?>
+<br>
+<div class="navbar-default sidebar" role="navigation">
+    <div class="sidebar-nav navbar-collapse">
+        <ul class="nav" id="side-menu">
+            <?php
+            $condition1 = ($_SESSION["EMPLOYEEID"] != "") ? " AND e.EMPLOYEEID = " . $_SESSION["EMPLOYEEID"]." AND d.ROLENAME = '".$_SESSION["ROLENAME"]."'  " : " AND a.EMPLOYEEID = 'ไม่มีข้อมูล'";
+
+            $sql_seMenu = "{call megRolemenu_v2(?,?)}";
+            $params_seMenu = array(
+                array('show_menu', SQLSRV_PARAM_IN),
+                array($condition1, SQLSRV_PARAM_IN)
+            );
+            $query_seMenu = sqlsrv_query($conn, $sql_seMenu, $params_seMenu);
+            while ($result_seMenu = sqlsrv_fetch_array($query_seMenu, SQLSRV_FETCH_ASSOC)) {
+                ?>
+                <li>
+                    <a href="#">
+                        <i class="glyphicon glyphicon-menu-hamburger "></i>&nbsp;<?= $result_seMenu['MENUNAME'] ?><span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <?php
+                            $condition2 = " AND b.MENUID = " . $result_seMenu['MENUID'] . "  AND e.EMPLOYEEID = " . $_SESSION["EMPLOYEEID"] ." AND d.ROLENAME = '".$_SESSION["ROLENAME"]."'";
+                            $sql_seSubmenu = "{call megRolemenu_v2(?,?)}";
+                            $params_seSubmenu = array(
+                                array('show_submenu', SQLSRV_PARAM_IN),
+                                array($condition2, SQLSRV_PARAM_IN)
+                            );
+                            $query_seSubmenu = sqlsrv_query($conn, $sql_seSubmenu, $params_seSubmenu);
+                            $query_chkSubmenu = sqlsrv_query($conn, $sql_seSubmenu, $params_seSubmenu);
+                            $result_chkSubmenu = sqlsrv_fetch_array($query_chkSubmenu, SQLSRV_FETCH_ASSOC);
+                            if ($result_chkSubmenu['SUBMENUNAME'] != "") {
+                                while ($result_seSubmenu = sqlsrv_fetch_array($query_seSubmenu, SQLSRV_FETCH_ASSOC)) {
+                                    ?>
+                                    <a href="<?= $result_seSubmenu['PATH'] ?>"><i class="glyphicon glyphicon-minus"></i>&nbsp;<?= $result_seSubmenu['SUBMENUNAME'] ?></a>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </li>
+                    </ul>
+                </li>
+    <?php
+}
+?>
+
+        </ul>
+    </div>
+</div>
