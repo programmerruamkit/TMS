@@ -272,17 +272,23 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                     </a>
                 </div>
 				<?php
-                if ($_SESSION["USERNAME"] == '100007' || $_SESSION["USERNAME"] == '100006' ) {
+                if ($_SESSION["USERNAME"] == '100007' || $_SESSION["USERNAME"] == '100006') {
                 ?>
-                    <div class="col-lg-2">
-                        <a href="meg_drivingpattern_driver.php">
+                    <div class="col-lg-2" style="">
+						<a href="meg_drivingpattern_driver.php">
 
-                            <b class="fa fa-file-text-o fa-3x">
-                                <br>
-                                <font style="font-size: 16px">เอกสารรูปแบบการวิ่งงาน</font>
-                            </b>
-                        </a>
-                    </div>
+							<b class="fa fa-3x">
+								<font style="font-size: 20px">DRIVINGPATTERN<br>แผนวิ่งงาน</br></font>
+							</b>
+						</a>
+					</div>
+					<div class="col-lg-2" >
+						<a href="meg_drivingpattern_driverselect.php">
+							<b class="fa fa-3x">
+								<font style="font-size: 20px">DRIVINGPATTERN<br>วิ่งงานจริง</br></font>
+							</b>
+						</a>
+					</div>
                 <?php
                 }else {
                 ?>
@@ -290,6 +296,7 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                 <?php
                 }
                 ?>
+				
 					
 				
 				
