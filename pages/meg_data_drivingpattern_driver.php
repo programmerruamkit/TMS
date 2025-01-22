@@ -1360,11 +1360,14 @@ if ($_POST['txt_flg'] == "select_drivingpatternskp") {
                     <tr>    
                         <th><label style="width: 100px">เลขที่แผนงาน1</label></th>
                         <th><label style="width: 100px">พนักงานคนที่1</label></th>
+                        <th><label style="width: 100px">พนักงานคนที่2</label></th>
                         <th><label style="width: 100px">บริษัทสังกัด</label></th>
                         <th><label style="width: 100px">สายงานสังกัด</label></th>
                         <th><label style="width: 100px">ชื่อรถ (ไทย)</label></th>
                         <th><label style="width: 100px">เลขทะเบียนรถ</label></th>
                         <th><label style="width: 100px;text-align: center">Driving <br>Pattern</label></th>
+                        <th><label style="width: 100px;text-align: center">ปลดล็อคแผน<br>วิ่งจริงขาไป</label></th>
+                        <th><label style="width: 100px;text-align: center">ปลดล็อคแผน<br>วิ่งจริงขากลับ</label></th>
                         <th><label style="width: 100px;text-align: center">สถานะ <br>ขาไป</label></th>
                         <th><label style="width: 100px;text-align: center">สถานะ <br>ขากลับ</label></th>
                         <th><label style="width: 100px;text-align: center">วันที่วิ่งงาน</label></th>
@@ -1380,7 +1383,7 @@ if ($_POST['txt_flg'] == "select_drivingpatternskp") {
 
                 $condition1 = "AND c.VEHICLEGROUPCODE !='VG-1403-0755' AND c.AFFCOMPANY IN ('RRC','RCC','RATC') 
                                AND CONVERT(DATE,a.DATEWORKING,103) BETWEEN CONVERT(DATE,'".$_POST['datestart']."',103) AND CONVERT(DATE,'".$_POST['dateend']."',103)
-                               AND a.EMPLOYEECODE1 ='".$_POST["employeecode"]."'
+                               AND (a.EMPLOYEECODE1 ='".$_POST["employeecode"]."' OR a.EMPLOYEECODE2 ='".$_POST["employeecode"]."')
                                ORDER BY a.DATEWORKING,c.AFFCOMPANY,c.AFFCUSTOMER,a.THAINAME ASC";
                 $condition2 = "";
                 $condition3 = "";
@@ -1421,12 +1424,19 @@ if ($_POST['txt_flg'] == "select_drivingpatternskp") {
                 <tr>
                     <td style="width: 100px"><?= $result_infolist['VEHICLETRANSPORTPLANID'] ?></td>
                     <td style="width: 100px"><?= $result_infolist['EMPLOYEENAME1'] ?></td>
+                    <td style="width: 100px"><?= $result_infolist['EMPLOYEENAME2'] ?></td>
                     <td style="width: 100px"><?= $result_infolist['AFFCOMPANY'] ?></td>
                     <td style="width: 100px"><?= $result_infolist['AFFCUSTOMER'] ?></td>
                     <td style="width: 100px"><?= str_replace("(4L)","",$result_infolist['THAINAME']) ?></td>
                     <td style="width: 100px"><?= $result_infolist['VEHICLEREGISNUMBER'] ?></td>
                     <td style="text-align: center;width: 100px">
                         <a style="background-color: #e0e0e0;" href='meg_drivingpattern_officer.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-list-alt"></span></a>
+                    </td>
+                    <td style="text-align: center;width: 70px">
+                        <a style="background-color: #e0e0e0;" href='meg_drivingpattern_gounlock.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-open-file"></span></a>
+                    </td>
+                    <td style="text-align: center">
+                        <a style="background-color: #e0e0e0;" href='meg_drivingpattern_backunlock.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-save-file"></span></a>
                     </td>
                     <td style="text-align: center;width: 100px;<?=$bgcolorgo?>"><?= $statustextgo ?></td>
                     <td style="text-align: center;width: 100px;<?=$bgcolorback?>"><?= $statustextback ?></td>
@@ -1440,10 +1450,620 @@ if ($_POST['txt_flg'] == "select_drivingpatternskp") {
     </div>
 <?php
 }
+// Driving Pattern สำหรับพนักงานลงข้อมูล
+if ($_POST['txt_flg'] == "select_drivingpattern_driverselect") {
+?>
+    <div class="row">
+        <div class="col-lg-12">
+            <table  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example1" role="grid" aria-describedby="dataTables-example" style="width: 100%;">
+                <thead>
+                    <tr>    
+                        <th><label style="width: 100px;text-align: center">ลงข้อมูล</label></th>
+                        <th><label style="width: 100px">เลขที่แผนงาน</label></th>
+                        <th><label style="width: 100px">พนักงานคนที่1</label></th>
+                        <th><label style="width: 100px">พนักงานคนที่2</label></th>
+                        <th><label style="width: 100px">บริษัทสังกัด</label></th>
+                        <th><label style="width: 100px">สายงานสังกัด</label></th>
+                        <th><label style="width: 100px">ชื่อรถ (ไทย)</label></th>
+                        <th><label style="width: 100px">เลขทะเบียนรถ</label></th>
+                        <th><label style="width: 100px;text-align: center">สถานะ <br>ขาไป</label></th>
+                        <th><label style="width: 100px;text-align: center">สถานะ <br>ขากลับ</label></th>
+                        <th><label style="width: 100px;text-align: center">วันที่วิ่งงาน</label></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                <?php
+                // $condition1 = " AND (a.THAINAME NOT LIKE '%R-%' OR a.THAINAME NOT LIKE '%RA-%' OR a.THAINAME NOT LIKE '%RP-%'";
+                // $condition2 = " OR a.THAINAME NOT LIKE '%คลองเขื่อน%'  OR a.THAINAME NOT LIKE '%ด่านช้าง%'  OR a.THAINAME NOT LIKE '%สวนผึ้ง%' ";
+                // $condition3 = " OR a.ENGNAME NOT LIKE '%ดินแดง%' OR a.ENGNAME NOT LIKE '%อุทัยธานี%' OR a.ENGNAME NOT LIKE '%Kerry%'";
+                // $condition4 = " OR a.THAINAME NOT LIKE '%เขาชะเมา%' OR a.THAINAME NOT LIKE '%เฉลิมพระเกียรติ%' OR a.THAINAME NOT LIKE '%P35%' )";
+
+                $condition1 = "AND c.VEHICLEGROUPCODE !='VG-1403-0755' AND c.AFFCOMPANY IN ('RRC','RCC','RATC') 
+                               AND CONVERT(DATE,a.DATEWORKING,103) BETWEEN CONVERT(DATE,'".$_POST['datestart']."',103) AND CONVERT(DATE,'".$_POST['dateend']."',103)
+                               AND (a.EMPLOYEECODE1 ='".$_POST["employeecode"]."' OR a.EMPLOYEECODE2 ='".$_POST["employeecode"]."')
+                               ORDER BY a.DATEWORKING,c.AFFCOMPANY,c.AFFCUSTOMER,a.THAINAME ASC";
+                $condition2 = "";
+                $condition3 = "";
+                $condition4 = "";
+                $condition5 = "";
+                $sql_infolist = "{call megDrivingPatternDriver(?,?,?,?,?,?,?)}";
+                $params_infolist = array(
+                array('select_vehicleinfo_drivingpattern', SQLSRV_PARAM_IN),
+                array('', SQLSRV_PARAM_IN),
+                array($condition1, SQLSRV_PARAM_IN),
+                array($condition2, SQLSRV_PARAM_IN),
+                array($condition3, SQLSRV_PARAM_IN),
+                array($condition4, SQLSRV_PARAM_IN),
+                array($condition5, SQLSRV_PARAM_IN)
+                );
+
+                $query_infolist = sqlsrv_query($conn, $sql_infolist, $params_infolist);
+                while ($result_infolist = sqlsrv_fetch_array($query_infolist, SQLSRV_FETCH_ASSOC)) {
+
+                // สถานะแผนขาไป
+                if ($result_infolist['DRIVINGPATTERNGO_STATUS'] == 'inprogess') {
+                $bgcolorgo ="background-color: #f5f2a6";
+                $statustextgo = "อยู่ระหว่างดำเนินการ";
+                }else{
+                $bgcolorgo ="background-color: #b3f5a6";
+                $statustextgo = "ดำเนินการเรียบร้อย";
+                }
+
+                // สถานะแผนขากลับ
+                if ($result_infolist['DRIVINGPATTERNRETURN_STATUS'] == 'inprogess') {
+                $bgcolorback ="background-color: #f5f2a6";
+                $statustextback = "อยู่ระหว่างดำเนินการ";
+                }else{
+                $bgcolorback ="background-color: #b3f5a6";
+                $statustextback = "ดำเนินการเรียบร้อย";
+                }
+                ?>
+                <tr>
+                    <td style="text-align: center;width: 100px">
+                        <a style="background-color: #e0e0e0;" href='meg_drivingpattern_driveractual.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-list-alt"></span></a>
+                    </td>
+                    <td style="width: 100px"><?= $result_infolist['VEHICLETRANSPORTPLANID'] ?></td>
+                    <td style="width: 100px"><?= $result_infolist['EMPLOYEENAME1'] ?></td>
+                    <td style="width: 100px"><?= $result_infolist['EMPLOYEENAME2'] ?></td>
+                    <td style="width: 100px"><?= $result_infolist['AFFCOMPANY'] ?></td>
+                    <td style="width: 100px"><?= $result_infolist['AFFCUSTOMER'] ?></td>
+                    <td style="width: 100px"><?= str_replace("(4L)","",$result_infolist['THAINAME']) ?></td>
+                    <td style="width: 100px"><?= $result_infolist['VEHICLEREGISNUMBER'] ?></td>
+                    <td style="text-align: center;width: 100px;<?=$bgcolorgo?>"><?= $statustextgo ?></td>
+                    <td style="text-align: center;width: 100px;<?=$bgcolorback?>"><?= $statustextback ?></td>
+                    <td style="width: 100px"><?= $result_infolist['DATEWORKING'] ?></td>
+                </tr>
+                <?php
+                }
+                ?>
+            </tbody>
+        </div>
+    </div>
+<?php
+// Function สำหรับล Actual 
+// Tracking Current Time P1
+}
+if ($_POST['txt_flg'] == "checkin4hurp1") {
+    
+      $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+      $query = sqlsrv_query($conn, $sql, $params);
+      $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+      
+      echo $result['RS'];
+      
+}if ($_POST['txt_flg'] == "checkout4hurp1") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}
+if ($_POST['txt_flg'] == "checkin2hurp1") {
+    
+      $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+      $query = sqlsrv_query($conn, $sql, $params);
+      $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+      
+      echo $result['RS'];
+      
+}if ($_POST['txt_flg'] == "checkout2hurp1") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}
+
+// Tracking Current Time P2
+if ($_POST['txt_flg'] == "checkin4hurp2") {
+    
+      $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+      $query = sqlsrv_query($conn, $sql, $params);
+      $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+      
+      echo $result['RS'];
+      
+}if ($_POST['txt_flg'] == "checkout4hurp2") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}
+if ($_POST['txt_flg'] == "checkin2hurp2") {
+    
+      $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+      $query = sqlsrv_query($conn, $sql, $params);
+      $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+      
+      echo $result['RS'];
+      
+}if ($_POST['txt_flg'] == "checkout2hurp2") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}
+
+// Tracking Current Time P3
+if ($_POST['txt_flg'] == "checkin4hurp3") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout4hurp3") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+if ($_POST['txt_flg'] == "checkin2hurp3") {
+  
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout2hurp3") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+
+// Tracking Current Time P4
+if ($_POST['txt_flg'] == "checkin4hurp4") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout4hurp4") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+if ($_POST['txt_flg'] == "checkin2hurp4") {
+  
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout2hurp4") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+
+// Tracking Current Time P5
+if ($_POST['txt_flg'] == "checkin4hurp5") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout4hurp5") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+if ($_POST['txt_flg'] == "checkin2hurp5") {
+  
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout2hurp5") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+
+// Tracking Current Time P6
+if ($_POST['txt_flg'] == "checkin4hurp6") {
+    
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout4hurp6") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+if ($_POST['txt_flg'] == "checkin2hurp6") {
+  
+    $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+    $query = sqlsrv_query($conn, $sql, $params);
+    $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    echo $result['RS'];
+    
+}if ($_POST['txt_flg'] == "checkout2hurp6") {
+  
+  $sql = "SELECT REPLACE(CONVERT(VARCHAR(16),GETDATE(),120), ' ', 'T') AS 'RS'";
+  $query = sqlsrv_query($conn, $sql, $params);
+  $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+  
+  echo $result['RS'];
+  
+}
+// CONFIRMED BUTTON 
+if ($_POST['txt_flg'] == "save_confirm_driver_p1") {
+
+
+    $sql_confirmp1 = "{call megDrivingPatternDriverNewV2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"; 
+    $params_confirmp1 = array(
+    array('save_confirm_driver_p1', SQLSRV_PARAM_IN),
+    array($_POST['employeecode'], SQLSRV_PARAM_IN),
+    array($_POST['condition1'], SQLSRV_PARAM_IN),
+    array($_POST['condition2'], SQLSRV_PARAM_IN),
+    array($_POST['condition3'], SQLSRV_PARAM_IN),
+    array($_POST['condition4'], SQLSRV_PARAM_IN),
+    array($_POST['condition5'], SQLSRV_PARAM_IN),
+    array($_POST['condition6'], SQLSRV_PARAM_IN),
+    array($_POST['condition7'], SQLSRV_PARAM_IN),
+    array($_POST['condition8'], SQLSRV_PARAM_IN),
+    array($_POST['condition9'], SQLSRV_PARAM_IN),
+    array($_POST['condition10'], SQLSRV_PARAM_IN),
+    array($_POST['condition11'], SQLSRV_PARAM_IN),
+    array($_POST['condition12'], SQLSRV_PARAM_IN),
+    array($_POST['condition13'], SQLSRV_PARAM_IN),
+    array($_POST['condition14'], SQLSRV_PARAM_IN),
+    array($_POST['condition15'], SQLSRV_PARAM_IN),
+    array($_POST['condition16'], SQLSRV_PARAM_IN),
+    array($_POST['condition17'], SQLSRV_PARAM_IN),
+    array($_POST['condition18'], SQLSRV_PARAM_IN)
+    );
+  
+    $query_confirmp1 = sqlsrv_query($conn, $sql_confirmp1, $params_confirmp1);
+    $result_confirmp1 = sqlsrv_fetch_array($query_confirmp1, SQLSRV_FETCH_ASSOC);
+    echo $result_confirmp1['RS'];
+  
+}
+// CONFIRMED BUTTON 
+if ($_POST['txt_flg'] == "save_confirm_driver_p2") {
+
+    $sql_confirmp2 = "{call megDrivingPatternDriverNewV2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"; 
+    $params_confirmp2 = array(
+    array('save_confirm_driver_p2', SQLSRV_PARAM_IN),
+    array($_POST['employeecode'], SQLSRV_PARAM_IN),
+    array($_POST['condition1'], SQLSRV_PARAM_IN),
+    array($_POST['condition2'], SQLSRV_PARAM_IN),
+    array($_POST['condition3'], SQLSRV_PARAM_IN),
+    array($_POST['condition4'], SQLSRV_PARAM_IN),
+    array($_POST['condition5'], SQLSRV_PARAM_IN),
+    array($_POST['condition6'], SQLSRV_PARAM_IN),
+    array($_POST['condition7'], SQLSRV_PARAM_IN),
+    array($_POST['condition8'], SQLSRV_PARAM_IN),
+    array($_POST['condition9'], SQLSRV_PARAM_IN),
+    array($_POST['condition10'], SQLSRV_PARAM_IN),
+    array($_POST['condition11'], SQLSRV_PARAM_IN),
+    array($_POST['condition12'], SQLSRV_PARAM_IN),
+    array($_POST['condition13'], SQLSRV_PARAM_IN),
+    array($_POST['condition14'], SQLSRV_PARAM_IN),
+    array($_POST['condition15'], SQLSRV_PARAM_IN),
+    array($_POST['condition16'], SQLSRV_PARAM_IN),
+    array($_POST['condition17'], SQLSRV_PARAM_IN),
+    array($_POST['condition18'], SQLSRV_PARAM_IN)
+    );
+  
+    $query_confirmp2 = sqlsrv_query($conn, $sql_confirmp2, $params_confirmp2);
+    $result_confirmp2 = sqlsrv_fetch_array($query_confirmp2, SQLSRV_FETCH_ASSOC);
+    echo $result_confirmp2['RS'];
+  
+}
+// CONFIRMED BUTTON 
+if ($_POST['txt_flg'] == "save_confirm_driver_p3") {
+
+
+    $sql_confirmp3 = "{call megDrivingPatternDriverNewV2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"; 
+    $params_confirmp3 = array(
+    array('save_confirm_driver_p3', SQLSRV_PARAM_IN),
+    array($_POST['employeecode'], SQLSRV_PARAM_IN),
+    array($_POST['condition1'], SQLSRV_PARAM_IN),
+    array($_POST['condition2'], SQLSRV_PARAM_IN),
+    array($_POST['condition3'], SQLSRV_PARAM_IN),
+    array($_POST['condition4'], SQLSRV_PARAM_IN),
+    array($_POST['condition5'], SQLSRV_PARAM_IN),
+    array($_POST['condition6'], SQLSRV_PARAM_IN),
+    array($_POST['condition7'], SQLSRV_PARAM_IN),
+    array($_POST['condition8'], SQLSRV_PARAM_IN),
+    array($_POST['condition9'], SQLSRV_PARAM_IN),
+    array($_POST['condition10'], SQLSRV_PARAM_IN),
+    array($_POST['condition11'], SQLSRV_PARAM_IN),
+    array($_POST['condition12'], SQLSRV_PARAM_IN),
+    array($_POST['condition13'], SQLSRV_PARAM_IN),
+    array($_POST['condition14'], SQLSRV_PARAM_IN),
+    array($_POST['condition15'], SQLSRV_PARAM_IN),
+    array($_POST['condition16'], SQLSRV_PARAM_IN),
+    array($_POST['condition17'], SQLSRV_PARAM_IN),
+    array($_POST['condition18'], SQLSRV_PARAM_IN)
+    );
+  
+    $query_confirmp3 = sqlsrv_query($conn, $sql_confirmp3, $params_confirmp3);
+    $result_confirmp3 = sqlsrv_fetch_array($query_confirmp3, SQLSRV_FETCH_ASSOC);
+    echo $result_confirmp3['RS'];
+  
+}
+// CONFIRMED BUTTON 
+if ($_POST['txt_flg'] == "save_confirm_driver_p4") {
+
+
+    $sql_confirmp4 = "{call megDrivingPatternDriverNewV2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"; 
+    $params_confirmp4 = array(
+    array('save_confirm_driver_p4', SQLSRV_PARAM_IN),
+    array($_POST['employeecode'], SQLSRV_PARAM_IN),
+    array($_POST['condition1'], SQLSRV_PARAM_IN),
+    array($_POST['condition2'], SQLSRV_PARAM_IN),
+    array($_POST['condition3'], SQLSRV_PARAM_IN),
+    array($_POST['condition4'], SQLSRV_PARAM_IN),
+    array($_POST['condition5'], SQLSRV_PARAM_IN),
+    array($_POST['condition6'], SQLSRV_PARAM_IN),
+    array($_POST['condition7'], SQLSRV_PARAM_IN),
+    array($_POST['condition8'], SQLSRV_PARAM_IN),
+    array($_POST['condition9'], SQLSRV_PARAM_IN),
+    array($_POST['condition10'], SQLSRV_PARAM_IN),
+    array($_POST['condition11'], SQLSRV_PARAM_IN),
+    array($_POST['condition12'], SQLSRV_PARAM_IN),
+    array($_POST['condition13'], SQLSRV_PARAM_IN),
+    array($_POST['condition14'], SQLSRV_PARAM_IN),
+    array($_POST['condition15'], SQLSRV_PARAM_IN),
+    array($_POST['condition16'], SQLSRV_PARAM_IN),
+    array($_POST['condition17'], SQLSRV_PARAM_IN),
+    array($_POST['condition18'], SQLSRV_PARAM_IN)
+    );
+  
+    $query_confirmp4 = sqlsrv_query($conn, $sql_confirmp4, $params_confirmp4);
+    $result_confirmp4 = sqlsrv_fetch_array($query_confirmp3, SQLSRV_FETCH_ASSOC);
+    echo $result_confirmp4['RS'];
+  
+}
+// CONFIRMED BUTTON 
+if ($_POST['txt_flg'] == "save_confirm_driver_p5") {
+
+
+    $sql_confirmp5 = "{call megDrivingPatternDriverNewV2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"; 
+    $params_confirmp5 = array(
+    array('save_confirm_driver_p5', SQLSRV_PARAM_IN),
+    array($_POST['employeecode'], SQLSRV_PARAM_IN),
+    array($_POST['condition1'], SQLSRV_PARAM_IN),
+    array($_POST['condition2'], SQLSRV_PARAM_IN),
+    array($_POST['condition3'], SQLSRV_PARAM_IN),
+    array($_POST['condition4'], SQLSRV_PARAM_IN),
+    array($_POST['condition5'], SQLSRV_PARAM_IN),
+    array($_POST['condition6'], SQLSRV_PARAM_IN),
+    array($_POST['condition7'], SQLSRV_PARAM_IN),
+    array($_POST['condition8'], SQLSRV_PARAM_IN),
+    array($_POST['condition9'], SQLSRV_PARAM_IN),
+    array($_POST['condition10'], SQLSRV_PARAM_IN),
+    array($_POST['condition11'], SQLSRV_PARAM_IN),
+    array($_POST['condition12'], SQLSRV_PARAM_IN),
+    array($_POST['condition13'], SQLSRV_PARAM_IN),
+    array($_POST['condition14'], SQLSRV_PARAM_IN),
+    array($_POST['condition15'], SQLSRV_PARAM_IN),
+    array($_POST['condition16'], SQLSRV_PARAM_IN),
+    array($_POST['condition17'], SQLSRV_PARAM_IN),
+    array($_POST['condition18'], SQLSRV_PARAM_IN)
+    );
+  
+    $query_confirmp5 = sqlsrv_query($conn, $sql_confirmp5, $params_confirmp5);
+    $result_confirmp5 = sqlsrv_fetch_array($query_confirmp5, SQLSRV_FETCH_ASSOC);
+    echo $result_confirmp5['RS'];
+  
+}
+// CONFIRMED BUTTON 
+if ($_POST['txt_flg'] == "save_confirm_driver_p6") {
+
+
+    $sql_confirmp6 = "{call megDrivingPatternDriverNewV2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"; 
+    $params_confirmp6 = array(
+    array('save_confirm_driver_p6', SQLSRV_PARAM_IN),
+    array($_POST['employeecode'], SQLSRV_PARAM_IN),
+    array($_POST['condition1'], SQLSRV_PARAM_IN),
+    array($_POST['condition2'], SQLSRV_PARAM_IN),
+    array($_POST['condition3'], SQLSRV_PARAM_IN),
+    array($_POST['condition4'], SQLSRV_PARAM_IN),
+    array($_POST['condition5'], SQLSRV_PARAM_IN),
+    array($_POST['condition6'], SQLSRV_PARAM_IN),
+    array($_POST['condition7'], SQLSRV_PARAM_IN),
+    array($_POST['condition8'], SQLSRV_PARAM_IN),
+    array($_POST['condition9'], SQLSRV_PARAM_IN),
+    array($_POST['condition10'], SQLSRV_PARAM_IN),
+    array($_POST['condition11'], SQLSRV_PARAM_IN),
+    array($_POST['condition12'], SQLSRV_PARAM_IN),
+    array($_POST['condition13'], SQLSRV_PARAM_IN),
+    array($_POST['condition14'], SQLSRV_PARAM_IN),
+    array($_POST['condition15'], SQLSRV_PARAM_IN),
+    array($_POST['condition16'], SQLSRV_PARAM_IN),
+    array($_POST['condition17'], SQLSRV_PARAM_IN),
+    array($_POST['condition18'], SQLSRV_PARAM_IN)
+    );
+  
+    $query_confirmp6 = sqlsrv_query($conn, $sql_confirmp6, $params_confirmp6);
+    $result_confirmp6 = sqlsrv_fetch_array($query_confirmp6, SQLSRV_FETCH_ASSOC);
+    echo $result_confirmp6['RS'];
+  
+}
+// SAVE ACTUAL ALL LOAD
+if ($_POST['txt_flg'] == "save_confirm_driver_allload") {
+
+
+    $sql_confirmactualallload = "{call megDrivingPatternDriverNewV2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"; 
+    $params_confirmactualallload = array(
+        array('save_confirm_driver_allload', SQLSRV_PARAM_IN),
+        array($_POST['employeecode'], SQLSRV_PARAM_IN),
+        array($_POST['condition1'], SQLSRV_PARAM_IN),
+        array($_POST['condition2'], SQLSRV_PARAM_IN),
+        array($_POST['condition3'], SQLSRV_PARAM_IN),
+        array($_POST['condition4'], SQLSRV_PARAM_IN),
+        array($_POST['condition5'], SQLSRV_PARAM_IN),
+        array($_POST['condition6'], SQLSRV_PARAM_IN),
+        array($_POST['condition7'], SQLSRV_PARAM_IN),
+        array($_POST['condition8'], SQLSRV_PARAM_IN),
+        array($_POST['condition9'], SQLSRV_PARAM_IN),
+        array($_POST['condition10'], SQLSRV_PARAM_IN),
+        array($_POST['condition11'], SQLSRV_PARAM_IN),
+        array($_POST['condition12'], SQLSRV_PARAM_IN),
+        array($_POST['condition13'], SQLSRV_PARAM_IN),
+        array($_POST['condition14'], SQLSRV_PARAM_IN),
+        array($_POST['condition15'], SQLSRV_PARAM_IN),
+        array($_POST['condition16'], SQLSRV_PARAM_IN),
+        array($_POST['condition17'], SQLSRV_PARAM_IN),
+        array($_POST['condition18'], SQLSRV_PARAM_IN)
+        );
+  
+    $query_confirmactualallload = sqlsrv_query($conn, $sql_confirmactualallload, $params_confirmactualallload);
+    $result_confirmactualallload = sqlsrv_fetch_array($query_confirmactualallload, SQLSRV_FETCH_ASSOC);
+    echo $result_confirmactualallload['RS'];
+
+//     $sql_updatedata = "UPDATE DRIVINGPATTERN_GO 
+//         SET JOBSTARTACTUAL ='RRR'
+//         WHERE DRIVINGPATTERNGO_ID = '8'";
+// $query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+// $result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC); 
+  
+}
+// UNLOCK P1
+if ($_POST['txt_flg'] == "unlockP1") {
+
+
+$sql_updatedata = "UPDATE  DRIVINGPATTERN_GO
+    SET STATUS_UNLOCK_P1 ='YES',UNLOCK_BY_P1='" . $_POST['unlockby'] . "',UNLOCK_DATE_P1 = GETDATE()
+    WHERE DRIVINGPATTERNGO_ID ='" . $_POST['drivinggoplanid'] . "'";
+$query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+$result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);    
+  
+}
+// UNLOCK P2
+if ($_POST['txt_flg'] == "unlockP2") {
+
+
+$sql_updatedata = "UPDATE  DRIVINGPATTERN_GO
+    SET STATUS_UNLOCK_P2 ='YES',UNLOCK_BY_P2 ='" . $_POST['unlockby'] . "',UNLOCK_DATE_P2 = GETDATE()
+    WHERE DRIVINGPATTERNGO_ID ='" . $_POST['drivinggoplanid'] . "'";
+$query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+$result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);      
+  
+}
+// UNLOCK P3
+if ($_POST['txt_flg'] == "unlockP3") {
+
+
+$sql_updatedata = "UPDATE  DRIVINGPATTERN_GO
+    SET STATUS_UNLOCK_P3 ='YES',UNLOCK_BY_P3 ='" . $_POST['unlockby'] . "',UNLOCK_DATE_P3 = GETDATE()
+    WHERE DRIVINGPATTERNGO_ID ='" . $_POST['drivinggoplanid'] . "'";
+$query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+$result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);      
+  
+}
+// UNLOCK P4
+if ($_POST['txt_flg'] == "unlockP4") {
+
+
+$sql_updatedata = "UPDATE  DRIVINGPATTERN_GO
+    SET STATUS_UNLOCK_P4 ='YES',UNLOCK_BY_P4 ='" . $_POST['unlockby'] . "',UNLOCK_DATE_P4 = GETDATE()
+    WHERE DRIVINGPATTERNGO_ID ='" . $_POST['drivinggoplanid'] . "'";
+$query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+$result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);      
+  
+}
+// UNLOCK P5
+if ($_POST['txt_flg'] == "unlockP5") {
+
+
+$sql_updatedata = "UPDATE  DRIVINGPATTERN_GO
+    SET STATUS_UNLOCK_P5 ='YES',UNLOCK_BY_P5 ='" . $_POST['unlockby'] . "',UNLOCK_DATE_P5 = GETDATE()
+    WHERE DRIVINGPATTERNGO_ID ='" . $_POST['drivinggoplanid'] . "'";
+$query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+$result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);      
+  
+}
+// UNLOCK P6
+if ($_POST['txt_flg'] == "unlockP6") {
+
+
+$sql_updatedata = "UPDATE  DRIVINGPATTERN_GO
+    SET STATUS_UNLOCK_P6 ='YES',UNLOCK_BY_P6 ='" . $_POST['unlockby'] . "',UNLOCK_DATE_P6 = GETDATE()
+    WHERE DRIVINGPATTERNGO_ID ='" . $_POST['drivinggoplanid'] . "'";
+$query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+$result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);      
+  
+}
 ?>
 
 
 <?php
-sqlsrv_close($conn);s
+sqlsrv_close($conn);
 ?>
 

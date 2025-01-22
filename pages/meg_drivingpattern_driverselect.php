@@ -25,6 +25,8 @@ $conn = connect("RTMS");
 // $result_getDate = sqlsrv_fetch_array($query_getDate, SQLSRV_FETCH_ASSOC);
 
 // echo $_SESSION["USERNAME"];
+
+// echo $_SESSION["USERNAME"];
 ?>
 <html lang="en">
 
@@ -142,6 +144,12 @@ $conn = connect("RTMS");
                                             <input type="text" class="form-control dateen"  readonly=""  style="background-color: #f080802e" id="txt_dateend" name="txt_dateend" placeholder="วันที่สิ้นสุด" value="<?= $result_getDate['SYSDATE']; ?>">
                                         </div>
                                     </div>
+                                    <div class="col-lg-2">
+                                        <label>ชื่อพนักงาน</label>
+                                        <div class="form-group">
+                                            <input disabled="" type="text" class="form-control dateen"  readonly=""  style="background-color: #f080802e" id="txt_drivercheck" name="txt_drivercheck" placeholder="พนักงาน" value="<?= $_SESSION["USERNAME"]; ?>">
+                                        </div>
+                                    </div>
                                     <div class="col-lg-1">
                                         <label>&nbsp;</label>
                                         <div class="form-group">
@@ -163,7 +171,7 @@ $conn = connect("RTMS");
                                 <div class="panel-heading" style="background-color: #e7e7e7">
                                     <div class="row">
                                         
-                                        <div class="col-sm-6"><a href='index2.php'>หน้าแรก</a> / ข้อมูลรถพื้นที่อมตะ สำหรับลงข้อมูล SKP </div>
+                                        <div class="col-sm-6"><a href='index2.php'>หน้าแรก</a> / ลงข้อมูลรูปแบบการวิ่งงานสำหรับพนักงาน </div>
                                         <!-- <div class="col-sm-6 text-right"><a target="_bank" href='meg_vehicleinfoamata.php?vehicleinfoid=&meg=add'>เพิ่มข้อมูลรถ</a></div> -->
                                        
                                     </div>
@@ -178,15 +186,14 @@ $conn = connect("RTMS");
                                                     <table  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example" style="width: 100%;">
                                                         <thead>
                                                             <tr>   
+                                                                <th><label style="width: 100px;text-align: center">ลงข้อมูล</label></th>
                                                                 <th><label style="width: 100px">เลขที่แผนงาน</label></th>
                                                                 <th><label style="width: 100px">พนักงานคนที่1</label></th>
+                                                                <th><label style="width: 100px">พนักงานคนที่2</label></th>
                                                                 <th><label style="width: 100px">บริษัทสังกัด</label></th>
                                                                 <th><label style="width: 100px">สายงานสังกัด</label></th>
                                                                 <th><label style="width: 100px">ชื่อรถ (ไทย)</label></th>
                                                                 <th><label style="width: 100px">เลขทะเบียนรถ</label></th>
-                                                                <th><label style="width: 100px;text-align: center">Driving <br>Pattern</label></th>
-                                                                <th><label style="width: 100px;text-align: center">ปลดล็อคแผน<br>วิ่งจริงขาไป</label></th>
-                                                                <th><label style="width: 100px;text-align: center">ปลดล็อคแผน<br>วิ่งจริงขากลับ</label></th>
                                                                 <th><label style="width: 100px;text-align: center">สถานะ <br>ขาไป</label></th>
                                                                 <th><label style="width: 100px;text-align: center">สถานะ <br>ขากลับ</label></th>
                                                                 <th><label style="width: 100px;text-align: center">วันที่วิ่งงาน</label></th>
@@ -202,7 +209,7 @@ $conn = connect("RTMS");
 
                                                             $condition1 = "AND c.VEHICLEGROUPCODE !='VG-1403-0755' AND c.AFFCOMPANY IN ('RRC','RCC','RATC') 
                                                                            AND CONVERT(DATE,a.DATEWORKING,103) BETWEEN CONVERT(DATE,DATEADD(DAY,-3,GETDATE())) AND CONVERT(DATE,GETDATE())
-                                                                           AND a.EMPLOYEECODE1 ='".$_SESSION["USERNAME"]."'
+                                                                           AND (a.EMPLOYEECODE1 ='".$_SESSION["USERNAME"]."' OR a.EMPLOYEECODE2 ='".$_SESSION["USERNAME"]."')
                                                                            ORDER BY a.DATEWORKING,c.AFFCOMPANY,c.AFFCUSTOMER,a.THAINAME ASC";
                                                             $condition2 = "";
                                                             $condition3 = "";
@@ -241,21 +248,17 @@ $conn = connect("RTMS");
                                                                 }
                                                                 ?>
                                                                 <tr>
+                                                                    <td style="text-align: center">
+                                                                        <a style="background-color: #e0e0e0;" href='meg_drivingpattern_driveractual.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-list-alt"></span></a>
+                                                                    </td>
+                                                                    
                                                                     <td><?= $result_infolist['VEHICLETRANSPORTPLANID'] ?></td>
                                                                     <td><?= $result_infolist['EMPLOYEENAME1'] ?></td>
+                                                                    <td><?= $result_infolist['EMPLOYEENAME2'] ?></td>
                                                                     <td><?= $result_infolist['AFFCOMPANY'] ?></td>
                                                                     <td><?= $result_infolist['AFFCUSTOMER'] ?></td>
                                                                     <td><?= str_replace("(4L)","",$result_infolist['THAINAME']) ?></td>
                                                                     <td><?= $result_infolist['VEHICLEREGISNUMBER'] ?></td>
-                                                                    <td style="text-align: center">
-                                                                        <a style="background-color: #e0e0e0;" href='meg_drivingpattern_officer.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-list-alt"></span></a>
-                                                                    </td>
-                                                                    <td style="text-align: center">
-                                                                        <a style="background-color: #e0e0e0;" href='meg_drivingpattern_gounlock.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-ok-circle"></span></a>
-                                                                    </td>
-                                                                    <td style="text-align: center">
-                                                                        <a style="background-color: #e0e0e0;" href='meg_drivingpattern_backunlock.php.php?drivinggoplanid=<?= $result_infolist['DRIVINGPATTERNGO_ID'] ?>&drivingbackplanid=<?= $result_infolist['DRIVINGPATTERNRETURN_ID'] ?>' target="_bank" class='list-group-item'><span class=""><i class="fa fa-unlock-alt" aria-hidden="true"></i></span></a>
-                                                                    </td>
                                                                     <td style="text-align: center;<?=$bgcolorgo?>"><?= $statustextgo ?></td>
                                                                     <td style="text-align: center;<?=$bgcolorback?>"><?= $statustextback ?></td>
                                                                     <td><?= $result_infolist['DATEWORKING'] ?></td>
@@ -336,7 +339,7 @@ $conn = connect("RTMS");
                                                     type: 'post',
                                                     url: 'meg_data_drivingpattern_driver.php',
                                                     data: {
-                                                        txt_flg: "select_drivingpatternskp", datestart: datestart, dateend: dateend,employeecode: employeecode
+                                                        txt_flg: "select_drivingpattern_driverselect", datestart: datestart, dateend: dateend,employeecode: employeecode
                                                     },
                                                     success: function (response) {
                                                         
