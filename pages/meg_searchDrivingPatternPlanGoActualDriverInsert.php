@@ -2012,9 +2012,7 @@ switch ($section) {
         <script src="../vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
         <script src="../vendor/datatables-responsive/dataTables.responsive.js"></script> -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbbjIb5paVwA7uyWGtvanhvwnz6zuUK98&loading=async">
-        </script>
+        
 
         <script src="../dist/js/bootstrap-select.js"></script>
         <?php
