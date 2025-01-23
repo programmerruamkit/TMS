@@ -9080,7 +9080,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                                                                             $.ajax({
                                                                                                 type: 'post',
-                                                                                                url: 'meg_data.php',
+                                                                                                url: 'meg_data_documentdriver.php',
                                                                                                 data: {
                                                                                                     txt_flg: "select_compensation", datestart: document.getElementById('txt_datestart').value, dateend: document.getElementById('txt_dateend').value, selsuccess: document.getElementById('sel_success').value
                                                                                                 },
