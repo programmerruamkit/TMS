@@ -1,6 +1,6 @@
-﻿<?php
+<?php
 // function connectEHR($db) {
-//     $serverName = "EHR";
+//     $serverName = "203.150.225.30";
 //     $userName = "sa";
 //     $userPassword = 'Fpce#9084';
 //     $dbName = $db;
@@ -33,7 +33,7 @@ function select_empautocomplatedetailrktc() {
     $conn = connect("RTMS");
     $data = "";
     $sql = "
-    SELECT DISTINCT [TYPNAME] FROM RKTC 
+    SELECT DISTINCT [TYPNAME] FROM RKTC
     WHERE 1=1 AND [TYPNAME] != ''";
     $params = array();
     $query = sqlsrv_query($conn, $sql, $params);
@@ -84,7 +84,7 @@ function commitRktc()
     $sql = "{call megRktc_v2(?)}";
     $params = array(
         array('commit_rktc', SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -98,7 +98,7 @@ function commitDcs1()
     $sql = "{call megDcs1_v2(?)}";
     $params = array(
         array('commit_dcs1', SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -112,7 +112,7 @@ function commitDcs2()
     $sql = "{call megDcs2_v2(?)}";
     $params = array(
         array('commit_dcs2', SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -126,7 +126,7 @@ function delDcs1()
     $sql = "{call megDcs1_v2(?)}";
     $params = array(
         array('delete_dcs1', SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -140,7 +140,7 @@ function delRktc()
     $sql = "{call megRktc_v2(?)}";
     $params = array(
         array('delete_rktc', SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -154,7 +154,7 @@ function delDcs2()
     $sql = "{call megDcs2_v2(?)}";
     $params = array(
         array('delete_dcs2', SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -168,33 +168,33 @@ function insRktc($FLG,$CONDITION1,$NICKNM, $CUSCOD, $OPENDATE, $CLOSEDATE,$TAXIN
     $sql = "{call megRktc_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
     $params = array(
         array($FLG, SQLSRV_PARAM_IN),
-        
+
         array($CONDITION1, SQLSRV_PARAM_IN),
         array($NICKNM, SQLSRV_PARAM_IN),
         array($CUSCOD, SQLSRV_PARAM_IN),
-        array($OPENDATE, SQLSRV_PARAM_IN), 
+        array($OPENDATE, SQLSRV_PARAM_IN),
         array($CLOSEDATE, SQLSRV_PARAM_IN),
-        
+
         array($TAXINVOICEDATEE, SQLSRV_PARAM_IN),
         array($REGNO, SQLSRV_PARAM_IN),
         array($CHASSIS, SQLSRV_PARAM_IN),
         array($MILEAGE, SQLSRV_PARAM_IN),
         array($JOBNO, SQLSRV_PARAM_IN),
-        
+
         array($TYPNAME, SQLSRV_PARAM_IN),
         array($SPAREPARTSDETAIL, SQLSRV_PARAM_IN),
         array($NET, SQLSRV_PARAM_IN),
         array($COST, SQLSRV_PARAM_IN),
         array($SELLING, SQLSRV_PARAM_IN),
-        
+
         array($SPAREPARTSSELLER, SQLSRV_PARAM_IN),
         array($SUMMARY, SQLSRV_PARAM_IN),
         array($WAGES, SQLSRV_PARAM_IN),
         array($MECHANIC, SQLSRV_PARAM_IN),
         array($WORKINGHOURS, SQLSRV_PARAM_IN),
-        
+
         array($COLLECTIONHOURS, SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -224,7 +224,7 @@ function insDcs1($FLG,$CONDITION1,$PLANNINGTERMYEARFROM, $PLANNINGTERMCDFROM, $R
         array($ARRVTIME, SQLSRV_PARAM_IN),
         array($DPTDATES, SQLSRV_PARAM_IN),
         array($DPTTIME, SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -239,43 +239,43 @@ function insDcs2($FLG,$CONDITION1,$PLANNINGTERMYEARFROM, $PLANNINGTERMCDFROM, $P
     $params = array(
         array($FLG, SQLSRV_PARAM_IN),
         array($CONDITION1, SQLSRV_PARAM_IN),
-        array($PLANNINGTERMYEARFROM, SQLSRV_PARAM_IN), 
-        array($PLANNINGTERMCDFROM, SQLSRV_PARAM_IN), 
-        array($PLANNINGTERMYEARTO, SQLSRV_PARAM_IN), 
-        array($PLANNINGTERMCDTO, SQLSRV_PARAM_IN), 
-        array($RTEGRPCD, SQLSRV_PARAM_IN), 
-        array($RTEDATES, SQLSRV_PARAM_IN), 
-        array($RUNSEQ, SQLSRV_PARAM_IN), 
-        array($LOGPTTO, SQLSRV_PARAM_IN), 
-        array($RCVCOMPCD, SQLSRV_PARAM_IN), 
-        array($RCVCOMPPLANTCD, SQLSRV_PARAM_IN), 
-        array($RCVCOMPDOCKCD, SQLSRV_PARAM_IN), 
-        array($LOGPTFROM, SQLSRV_PARAM_IN), 
-        array($SUPPCD, SQLSRV_PARAM_IN), 
-        array($SUPPPLANTCD, SQLSRV_PARAM_IN), 
-        array($SUPPDOCKCD, SQLSRV_PARAM_IN), 
-        array($LOGPTCDFROM, SQLSRV_PARAM_IN), 
-        array($PLANTCDFROM, SQLSRV_PARAM_IN), 
-        array($DOCKCDFROM, SQLSRV_PARAM_IN), 
-        array($LOGPTCDTO, SQLSRV_PARAM_IN), 
-        array($PLANTCDTO, SQLSRV_PARAM_IN), 
-        array($DOCKCDTO, SQLSRV_PARAM_IN), 
-        array($PHYPTFROM, SQLSRV_PARAM_IN), 
-        array($PHYLOGPTCDFROM, SQLSRV_PARAM_IN), 
-        array($PHYPLANTCDFROM, SQLSRV_PARAM_IN), 
-        array($PHYDOCKCDFROM, SQLSRV_PARAM_IN), 
-        array($PHYPTTO, SQLSRV_PARAM_IN), 
-        array($PHYLOGPTCDTO, SQLSRV_PARAM_IN), 
-        array($PHYPLANTCDTO, SQLSRV_PARAM_IN), 
-        array($PHYDOCKCDTO, SQLSRV_PARAM_IN), 
-        array($PARTEMPKBTYPECD, SQLSRV_PARAM_IN), 
-        array($ORDDATE, SQLSRV_PARAM_IN), 
-        array($ORDSEQS, SQLSRV_PARAM_IN), 
-        array($LOADMATRIXUNLOADSTRDATE, SQLSRV_PARAM_IN), 
-        array($LOADMATRIXUNLOADSTRTIME, SQLSRV_PARAM_IN), 
-        array($LOADMATRIXUNLOADENDDATE, SQLSRV_PARAM_IN), 
+        array($PLANNINGTERMYEARFROM, SQLSRV_PARAM_IN),
+        array($PLANNINGTERMCDFROM, SQLSRV_PARAM_IN),
+        array($PLANNINGTERMYEARTO, SQLSRV_PARAM_IN),
+        array($PLANNINGTERMCDTO, SQLSRV_PARAM_IN),
+        array($RTEGRPCD, SQLSRV_PARAM_IN),
+        array($RTEDATES, SQLSRV_PARAM_IN),
+        array($RUNSEQ, SQLSRV_PARAM_IN),
+        array($LOGPTTO, SQLSRV_PARAM_IN),
+        array($RCVCOMPCD, SQLSRV_PARAM_IN),
+        array($RCVCOMPPLANTCD, SQLSRV_PARAM_IN),
+        array($RCVCOMPDOCKCD, SQLSRV_PARAM_IN),
+        array($LOGPTFROM, SQLSRV_PARAM_IN),
+        array($SUPPCD, SQLSRV_PARAM_IN),
+        array($SUPPPLANTCD, SQLSRV_PARAM_IN),
+        array($SUPPDOCKCD, SQLSRV_PARAM_IN),
+        array($LOGPTCDFROM, SQLSRV_PARAM_IN),
+        array($PLANTCDFROM, SQLSRV_PARAM_IN),
+        array($DOCKCDFROM, SQLSRV_PARAM_IN),
+        array($LOGPTCDTO, SQLSRV_PARAM_IN),
+        array($PLANTCDTO, SQLSRV_PARAM_IN),
+        array($DOCKCDTO, SQLSRV_PARAM_IN),
+        array($PHYPTFROM, SQLSRV_PARAM_IN),
+        array($PHYLOGPTCDFROM, SQLSRV_PARAM_IN),
+        array($PHYPLANTCDFROM, SQLSRV_PARAM_IN),
+        array($PHYDOCKCDFROM, SQLSRV_PARAM_IN),
+        array($PHYPTTO, SQLSRV_PARAM_IN),
+        array($PHYLOGPTCDTO, SQLSRV_PARAM_IN),
+        array($PHYPLANTCDTO, SQLSRV_PARAM_IN),
+        array($PHYDOCKCDTO, SQLSRV_PARAM_IN),
+        array($PARTEMPKBTYPECD, SQLSRV_PARAM_IN),
+        array($ORDDATE, SQLSRV_PARAM_IN),
+        array($ORDSEQS, SQLSRV_PARAM_IN),
+        array($LOADMATRIXUNLOADSTRDATE, SQLSRV_PARAM_IN),
+        array($LOADMATRIXUNLOADSTRTIME, SQLSRV_PARAM_IN),
+        array($LOADMATRIXUNLOADENDDATE, SQLSRV_PARAM_IN),
         array($LOADMATRIXUNLOADENDIME, SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -725,14 +725,14 @@ function updatevehicletransportplan_getwaye1($vehicletransportplanid, $E1) {
             );
             $query_seStartholidayrcc = sqlsrv_query($conn, $sql_seStartholidayrcc, $params_seStartholidayrcc);
             $result_seStartholidayrcc = sqlsrv_fetch_array($query_seStartholidayrcc, SQLSRV_FETCH_ASSOC);
-            
+
             $sql_seTenkoafter = "SELECT TOP 1 CONVERT(NVARCHAR(10),a.TENKOAFTERDATE,103) AS 'TENKOAFTERDATE' from [dbo].[TENKOAFTER] a
             INNER JOIN [dbo].[TENKOMASTER] b ON a.TENKOMASTERID = b.TENKOMASTERID
             WHERE b.VEHICLETRANSPORTPLANID = '".$result_seVehicletransportplan['VEHICLETRANSPORTPLANID']."'";
             $params_seTenkoafter = array();
             $query_seTenkoafter = sqlsrv_query($conn, $sql_seTenkoafter, $params_seTenkoafter);
             $result_seTenkoafter = sqlsrv_fetch_array($query_seTenkoafter, SQLSRV_FETCH_ASSOC);
-            
+
             $sql_seStartholidaymondayrcc = "{call megHolidayEHR_v2(?,?,?,?)}";
             $params_seStartholidaymondayrcc = array(
                 array('return_holidayworkrccmonday', SQLSRV_PARAM_IN),
@@ -742,11 +742,11 @@ function updatevehicletransportplan_getwaye1($vehicletransportplanid, $E1) {
             );
             $query_seStartholidaymondayrcc = sqlsrv_query($conn, $sql_seStartholidaymondayrcc, $params_seStartholidaymondayrcc);
             $result_seStartholidaymondayrcc = sqlsrv_fetch_array($query_seStartholidaymondayrcc, SQLSRV_FETCH_ASSOC);
-            
-            
-            
-                    
-                    
+
+
+
+
+
             $sql_seBefore13holidayrcc = "{call megHolidayEHR_v2(?,?,?,?)}";
             $params_seBefore13holidayrcc = array(
                 array('return_beforercc13', SQLSRV_PARAM_IN),
@@ -893,14 +893,14 @@ function updatevehicletransportplan_getwaye2($vehicletransportplanid, $E1) {
             );
             $query_seStartholidayrcc = sqlsrv_query($conn, $sql_seStartholidayrcc, $params_seStartholidayrcc);
             $result_seStartholidayrcc = sqlsrv_fetch_array($query_seStartholidayrcc, SQLSRV_FETCH_ASSOC);
-            
+
             $sql_seTenkoafter = "SELECT TOP 1 CONVERT(NVARCHAR(10),a.TENKOAFTERDATE,103) AS 'TENKOAFTERDATE' from [dbo].[TENKOAFTER] a
             INNER JOIN [dbo].[TENKOMASTER] b ON a.TENKOMASTERID = b.TENKOMASTERID
             WHERE b.VEHICLETRANSPORTPLANID = '".$result_seVehicletransportplan['VEHICLETRANSPORTPLANID']."'";
             $params_seTenkoafter = array();
             $query_seTenkoafter = sqlsrv_query($conn, $sql_seTenkoafter, $params_seTenkoafter);
             $result_seTenkoafter = sqlsrv_fetch_array($query_seTenkoafter, SQLSRV_FETCH_ASSOC);
-            
+
             $sql_seStartholidaymondayrcc = "{call megHolidayEHR_v2(?,?,?,?)}";
             $params_seStartholidaymondayrcc = array(
                 array('return_holidayworkrccmonday', SQLSRV_PARAM_IN),
@@ -1057,14 +1057,14 @@ function updatevehicletransportplan_getwaye3($vehicletransportplanid, $E1) {
             );
             $query_seStartholidayrcc = sqlsrv_query($conn, $sql_seStartholidayrcc, $params_seStartholidayrcc);
             $result_seStartholidayrcc = sqlsrv_fetch_array($query_seStartholidayrcc, SQLSRV_FETCH_ASSOC);
-            
+
             $sql_seTenkoafter = "SELECT TOP 1 CONVERT(NVARCHAR(10),a.TENKOAFTERDATE,103) AS 'TENKOAFTERDATE' from [dbo].[TENKOAFTER] a
             INNER JOIN [dbo].[TENKOMASTER] b ON a.TENKOMASTERID = b.TENKOMASTERID
             WHERE b.VEHICLETRANSPORTPLANID = '".$result_seVehicletransportplan['VEHICLETRANSPORTPLANID']."'";
             $params_seTenkoafter = array();
             $query_seTenkoafter = sqlsrv_query($conn, $sql_seTenkoafter, $params_seTenkoafter);
             $result_seTenkoafter = sqlsrv_fetch_array($query_seTenkoafter, SQLSRV_FETCH_ASSOC);
-            
+
             $sql_seStartholidaymondayrcc = "{call megHolidayEHR_v2(?,?,?,?)}";
             $params_seStartholidaymondayrcc = array(
                 array('return_holidayworkrccmonday', SQLSRV_PARAM_IN),
@@ -1074,7 +1074,7 @@ function updatevehicletransportplan_getwaye3($vehicletransportplanid, $E1) {
             );
             $query_seStartholidaymondayrcc = sqlsrv_query($conn, $sql_seStartholidaymondayrcc, $params_seStartholidaymondayrcc);
             $result_seStartholidaymondayrcc = sqlsrv_fetch_array($query_seStartholidaymondayrcc, SQLSRV_FETCH_ASSOC);
-            
+
             $sql_seBefore13holidayrcc = "{call megHolidayEHR_v2(?,?,?,?)}";
             $params_seBefore13holidayrcc = array(
                 array('return_beforercc13', SQLSRV_PARAM_IN),
@@ -1557,7 +1557,7 @@ function select_dealerautocomplate($STORED,$FLG,$EMPCODE,$CONDI1,$CONDI2,$CONDI3
     }
     return rtrim($data, ",");
     // echo $result['DEALER'] ;
-    
+
 }
 
 function select_carautocomplate($STORED, $FLG, $CONDI1, $CONDI2, $CONDI3, $CONDI4) {
@@ -2084,90 +2084,90 @@ function updStatusjob($FLG) {
 }
 
 function editTenkobeforepast(
-        $FLG, 
+        $FLG,
         $ID,
         $TENKOBEFOREGREETCHECK,
         $TENKOUNIFORMCHECK,
         $TENKOBODYCHECK,
-        
+
         $TENKORESTCHECK,
         $TENKOSLEEPTIMECHECK,
         $TENKOTEMPERATURECHECK,
         $TENKOPRESSURECHECK,
         $TENKOALCOHOLCHECK,
-        
+
         $TENKOWORRYCHECK,
         $TENKODAILYTRAILERCHECK,
         $TENKOCARRYCHECK,
         $TENKOJOBDETAILCHECK,
         $TENKOLOADINFORMCHECK,
-        
+
         $TENKOAIRINFORMCHECK,
         $TENKOYOKOTENCHECK,
         $TENKOCHIMOLATORCHECK,
         $TENKOTRANSPORTCHECK,
         $TENKOAFTERGREETCHECK,
-        
+
         $TENKOOXYGENCHECK,
         $TENKOBEFOREGREETRESULT,
         $TENKOUNIFORMRESULT,
         $TENKOBODYRESULT,
         $TENKORESTRESULT,
-        
+
         $TENKOSLEEPTIMERESULT,
         $TENKOTEMPERATURERESULT,
         $TENKOPRESSURERESULT,
         $TENKOALCOHOLRESULT,
         $TENKOWORRYRESULT,
-        
+
         $TENKODAILYTRAILERRESULT,
         $TENKOCARRYRESULT,
         $TENKOJOBDETAILRESULT,
         $TENKOLOADINFORMRESULT,
         $TENKOAIRINFORMRESULT,
-        
+
         $TENKOYOKOTENRESULT,
         $TENKOCHIMOLATORRESULT,
         $TENKOTRANSPORTRESULT,
         $TENKOAFTERGREETRESULT,
         $TENKOOXYGENRESULT,
-        
+
         $TENKOBEFOREGREETREMARK,
         $TENKOUNIFORMREMARK,
         $TENKOBODYREMARK,
         $TENKORESTREMARK,
         $TENKOSLEEPTIMEREMARK,
-        
+
         $TENKOTEMPERATUREREMARK,
         $TENKOPRESSUREREMARK,
         $TENKOALCOHOLREMARK,
         $TENKOWORRYREMARK,
         $TENKODAILYTRAILERREMARK,
-        
+
         $TENKOCARRYREMARK,
         $TENKOJOBDETAILREMARK,
         $TENKOLOADINFORMREMARK,
         $TENKOAIRINFORMREMARK,
         $TENKOYOKOTENREMARK,
-        
+
         $TENKOCHIMOLATORREMARK,
         $TENKOTRANSPORTREMARK,
         $TENKOAFTERGREETREMARK,
         $TENKOOXYGENREMARK,
         $TENKORESTDATA,
-        
+
         $TENKOSLEEPTIMEDATA_AFTER6H,
         $TENKOSLEEPTIMEDATA_ADD45H,
         $TENKOTEMPERATUREDATA,
         $TENKOPRESSUREDATA_90160,
         $TENKOPRESSUREDATA_90160_2,
-        
+
         $TENKOPRESSUREDATA_90160_3,
         $TENKOPRESSUREDATA_60100,
         $TENKOPRESSUREDATA_60100_2,
         $TENKOPRESSUREDATA_60100_3,
         $TENKOPRESSUREDATA_60110,
-        
+
         $TENKOPRESSUREDATA_60110_2,
         $TENKOPRESSUREDATA_60110_3,
         $TENKOALCOHOLDATA,
@@ -2185,85 +2185,85 @@ function editTenkobeforepast(
         array($TENKOBEFOREGREETCHECK, SQLSRV_PARAM_IN),
         array($TENKOUNIFORMCHECK, SQLSRV_PARAM_IN),
         array($TENKOBODYCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKORESTCHECK, SQLSRV_PARAM_IN),
         array($TENKOSLEEPTIMECHECK, SQLSRV_PARAM_IN),
         array($TENKOTEMPERATURECHECK, SQLSRV_PARAM_IN),
         array($TENKOPRESSURECHECK, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOWORRYCHECK, SQLSRV_PARAM_IN),
         array($TENKODAILYTRAILERCHECK, SQLSRV_PARAM_IN),
         array($TENKOCARRYCHECK, SQLSRV_PARAM_IN),
         array($TENKOJOBDETAILCHECK, SQLSRV_PARAM_IN),
         array($TENKOLOADINFORMCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOAIRINFORMCHECK, SQLSRV_PARAM_IN),
         array($TENKOYOKOTENCHECK, SQLSRV_PARAM_IN),
         array($TENKOCHIMOLATORCHECK, SQLSRV_PARAM_IN),
         array($TENKOTRANSPORTCHECK, SQLSRV_PARAM_IN),
         array($TENKOAFTERGREETCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOOXYGENCHECK, SQLSRV_PARAM_IN),
         array($TENKOBEFOREGREETRESULT, SQLSRV_PARAM_IN),
         array($TENKOUNIFORMRESULT, SQLSRV_PARAM_IN),
         array($TENKOBODYRESULT, SQLSRV_PARAM_IN),
         array($TENKORESTRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKOSLEEPTIMERESULT, SQLSRV_PARAM_IN),
         array($TENKOTEMPERATURERESULT, SQLSRV_PARAM_IN),
         array($TENKOPRESSURERESULT, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLRESULT, SQLSRV_PARAM_IN),
         array($TENKOWORRYRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKODAILYTRAILERRESULT, SQLSRV_PARAM_IN),
         array($TENKOCARRYRESULT, SQLSRV_PARAM_IN),
         array($TENKOJOBDETAILRESULT, SQLSRV_PARAM_IN),
         array($TENKOLOADINFORMRESULT, SQLSRV_PARAM_IN),
         array($TENKOAIRINFORMRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKOYOKOTENRESULT, SQLSRV_PARAM_IN),
         array($TENKOCHIMOLATORRESULT, SQLSRV_PARAM_IN),
         array($TENKOTRANSPORTRESULT, SQLSRV_PARAM_IN),
         array($TENKOAFTERGREETRESULT, SQLSRV_PARAM_IN),
         array($TENKOOXYGENRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKOBEFOREGREETREMARK, SQLSRV_PARAM_IN),
         array($TENKOUNIFORMREMARK, SQLSRV_PARAM_IN),
         array($TENKOBODYREMARK, SQLSRV_PARAM_IN),
         array($TENKORESTREMARK, SQLSRV_PARAM_IN),
         array($TENKOSLEEPTIMEREMARK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOTEMPERATUREREMARK, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREREMARK, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLREMARK, SQLSRV_PARAM_IN),
         array($TENKOWORRYREMARK, SQLSRV_PARAM_IN),
         array($TENKODAILYTRAILERREMARK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOCARRYREMARK, SQLSRV_PARAM_IN),
         array($TENKOJOBDETAILREMARK, SQLSRV_PARAM_IN),
         array($TENKOLOADINFORMREMARK, SQLSRV_PARAM_IN),
         array($TENKOAIRINFORMREMARK, SQLSRV_PARAM_IN),
         array($TENKOYOKOTENREMARK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOCHIMOLATORREMARK, SQLSRV_PARAM_IN),
         array($TENKOTRANSPORTREMARK, SQLSRV_PARAM_IN),
         array($TENKOAFTERGREETREMARK, SQLSRV_PARAM_IN),
         array($TENKOOXYGENREMARK, SQLSRV_PARAM_IN),
         array($TENKORESTDATA, SQLSRV_PARAM_IN),
-        
+
         array($TENKOSLEEPTIMEDATA_AFTER6H, SQLSRV_PARAM_IN),
         array($TENKOSLEEPTIMEDATA_ADD45H, SQLSRV_PARAM_IN),
         array($TENKOTEMPERATUREDATA, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_90160, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_90160_2, SQLSRV_PARAM_IN),
-        
+
         array($TENKOPRESSUREDATA_90160_3, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60100, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60100_2, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60100_3, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60110, SQLSRV_PARAM_IN),
-        
+
         array($TENKOPRESSUREDATA_60110_2, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60110_3, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLDATA, SQLSRV_PARAM_IN),
@@ -2279,90 +2279,90 @@ function editTenkobeforepast(
     return $result['RS'];
 }
 function editTenkobefore2(
-        $FLG, 
+        $FLG,
         $ID,
         $TENKOBEFOREGREETCHECK,
         $TENKOUNIFORMCHECK,
         $TENKOBODYCHECK,
-        
+
         $TENKORESTCHECK,
         $TENKOSLEEPTIMECHECK,
         $TENKOTEMPERATURECHECK,
         $TENKOPRESSURECHECK,
         $TENKOALCOHOLCHECK,
-        
+
         $TENKOWORRYCHECK,
         $TENKODAILYTRAILERCHECK,
         $TENKOCARRYCHECK,
         $TENKOJOBDETAILCHECK,
         $TENKOLOADINFORMCHECK,
-        
+
         $TENKOAIRINFORMCHECK,
         $TENKOYOKOTENCHECK,
         $TENKOCHIMOLATORCHECK,
         $TENKOTRANSPORTCHECK,
         $TENKOAFTERGREETCHECK,
-        
+
         $TENKOOXYGENCHECK,
         $TENKOBEFOREGREETRESULT,
         $TENKOUNIFORMRESULT,
         $TENKOBODYRESULT,
         $TENKORESTRESULT,
-        
+
         $TENKOSLEEPTIMERESULT,
         $TENKOTEMPERATURERESULT,
         $TENKOPRESSURERESULT,
         $TENKOALCOHOLRESULT,
         $TENKOWORRYRESULT,
-        
+
         $TENKODAILYTRAILERRESULT,
         $TENKOCARRYRESULT,
         $TENKOJOBDETAILRESULT,
         $TENKOLOADINFORMRESULT,
         $TENKOAIRINFORMRESULT,
-        
+
         $TENKOYOKOTENRESULT,
         $TENKOCHIMOLATORRESULT,
         $TENKOTRANSPORTRESULT,
         $TENKOAFTERGREETRESULT,
         $TENKOOXYGENRESULT,
-        
+
         $TENKOBEFOREGREETREMARK,
         $TENKOUNIFORMREMARK,
         $TENKOBODYREMARK,
         $TENKORESTREMARK,
         $TENKOSLEEPTIMEREMARK,
-        
+
         $TENKOTEMPERATUREREMARK,
         $TENKOPRESSUREREMARK,
         $TENKOALCOHOLREMARK,
         $TENKOWORRYREMARK,
         $TENKODAILYTRAILERREMARK,
-        
+
         $TENKOCARRYREMARK,
         $TENKOJOBDETAILREMARK,
         $TENKOLOADINFORMREMARK,
         $TENKOAIRINFORMREMARK,
         $TENKOYOKOTENREMARK,
-        
+
         $TENKOCHIMOLATORREMARK,
         $TENKOTRANSPORTREMARK,
         $TENKOAFTERGREETREMARK,
         $TENKOOXYGENREMARK,
         $TENKORESTDATA,
-        
+
         $TENKOSLEEPTIMEDATA_AFTER6H,
         $TENKOSLEEPTIMEDATA_ADD45H,
         $TENKOTEMPERATUREDATA,
         $TENKOPRESSUREDATA_90160,
         $TENKOPRESSUREDATA_90160_2,
-        
+
         $TENKOPRESSUREDATA_90160_3,
         $TENKOPRESSUREDATA_60100,
         $TENKOPRESSUREDATA_60100_2,
         $TENKOPRESSUREDATA_60100_3,
         $TENKOPRESSUREDATA_60110,
-        
+
         $TENKOPRESSUREDATA_60110_2,
         $TENKOPRESSUREDATA_60110_3,
         $TENKOALCOHOLDATA,
@@ -2379,85 +2379,85 @@ function editTenkobefore2(
         array($TENKOBEFOREGREETCHECK, SQLSRV_PARAM_IN),
         array($TENKOUNIFORMCHECK, SQLSRV_PARAM_IN),
         array($TENKOBODYCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKORESTCHECK, SQLSRV_PARAM_IN),
         array($TENKOSLEEPTIMECHECK, SQLSRV_PARAM_IN),
         array($TENKOTEMPERATURECHECK, SQLSRV_PARAM_IN),
         array($TENKOPRESSURECHECK, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOWORRYCHECK, SQLSRV_PARAM_IN),
         array($TENKODAILYTRAILERCHECK, SQLSRV_PARAM_IN),
         array($TENKOCARRYCHECK, SQLSRV_PARAM_IN),
         array($TENKOJOBDETAILCHECK, SQLSRV_PARAM_IN),
         array($TENKOLOADINFORMCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOAIRINFORMCHECK, SQLSRV_PARAM_IN),
         array($TENKOYOKOTENCHECK, SQLSRV_PARAM_IN),
         array($TENKOCHIMOLATORCHECK, SQLSRV_PARAM_IN),
         array($TENKOTRANSPORTCHECK, SQLSRV_PARAM_IN),
         array($TENKOAFTERGREETCHECK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOOXYGENCHECK, SQLSRV_PARAM_IN),
         array($TENKOBEFOREGREETRESULT, SQLSRV_PARAM_IN),
         array($TENKOUNIFORMRESULT, SQLSRV_PARAM_IN),
         array($TENKOBODYRESULT, SQLSRV_PARAM_IN),
         array($TENKORESTRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKOSLEEPTIMERESULT, SQLSRV_PARAM_IN),
         array($TENKOTEMPERATURERESULT, SQLSRV_PARAM_IN),
         array($TENKOPRESSURERESULT, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLRESULT, SQLSRV_PARAM_IN),
         array($TENKOWORRYRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKODAILYTRAILERRESULT, SQLSRV_PARAM_IN),
         array($TENKOCARRYRESULT, SQLSRV_PARAM_IN),
         array($TENKOJOBDETAILRESULT, SQLSRV_PARAM_IN),
         array($TENKOLOADINFORMRESULT, SQLSRV_PARAM_IN),
         array($TENKOAIRINFORMRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKOYOKOTENRESULT, SQLSRV_PARAM_IN),
         array($TENKOCHIMOLATORRESULT, SQLSRV_PARAM_IN),
         array($TENKOTRANSPORTRESULT, SQLSRV_PARAM_IN),
         array($TENKOAFTERGREETRESULT, SQLSRV_PARAM_IN),
         array($TENKOOXYGENRESULT, SQLSRV_PARAM_IN),
-        
+
         array($TENKOBEFOREGREETREMARK, SQLSRV_PARAM_IN),
         array($TENKOUNIFORMREMARK, SQLSRV_PARAM_IN),
         array($TENKOBODYREMARK, SQLSRV_PARAM_IN),
         array($TENKORESTREMARK, SQLSRV_PARAM_IN),
         array($TENKOSLEEPTIMEREMARK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOTEMPERATUREREMARK, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREREMARK, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLREMARK, SQLSRV_PARAM_IN),
         array($TENKOWORRYREMARK, SQLSRV_PARAM_IN),
         array($TENKODAILYTRAILERREMARK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOCARRYREMARK, SQLSRV_PARAM_IN),
         array($TENKOJOBDETAILREMARK, SQLSRV_PARAM_IN),
         array($TENKOLOADINFORMREMARK, SQLSRV_PARAM_IN),
         array($TENKOAIRINFORMREMARK, SQLSRV_PARAM_IN),
         array($TENKOYOKOTENREMARK, SQLSRV_PARAM_IN),
-        
+
         array($TENKOCHIMOLATORREMARK, SQLSRV_PARAM_IN),
         array($TENKOTRANSPORTREMARK, SQLSRV_PARAM_IN),
         array($TENKOAFTERGREETREMARK, SQLSRV_PARAM_IN),
         array($TENKOOXYGENREMARK, SQLSRV_PARAM_IN),
         array($TENKORESTDATA, SQLSRV_PARAM_IN),
-        
+
         array($TENKOSLEEPTIMEDATA_AFTER6H, SQLSRV_PARAM_IN),
         array($TENKOSLEEPTIMEDATA_ADD45H, SQLSRV_PARAM_IN),
         array($TENKOTEMPERATUREDATA, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_90160, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_90160_2, SQLSRV_PARAM_IN),
-        
+
         array($TENKOPRESSUREDATA_90160_3, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60100, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60100_2, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60100_3, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60110, SQLSRV_PARAM_IN),
-        
+
         array($TENKOPRESSUREDATA_60110_2, SQLSRV_PARAM_IN),
         array($TENKOPRESSUREDATA_60110_3, SQLSRV_PARAM_IN),
         array($TENKOALCOHOLDATA, SQLSRV_PARAM_IN),
@@ -3015,7 +3015,7 @@ function insTenkomaster($FLG, $CONDITION1, $VEHICLETRANSPORTPLANID, $TENKOMASTER
         array($ACTIVESTATUS, SQLSRV_PARAM_IN),
         array($OFFICER, SQLSRV_PARAM_IN),
         array($STATUSEMP, SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -3893,7 +3893,7 @@ function saveCopyjobvehicletransportplan($FLG, $JOBNO, $ROWSAMOUNT) {
     return $result['RS'];
 }
 function save_copyjobvehicletransportplan_newrccratc($FLG, $JOBNO, $ROWSAMOUNT) {
-    
+
     $conn = connect("RTMS");
     $sql = "{call megVehicletransportplancopyjob_new_rccratc_v2(?,?,?)}";
     $params = array(
@@ -4068,7 +4068,7 @@ function insUpdatebilling($TXT_FLG, $CONDITION1, $EMPLOYEENAME1, $EMPLOYEENAME2,
         array($LOAD, SQLSRV_PARAM_IN),
         array($copydiagramdaterkupd, SQLSRV_PARAM_IN),
         array($JOBEND, SQLSRV_PARAM_IN)
-        
+
     );
     $query = sqlsrv_query($conn, $sql, $params);
     $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -4132,43 +4132,43 @@ $TXT_FLG, $CONDITION1, $STARTDATE, $ENDDATE, $CUSTOMERCODE, $COMPANYCODE, $THAIN
     return $result['RS'];
 }
 function insCopydiagramvehicletransportplan_new_rccratc(
-    $TXT_FLG, 
-    $CONDITION1, 
-    $STARTDATE, 
-    $ENDDATE, 
-    $CUSTOMERCODE, 
-    $COMPANYCODE, 
-    $THAINAME, 
-    $JOBSTART, 
-    $CLUSTER, 
-    $JOBEND, 
-    $EMPLOYEENAME1, 
-    $EMPLOYEENAME2, 
-    $EMPLOYEENAME3, 
-    $JOBNO, 
-    $DATEINPUT, 
-    $DATEPRESENT, 
-    $DATEWORKING, 
-    $DATERK, 
-    $DATEVLIN, 
+    $TXT_FLG,
+    $CONDITION1,
+    $STARTDATE,
+    $ENDDATE,
+    $CUSTOMERCODE,
+    $COMPANYCODE,
+    $THAINAME,
+    $JOBSTART,
+    $CLUSTER,
+    $JOBEND,
+    $EMPLOYEENAME1,
+    $EMPLOYEENAME2,
+    $EMPLOYEENAME3,
+    $JOBNO,
+    $DATEINPUT,
+    $DATEPRESENT,
+    $DATEWORKING,
+    $DATERK,
+    $DATEVLIN,
     $DATEVLOUT,
-    $DATEDEALERIN, 
-    $DATERETURN, 
-    $VEHICLETYPE, 
-    $MATERIALTYPE, 
-    $GORETURN, 
-    $WORKTYPE, 
-    $LOAD, 
-    $ROUTE, 
-    $UNIT, 
-    $ROUNDAMOUNT, 
-    $DN, 
-    $CARRYTYPE, 
-    $THAINAME2, 
-    $BILLING, 
-    $CREATEBY, 
-    $NO7, 
-    $NO8, 
+    $DATEDEALERIN,
+    $DATERETURN,
+    $VEHICLETYPE,
+    $MATERIALTYPE,
+    $GORETURN,
+    $WORKTYPE,
+    $LOAD,
+    $ROUTE,
+    $UNIT,
+    $ROUNDAMOUNT,
+    $DN,
+    $CARRYTYPE,
+    $THAINAME2,
+    $BILLING,
+    $CREATEBY,
+    $NO7,
+    $NO8,
     $HOLIDAY) {
     $conn = connect("RTMS");
     // $sql = "{call megVehicletransportplancopydiagram_v2("
@@ -4327,50 +4327,50 @@ function insVehicletransportprice($FLG, $CONDITION1, $CONDITION2, $CONDITION3,$C
     return $result['RS'];
 }
 function insVehicleinfo(
-    $FLG, 
-    $CONDITION1, 
-    $VEHICLEREGISNUMBER, 
-    $VEHICLEGROUPCODE, 
-    $VEHICLETYPECODE, 
-    $BRANDCODE, 
-    $GEARTYPECODE, 
-    $COLORCODE, 
-    $SERIES, 
-    $THAINAME, 
-    $ENGNAME, 
-    $TRUCKLINE, 
-    $HORSEPOWER, 
-    $CC, 
-    $TAXEXPIREDDATE, 
-    $MACHINENUMBER, 
+    $FLG,
+    $CONDITION1,
+    $VEHICLEREGISNUMBER,
+    $VEHICLEGROUPCODE,
+    $VEHICLETYPECODE,
+    $BRANDCODE,
+    $GEARTYPECODE,
+    $COLORCODE,
+    $SERIES,
+    $THAINAME,
+    $ENGNAME,
+    $TRUCKLINE,
+    $HORSEPOWER,
+    $CC,
+    $TAXEXPIREDDATE,
+    $MACHINENUMBER,
     $CHASSISNUMBER,
-    $GPS, 
-    $INSURANCE,  
-    $ENERGY, 
-    $WEIGHT, 
-    $AXLETYPE, 
-    $PISTON, 
+    $GPS,
+    $INSURANCE,
+    $ENERGY,
+    $WEIGHT,
+    $AXLETYPE,
+    $PISTON,
     $MAXIMUMLOAD,
-    $TOTALWEIGHT, 
-    $TRUCKDIMENSION, 
-    $CARGODIMENSION, 
-    $FUELTANKCAP, 
-    $SPEEDLIMIT, 
-    $USED, 
-    $VEHICLEBUYWHERE, 
-    $VEHICLEBUYDATE, 
-    $VEHICLEBUYPRICE, 
-    $VEHICLEBUYCONDITION, 
-    $VEHICLESTRUCTUREWHERE, 
-    $VEHICLESTRUCTUREDATE, 
-    $VEHICLESTRUCTUREPRICE, 
-    $VEHICLEREGISTERDATE, 
-    $VEHICLEREGISTERFIRSTDATE, 
-    $VEHICLESPECIAL, 
-    $AFFCOMPANY, 
-    $REMARK, 
+    $TOTALWEIGHT,
+    $TRUCKDIMENSION,
+    $CARGODIMENSION,
+    $FUELTANKCAP,
+    $SPEEDLIMIT,
+    $USED,
+    $VEHICLEBUYWHERE,
+    $VEHICLEBUYDATE,
+    $VEHICLEBUYPRICE,
+    $VEHICLEBUYCONDITION,
+    $VEHICLESTRUCTUREWHERE,
+    $VEHICLESTRUCTUREDATE,
+    $VEHICLESTRUCTUREPRICE,
+    $VEHICLEREGISTERDATE,
+    $VEHICLEREGISTERFIRSTDATE,
+    $VEHICLESPECIAL,
+    $AFFCOMPANY,
+    $REMARK,
     $ACTIVESTATUS) {
-    
+
     $conn = connect("RTMS");
     $sql = "{call megVehicleinfo_v2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
     $params = array(
