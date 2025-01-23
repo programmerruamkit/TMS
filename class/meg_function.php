@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // function connectEHR($db) {
 //     $serverName = "203.150.225.30";
 //     $userName = "sa";
@@ -17,7 +17,7 @@ function connect($db) {
 //$conn = sqlsrv_connect($serverName, $connectionInfo);
 //return $conn;
     //$serverName = "61.91.5.110";
-    $serverName = "RK01";
+    $serverName = "RK01";  
     $userName = "sa";
     $userPassword = 'Fpce#9084';
     $dbName = $db;
