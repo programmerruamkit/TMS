@@ -1,6 +1,6 @@
 <?php
 function connectEHR($db) {
-    $serverName = "203.150.225.30";
+    $serverName = "EHR";
     $userName = "sa";
     $userPassword = 'Fpce#9084';
     $dbName = $db;
@@ -9,14 +9,14 @@ function connectEHR($db) {
     return $conn;
 }
 function connect($db) {
-//$serverName = "203.150.29.241\SQLEXPRESS,1433";
+//$serverName = "EHR\SQLEXPRESS,1433";
 //$userName = "sa";
 //$userPassword = 'tm$wa01';
 //$dbName = $db;
 //$connectionInfo = array("Database" => $dbName, "UID" => $userName, "PWD" => $userPassword, "MultipleActiveResultSets" => true, "CharacterSet" => 'UTF-8');
 //$conn = sqlsrv_connect($serverName, $connectionInfo);
 //return $conn;
-    //$serverName = "61.91.5.110";
+	
     $serverName = "RK01";
     $userName = "sa";
     $userPassword = 'Fpce#9084';
