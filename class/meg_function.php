@@ -1,6 +1,6 @@
 ﻿<?php
 // function connectEHR($db) {
-//     $serverName = "203.150.225.30";
+//     $serverName = "EHR";
 //     $userName = "sa";
 //     $userPassword = 'Fpce#9084';
 //     $dbName = $db;
