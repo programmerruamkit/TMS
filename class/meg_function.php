@@ -10,7 +10,7 @@
 // }
 function connect($db) {
 
-    $serverName = "RK01";  
+    $serverName = "RK01";
     $userName = "sa";
     $userPassword = 'Fpce#9084';
     $dbName = $db;
