@@ -14,5 +14,5 @@ while ($result_seCountstop = sqlsrv_fetch_array($query_seCountstop, SQLSRV_FETCH
     $result[] = $result_seCountstop;
 }
 echo $json = json_encode($result, JSON_NUMERIC_CHECK);
-echo "001";
+echo "0011";
 ?>
