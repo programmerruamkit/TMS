@@ -14335,7 +14335,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function (rs) {
-                                alert(rs);
+                                //alert(rs);
                                 // save_logprocess('Planing', 'Save Thursday Planing', '<?= $result_seLogin['PersonCode'] ?>');
                             }
                         });
@@ -14373,7 +14373,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     }
                     if (chk_copydiagramfriday.checked == true) {
 
-                        alert('friday');
+                       //alert('friday');
 
                         $.ajax({
                             type: 'post',
