@@ -15,16 +15,14 @@ $params_seSystime = array(
 $query_seSystime = sqlsrv_query($conn, $sql_seSystime, $params_seSystime);
 $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
 
-if ($_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC' || $_GET['companycode'] == 'RRC') {
-    updatevehicletransportplan_getway();
-} else if ($_GET['companycode'] == 'RKS') {
-    if ($_GET['customercode'] == 'STM' || $_GET['customercode'] == 'TMT' || $_GET['customercode'] == 'TAW' || $_GET['customercode'] == 'TGT') {
-        updatevehicletransportplan_stmtmttawtgt();
-    } else if ($_GET['customercode'] == 'DENSO-THAI') {
-        updatevehicletransportplan_denso();
-    }
-}
-
+$condition1 = " AND (a.USERNAME ='" . $_SESSION["USERNAME"] . "' AND a.PASSWORD = '" . $_SESSION["PASSWORD"] . "') AND a.ACTIVESTATUS = 1";
+$sql_seLogin = "{call megRoleaccount_v2(?,?)}";
+$params_seLogin = array(
+    array('select_roleaccount', SQLSRV_PARAM_IN),
+    array($condition1, SQLSRV_PARAM_IN)
+);
+$query_seLogin = sqlsrv_query($conn, $sql_seLogin, $params_seLogin);
+$result_seLogin = sqlsrv_fetch_array($query_seLogin, SQLSRV_FETCH_ASSOC);
 
 
 $run_jobno = create_jobno(substr($_GET['companycode'], 0, 3), 'GETDATE()');
@@ -66,7 +64,7 @@ $result_seCustomer = sqlsrv_fetch_array($query_seCustomer, SQLSRV_FETCH_ASSOC);
 $condition1 = "  AND a.PersonID = '" . $_SESSION["EMPLOYEEID"] . "'";
 $sql_seEmployee = "{call megEmployeeEHR_v2(?,?)}";
 $params_seEmployee = array(
-    array('select_employee', SQLSRV_PARAM_IN),
+    array('select_employeeehr2', SQLSRV_PARAM_IN),
     array($condition1, SQLSRV_PARAM_IN)
 );
 $query_seEmployee = sqlsrv_query($conn, $sql_seEmployee, $params_seEmployee);
@@ -93,6 +91,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
         <link href="../js/jquery.datetimepicker.css" rel="stylesheet">
         <link href="../dist/css/jquery.autocomplete.css" rel="stylesheet">
         <link href="../dist/css/bootstrap-select.css" rel="stylesheet">
+        <link href="../dist/css/select2.min.css" rel="stylesheet">
+         
+        <!-- <link href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/3.0.0/css/buttons.dataTables.css" rel="stylesheet"> -->
         <script>
             $(function () {
                 $('[data-toggle="popover"]').popover({
@@ -134,8 +136,40 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 opacity: 0;
                 filter: alpha(opacity=0);
             }
+            .swal2-popup {
+                font-size: 16px !important;
+                padding: 17px;
+                border: 1px solid #F0E1A1;
+                display: block;
+                margin: 22px;
+                text-align: center;
+                color: #61534e;
+                width:600px;
+            }
 
-
+            #loading {
+                display:none; 
+                opacity: 0.5;
+                /* border-radius: 50%; */
+                /* border-top: 12px ; */
+                width: 10px;
+                left: 10px;
+                right: 800px;
+                top:10px;
+                bottom: 450px;
+                height: 10px;
+                
+                /* animation: spin 1s linear infinite; */
+            }
+            
+            .center {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+            }
 
 
         </style>
@@ -154,7 +188,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html"><font style="color: #000;font-size: 14px"><img src="../images/logo.ico" height="30"> <strong>Transport Management System</strong></font></a>
+                <a class="navbar-brand" href="index.php"><font style="color: #000;font-size: 14px"><img src="../images/logo.ico" height="30"> <strong>Transport Management System</strong></font></a>
             </div>
             <ul class="nav navbar-top-links navbar-right">
                 <li class="dropdown">
@@ -305,7 +339,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     <label>จำนวน (JOB) : </label>
 
                                     <input class="form-control" id="txt_startdatejobcopy" name="txt_startdatejobcopy" style="display: none">
-                                    <input class="form-control" id="txt_rowsamount" name="txt_rowsamount" >
+                                    <input class="form-control" id="txt_rowsamount" name="txt_rowsamount" onKeyUp="if (isNaN(this.value)) {
+                                                            alert('กรุณากรอกตัวเลข');
+                                                            this.value = '';
+                                                        }">
 
                                 </div>
                             </div>
@@ -388,6 +425,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 </div>
 
                                 <?php
+                            } else if ($_GET['companycode'] == 'RRC') {
+                                if ($_GET['customercode'] == 'GMT-IB') {
+                                    ?>
+                                    <div class="col-lg-4">
+                                        <label>Terms & Condition :</label><br>
+                                        <input type="checkbox" id="chk_7" name="chk_7" style="transform: scale(2)"> : ข้อ 7.(50%)&emsp;
+                                        <input type="checkbox" id="chk_8" name="chk_8" style="transform: scale(2)"> : ข้อ 8.(ต่างสถานที่)&emsp;
+                                        <input type="checkbox" id="chk_holiday" name="chk_holiday" style="transform: scale(2)"> : ข้อ 5. (ทำงานวันหยุด)
+                                    </div>
+    
+                                    <?php
+                                }
+                            }else if ($_GET['companycode'] == 'RKL' || $_GET['companycode'] == 'SKB' ) {
+                                ?>
+                                <div class="col-lg-2">
+                                    <label>พขร.(3):</label>
+                                    <input type="text"  class="form-control" name="txt_copydiagramemployeename3" id="txt_copydiagramemployeename3">
+                                </div>
+                                <div class="col-lg-2">
+                                    <label>&nbsp;</label><br>
+                                    <button class="btn btn-secondary"  id="btn_checkdriver" onclick="select_checkdriversr('3')"  name="btn_checkdriver" data-toggle="modal"  data-target="#modal_checkdriver"><span class="fa fa-check"></span> พขร.(3)</button>
+                                </div>
+
+
+                                <?php
+                            
                             }
                             ?>
 
@@ -399,45 +462,172 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 if ($_GET['customercode'] == 'SKB') {
                                     ?>
                                     <div class="col-lg-2">
-                                        <font style="color: red">* </font><label>ชื่อรถ :</label>
-                                        <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame">
+                                        <font style="color: red">* </font><label>ชื่อรถSKB :</label>
+                                        <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame" style="display:none">
+
+                                        <div class="dropdown bootstrap-select show-tick form-control" >
+                                            <select   onchange="check_thainamerklskb(this.value)" id="cb_copydiagramthainame" name="cb_copydiagramthainame"   class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ทะเบียนรถ..." data-hide-disabled="true" data-actions-box="false" data-virtual-scroll="false" tabindex="-98" >
+                                                <option value="" selected="selected">เลือกทะเบียนรถ</option>
+                                                <?php
+
+                                                    // $condiFrom1 = " AND COMPANYCODE = '" . $_POST['companycode'] . "' AND CUSTOMERCODE = '" . $_POST['customercode'] . "'";
+                                                    $sql_seFrom = "{call megVehicleinfo_v2(?,?)}";
+                                                    $params_seFrom = array(
+                                                    array('select_vehicleinfo', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                    );
+                                                    $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                    while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    // $selected = "";
+                                                    // if ($result_sePlan1['JOBSTART'] == $result_seFrom['FROM']) {
+                                                    //     $selected = "selected";
+                                                    // }
+                                                ?> 
+                                                    <option value="<?= $result_seFrom['VEHICLEREGISNUMBER'] ?>"  width="300" ><?= $result_seFrom['VEHICLEREGISNUMBER'] ?></option>
+                                                <?php
+                                                }
+                                                ?>
+                                            </select>
+                                            <!-- <input class="form-control"  style=""  id="txt_copydiagramzone" name="txt_copydiagramzone" maxlength="500" value="" > -->
+                                        </div>
+
                                     </div>
                                     <div class="col-lg-2">
-                                        <font style="color: red">* </font><label>ชื่อรถ(หาง) :</label>
+                                        <label>ชื่อรถ(หาง) :</label>
                                         <input type="text" class="form-control"  id="txt_copydiagramthainame2" name="txt_copydiagramthainame2">
                                     </div>
                                     <?php
                                 } else {
                                     ?>
                                     <div class="col-lg-2">
-                                        <font style="color: red">* </font><label>ชื่อรถ :</label>
-                                        <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame">
+                                        <font style="color: red">* </font><label>ชื่อรถRKL :</label>
+                                        <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame" style="display:none">
                                         
+                                        <div class="dropdown bootstrap-select show-tick form-control" >
+                                            <select   onchange="check_thainamerkl(this.value)" id="cb_copydiagramthainame" name="cb_copydiagramthainame"   class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ทะเบียนรถ..." data-hide-disabled="true" data-actions-box="false" data-virtual-scroll="false" tabindex="-98" >
+                                                <option value="" selected="selected">เลือกทะเบียนรถ</option>
+                                                <?php
+
+                                                    
+                                                    // $condiFrom1 = " AND COMPANYCODE = '" . $_POST['companycode'] . "' AND CUSTOMERCODE = '" . $_POST['customercode'] . "'";
+                                                    $sql_seFrom = "{call megVehicleinfo_v2(?,?)}";
+                                                    $params_seFrom = array(
+                                                    array('select_vehicleinfo', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                    );
+                                                    $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                    while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    // $selected = "";
+                                                    // if ($result_sePlan1['JOBSTART'] == $result_seFrom['FROM']) {
+                                                    //     $selected = "selected";
+                                                    // }
+                                                ?> 
+                                                    <option value="<?= $result_seFrom['VEHICLEREGISNUMBER'] ?>"  width="300" ><?= $result_seFrom['VEHICLEREGISNUMBER'] ?></option>
+                                                <?php
+                                                }
+                                                ?>
+                                            </select>
+                                            <!-- <input class="form-control"  style=""  id="txt_copydiagramzone" name="txt_copydiagramzone" maxlength="500" value="" > -->
+                                        </div>
                                     </div>
-                            <div class="col-lg-2">
-                                        <font style="color: red">* </font><label>ชื่อรถ(หาง) :</label>
+                                    <div class="col-lg-2">
+                                        <label>ชื่อรถ(หาง) :</label>
                                         <input type="text" class="form-control"  id="txt_copydiagramthainame2" name="txt_copydiagramthainame2">
+                                        
                                     </div>
                                     <?php
                                 }
+                            }else if($_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC' || $_GET['companycode'] == 'RRC'){
+                                ?>
+                                <div class="col-lg-2">
+                                    <font style="color: red">* </font><label>ชื่อรถRRC :</label>
+                                    <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame" style="display:none">
+                                    
+                                    <div class="dropdown bootstrap-select show-tick form-control" >
+                                        <select   onchange="check_thainamerksrkr(this.value)" id="cb_copydiagramthainame" name="cb_copydiagramthainame"   class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ทะเบียนรถ..." data-hide-disabled="true" data-actions-box="false" data-virtual-scroll="false" tabindex="-98" >
+                                            <option value="" selected="selected">เลือกทะเบียนรถ</option>
+                                            <?php
+
+                                                
+                                                $condiFrom1 = "AND a.THAINAME != '-' 
+                                                    AND( a.ENGNAME  LIKE '%R-%' OR a.ENGNAME  LIKE '%RA-%' OR a.ENGNAME  LIKE '%T-%' 
+                                                    OR a.THAINAME LIKE '%ดินแดง%' OR a.THAINAME  LIKE '%อุทัยธานี%' OR a.THAINAME  LIKE '%G-%'
+                                                    OR a.THAINAME  LIKE '%คลองเขื่อน%'  OR a.THAINAME LIKE '%RP-%' OR a.THAINAME  LIKE '%สวนผึ้ง%' 
+                                                    OR a.THAINAME  LIKE '%ด่านช้าง%' OR a.ENGNAME LIKE '%Khao Chamao%' 
+                                                    OR a.ENGNAME LIKE '%Kerry%' OR a.ENGNAME LIKE '%Chaloem Prakiat%' 
+                                                    OR a.THAINAME LIKE '%แปลงยาว%' OR a.THAINAME LIKE '%สนามชัยเขต%' 
+                                                    OR a.THAINAME LIKE '%ชัยนาท%' OR a.THAINAME LIKE '%วานรนิวาส%' OR a.THAINAME LIKE '%เฉลิมพระเกียรติ%'
+                                                    OR a.THAINAME LIKE '%ประจันตคาม%' OR a.THAINAME LIKE '%น่าน%'  OR a.THAINAME LIKE '%พรหมพิราม%'
+													OR a.THAINAME LIKE '%คง%' OR a.THAINAME LIKE '%ชัยภูมิ%')";
+                                                $sql_seFrom = "{call megVehicleinfo_v2(?,?)}";
+                                                $params_seFrom = array(
+                                                array('select_vehicleinfo', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                // $selected = "";
+                                                // if ($result_sePlan1['JOBSTART'] == $result_seFrom['FROM']) {
+                                                //     $selected = "selected";
+                                                // }
+                                            ?> 
+                                                 <option value="<?= $result_seFrom['THAINAME'] ?>"  width="300" ><?= $result_seFrom['THAINAME'] ?></option>
+                                            <?php
+                                            }
+                                            ?>
+                                        </select>
+                                        <!-- <input class="form-control"  style=""  id="txt_copydiagramzone" name="txt_copydiagramzone" maxlength="500" value="" > -->
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label>ชื่อรถ(หาง) :</label>
+                                    <input type="text" class="form-control"  id="txt_copydiagramthainame2" name="txt_copydiagramthainame2">
+                                </div>
+                                <?php
                             } else {
                                 ?>
                                 <div class="col-lg-2">
-                                    <font style="color: red">* </font><label>ชื่อรถ :</label>
-                                    <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame">
+                                    <font style="color: red">* </font><label>ชื่อรถRKS :</label>
+                                    <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame" style="display:none">
                                     
-                                </div>
-                            <div class="col-lg-2">
-                                        <font style="color: red">* </font><label>ชื่อรถ(หาง) :</label>
-                                        <input type="text" class="form-control"  id="txt_copydiagramthainame2" name="txt_copydiagramthainame2">
+                                    <div class="dropdown bootstrap-select show-tick form-control" >
+                                        <select   onchange="check_thainamerksrkr(this.value)" id="cb_copydiagramthainame" name="cb_copydiagramthainame"   class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ทะเบียนรถ..." data-hide-disabled="true" data-actions-box="false" data-virtual-scroll="false" tabindex="-98" >
+                                            <option value="" selected="selected">เลือกทะเบียนรถ</option>
+                                            <?php
+
+                                                
+                                                // $condiFrom1 = " AND COMPANYCODE = '" . $_POST['companycode'] . "' AND CUSTOMERCODE = '" . $_POST['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicleinfo_v2(?,?)}";
+                                                $params_seFrom = array(
+                                                array('select_vehicleinfo', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                // $selected = "";
+                                                // if ($result_sePlan1['JOBSTART'] == $result_seFrom['FROM']) {
+                                                //     $selected = "selected";
+                                                // }
+                                            ?> 
+                                                 <option value="<?= $result_seFrom['VEHICLEREGISNUMBER'] ?>"  width="300" ><?= $result_seFrom['VEHICLEREGISNUMBER'] ?></option>
+                                            <?php
+                                            }
+                                            ?>
+                                        </select>
+                                        <!-- <input class="form-control"  style=""  id="txt_copydiagramzone" name="txt_copydiagramzone" maxlength="500" value="" > -->
                                     </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label>ชื่อรถ(หาง) :</label>
+                                    <input type="text" class="form-control"  id="txt_copydiagramthainame2" name="txt_copydiagramthainame2">
+                                </div>
                                 <?php
                             }
                             if ($_GET['companycode'] == 'RRC') {
-                                if ($_GET['customercode'] == 'GMT') {
+                                if ($_GET['customercode'] == 'GMT' || $_GET['customercode'] == 'GMT-IB') {
                                     ?>
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="">เลือกประเภทรถ</option>
                                             <?php
@@ -459,7 +649,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-1">
-                                        <label>ไป / กลับ :</label>
+                                        <font style="color: red">* </font><label>ไป / กลับ :</label>
                                         <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="go">ไป</option>
                                             <option value="return">กลับ</option>
@@ -470,7 +660,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'status'";
+                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -486,7 +676,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -508,7 +698,103 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                } else if ($_GET['customercode'] == 'SWN') {
+                                    ?>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                            <option value="">เลือกประเภทรถ</option>
+                                            <?php
+                                            $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seCartype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiCartype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                            while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <font style="color: red">* </font><label>ไป / กลับ :</label>
+                                        <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
+                                            <option value="go">ไป</option>
+                                            <option value="return">กลับ</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <label>ประเภทวัสดุ :</label>
+                                        <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
+                                            <option value="">เลือกประเภทวัสดุ</option>
+                                            <?php
+                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
+                                            $sql_seStatus = "{call megStatus_v2(?,?)}";
+                                            $params_seStatus = array(
+                                                array('select_status', SQLSRV_PARAM_IN),
+                                                array($condStatus, SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seStatus = sqlsrv_query($conn, $sql_seStatus, $params_seStatus);
+                                            while ($result_seStatus = sqlsrv_fetch_array($query_seStatus, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seStatus['STATUSDETAILS'] ?>"><?= $result_seStatus['STATUSDETAILS'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -533,7 +819,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 } else if ($_GET['customercode'] == 'BP') {
                                     ?>
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="">เลือกประเภทรถ</option>
                                             <?php
@@ -555,7 +841,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-1">
-                                        <label>ไป / กลับ :</label>
+                                        <font style="color: red">* </font><label>ไป / กลับ :</label>
                                         <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="go">ไป</option>
                                             <option value="return">กลับ</option>
@@ -566,7 +852,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'status'";
+                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -582,7 +868,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -604,7 +890,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -629,7 +915,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 } else if ($_GET['customercode'] == 'TTAST') {
                                     ?>
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="">เลือกประเภทรถ</option>
                                             <?php
@@ -651,7 +937,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-1">
-                                        <label>ไป / กลับ :</label>
+                                        <font style="color: red">* </font><label>ไป / กลับ :</label>
                                         <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="go">ไป</option>
                                             <option value="return">กลับ</option>
@@ -662,7 +948,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'status'";
+                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -678,7 +964,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -700,7 +986,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -725,7 +1011,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 } else if ($_GET['customercode'] == 'TTTC') {
                                     ?>
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="">เลือกประเภทรถ</option>
                                             <?php
@@ -747,7 +1033,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-1">
-                                        <label>ไป / กลับ :</label>
+                                        <font style="color: red">* </font><label>ไป / กลับ :</label>
                                         <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="go">ไป</option>
                                             <option value="return">กลับ</option>
@@ -758,7 +1044,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'status'";
+                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -774,7 +1060,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -796,7 +1082,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -821,7 +1107,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 } else if ($_GET['customercode'] == 'HDK') {
                                     ?>
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="">เลือกประเภทรถ</option>
                                             <?php
@@ -843,7 +1129,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-1">
-                                        <label>ไป / กลับ :</label>
+                                        <font style="color: red">* </font><label>ไป / กลับ :</label>
                                         <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                             <option value="go">ไป</option>
                                             <option value="return">กลับ</option>
@@ -854,7 +1140,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'status'";
+                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -871,7 +1157,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
                                     <div class="col-lg-2">
 
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -893,7 +1179,104 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                } else if ($_GET['customercode'] == 'THAIDAISEN') {
+                                    ?>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                            <option value="">เลือกประเภทรถ</option>
+                                            <?php
+                                            $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seCartype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiCartype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                            while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <font style="color: red">* </font><label>ไป / กลับ :</label>
+                                        <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
+                                            <option value="go">ไป</option>
+                                            <option value="return">กลับ</option>
+                                        </select>
+                                    </div>
+                                    <!-- <div class="col-lg-1">
+                                        <label>ประเภทวัสดุ :</label>
+                                        <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
+                                            <option value="">เลือกประเภทวัสดุ</option>
+                                            <?php
+                                            $condStatus = " AND SUBDOMAIN = 'status'";
+                                            $sql_seStatus = "{call megStatus_v2(?,?)}";
+                                            $params_seStatus = array(
+                                                array('select_status', SQLSRV_PARAM_IN),
+                                                array($condStatus, SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seStatus = sqlsrv_query($conn, $sql_seStatus, $params_seStatus);
+                                            while ($result_seStatus = sqlsrv_fetch_array($query_seStatus, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seStatus['STATUSDETAILS'] ?>"><?= $result_seStatus['STATUSDETAILS'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div> -->
+                                    <div class="col-lg-2">
+
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -918,10 +1301,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 }
                             } else if ($_GET['companycode'] == 'RKR') {
                                 if ($_GET['carrytype'] == 'trip') {
-                                    if ($_GET['customercode'] == 'TSPT') {
+                                    if ($_GET['customercode'] == 'TSAT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -943,7 +1326,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -965,7 +1348,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -989,11 +1372,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
 
                                         <?php
-                                    }
-                                    else if ($_GET['customercode'] == 'TID') {
+                                    } else if ($_GET['customercode'] == 'TSPT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1015,7 +1397,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1037,7 +1419,78 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+
+                                        <?php
+                                    } else if ($_GET['customercode'] == 'TID') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1064,7 +1517,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'DAIKI') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1086,7 +1539,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1108,7 +1561,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1135,7 +1588,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1157,7 +1610,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1179,7 +1632,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1206,7 +1659,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTPRO') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1228,7 +1681,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1250,7 +1703,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1277,7 +1730,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTAST') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1299,7 +1752,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1321,7 +1774,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1348,7 +1801,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTAT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1370,7 +1823,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1392,7 +1845,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1416,10 +1869,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
 
                                         <?php
-                                    } else if ($_GET['customercode'] == 'TGT') {
+                                      } else if ($_GET['customercode'] == 'CH-AUTO') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ1 :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1441,7 +1894,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1463,7 +1916,77 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <?php
+                                    } else if ($_GET['customercode'] == 'TGT') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1490,7 +2013,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'SUTT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1512,7 +2035,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1534,7 +2057,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1561,7 +2084,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'HINO') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1583,7 +2106,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1605,7 +2128,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1632,7 +2155,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'ACSE') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1654,7 +2177,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1676,7 +2199,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1703,7 +2226,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'PARAGON') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1725,7 +2248,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1747,7 +2270,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1774,7 +2297,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TKT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1796,7 +2319,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1818,7 +2341,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1845,7 +2368,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1867,7 +2390,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1889,7 +2412,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1916,7 +2439,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTASTSTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -1938,7 +2461,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -1960,7 +2483,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -1987,7 +2510,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'GMT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2009,7 +2532,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2031,7 +2554,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -2058,7 +2581,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TMT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2080,7 +2603,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2102,7 +2625,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -2129,7 +2652,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'NITTSUSHOJI') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2151,7 +2674,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2173,7 +2696,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -2200,7 +2723,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'YNP') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2222,7 +2745,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2244,7 +2767,77 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <?php
+                                    }
+                                    else if ($_GET['customercode'] == 'TDEM') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -2266,14 +2859,151 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
 
-
+                                        <?php
+                                    } else if ($_GET['customercode'] == 'RNSTEEL') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <?php
+                                    } else if ($_GET['customercode'] == 'PJW') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
                                         <?php
                                     }
                                 } else if ($_GET['carrytype'] == 'weight') {
                                     if ($_GET['customercode'] == 'TTASTSTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2295,7 +3025,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -2303,7 +3033,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2367,7 +3097,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -2400,7 +3130,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2422,7 +3152,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -2430,7 +3160,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2452,7 +3182,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -2493,7 +3223,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -2524,7 +3254,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2546,15 +3276,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
-                                                <option value="return">กลับ</option>
+                                                <option value="return" >กลับ</option>
                                             </select>
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2576,7 +3306,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -2617,7 +3347,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -2651,7 +3381,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTPROCS') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2673,7 +3403,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -2681,7 +3411,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2703,7 +3433,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -2744,7 +3474,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -2777,7 +3507,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'DAIKI') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2799,15 +3529,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
-                                            <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
+                                            <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" onchange="select_producttyperetrun(this.value)" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
-                                                <option value="return">กลับ</option>
+                                                <option value="return" >กลับ</option>
                                             </select>
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2829,7 +3559,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -2870,7 +3600,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -2903,7 +3633,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'PARAGON') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -2925,7 +3655,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -2933,7 +3663,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -2955,7 +3685,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -2996,7 +3726,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -3024,12 +3754,137 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
 
+
+                                        <?php
+                                    } else if ($_GET['customercode'] == 'TTAST') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-1">
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
+                                            <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="go">ไป</option>
+                                                <option value="return">กลับ</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-lg-1">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>โซน :</label>
+                                            <div class="dropdown bootstrap-select show-tick form-control">
+
+                                                <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
+                                                    <?php
+                                                    $condiLocation1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                    $sql_seLocation = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                    $params_seLocation = array(
+                                                        array('select_location', SQLSRV_PARAM_IN),
+                                                        array($condiLocation1, SQLSRV_PARAM_IN),
+                                                        array('', SQLSRV_PARAM_IN),
+                                                        array('', SQLSRV_PARAM_IN)
+                                                    );
+                                                    $query_seLocation = sqlsrv_query($conn, $sql_seLocation, $params_seLocation);
+                                                    while ($result_seLocation = sqlsrv_fetch_array($query_seLocation, SQLSRV_FETCH_ASSOC)) {
+                                                        ?>
+                                                        <option value="<?= $result_seLocation['LOCATION'] ?>"><?= $result_seLocation['LOCATION'] ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                                <input class="form-control" style="display: none"   id="txt_copydiagramzone" name="txt_copydiagramzone" maxlength="500" value="" >
+
+
+                                                <div class="dropdown-menu open" role="combobox">
+                                                    <div class="bs-searchbox">
+                                                        <input type="text" class="form-control" autocomplete="off" role="textbox" aria-label="Search"></div>
+                                                    <div class="bs-actionsbox">
+                                                        <div class="btn-group btn-group-sm btn-block">
+                                                            <button type="button" class="actions-btn bs-select-all btn btn-default">Select All</button>
+                                                            <button type="button" class="actions-btn bs-deselect-all btn btn-default">Deselect All</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="inner open" role="listbox" aria-expanded="false" tabindex="-1">
+                                                        <ul class="dropdown-menu inner "></ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <div id="data_copydiagramjobendtondef">
+                                                <div class="dropdown bootstrap-select show-tick form-control">
+
+                                                    <select multiple="" id="cb_copydiagramjobendton" name="cb_copydiagramjobendton" class="selectpicker form-control" id="number-multiple" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
+
+                                                    </select>
+                                                    <input class="form-control" style="display: none"   id="txt_copydiagramjobendton" name="txt_copydiagramjobendton" maxlength="500" value="" >
+
+
+                                                    <div class="dropdown-menu open" role="combobox">
+                                                        <div class="bs-searchbox">
+                                                            <input type="text" class="form-control" autocomplete="off" role="textbox" aria-label="Search"></div>
+                                                        <div class="bs-actionsbox">
+                                                            <div class="btn-group btn-group-sm btn-block">
+                                                                <button type="button" class="actions-btn bs-select-all btn btn-default">Select All</button>
+                                                                <button type="button" class="actions-btn bs-deselect-all btn btn-default">Deselect All</button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="inner open" role="listbox" aria-expanded="false" tabindex="-1">
+                                                            <ul class="dropdown-menu inner "></ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="data_copydiagramjobendtonsr"></div>
+                                        </div>
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTTCSTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3051,7 +3906,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -3059,7 +3914,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3081,7 +3936,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -3122,7 +3977,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -3150,8 +4005,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
 
-
-                                        <?php
+                                    <?php                
                                     }
                                 }
                             } else if ($_GET['companycode'] == 'RKL') {
@@ -3159,7 +4013,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'DAIKI') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3181,7 +4035,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3203,7 +4057,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3226,32 +4080,33 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    } else if ($_GET['customercode'] == 'TTPRO') {
+                                    } else if ($_GET['customercode'] == 'COPPERCORD') {
                                         ?>
+    
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
-                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
-                                                <option value="">เลือกประเภทรถ</option>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                                <option value="">เลือก ประเภทรถ</option>
                                                 <?php
-                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
-                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
-                                                $params_seCartype = array(
+                                                $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seVehicletype = array(
                                                     array('select_vehicletype', SQLSRV_PARAM_IN),
-                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array($condiVehicletype1, SQLSRV_PARAM_IN),
                                                     array('', SQLSRV_PARAM_IN),
                                                     array('', SQLSRV_PARAM_IN)
                                                 );
-                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
-                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                                while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
                                                     ?>
-                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
                                                     <?php
                                                 }
                                                 ?>
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3273,7 +4128,76 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <?php
+                                    } else if ($_GET['customercode'] == 'TTPRO') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3299,7 +4223,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'AMT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3321,7 +4245,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3343,7 +4267,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3369,7 +4293,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTAST') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3391,7 +4315,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3413,7 +4337,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3439,7 +4363,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3461,7 +4385,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3483,7 +4407,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3512,7 +4436,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TID') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3534,7 +4458,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3556,7 +4480,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3583,7 +4507,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'SUTT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3605,7 +4529,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3627,7 +4551,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3654,7 +4578,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'HINO') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3676,7 +4600,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3698,7 +4622,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3725,7 +4649,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'SKB') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3744,7 +4668,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                     <?php
                                                 }
                                                 ?>
-                                                <option value="ADC-Dealer(FB)">ADC-Dealer(FB)</option>
+
                                                 <option value="ADC-Myanmar(10W-FB)">ADC-Myanmar(10W-FB)</option>
                                                 <option value="KDC-Dealer(SL2)">KDC-Dealer(SL2)</option>
                                                 <option value="KDC-Dealer(FB)">KDC-Dealer(FB)</option>
@@ -3755,7 +4679,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3826,7 +4750,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramlocationdef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -3858,7 +4782,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'GMT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3880,7 +4804,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3902,7 +4826,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -3929,7 +4853,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TMT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -3951,7 +4875,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -3973,7 +4897,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4000,7 +4924,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'YNP') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4022,7 +4946,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4044,7 +4968,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4071,7 +4995,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'WSBT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4093,7 +5017,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4115,7 +5039,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4142,7 +5066,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'NITTSUSHOJI') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4164,7 +5088,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4186,7 +5110,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4213,7 +5137,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TSAT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4235,7 +5159,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4257,7 +5181,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4284,7 +5208,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TTAT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4306,7 +5230,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4328,7 +5252,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4355,7 +5279,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'CH-AUTO') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4377,7 +5301,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4399,7 +5323,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4426,7 +5350,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TSPT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4448,7 +5372,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4470,7 +5394,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4497,7 +5421,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TKT') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4519,7 +5443,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4541,7 +5465,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4568,7 +5492,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TDEM') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4590,7 +5514,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4612,7 +5536,216 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <?php
+                                    } else if ($_GET['customercode'] == 'RNSTEEL') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <?php
+                                    }else if ($_GET['customercode'] == 'VUTEQ') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <?php
+                                    }else if ($_GET['customercode'] == 'PJW') {
+                                        ?>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                                 <option value="">เลือก ปลายทาง</option>
                                                 <?php
@@ -4640,7 +5773,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     if ($_GET['customercode'] == 'TTASTSTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4662,7 +5795,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -4670,7 +5803,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4692,7 +5825,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
 
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -4734,7 +5867,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -4767,7 +5900,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4789,7 +5922,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -4797,7 +5930,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4819,7 +5952,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -4860,7 +5993,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -4893,7 +6026,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -4915,7 +6048,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -4923,7 +6056,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -4945,7 +6078,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -4986,7 +6119,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -5018,7 +6151,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTAST') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -5040,7 +6173,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -5048,7 +6181,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -5070,7 +6203,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -5111,7 +6244,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -5145,7 +6278,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTPROCS') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -5167,7 +6300,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -5175,7 +6308,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -5197,7 +6330,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -5238,7 +6371,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -5271,7 +6404,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'DAIKI') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -5293,7 +6426,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -5301,7 +6434,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -5323,7 +6456,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -5364,7 +6497,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -5397,7 +6530,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'TTTCSTC') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -5419,7 +6552,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -5427,7 +6560,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -5449,7 +6582,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -5490,7 +6623,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -5523,7 +6656,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     } else if ($_GET['customercode'] == 'PARAGON') {
                                         ?>
                                         <div class="col-lg-2">
-                                            <label>ประเภทรถ :</label>
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
                                             <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="">เลือกประเภทรถ</option>
                                                 <?php
@@ -5545,7 +6678,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-1">
-                                            <label>ไป / กลับ :</label>
+                                            <font style="color: red">* </font><label>ไป / กลับ :</label>
                                             <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
                                                 <option value="go">ไป</option>
                                                 <option value="return">กลับ</option>
@@ -5553,7 +6686,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <div class="col-lg-1">
-                                            <label>ต้นทาง :</label>
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
                                             <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                                 <option value="">เลือก ต้นทาง</option>
                                                 <?php
@@ -5575,7 +6708,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>โซน :</label>
+                                            <font style="color: red">* </font><label>โซน :</label>
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
                                                 <select multiple="" onchange="select_zone()" id="cb_copydiagramzone" name="cb_copydiagramzone" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ปลายทาง..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
@@ -5616,7 +6749,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div class="col-lg-2">
 
-                                            <label>ปลายทาง :</label>
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
                                             <div id="data_copydiagramjobendtondef">
                                                 <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -5651,9 +6784,30 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             } else if ($_GET['companycode'] == 'RKS') {
                                 if ($_GET['customercode'] == 'DENSO-THAI' || $_GET['customercode'] == 'DENSO-WGR' || $_GET['customercode'] == 'DENSO-SALES' || $_GET['customercode'] == 'ANDEN' || $_GET['customercode'] == 'SDM' || $_GET['customercode'] == 'SKD' || $_GET['customercode'] == 'DENSO') {
                                     ?>
-
                                     <div class="col-lg-2">
-                                        <label>Route No :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                            <option value="">เลือกประเภทรถ</option>
+                                            <?php
+                                            $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seCartype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiCartype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                            while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>Route No :</label>
                                         <select id="cb_copydiagramrouteno" name="cb_copydiagramrouteno" class="form-control">
 
                                             <option value="">เลือก Route No.</option>
@@ -5671,6 +6825,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             while ($result_seRouteno = sqlsrv_fetch_array($query_seRouteno, SQLSRV_FETCH_ASSOC)) {
                                                 ?>
                                                 <option value="<?= $result_seRouteno['ROUTENO'] ?>"><?= $result_seRouteno['ROUTENO'] ?></option>
+
                                                 <?php
                                             }
                                             ?>
@@ -5679,7 +6834,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>Route Type :</label>
+                                        <font style="color: red">* </font><label>Route Type :</label>
                                         <select id="cb_copydiagramroutetype" name="cb_copydiagramroutetype" class="form-control">
 
                                             <option value="">เลือก Route Type</option>
@@ -5696,6 +6851,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             while ($result_seRoutetype = sqlsrv_fetch_array($query_seRoutetype, SQLSRV_FETCH_ASSOC)) {
                                                 ?>
                                                 <option value="<?= $result_seRoutetype['ROUTETYPE'] ?>"><?= $result_seRoutetype['ROUTETYPE'] ?></option>
+
                                                 <?php
                                             }
                                             ?>
@@ -5703,12 +6859,43 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
 
                                     </div>
+                                    <div class="col-lg-2">
+                                        <label>Route Description :</label>
+                                        <br>
+                                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" onclick="select_RouteDes();"><li class="fa fa-search"></li>ดูรายละเอียด</button>
+
+
+                                    </div>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="myModal" role="dialog">
+                                        <div class="modal-dialog">
+
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+
+                                                    <h4 class="modal-title">รายละเอียดการวิ่งงาน</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div id="datacompdetailsr"></div>
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger" onclick="close_modal();"><span class="fa fa-close"></span> ปิด</button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+
                                     <?php
                                 } else if ($_GET['customercode'] == 'TGT') {
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -5730,7 +6917,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -5792,7 +6979,217 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                } else if ($_GET['customercode'] == 'THAITOHKEN') {
+                                    ?>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                            <option value="">เลือก ประเภทรถ</option>
+                                            <?php
+                                            $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seVehicletype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiVehicletype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                            while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                } else if ($_GET['customercode'] == 'COPPERCORD') {
+                                    ?>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                            <option value="">เลือก ประเภทรถ</option>
+                                            <?php
+                                            $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seVehicletype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiVehicletype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                            while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                } else if ($_GET['customercode'] == 'HINO') {
+                                    ?>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                            <option value="">เลือก ประเภทรถ</option>
+                                            <?php
+                                            $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seVehicletype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiVehicletype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                            while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -5818,7 +7215,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -5840,7 +7237,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>Transportation :</label>
+                                        <font style="color: red">* </font><label>Transportation :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก Transportation</option>
                                             <?php
@@ -5863,11 +7260,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-lg-2">
-                                        <label>จำนวนรอบ :</label>
+                                        <font style="color: red">* </font><label>จำนวนรอบ :</label>
                                         <input type="text" id="txt_roundamount" name="txt_roundamount" class="form-control">
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>D/N :</label>
+                                        <font style="color: red">* </font><label>D/N :</label>
                                         <select id="cb_copydiagramdn" name="cb_copydiagramdn" class="form-control">
                                             <option value="">เลือก D/N</option>
                                             <?php
@@ -5882,18 +7279,21 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="">เลือก D/N</option>
                                                 <option value="D" selected="">D</option>
                                                 <option value="N">N</option>
+                                                <option value="E">Extra</option>
                                                 <?php
                                             } else if ($result_seDN['DN'] == '(N)') {
                                                 ?>
                                                 <option value="">เลือก D/N</option>
                                                 <option value="D">D</option>
                                                 <option value="N" selected="">N</option>
+                                                <option value="E">Extra</option>
                                                 <?php
                                             } else {
                                                 ?>
                                                 <option value="">เลือก D/N</option>
                                                 <option value="D">D</option>
                                                 <option value="N">N</option>
+                                                <option value="E">Extra</option>
                                                 <?php
                                             }
                                             ?>
@@ -5908,7 +7308,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -5997,7 +7397,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -6019,7 +7419,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>Transportation :</label>
+                                        <font style="color: red">* </font><label>Transportation :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก Transportation</option>
                                             <?php
@@ -6046,7 +7446,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -6068,7 +7468,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -6091,7 +7491,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -6117,7 +7517,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -6139,7 +7539,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -6162,7 +7562,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -6188,7 +7588,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -6210,7 +7610,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -6233,7 +7633,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -6259,7 +7659,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -6281,7 +7681,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -6304,7 +7704,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -6330,7 +7730,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -6352,7 +7752,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -6375,7 +7775,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -6401,7 +7801,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <label>ประเภทรถ :</label>
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
                                         <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
                                             <option value="">เลือก ประเภทรถ</option>
                                             <?php
@@ -6423,7 +7823,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-2">
-                                        <label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
                                             <option value="">เลือก ต้นทาง</option>
                                             <?php
@@ -6446,7 +7846,293 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-lg-2">
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                } else if ($_GET['customercode'] == 'NITTSUSHOJI') {
+                                    ?>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                            <option value="">เลือกประเภทรถ</option>
+                                            <?php
+                                            $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seCartype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiCartype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                            while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+
+
+                                    <?php
+                                } else if ($_GET['customercode'] == 'TTTC') {
+                                    ?>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                            <option value="">เลือก ประเภทรถ</option>
+                                            <?php
+                                            $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seVehicletype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiVehicletype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                            while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                }
+                                else if ($_GET['customercode'] == 'SWN') {
+                                    ?>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                            <option value="">เลือก ประเภทรถ</option>
+                                            <?php
+                                            $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seVehicletype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiVehicletype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                            while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                }
+                                else if ($_GET['customercode'] == 'TSAT') {
+                                    ?>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                            <option value="">เลือก ประเภทรถ</option>
+                                            <?php
+                                            $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seVehicletype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiVehicletype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                            while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
                                             <option value="">เลือก ปลายทาง</option>
                                             <?php
@@ -6474,8 +8160,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     ?>
 
                                     <div class="col-lg-2">
-                                        <font style="color: red">* </font><label>ต้นทาง :</label>
-                                        <select  id="txt_copydiagramjobstart" name="txt_copydiagramjobstart" class="form-control" onchange="se_copydiagramroute(this.value)">
+                                        <font style="color: red">* </font><label>ต้นทาง(เก็บเงิน) :</label>
+                                        <select  id="txt_copydiagramjobstart" name="txt_copydiagramjobstart" class="form-control" >
                                             <option value="">เลือกต้นทาง</option>
                                             <option value="GW">GW</option>
                                             <option value="BP">BP</option>
@@ -6484,7 +8170,18 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             <option value="OTH">OTH</option>
                                         </select>
                                     </div>
-
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง(รับงาน) :</label>
+                                        <select  id="txt_copydiagramjobstart1" name="txt_copydiagramjobstart1" class="form-control">
+                                            <option value="">เลือกต้นทาง</option>
+                                            <option value="GW">GW</option>
+                                            <option value="BP">BP</option>
+                                            <option value="SR">SR</option>
+                                            <option value="TAC">TAC</option>
+                                            <option value="OTH">OTH</option>
+                                            <option value="Other-SW">SW</option>
+                                        </select>
+                                    </div>
 
 
                                     <div class="col-lg-2">
@@ -6536,7 +8233,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                     <div class="col-lg-2">
 
-                                        <label>ปลายทาง :</label>
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
                                         <div id="data_copydiagramjobenddef">
                                             <div class="dropdown bootstrap-select show-tick form-control">
 
@@ -6563,18 +8260,19 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
                                         <div id="data_copydiagramjobendsr"></div>
                                     </div>
-                                    <div class="col-lg-2">
+                                    <!--<div class="col-lg-2">
                                         <label>ก่อนเวลารายงานตัว (OTH) :</label>
                                         <input type="text" class="form-control"  id="txt_beforpersentoth"  name="txt_beforpersentoth">
                                     </div>
-
+                                    -->
+                                    <input type="text" class="form-control"  id="txt_beforpersentoth"  name="txt_beforpersentoth" style="display: none">
 
 
                                     <?php
                                 } else if ($_GET['worktype'] == 'sh') {
                                     ?>
                                     <div class="col-lg-2">
-                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <font style="color: red">* </font><font style="color: red">* </font><label>ต้นทาง :</label>
                                         <select  id="txt_copydiagramjobstart" name="txt_copydiagramjobstart" class="form-control" onchange="se_copydiagramroute(this.value)">
                                             <option value="">เลือกต้นทาง</option>
                                             <option value="GW">GW</option>
@@ -6624,6 +8322,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             ?>
 
                         </div>
+<?php if ($_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC') { ?>
+    <div class="row">                            
+        <div class="col-lg-2">
+            <label>รอบที่วิ่งงาน :</label>
+            <select id="txt_roundamountgw" name="txt_roundamountgw" class="form-control">
+                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                <option value="1">รอบที่ 1</option>
+                <option value="2">รอบที่ 2</option>
+                <option value="3">รอบที่ 3</option>
+                <option value="4">รอบที่ 4</option>
+            </select>                                
+        </div>
+    </div>
+<?php } ?>
+<?php if ($_GET['companycode'] == 'RRC') { ?>
+    <div class="row">                            
+        <div class="col-lg-2">
+            <label>รอบที่วิ่งงาน :</label>
+            <select id="txt_roundamountgw" name="txt_roundamountgw" class="form-control">
+                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                <option value="Normal">Normal</option>
+                <option value="Extra">Extra</option>
+            </select>                                
+        </div>
+    </div>
+<?php } ?>
 
                         <div class="row">&nbsp;</div>
                         <div class="row">
@@ -6634,7 +8358,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             <div class="col-lg-2">
                                 <label>เวลารายงานตัว :</label>
                                 <input type="text" class="form-control timeen" style="background-color: #f080802e" disabled="" id="txt_copydiagramdatepresent" name="txt_copydiagramdatepresent">
-
+                               
                             </div>
 
                             <div class="col-lg-2">
@@ -6727,6 +8451,52 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modal_producttypereturn" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-modal-parent="#modal_copydiagram">
+            <div class="modal-dialog" role="document" style="width: 40%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <h5 class="modal-title" id="title_copydiagram"><b>วัสดุ / ภาชนะ งานรับกลับ</b></h5>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>วัสดุ / ภาชนะ :</label>
+                                    <select  id="cb_producttypereturn" name="cb_producttypereturn" class="form-control">
+                                        <option value="">เลือกวัสดุ / ภาชนะ</option>
+                                        <option value="วัสดุ">วัสดุ</option>
+                                        <option value="Box">Box</option>
+                                        <option value="อื่นๆ">อื่นๆ</option>
+
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="fa fa-close"></span> ปิด</button>
+
+                    </div>
+
+
+
+
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="modal_confrimpriceskb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-modal-parent="#modal_copydiagram">
             <div class="modal-dialog" role="document" style="width: 60%">
                 <div class="modal-content">
@@ -6745,7 +8515,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>ต้นทาง :</label>
+                                    <font style="color: red">* </font><label>ต้นทาง :</label>
                                     <input type="text" class="form-control" id="txt_confrimjobid" name="txt_confrimjobid" style="display: none">
                                     <input type="text" class="form-control" id="txt_confrimjobstart" name="txt_confrimjobstart" disabled="" style="background-color: #f080802e">
                                 </div>
@@ -6760,7 +8530,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>ปลายทาง :</label>
+                                    <font style="color: red">* </font><label>ปลายทาง :</label>
                                     <input type="text" class="form-control" id="txt_confrimjobend" name="txt_confrimjobend" disabled="" style="background-color: #f080802e">
                                 </div>
 
@@ -6768,7 +8538,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             <div class="col-lg-2">
                                 <div class="form-group">
                                     <label>ระยะทาง(กม.) :</label>
-                                    <input type="text" class="form-control" id="txt_confrimkm" name="txt_confrimkm" onchange="edit_pricekm(this.value)">
+                                    <input type="text" class="form-control" id="txt_confrimkm" name="txt_confrimkm" onkeypress="edit_pricekm(this.value)">
                                     <input type="text" class="form-control" id="txt_pricekm" name="txt_pricekm" style="display: none">
                                 </div>
 
@@ -7024,14 +8794,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
 
                 <form method="post">
-                    <input class="btn btn-default" type="button" style="background-color: red;border:solid 2px white" id="btn_srquotation" name="btn_srquotation" value=""> * แจ้งเตือนข้อมูล ไม่พบราคาขนส่ง &emsp;
+                    <input class="btn btn-default" type="button" style="background-color: orange;border:solid 2px white" id="btn_srquotation" name="btn_srquotation" value=""> * แจ้งเตือนข้อมูล ไม่พบราคาขนส่ง &emsp;
+                    <input class="btn btn-default" type="button" style="background-color: red;border:solid 2px white" id="btn_srquotation" name="btn_srquotation" value=""> * แจ้งเตือนข้อมูลผิดพลาด &emsp;
                     <input type="text" id="txt_vehicletransportdocumentid" name="txt_vehicletransportdocumentid" class="form-control" style="display: none"  value="">
                     <input type="text" id="txt_companycode" name="txt_companycode" class="form-control" style="display: none"  value="<?= $_GET['companycode'] ?>">
                     <input type="text" id="txt_customercode" name="txt_customercode" class="form-control" style="display: none"  value="<?= $_GET['customercode'] ?>">
                     <input class="form-control" style="display: none"  id="txt_copydiagramsubroute" name="txt_copydiagramsubroute" maxlength="500" value="" >
                     <!--<button type="button" id="addrow" name="addrow" onclick="javascript:appendRow()" class="btn btn-outline btn-default"><li class="fa fa-plus-circle"></li> เพิ่มแถว</button>-->
                     <input  style="margin-right: 15px" type="button"  data-toggle="modal"  data-target="#modal_copydiagram"  class=" btn btn-default" value="NEW DIAGRAM">
-                    <!--<input  style="margin-right: 15px"  type="button"  onclick="save_vehicletransportplan('<?php //echo $_GET['EMPLOYEENAME1']                                                                                                                                                       ?>')"  class=" btn btn-default" value="NEW JOB">-->
+                    <!--<input  style="margin-right: 15px"  type="button"  onclick="save_vehicletransportplan('<?php //echo $_GET['EMPLOYEENAME1']                                                                                                                                                                 ?>')"  class=" btn btn-default" value="NEW JOB">-->
                     <!--<button type="button" onclick="javascript:deleteRows()" class="btn btn-outline btn-default"><li class="fa fa-plus-circle"></li> ลบแถว</button>-->
                     <!--<button type="button" onclick="javascript:appendColumn()" class="btn btn-outline btn-default"><li class="fa fa-minus-circle"></li> เพิ่มคอลัมม์</button>-->
                     <!--<button type="button" onclick="javascript:deleteColumns()" class="btn btn-outline btn-default"><li class="fa fa-minus-circle"></li> ลบคอลัมม์</button>
@@ -7076,7 +8847,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 <a href="#" onclick="pdf_transportplan();" class="btn btn-default">PDF <li class="fa fa-print"></li></a>
                             </div>-->
 
-                            <div class="col-lg-6">&nbsp;</div>
+                            <div class="col-lg-4">&nbsp;</div>
+                            <div class="col-lg-2" style="text-align: center">
+                                <div class="form-group" style="text-align: center">
+                                    <label>พิมพ์ข้อมูลแผนงาน(EXCEL) &nbsp;<i class="fa fa-file-excel-o" aria-hidden="true"></i></label><br>   
+                                    <input type="button" style="width: 150px" onclick="excel_planningprintout()" name="" id="" value="พิมพ์ข้อมูล" class="btn btn-primary">
+                                </div>
+                            </div>
                             <div class="col-lg-2" >วันที่เริ่มต้น
                                 <input type="text" value="<?= $result_seSystime['STARTWEEK']; ?>" name="txt_datestartsr" readonly="" id="txt_datestartsr" onchange="add_dateweek1(this.value)" class="form-control dateen" >
                             </div>
@@ -7087,7 +8864,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             <div class="col-lg-2 " >สถานะ
                                 <select  class="form-control" id="cb_statussr" name="cb_statussr" onchange="dateendsr()">
 
-
+                                    <option   value ="">แผนงานทั้งหมด</option>
                                     <option   value ="O">แผนงานยังไม่ถึงเวลารายงาน</option>
                                     <option   value ="P">แผนงานรายงานตัวเรียบร้อย</option>
                                     <option   value ="L">แผนงานเลยเวลารายงานตัว</option>
@@ -7096,7 +8873,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     <option   value ="3">แผนงานเอกสารสมบูรณ์</option>
                                     <option   value ="0">แผนงานยกเลิก</option>
                                     <option   value ="X">แผนงานตัดงาน</option>
-                                    <option   value ="">แผนงานทั้งหมด</option>
+
 
 
                                 </select>
@@ -7111,19 +8888,26 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 <div class="col-lg-12">
                                     <!-- Nav tabs -->
                                     <ul class="nav nav-tabs">
+
+                                        
                                         <li class="active"><a href="#monday" data-toggle="tab" aria-expanded="true" onclick="show_monday()">จันทร์<label id="lbl_m"></label></a>
                                         </li>
+                                        
                                         <li class=""><a href="#tuesday" data-toggle="tab" aria-expanded="true" onclick="show_tuesday()">อังคาร<label id="lbl_tu"></label></a>
                                         </li>
+                                        
                                         <li class=""><a href="#wednesday" data-toggle="tab" aria-expanded="false" onclick="show_wednesday()">พุธ<label id="lbl_w"></label></a>
                                         </li>
-
+                                        
                                         <li class=""><a href="#thursday" data-toggle="tab" aria-expanded="false" onclick="show_thursday()">พฤหัสบดี<label id="lbl_th"></label></a>
-
+                                        </li>
+                                        
                                         <li class=""><a href="#friday" data-toggle="tab" aria-expanded="false" onclick="show_friday()">ศุกร์<label id="lbl_f"></label></a>
                                         </li>
+                                        
                                         <li class=""><a href="#saturday" data-toggle="tab" aria-expanded="false" onclick="show_saturday()">เสาร์<label id="lbl_sat"></label></a>
                                         </li>
+                                        
                                         <li class=""><a href="#sunday" data-toggle="tab" aria-expanded="false" onclick="show_sunday()">อาทิตย์<label id="lbl_sun"></label></a>
                                         </li>
                                     </ul>
@@ -7131,39 +8915,59 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     <!-- Tab panes -->
                                     <div class="tab-content">
                                         <p>&nbsp;</p>
-
-
+                                
+                                       
                                         <div class="tab-pane fade active in" id="mondaydef">
                                             <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
                                                 <div id="show_mondaydef">
+                                                <form name="frmMain" action="meg_deletetransportplan.php" method="post" OnSubmit="return onDelete();">
+
+                                                    <input type="text" id="url" name="url" value="<?= $_SERVER['REQUEST_URI'] ?>" style="display: none">
                                                     <table  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example11" role="grid" aria-describedby="dataTables-example11" style="width: 100%;">
                                                         <thead >
-                                                            <tr>
-
-                                                                <th style="text-align: center;"><label style="width: 50px">DELETE JOB</label></th>
+                                                            <tr>    
+                                                                <th style="text-align: center;"><label style="width: 50px"><input type="submit" name="btnDelete" class="btn btn-default btn-circle" value="ลบss"></label></th>
+                                                                <th style="text-align: center;"><label style="width: 50px">DELETE JOB1</label></th>
                                                                 <th style="text-align: center;"><label style="width: 50px">EDIT JOB</label></th>
                                                                 <!--<th style="text-align: center;"><label style="width: 50px">COPY ROOT</label></th>-->
                                                                 <!--<th style="text-align: center;"><label style="width: 50px">ADD DN</label></th>-->
+                                                                <th style="text-align: center;"><label style="width: 50px">COPY JOB</label></th>
+
+                                                                <th style="text-align: center;"><label style="width: 50px">รอบวิ่ง</label></th>
+                                                                <th style="text-align: center;"><label style="width: 80px">ชื่อรถ1</label></th>
+                                                                <th style="text-align: center;"><label style="width: 140px">พนักงาน(1)</label></th>
+                                                                <th style="text-align: center;"><label style="width: 140px">พนักงาน(2)</label></th>
                                                                 <?php
-                                                                if ($_GET['companycode'] != 'RKS' && $_GET['customercode'] != 'STM') {
+                                                                if ($_GET['companycode'] == 'RKL' && $_GET['customercode'] == 'SKB') {
                                                                     ?>
-                                                                    <th style="text-align: center;"><label style="width: 50px">COPY JOB</label></th>
+                                                                    <th style="text-align: center;"><label style="width: 200px">พนักงาน(3)</label></th>
+                                                                    <?php
+                                                                } else {
+                                                                    ?>
+                                                                    
                                                                     <?php
                                                                 }
                                                                 ?>
-
-                                                                <th style="text-align: center;"><label style="width: 100px">รอบวิ่ง</label></th>
-                                                                <th style="text-align: center;"><label style="width: 200px">พนักงาน(1)</label></th>
-                                                                <th style="text-align: center;"><label style="width: 200px">พนักงาน(2)</label></th>
-                                                                <th style="text-align: center;"><label style="width: 200px">ชื่อรถ</label></th>
+                                                                <th style="text-align: center;"><label style="width: 80px">รายงานตัว</label></th>
                                                                 <th style="text-align: center;"><label style="width: 200px">ต้นทาง</label></th>
                                                                 <th style="text-align: center;"><label style="width: 200px">CLUSTER</label></th>
+                                                                <?php
+                                                                if ($_GET['companycode'] == 'RKL' && $_GET['customercode'] == 'SKB') {
+                                                                    ?>
+                                                                    <th style="text-align: center;"><label style="width: 200px">ภาค</label></th>
+                                                                    <?php
+                                                                } else {
+                                                                    ?>
+                                                                    
+                                                                    <?php
+                                                                }
+                                                                ?>
                                                                 <th style="text-align: center;"><label style="width: 200px">ปลายทาง</label></th>
-                                                                <th style="text-align: center;"><label style="width: 100px">JOB NO</label></th>
+                                                                <th style="text-align: center;"><label style="width: 150px">JOB NO</label></th>
                                                                 <th style="text-align: center;"><label style="width: 100px">TRIP </label></th>
                                                                 <th style="text-align: center;"><label style="width: 100px">ทำแผน</label></th>
 
-                                                                <th style="text-align: center;"><label style="width: 100px">รายงานตัว</label></th>
+                                                                
                                                                 <th style="text-align: center;"><label style="width: 100px">ทำงาน</label></th>
                                                                 <th style="text-align: center;"><label style="width: 100px">เข้า(ลูกค้า)</label></th>
                                                                 <th style="text-align: center;"><label style="width: 100px">ออก(ลูกค้า)</label></th>
@@ -7171,7 +8975,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                 <th style="text-align: center;"><label style="width: 100px">กลับบริษัท</label></th>
                                                                 <th style="text-align: center;"><label style="width: 100px">สถานะ</label></th>
 
-            <!--<th style="text-align: center;">สายงาน</th>-->
+                                                        <!--<th style="text-align: center;">สายงาน</th>-->
 
 
                                                             </tr>
@@ -7189,75 +8993,137 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                 } else {
                                                                     $conditionmonday1 = " AND (CONVERT(DATE,a.DATEWORKING,103) BETWEEN CONVERT(DATE,'" . $result_seSystime['STARTWEEK'] . "',103) AND CONVERT(DATE,'" . $result_seSystime['ENDWEEK'] . "',103))";
                                                                 }
-                                                                $conditionmonday2 = " AND a.STATUSNUMBER = 'O' AND DATENAME(DW,a.DATEWORKING) = 'Monday' AND a.COMPANYCODE ='" . $_GET['companycode'] . "' AND a.CUSTOMERCODE ='" . $_GET['customercode'] . "'";
+                                                                $conditionmonday2 = "  AND DATENAME(DW,a.DATEWORKING) = 'Monday' AND a.COMPANYCODE ='" . $_GET['companycode'] . "' AND a.CUSTOMERCODE ='" . $_GET['customercode'] . "'";
 
 
                                                                 $sql_sePlanmonday = "{call megVehicletransportplan_v2(?,?,?,?)}";
                                                                 $params_sePlanmonday = array(
                                                                     array('select_datevehicletransportplan', SQLSRV_PARAM_IN),
                                                                     array($conditionmonday1, SQLSRV_PARAM_IN),
-                                                                    array(" AND (a.WORKTYPE = '" . $_GET['worktype'] . "' OR a.WORKTYPE IS NULL) AND b.CARRYTYPE = '" . $_GET['carrytype'] . "'", SQLSRV_PARAM_IN),
+                                                                    array(" AND (a.WORKTYPE = '" . $_GET['worktype'] . "' OR a.WORKTYPE IS NULL) AND (b.CARRYTYPE = '" . $_GET['carrytype'] . "' OR b.CARRYTYPE IS NULL)", SQLSRV_PARAM_IN),
                                                                     array($conditionmonday2, SQLSRV_PARAM_IN)
                                                                 );
                                                                 $query_sePlanmonday = sqlsrv_query($conn, $sql_sePlanmonday, $params_sePlanmonday);
                                                                 while ($result_sePlanmonday = sqlsrv_fetch_array($query_sePlanmonday, SQLSRV_FETCH_ASSOC)) {
-
+                                                                
                                                                     $sql_seConfrimskb = "SELECT JOBEND = STUFF((
-                                                                SELECT ', ' + JOBEND
-                                                                FROM dbo.CONFRIMSKB
-                                                                WHERE VEHICLETRANSPORTPLANID = '" . $result_sePlanmonday['VEHICLETRANSPORTPLANID'] . "'
-                                                                FOR XML PATH(''), TYPE).value('.', 'VARCHAR(MAX)'), 1, 2, ''),
-                                                                CLUSTER = STUFF((
-                                                                SELECT DISTINCT ', ' + CLUSTER
-                                                                FROM dbo.CONFRIMSKB
-                                                                WHERE VEHICLETRANSPORTPLANID = '" . $result_sePlansunday['VEHICLETRANSPORTPLANID'] . "'
-                                                                FOR XML PATH(''), TYPE).value('.', 'VARCHAR(MAX)'), 1, 2, '') ";
+                                                                        SELECT ', ' + JOBEND
+                                                                        FROM dbo.CONFRIMSKB
+                                                                        WHERE VEHICLETRANSPORTPLANID = '" . $result_sePlanmonday['VEHICLETRANSPORTPLANID'] . "'
+                                                                        FOR XML PATH(''), TYPE).value('.', 'VARCHAR(MAX)'), 1, 2, ''),
+                                                                        CLUSTER = STUFF((
+                                                                        SELECT DISTINCT ', ' + CLUSTER
+                                                                        FROM dbo.CONFRIMSKB
+                                                                        WHERE VEHICLETRANSPORTPLANID = '" . $result_sePlanmonday['VEHICLETRANSPORTPLANID'] . "'
+                                                                        FOR XML PATH(''), TYPE).value('.', 'VARCHAR(MAX)'), 1, 2, '') ";
                                                                     $query_seConfrimskb = sqlsrv_query($conn, $sql_seConfrimskb, $params_seConfrimskb);
                                                                     $result_seConfrimskb = sqlsrv_fetch_array($query_seConfrimskb, SQLSRV_FETCH_ASSOC);
+                                                                        
+                                                                    // echo $result_seConfrimskb['CLUSTER'];
                                                                     $VAR_JOBEND = ($result_sePlanmonday['CUSTOMERCODE'] == 'SKB') ? $result_seConfrimskb['JOBEND'] : $result_sePlanmonday['JOBEND'];
                                                                     $VAR_CLUSTER = ($result_sePlanmonday['CUSTOMERCODE'] == 'SKB') ? $result_seConfrimskb['CLUSTER'] : $result_sePlanmonday['CLUSTER'];
-                                                                    ?>
+                                                                    
+                                                                    $sql_seStatusmon = "SELECT VEHICLEINFOID,VEHICLEREGISNUMBER,THAINAME,STATUSTRUCK
+                                                                        FROM VEHICLEINFO WHERE (THAINAME ='".$result_sePlanmonday['THAINAME']."' OR VEHICLEREGISNUMBER ='".$result_sePlanmonday['THAINAME']."')";
+                                                                    $params_seStatusmon = array();
+                                                                    $query_seStatusmon  = sqlsrv_query($conn, $sql_seStatusmon, $params_seStatusmon);
+                                                                    $result_seStatusmon = sqlsrv_fetch_array($query_seStatusmon, SQLSRV_FETCH_ASSOC);
+                                                                    
+                                                                    $clusterplit = explode(",", $VAR_CLUSTER);
+                                                                    
+                                                                    // echo $VAR_CLUSTER;
+                                                                    // echo($clusterplit[0]);
+                                                                    // echo "</br>";
+                                                                    // echo($clusterplit[1]);
+                                                                    // echo "</br>";
+                                                                    // echo($clusterplit[2]);
+                                                                   
+                                                                    $sql_seZoneSKB1 = "SELECT ZONE AS 'ZONE1' FROM ZONEFORSKB 
+                                                                                      WHERE PROVINCE ='".$clusterplit[0]."'";
+                                                                    $params_seZoneSKB1 = array();
+                                                                    $query_seZoneSKB1  = sqlsrv_query($conn, $sql_seZoneSKB1, $params_seZoneSKB1);
+                                                                    $result_seZoneSKB1 = sqlsrv_fetch_array($query_seZoneSKB1, SQLSRV_FETCH_ASSOC);
+                                                                    
+                                                                    $sql_seZoneSKB2 = "SELECT ZONE AS 'ZONE2' FROM ZONEFORSKB 
+                                                                                      WHERE PROVINCE ='".$clusterplit[1]."'";
+                                                                    $params_seZoneSKB2 = array();
+                                                                    $query_seZoneSKB2  = sqlsrv_query($conn, $sql_seZoneSKB2, $params_seZoneSKB2);
+                                                                    $result_seZoneSKB2 = sqlsrv_fetch_array($query_seZoneSKB2, SQLSRV_FETCH_ASSOC);
+
+                                                                    $sql_seZoneSKB3 = "SELECT ZONE AS 'ZONE3' FROM ZONEFORSKB 
+                                                                                      WHERE PROVINCE ='".$clusterplit[2]."'";
+                                                                    $params_seZoneSKB3 = array();
+                                                                    $query_seZoneSKB3  = sqlsrv_query($conn, $sql_seZoneSKB3, $params_seZoneSKB3);
+                                                                    $result_seZoneSKB3 = sqlsrv_fetch_array($query_seZoneSKB3, SQLSRV_FETCH_ASSOC);
+                                                                    
+                                                                    //เช็ค Zone ตำแหน่งที่1 ที่ซ้ำกัน
+                                                                     if ( ($result_seZoneSKB1['ZONE1'] == $result_seZoneSKB2['ZONE2'])   ) {
+                                                                         $zone1 = $result_seZoneSKB1['ZONE1'] ;
+                                                                     }else if(($result_seZoneSKB1['ZONE1'] == $result_seZoneSKB3['ZONE3'])) {
+                                                                         $zone1 = $result_seZoneSKB1['ZONE1'] ;
+                                                                     }else{
+                                                                         $zone1 = $result_seZoneSKB1['ZONE1'];
+                                                                     } 
+
+                                                                     //เช็ค Zone ตำแหน่งที่1 ที่ซ้ำกัน
+                                                                     if ( ($result_seZoneSKB2['ZONE2'] == $result_seZoneSKB1['ZONE1'])) {
+                                                                        $zone2 = '' ;
+                                                                    }else if($result_seZoneSKB2['ZONE2'] == $result_seZoneSKB3['ZONE3']){
+                                                                        $zone2 = $result_seZoneSKB2['ZONE2'] ;
+                                                                    }else {
+                                                                        $zone2 = $result_seZoneSKB2['ZONE2'];
+                                                                    } 
+
+                                                                    //เช็ค Zone ตำแหน่งที่1 ที่ซ้ำกัน
+                                                                    if ( ($result_seZoneSKB3['ZONE3'] == $result_seZoneSKB1['ZONE1'])) {
+                                                                        $zone3 = '' ;
+                                                                    }else if($result_seZoneSKB3['ZONE3'] == $result_seZoneSKB2['ZONE2']){
+                                                                        $zone3 = '' ;
+                                                                    }else {
+                                                                        $zone3 = $result_seZoneSKB3['ZONE3'];
+                                                                    } 
+
+
+
+                                                                    ?>  
                                                                     <tr
                                                                     <?php
-                                                                    if ($result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                    // PRICEID = NULL
+                                                                    if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
                                                                         ?>
                                                                             style="color: red"
                                                                             <?php
+                                                                            // ACTUALPRICE = NULL
+                                                                        } else if ($result_sePlanmonday['ACTUALPRICE'] == NULL || $result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                            ?>
+                                                                            style="color: orange"
+                                                                            <?php
+                                                                        } else {
+                                                                            ?>
+
+                                                                            <?php
                                                                         }
                                                                         ?>
+
                                                                         >
 
+                                                                        <td align="center"><input class="form-control" type="checkbox" name="chkDel[]" value="<?php echo $result_sePlanmonday["VEHICLETRANSPORTPLANID"]; ?>"></td>
 
                                                                         <td style="text-align: center;">
                                                                             <button onclick="delete_vehicletransportplan('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>');" title="ลบแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="fa fa-times"></span></button>
                                                                         </td>
 
+
                                                                         <?php
-                                                                        if ($result_sePlanmonday['COMPANYCODE'] == 'RCC' || $result_sePlanmonday['COMPANYCODE'] == 'RATC') {
+                                                                        // PRICEID = NULL
+                                                                        if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
                                                                             ?>
                                                                             <td style="text-align: center;">
-                                                                                <button onclick="update_modalrcc('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupd"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+
                                                                             </td>
                                                                             <?php
-                                                                        } else if ($result_sePlanmonday['COMPANYCODE'] == 'RRC') {
-                                                                            ?>
-                                                                            <td style="text-align: center;">
-                                                                                <button onclick="update_modalrrc('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrrc"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
-                                                                            </td>
-                                                                            <?php
-                                                                        } else if ($result_sePlanmonday['COMPANYCODE'] == 'RKS') {
-                                                                            ?>
-                                                                            <td style="text-align: center;">
-                                                                                <button onclick="update_modalrks('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrks"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
-                                                                            </td>
-                                                                            <?php
-                                                                        } else if ($result_sePlanmonday['COMPANYCODE'] == 'RKR') {
-                                                                            ?>
-                                                                            <td style="text-align: center;">
-                                                                                <button onclick="update_modalrkr('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkr"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
-                                                                            </td>
-                                                                            <?php
-                                                                        } else if ($result_sePlanmonday['COMPANYCODE'] == 'RKL') {
+                                                                            // ACTUALPRICE = NULL
+                                                                        } else {
                                                                             ?>
                                                                             <td style="text-align: center;">
                                                                                 <button onclick="update_modalrkl('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkl"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
@@ -7267,21 +9133,74 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         ?>
 
 
-                                                                        <td style="text-align: center;">
-                                                                            <button title="COPY JOB" type="button" onclick="select_copyjob('<?= $result_sePlanmonday['JOBNO'] ?>', '<?= $result_sePlanmonday['JOBSTART'] ?>', '<?= $result_sePlanmonday['JOBEND'] ?>', '<?= $result_sePlanmonday['DATEVLIN'] ?>');" class="btn btn-default btn-circle" data-toggle="modal"  data-target="#modal_copyjob"><span class="fa fa-copy"></span></button>
-                                                                        </td>
+
+                                                                        <?php
+                                                                        // PRICEID = NULL
+                                                                        if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
+                                                                            ?>
+                                                                            <td style="text-align: center;">
+
+                                                                            </td>
+                                                                            <?php
+                                                                            // ACTUALPRICE = NULL
+                                                                        } else if ($result_sePlanmonday['ACTUALPRICE'] == NULL || $result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                            ?>
+                                                                            <td style="text-align: center;">
+
+                                                                            </td>
+                                                                            <?php
+                                                                        } else {
+                                                                            ?>
+                                                                            <td style="text-align: center;">
+                                                                                <button title="COPY JOB" type="button" onclick="select_copyjob('<?= $result_sePlanmonday['JOBNO'] ?>', '<?= $result_sePlanmonday['JOBSTART'] ?>', '<?= $result_sePlanmonday['JOBEND'] ?>', '<?= $result_sePlanmonday['DATEVLIN'] ?>');" class="btn btn-default btn-circle" data-toggle="modal"  data-target="#modal_copyjob"><span class="fa fa-copy"></span></button>
+                                                                            </td>
+                                                                            <?php
+                                                                        }
+                                                                        ?>
 
                                                                         <td style="text-align: center"><?= $result_sePlanmonday['ROUNDAMOUNT'] ?></td>
+                                                                        <?php
+                                                                        if ($result_seStatusmon['STATUSTRUCK'] == 'หยุดรถ' || $result_seStatusmon['STATUSTRUCK'] == 'จ่ายงาน' || $result_seStatusmon['STATUSTRUCK'] == 'รอดำเนินการ') {
+                                                                         ?>
+                                                                            <td title="รถคันนี้ไม่อยู่ในสถานะพร้อมใช้งาน" style="background-color:#FB656A"><?= $result_sePlanmonday['THAINAME'] ?></td>
+                                                                        <?php
+                                                                        }else{
+                                                                        ?>
+                                                                            <td ><?= $result_sePlanmonday['THAINAME'] ?></td>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
                                                                         <td><?= $result_sePlanmonday['EMPLOYEENAME1'] ?></td>
                                                                         <td><?= $result_sePlanmonday['EMPLOYEENAME2'] ?></td>
-                                                                        <td><?= $result_sePlanmonday['THAINAME'] ?></td>
+                                                                        <?php
+                                                                        if ($_GET['companycode'] == 'RKL' && $_GET['customercode'] == 'SKB') {
+                                                                            ?>
+                                                                            <td><?= $result_sePlanmonday['EMPLOYEENAME3'] ?></td>
+                                                                            <?php
+                                                                        } else {
+                                                                            ?>
+                                                                            
+                                                                            <?php
+                                                                        }
+                                                                        ?>
+                                                                        <td><?= $result_sePlanmonday['DATEPRESENT'] ?></td>
                                                                         <td><?= $result_sePlanmonday['JOBSTART'] ?></td>
                                                                         <td><?= $VAR_CLUSTER ?></td>
+                                                                        <?php
+                                                                        if ($_GET['companycode'] == 'RKL' && $_GET['customercode'] == 'SKB') {
+                                                                            ?>
+                                                                            <td><?= $zone1 ?>,<?= $zone2 ?>,<?= $zone3 ?></td>
+                                                                            <?php
+                                                                        } else {
+                                                                            ?>
+                                                                            
+                                                                            <?php
+                                                                        }
+                                                                        ?>
                                                                         <td><?= $VAR_JOBEND ?></td>
                                                                         <td ><?= $result_sePlanmonday['JOBNO'] ?></td>
                                                                         <td ><?= $result_sePlanmonday['TRIPNO'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEINPUT'] ?></td>
-                                                                        <td><?= $result_sePlanmonday['DATEPRESENT'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATERK'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEVLIN'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEVLOUT'] ?></td>
@@ -7328,6 +9247,18 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                         <?php
                                                                                     }
                                                                                     break;
+                                                                                case 'T': {
+                                                                                        ?>
+                                                                                        แผนงานเปิดงาน
+                                                                                        <?php
+                                                                                    }
+                                                                                    break;
+                                                                                 case 'X': {
+                                                                                        ?>
+                                                                                        แผนงานตัดงาน
+                                                                                        <?php
+                                                                                    }
+                                                                                    break;   
                                                                                 default : {
                                                                                         
                                                                                     }
@@ -7348,27 +9279,45 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                 } else {
                                                                     $conditionmonday1 = " AND (CONVERT(DATE,a.DATEWORKING,103) BETWEEN CONVERT(DATE,'" . $result_seSystime['STARTWEEK'] . "',103) AND CONVERT(DATE,'" . $result_seSystime['ENDWEEK'] . "',103))";
                                                                 }
-                                                                $conditionmonday2 = " AND a.STATUSNUMBER = 'O' AND DATENAME(DW,a.DATEWORKING) = 'Monday' AND a.COMPANYCODE ='" . $_GET['companycode'] . "' AND a.CUSTOMERCODE ='" . $_GET['customercode'] . "'";
+                                                                $conditionmonday2 = "  AND DATENAME(DW,a.DATEWORKING) = 'Monday' AND a.COMPANYCODE ='" . $_GET['companycode'] . "' AND a.CUSTOMERCODE ='" . $_GET['customercode'] . "'";
                                                                 $sql_sePlanmonday = "{call megVehicletransportplan_v2(?,?,?,?)}";
                                                                 $params_sePlanmonday = array(
                                                                     array('select_datevehicletransportplan', SQLSRV_PARAM_IN),
                                                                     array($conditionmonday1, SQLSRV_PARAM_IN),
-                                                                    array(" AND (a.WORKTYPE = '" . $_GET['worktype'] . "' OR a.WORKTYPE IS NULL) AND b.CARRYTYPE = '" . $_GET['carrytype'] . "'", SQLSRV_PARAM_IN),
+                                                                    array(" AND (a.WORKTYPE = '" . $_GET['worktype'] . "' OR a.WORKTYPE IS NULL) AND (b.CARRYTYPE = '" . $_GET['carrytype'] . "' OR b.CARRYTYPE IS NULL)", SQLSRV_PARAM_IN),
                                                                     array($conditionmonday2, SQLSRV_PARAM_IN)
                                                                 );
                                                                 $query_sePlanmonday = sqlsrv_query($conn, $sql_sePlanmonday, $params_sePlanmonday);
                                                                 while ($result_sePlanmonday = sqlsrv_fetch_array($query_sePlanmonday, SQLSRV_FETCH_ASSOC)) {
+                                                                    
+                                                                    $sql_seStatusmon = "SELECT VEHICLEINFOID,VEHICLEREGISNUMBER,THAINAME,STATUSTRUCK
+                                                                    FROM VEHICLEINFO WHERE (THAINAME ='".$result_sePlanmonday['THAINAME']."' OR VEHICLEREGISNUMBER ='".$result_sePlanmonday['THAINAME']."')";
+                                                                    $params_seStatusmon = array();
+                                                                    $query_seStatusmon  = sqlsrv_query($conn, $sql_seStatusmon, $params_seStatusmon);
+                                                                    $result_seStatusmon = sqlsrv_fetch_array($query_seStatusmon, SQLSRV_FETCH_ASSOC);
                                                                     ?>
                                                                     <tr
                                                                     <?php
-                                                                    if ($result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                    // PRICEID = NULL
+                                                                    if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
                                                                         ?>
                                                                             style="color: red"
+                                                                            <?php
+                                                                            // ACTUALPRICE = NULL
+                                                                        } else if ($result_sePlanmonday['ACTUALPRICE'] == NULL || $result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                            ?>
+                                                                            style="color: orange"
+                                                                            <?php
+                                                                        } else {
+                                                                            ?>
+
                                                                             <?php
                                                                         }
                                                                         ?>
                                                                         >
 
+
+                                                                        <td align="center"><input class="form-control" type="checkbox" name="chkDel[]" value="<?php echo $result_sePlanmonday["VEHICLETRANSPORTPLANID"]; ?>"></td>
 
                                                                         <td style="text-align: center;">
                                                                             <button onclick="delete_vehicletransportplan('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>');" title="ลบแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="fa fa-times"></span></button>
@@ -7384,52 +9333,168 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         } else if ($result_sePlanmonday['COMPANYCODE'] == 'RRC') {
                                                                             ?>
                                                                             <td style="text-align: center;">
-                                                                                <button onclick="update_modalrrc('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrrc"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+                                                                                <button onclick="update_modalrrc('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrrc"  title="แก้ไขแผนการขนส่งRRC" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
                                                                             </td>
                                                                             <?php
                                                                         } else if ($result_sePlanmonday['COMPANYCODE'] == 'RKS') {
                                                                             ?>
-                                                                            <td style="text-align: center;">
-                                                                                <button onclick="update_modalrks('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrks"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
-                                                                            </td>
+                                                                            <?php
+                                                                            // PRICEID = NULL
+                                                                            if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+
+                                                                                </td>
+                                                                                <?php
+                                                                                // ACTUALPRICE = NULL
+                                                                            } else if ($result_sePlanmonday['ACTUALPRICE'] == NULL || $result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+                                                                                    <button onclick="update_modalrks('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrks"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+                                                                                </td>
+                                                                                <?php
+                                                                            } else {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+                                                                                    <button onclick="update_modalrks('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrks"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+                                                                                </td>
+                                                                                <?php
+                                                                            }
+                                                                            ?>
+
                                                                             <?php
                                                                         } else if ($result_sePlanmonday['COMPANYCODE'] == 'RKR') {
                                                                             ?>
-                                                                            <td style="text-align: center;">
-                                                                                <button onclick="update_modalrkr('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkr"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
-                                                                            </td>
+                                                                            <?php
+                                                                            // PRICEID = NULL
+                                                                            if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+
+                                                                                </td>
+                                                                                <?php
+                                                                                // ACTUALPRICE = NULL
+                                                                            } else if ($result_sePlanmonday['ACTUALPRICE'] == NULL || $result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+                                                                                    <button onclick="update_modalrkr('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkr"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+                                                                                </td>
+                                                                                <?php
+                                                                            } else {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+                                                                                    <button onclick="update_modalrkr('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkr"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+                                                                                </td>
+                                                                                <?php
+                                                                            }
+                                                                            ?>
                                                                             <?php
                                                                         } else if ($result_sePlanmonday['COMPANYCODE'] == 'RKL') {
                                                                             ?>
-                                                                            <td style="text-align: center;">
-                                                                                <button onclick="update_modalrkl('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkl"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
-                                                                            </td>
+                                                                            <?php
+                                                                            // PRICEID = NULL
+                                                                            if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+
+                                                                                </td>
+                                                                                <?php
+                                                                                // ACTUALPRICE = NULL
+                                                                            } else if ($result_sePlanmonday['ACTUALPRICE'] == NULL || $result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+                                                                                    <button onclick="update_modalrkl('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkl"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+                                                                                </td>
+                                                                                <?php
+                                                                            } else {
+                                                                                ?>
+                                                                                <td style="text-align: center;">
+                                                                                    <button onclick="update_modalrkl('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>')"  data-toggle="modal"  data-target="#modal_copydiagramupdrkl"  title="แก้ไขแผนการขนส่ง" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-wrench"></span></button>
+                                                                                </td>
+                                                                                <?php
+                                                                            }
+                                                                            ?>
+
                                                                             <?php
                                                                         }
                                                                         ?>
 
 
                                                                         <?php
-                                                                        if ($_GET['companycode'] != 'RKS' && $_GET['customercode'] != 'STM') {
+                                                                        // PRICEID = NULL
+                                                                        if ($result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == NULL || $result_sePlanmonday['VEHICLETRANSPORTPRICEID'] == '') {
                                                                             ?>
+                                                                            <td style="text-align: center;">
 
+                                                                            </td>
+                                                                            <?php
+                                                                            // ACTUALPRICE = NULL
+                                                                        } else if ($result_sePlanmonday['ACTUALPRICE'] == NULL || $result_sePlanmonday['ACTUALPRICE'] == '' || $result_sePlanmonday['ACTUALPRICE'] == '0.00') {
+                                                                            ?>
+                                                                            <td style="text-align: center;">
+
+                                                                            </td>
+                                                                            <?php
+                                                                        } else {
+                                                                            ?>
                                                                             <td style="text-align: center;">
                                                                                 <button title="COPY JOB" type="button" onclick="select_copyjob('<?= $result_sePlanmonday['JOBNO'] ?>', '<?= $result_sePlanmonday['JOBSTART'] ?>', '<?= $result_sePlanmonday['JOBEND'] ?>', '<?= $result_sePlanmonday['DATEVLIN'] ?>');" class="btn btn-default btn-circle" data-toggle="modal"  data-target="#modal_copyjob"><span class="fa fa-copy"></span></button>
                                                                             </td>
                                                                             <?php
                                                                         }
                                                                         ?>
-                                                                        <td style="text-align: center"><?= $result_sePlanmonday['ROUNDAMOUNT'] ?></td>
+
+
+                                                                        <td style="text-align: center">
+                                                                            <?php if($_GET['companycode'] == 'RRC') { ?>
+                                                                                <select id="txt_roundamountgw" name="txt_roundamountgw" class="form-control" onchange="update_copydiagram('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                                                                    <option value disabled selected>--</option>
+                                                                                    <?php
+                                                                                        $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
+                                                                                        $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                                                        while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                                                        $selected = "";
+                                                                                        $SePY_CCID = $result_sePlanmonday['ROUNDAMOUNT'];
+                                                                                            $SeCC_ID = $result_slram['NAME'];
+                                                                                        if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                                                                    ?>
+                                                                                    <option value="<?=$result_slram['NAME']?>" <?= $selected ?>><?php echo $result_slram["NAME"];?></option>
+                                                                                    <?php } ?>
+                                                                                </select>   
+                                                                            <?php }else { ?>
+                                                                                <?= $result_sePlanmonday['ROUNDAMOUNT'] ?>
+                                                                            <?php } ?>
+                                                                        </td>
+                                                                        <?php
+                                                                        if ($result_seStatusmon['STATUSTRUCK'] == 'หยุดรถ' || $result_seStatusmon['STATUSTRUCK'] == 'จ่ายงาน' || $result_seStatusmon['STATUSTRUCK'] == 'รอดำเนินการ') {
+                                                                         ?>
+                                                                            <td title="รถคันนี้ไม่อยู่ในสถานะพร้อมใช้งาน" style="background-color:#FB656A"><?= $result_sePlanmonday['THAINAME'] ?></td>
+                                                                        <?php
+                                                                        }else{
+                                                                        ?>
+                                                                            <td ><?= $result_sePlanmonday['THAINAME'] ?></td>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
                                                                         <td><?= $result_sePlanmonday['EMPLOYEENAME1'] ?></td>
                                                                         <td><?= $result_sePlanmonday['EMPLOYEENAME2'] ?></td>
-                                                                        <td><?= $result_sePlanmonday['THAINAME'] ?></td>
+                                                                        <td><?= $result_sePlanmonday['DATEPRESENT'] ?></td>
                                                                         <td><?= $result_sePlanmonday['JOBSTART'] ?></td>
-                                                                        <td><?= $result_sePlanmonday['CLUSTER'] ?></td>
+                                                                        <?php
+                                                                        if ($_GET['companycode'] == 'RKS' && $_GET['customercode'] == 'DENSO-THAI') {
+                                                                            ?>
+                                                                            <td><?= $result_sePlanmonday['ROUTEDESCRIPTION'] ?></td>
+                                                                            <?php
+                                                                        } else {
+                                                                            ?>
+                                                                            <td><?= $result_sePlanmonday['CLUSTER'] ?></td>
+                                                                            <?php
+                                                                        }
+                                                                        ?>
                                                                         <td><?= $result_sePlanmonday['JOBEND'] ?></td>
                                                                         <td ><?= $result_sePlanmonday['JOBNO'] ?></td>
                                                                         <td ><?= $result_sePlanmonday['TRIPNO'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEINPUT'] ?></td>
-                                                                        <td><?= $result_sePlanmonday['DATEPRESENT'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATERK'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEVLIN'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEVLOUT'] ?></td>
@@ -7476,6 +9541,18 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                         <?php
                                                                                     }
                                                                                     break;
+                                                                                case 'T': {
+                                                                                        ?>
+                                                                                        แผนงานเปิดงาน
+                                                                                        <?php
+                                                                                    }
+                                                                                    break;
+                                                                                 case 'X': {
+                                                                                        ?>
+                                                                                        แผนงานตัดงาน
+                                                                                        <?php
+                                                                                    }
+                                                                                    break;
                                                                                 default : {
                                                                                         
                                                                                     }
@@ -7491,9 +9568,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                             ?>
                                                         </tbody>
                                                     </table>
-                                                </div>
+                                                </form>
                                             </div>
                                         </div>
+                                    </div>
 
                                         <div class="tab-pane fade " id="monday">
                                             <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
@@ -7561,6 +9639,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             </div>
         </div>
 
+        <!-- this will show our spinner -->
+        <div  id="loading" class="center" >
+            <p><img style="" src="../images/Truckload5.gif" /></p>
+        </div>
+
         <script src="../vendor/jquery/jquery.min.js"></script>
         <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
         <script src="../vendor/metisMenu/metisMenu.min.js"></script>
@@ -7571,9 +9654,27 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
         <script src="../js/jquery.datetimepicker.full.js"></script>
         <script src="../dist/js/jquery.autocomplete.js"></script>
         <script src="../dist/js/bootstrap-select.js"></script>
+        <script src="../dist/js/select2.js"></script>
+
+        <!-- Data Table Export File -->
+       
+        <!-- <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+        <script src="https://cdn.datatables.net/buttons/3.0.0/js/dataTables.buttons.js"></script>
+        <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.dataTables.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        
+        <script src="//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json"></script>
+        <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.colVis.min.js"></script> -->
+        
+        <!-- Sweet Alert -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
         <?php
         $job = '';
+        if ($_GET['companycode'] == 'RRC' && ($_GET['customercode'] == 'GMT' || $_GET['customercode'] == 'GMT-IB')) {
+            $job = select_jobautocomplatestartgetway('megVehicletransportprice_v2', 'select_from', '');
+        }
         if ($_GET['companycode'] == 'RRC' && $_GET['customercode'] == 'GMT') {
             $job = select_jobautocomplatestartgetway('megVehicletransportprice_v2', 'select_from', '');
         }
@@ -7591,29 +9692,219 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             $job = select_jobautocomplatestarttttsh('megVehicletransportprice_v2', 'select_fromtttsh', '');
         }
         if ($_GET['companycode'] == 'RRC' || $_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC') {
-            $thainame = select_carautocomplate('megVehicleinfo_v2', 'selectcond_vehicleinfo', " AND a.THAINAME != '-' AND (a.ENGNAME  LIKE '%R-%' OR a.ENGNAME  LIKE '%RA-%'", " OR a.THAINAME LIKE '%ดินแดง%'  OR a.THAINAME  LIKE '%อุทัยธานี%'  OR a.THAINAME  LIKE '%คลองเขื่อน%'  ", " OR a.THAINAME LIKE '%RP-%' OR a.THAINAME  LIKE '%สวนผึ้ง%' OR a.THAINAME  LIKE '%ด่านช้าง%'", " OR a.ENGNAME LIKE '%Khao Chamao%' OR a.ENGNAME LIKE '%Kerry%' OR a.ENGNAME LIKE '%Chaloem Prakiat%' OR a.THAINAME LIKE '%แปลงยาว%' OR a.THAINAME LIKE '%สนามชัยเขต%')");
+            $thainame = select_carautocomplate('megVehicleinfo_v2', 'selectcond_vehicleinfo', " AND a.THAINAME != '-' AND (a.ENGNAME  LIKE '%R-%' OR a.ENGNAME  LIKE '%RA-%' OR a.ENGNAME  LIKE '%T-%' OR a.ENGNAME  LIKE '%G-%'", " OR a.THAINAME LIKE '%ดินแดง%'  OR a.THAINAME  LIKE '%อุทัยธานี%'  OR a.THAINAME  LIKE '%คลองเขื่อน%'  ", " OR a.THAINAME LIKE '%RP-%' OR a.THAINAME  LIKE '%สวนผึ้ง%' OR a.THAINAME  LIKE '%ด่านช้าง%'", " OR a.ENGNAME LIKE '%Khao Chamao%' OR a.ENGNAME LIKE '%Kerry%' OR a.ENGNAME LIKE '%Chaloem Prakiat%' OR a.THAINAME LIKE '%แปลงยาว%' OR a.THAINAME LIKE '%สนามชัยเขต%' OR a.THAINAME LIKE '%วานรนิวาส%' OR a.THAINAME LIKE '%เฉลิมพระเกียรติ%' OR a.THAINAME LIKE '%ชัยนาท%'  OR a.THAINAME LIKE '%พรหมพิราม%' OR a.THAINAME LIKE '%คง%' OR a.THAINAME LIKE '%ชัยภูมิ%')");
         } else {
             $thainame = select_vehiclenumberautocomplate('megVehicleinfo_v2', 'select_vehicleinfo', '');
         }
         $jobrccend = select_jobautocomplateendgetway('megVehicletransportprice_v2', 'select_to', '');
 
 
-        $emp = select_empautocomplate('megEmployeeEHR_v2', 'select_employee', " ");
+        $emp = select_empautocomplate('megEmployeeEHR_v2', 'select_employeeehr2', " ");
         $cluster = select_clusterautocomplate('megVehicletransportprice_v2', 'select_cluster', '');
+        
+        $data = 'xxx'; // ตัวแปร PHP
+
+        
+        
         ?>
 
 
-        <script type="text/javascript">
+        <script type="text/javascript"> 
+                                                                        function showLoading() {
+                                                                            $("#loading").show();
+                                                                            
+                                                                        }
+
+                                                                        function hideLoading() {
+                                                                            $("#loading").hide();
+                                                                        }
+                                                                        function excel_planningprintout()
+                                                                        {
+                                                                            var companycode     = '<?=$_GET['companycode']?>';
+                                                                            var customercode    = '<?=$_GET['customercode']?>';
+                                                                            var worktype        = '<?=$_GET['worktype']?>';
+                                                                            var carrytype       = '<?=$_GET['carrytype']?>';
+                                                                            var datestartplan = document.getElementById('txt_datestartsr').value;
+                                                                            var dateendplan   = document.getElementById('txt_dateendsr').value;
+
+                                                                            Swal.fire({
+                                                                                title: 'ต้องการพิมพ์ข้อมูลแผนงานหรือไม่ ?',
+                                                                                // html: '<div style="text-align: left;"><b>รหัสพนักงาน (TLEP)</b>&nbsp;:  '+empcodeshow.bold()+'<br><b>ชื่อพนักงาน</b>&nbsp;: '+nameshow.bold()+'<br><b>เวลาลงชื่อเข้า</b>&nbsp;: '+checkindateshow.bold()+'<br><b>เวลาที่ต้องมาเท็งโกะ</b>&nbsp;: '+tenkoestdateshow.bold()+'</div>',
+                                                                                text: "กรุณากด 'ตกลง' เพื่อยืนยัน!!!",
+                                                                                icon: 'warning',
+                                                                                showCancelButton: true,
+                                                                                confirmButtonColor: '#3085d6',
+                                                                                cancelButtonColor: '#d33',
+                                                                                confirmButtonText: 'ตกลง',
+                                                                                cancelButtonText: 'ยกเลิก',
+                                                                                allowOutsideClick: false,
+                                                                                position: 'top'
+                                                                            }).then((result) => {
+                                                                                if (result.isConfirmed) {
+                                                                                    // Swal.fire(
+                                                                                    // 'Deleted!',
+                                                                                    // 'Your file has been deleted.',
+                                                                                    // 'success'
+                                                                                    // )
+                                                                                    // alert('print');
+                                                                                    window.open('excel_planningprintout.php?companycode=' + companycode + '&customercode=' + customercode+ '&worktype=' + worktype+ '&carrytype=' + carrytype+ '&datestartplan=' + datestartplan+ '&dateendplan=' + dateendplan, '_blank');
+                                                                                }else{
+                                                                                    // alert('not print');
+                                                                                    // window.location.reload();
+                                                                                }
+                                                                            })
+                                                                            
+                                                                            
+                                                                            // alert(drivercode);
+                                                                            // alert(dateend);
+                                                                            
+
+                                                                        }
+                                                                        function check_thainamerksrkr(thainame){
+                                                                            // alert(thainame);
+                                                                            $.ajax({
+                                                                                url: 'meg_data2.php',
+                                                                                type: 'POST',
+                                                                                data: {
+                                                                                    txt_flg: "check_thainame", thainame: thainame
+                                                                                },
+                                                                                success: function (response) {
+                                                                                    // alert(response);
+                                                                                    // document.getElementById("txt_copydiagramthainame").value = str.trim();
+                                                                                    let str = response;
+                                                                                    let strcheck = str.trim();
+                                                                                        if (strcheck == 'หยุดรถ' || strcheck == 'จ่ายงาน' || strcheck == 'รอดำเนินการ' ) {
+                                                                                            // alert('รถสถานะ "หยุดรถ","จ่ายงาน","รอดำเนินการ" ไม่สามารถทำการวางแผนได้ !!!');
+                                                                                            // document.getElementById("txt_copydiagramthainame").value = '';
+                                                                                            document.getElementById("txt_copydiagramthainame").value = thainame;
+                                                                                        }else{
+                                                                                            // alert('else');
+                                                                                            document.getElementById("txt_copydiagramthainame").value = thainame;   
+                                                                                        }
+                  
+                                                                                }
+                                                                            });
+                                                                        
+                                                                        }
+                                                                        function check_thainamerkl(thainame){
+                                                                            // alert(thainame);
+                                                                            $.ajax({
+                                                                                url: 'meg_data2.php',
+                                                                                type: 'POST',
+                                                                                data: {
+                                                                                    txt_flg: "check_thainame", thainame: thainame
+                                                                                },
+                                                                                success: function (response) {
+                                                                                    // alert(response);
+                                                                                    // document.getElementById("txt_copydiagramthainame").value = str.trim();
+                                                                                    let str = response;
+                                                                                    let strcheck = str.trim();
+                                                                                        if (strcheck == 'หยุดรถ' || strcheck == 'จ่ายงาน' || strcheck == 'รอดำเนินการ') {
+                                                                                            // alert('รถสถานะ "หยุดรถ","จ่ายงาน","รอดำเนินการ" ไม่สามารถทำการวางแผนได้ !!!');
+                                                                                            // document.getElementById("txt_copydiagramthainame").value = '';
+                                                                                           
+                                                                                            document.getElementById("txt_copydiagramthainame").value = thainame;
+                                                                                        }else{
+                                                                                            // alert('else');
+                                                                                            document.getElementById("txt_copydiagramthainame").value = thainame;   
+                                                                                        }
+                  
+                                                                                }
+                                                                            });
+                                                                        
+                                                                        }
+                                                                        function check_thainamerklskb(thainame){
+                                                                            // alert(thainame);
+                                                                            $.ajax({
+                                                                                url: 'meg_data2.php',
+                                                                                type: 'POST',
+                                                                                data: {
+                                                                                    txt_flg: "check_thainame", thainame: thainame
+                                                                                },
+                                                                                success: function (response) {
+                                                                                    // alert(response);
+                                                                                    // document.getElementById("txt_copydiagramthainame").value = str.trim();
+                                                                                    let str = response;
+                                                                                    let strcheck = str.trim();
+                                                                                        if (strcheck == 'หยุดรถ' || strcheck == 'จ่ายงาน' || strcheck == 'รอดำเนินการ') {
+                                                                                            // alert('รถสถานะ "หยุดรถ","จ่ายงาน","รอดำเนินการ" ไม่สามารถทำการวางแผนได้ !!!');
+                                                                                            // document.getElementById("txt_copydiagramthainame").value = '';
+                                                                                            
+                                                                                            document.getElementById("txt_copydiagramthainame").value = thainame;   
+                                                                                        }else{
+                                                                                            // alert('else');
+                                                                                            document.getElementById("txt_copydiagramthainame").value = thainame;   
+                                                                                        }
+                  
+                                                                                }
+                                                                            });
+                                                                        
+                                                                        }
+                                                                        function save_logprocess(category, process, employeecode)
+                                                                        {
+                                                                            $.ajax({
+                                                                                url: 'meg_data.php',
+                                                                                type: 'POST',
+                                                                                data: {
+                                                                                    txt_flg: "save_logprocess", category: category, process: process, employeecode: employeecode
+                                                                                },
+                                                                                success: function () {
+
+
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                        function select_RouteDes() {
+                                                                            // alert("444444");
+                                                                            var routetype = document.getElementById("cb_copydiagramroutetype").value;
+                                                                            var routeno = document.getElementById("cb_copydiagramrouteno").value;
+                                                                            // alert(routetype);
+                                                                            // alert(routeno);
+                                                                            $.ajax({
+                                                                                type: 'post',
+                                                                                url: 'meg_data.php',
+                                                                                data: {
+                                                                                    txt_flg: "select_RouteDes", routetype: routetype, routeno: routeno
+                                                                                },
+                                                                                success: function (response) {
+                                                                                    if (response) {
+
+                                                                                        document.getElementById("datacompdetailsr").innerHTML = response;
+                                                                                        document.getElementById("datacompdetaildef").innerHTML = "";
+
+                                                                                    }
+
+
+
+
+                                                                                }
+                                                                            });
+
+                                                                        }
+                                                                        $(document).ready(function () {
+                                                                            $('#dataTables-example').DataTable({
+                                                                                responsive: true,
+                                                                            });
+                                                                        });
+
+                                                                        function close_modal() {
+                                                                            $('#myModal').hide();
+                                                                        }
+
                                                                         function show_monday()
                                                                         {
+
+                                                                            showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
                                                                                     txt_flg: "show_monday", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', STARTWEEK: document.getElementById("txt_datestartsr").value, ENDWEEK: document.getElementById("txt_dateendsr").value, condish: "<?= $condish ?>", statusnumber: document.getElementById("cb_statussr").value, worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+                                                                                    , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
+                                                                                    hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = rs;
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
                                                                                     document.getElementById("show_tuesday").innerHTML = "";
@@ -7639,14 +9930,17 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         function show_tuesday()
                                                                         {
 
+                                                                            showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
                                                                                     txt_flg: "show_tuesday", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', STARTWEEK: document.getElementById("txt_datestartsr").value, ENDWEEK: document.getElementById("txt_dateendsr").value, condish: "<?= $condish ?>", statusnumber: document.getElementById("cb_statussr").value, worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+                                                                                    , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
+                                                                                    hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = "";
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
                                                                                     document.getElementById("show_tuesday").innerHTML = rs;
@@ -7671,14 +9965,18 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         }
                                                                         function show_wednesday()
                                                                         {
+                                                                            
+                                                                            showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
                                                                                     txt_flg: "show_wednesday", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', STARTWEEK: document.getElementById("txt_datestartsr").value, ENDWEEK: document.getElementById("txt_dateendsr").value, condish: "<?= $condish ?>", statusnumber: document.getElementById("cb_statussr").value, worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+                                                                                    , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
+                                                                                    hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = "";
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
                                                                                     document.getElementById("show_tuesday").innerHTML = "";
@@ -7702,14 +10000,18 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         }
                                                                         function show_thursday()
                                                                         {
+
+                                                                            showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
                                                                                     txt_flg: "show_thursday", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', STARTWEEK: document.getElementById("txt_datestartsr").value, ENDWEEK: document.getElementById("txt_dateendsr").value, condish: "<?= $condish ?>", statusnumber: document.getElementById("cb_statussr").value, worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+                                                                                    , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
+                                                                                    hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = "";
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
                                                                                     document.getElementById("show_tuesday").innerHTML = "";
@@ -7732,14 +10034,25 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         }
                                                                         function show_friday()
                                                                         {
+                                                                        //    alert("friday");
+                                                                        //    var  startweek = document.getElementById("txt_datestartsr").value;
+                                                                        //    var  endweek = document.getElementById("txt_dateendsr").value;
+
+
+                                                                        //    alert(startweek);
+                                                                        //    alert(endweek);
+
+                                                                            showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
                                                                                     txt_flg: "show_friday", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', STARTWEEK: document.getElementById("txt_datestartsr").value, ENDWEEK: document.getElementById("txt_dateendsr").value, condish: "<?= $condish ?>", statusnumber: document.getElementById("cb_statussr").value, worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+                                                                                    , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
+                                                                                    hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = "";
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
                                                                                     document.getElementById("show_tuesday").innerHTML = "";
@@ -7761,15 +10074,19 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             });
                                                                         }
                                                                         function show_saturday()
-                                                                        {
+                                                                        {   
+
+                                                                            showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
                                                                                     txt_flg: "show_saturday", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', STARTWEEK: document.getElementById("txt_datestartsr").value, ENDWEEK: document.getElementById("txt_dateendsr").value, condish: "<?= $condish ?>", statusnumber: document.getElementById("cb_statussr").value, worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+                                                                                    , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
+                                                                                    hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = "";
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
                                                                                     document.getElementById("show_tuesday").innerHTML = "";
@@ -7789,15 +10106,19 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             });
                                                                         }
                                                                         function show_sunday()
-                                                                        {
+                                                                        {   
+
+                                                                            showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
                                                                                     txt_flg: "show_sunday", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', STARTWEEK: document.getElementById("txt_datestartsr").value, ENDWEEK: document.getElementById("txt_dateendsr").value, condish: "<?= $condish ?>", statusnumber: document.getElementById("cb_statussr").value, worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+                                                                                    , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
+                                                                                    hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = "";
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
                                                                                     document.getElementById("show_tuesday").innerHTML = "";
@@ -7838,8 +10159,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                 document.getElementById('txt_copydiagramemployeename2').value = data;
                                                                             } else if (emp == '3')
                                                                             {
-                                                                                if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC')
-                                                                                {
+                                                                                if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC'){
+                                                                                    document.getElementById('txt_copydiagramemployeename3').value = data;
+                                                                                }else if('<?= $_GET['companycode'] ?>' == 'RKL' || '<?= $_GET['companycode'] ?>' == 'SKB'){
                                                                                     document.getElementById('txt_copydiagramemployeename3').value = data;
                                                                                 }
                                                                             }
@@ -8000,8 +10322,14 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     txt_flg: "modal_updatediagramrks", vehicletransportplanid: vehicletransportplanid, companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
-
+                                                                                    <?php
+                                                                                    if ($_GET['companycode'] == 'RKS') {
+                                                                                    ?>
                                                                                     document.getElementById("modalbodyupdatediagramrkssr").innerHTML = rs;
+                                                                                    <?php
+                                                                                    }
+                                                                                    ?>
+
                                                                                     $(function () {
 
                                                                                         $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
@@ -8040,6 +10368,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     $("#txt_copydiagramthainameupdrks").autocomplete({
                                                                                         source: [txt_copydiagramthainameupdrks]
                                                                                     });
+                                                                                    var txt_copydiagramthainameupdrks2 = [<?= $thainame ?>];
+                                                                                    $("#txt_copydiagramthainameupdrks2").autocomplete({
+                                                                                        source: [txt_copydiagramthainameupdrks2]
+                                                                                    });
                                                                                     var txt_copydiagramemployeenameupdrks1 = [<?= $emp ?>];
                                                                                     $("#txt_copydiagramemployeenameupdrks1").autocomplete({
                                                                                         source: [txt_copydiagramemployeenameupdrks1]
@@ -8067,7 +10399,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
                                                                                 data: {
-                                                                                    txt_flg: "modal_updatediagramrkr", vehicletransportplanid: vehicletransportplanid, companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>'
+                                                                                    txt_flg: "modal_updatediagramrkr", vehicletransportplanid: vehicletransportplanid, carrytype: '<?= $_GET['carrytype'] ?>', companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
 
@@ -8110,6 +10442,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     $("#txt_copydiagramthainameupdrkr").autocomplete({
                                                                                         source: [txt_copydiagramthainameupdrkr]
                                                                                     });
+                                                                                    var txt_copydiagramthainameupdrkr2 = [<?= $thainame ?>];
+                                                                                    $("#txt_copydiagramthainameupdrkr2").autocomplete({
+                                                                                        source: [txt_copydiagramthainameupdrkr2]
+                                                                                    });
                                                                                     var txt_copydiagramemployeenameupdrkr1 = [<?= $emp ?>];
                                                                                     $("#txt_copydiagramemployeenameupdrkr1").autocomplete({
                                                                                         source: [txt_copydiagramemployeenameupdrkr1]
@@ -8118,6 +10454,12 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     $("#txt_copydiagramemployeenameupdrkr2").autocomplete({
                                                                                         source: [txt_copydiagramemployeenameupdrkr2]
                                                                                     });
+                                                                                    
+                                                                                    $('#cb_zonettaststc').select2({
+                                                                                        placeholder: 'เลือก Cluster'
+                                                                                    });
+                                                                                    
+                                                                                 
                                                                                 }
 
 
@@ -8174,6 +10516,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     $("#txt_copydiagramthainameupdrkr").autocomplete({
                                                                                         source: [txt_copydiagramthainameupdrkr]
                                                                                     });
+                                                                                    var txt_copydiagramthainameupdrkr2 = [<?= $thainame ?>];
+                                                                                    $("#txt_copydiagramthainameupdrkr2").autocomplete({
+                                                                                        source: [txt_copydiagramthainameupdrkr2]
+                                                                                    });
                                                                                     var txt_copydiagramemployeenameupdrkr1 = [<?= $emp ?>];
                                                                                     $("#txt_copydiagramemployeenameupdrkr1").autocomplete({
                                                                                         source: [txt_copydiagramemployeenameupdrkr1]
@@ -8182,8 +10528,19 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     $("#txt_copydiagramemployeenameupdrkr2").autocomplete({
                                                                                         source: [txt_copydiagramemployeenameupdrkr2]
                                                                                     });
+                                                                                    var txt_copydiagramemployeenameupdrkr3 = [<?= $emp ?>];
+                                                                                    $("#txt_copydiagramemployeenameupdrkr3").autocomplete({
+                                                                                        source: [txt_copydiagramemployeenameupdrkr3]
+                                                                                    });
 
-
+                                                                                    $('#cb_copydiagramzoneskb').select2({
+                                                                                        placeholder: 'เลือกโซน'
+                                                                                    });
+                                                                                    
+                                                                                    
+                                                                                    $('#cb_zonettaststc').select2({
+                                                                                        placeholder: 'เลือก Cluster'
+                                                                                    });
 
                                                                                 }
 
@@ -8218,6 +10575,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     $("#txt_copydiagramthainameupdrcc").autocomplete({
                                                                                         source: [txt_copydiagramthainameupdrcc]
                                                                                     });
+
+
 
 
                                                                                     $(function () {
@@ -8290,6 +10649,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     var txt_copydiagramthainameupdrrc = [<?= $thainame ?>];
                                                                                     $("#txt_copydiagramthainameupdrrc").autocomplete({
                                                                                         source: [txt_copydiagramthainameupdrrc]
+                                                                                    });
+                                                                                    var txt_copydiagramthainameupdrrc2 = [<?= $thainame ?>];
+                                                                                    $("#txt_copydiagramthainameupdrrc2").autocomplete({
+                                                                                        source: [txt_copydiagramthainameupdrrc2]
                                                                                     });
 
 
@@ -8430,13 +10793,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             var compensation = document.getElementById("txt_confrimcomp").value;
                                                                             var pricekm = document.getElementById("txt_pricekm").value;
 
+
+
                                                                             $.ajax({
                                                                                 url: 'meg_data.php',
                                                                                 type: 'POST',
                                                                                 data: {
                                                                                     txt_flg: "save_confrimtempskb", condition: condition, jobstart: jobstart, cluster: cluster, jobend: jobend, km: km, compensation: compensation, pricekm: pricekm
                                                                                 },
-                                                                                success: function () {
+                                                                                success: function (rs) {
+
                                                                                     select_confrimpriceskb('');
                                                                                     document.getElementById("txt_confrimjobstart").value = "";
                                                                                     document.getElementById("txt_confrimcluster").value = "";
@@ -8446,6 +10812,25 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     document.getElementById("txt_pricekm").value = "";
                                                                                 }
                                                                             });
+                                                                        }
+
+                                                                        function update_planskb(vehicletransportplanid)
+                                                                        {
+
+                                                                            $.ajax({
+                                                                                type: 'post',
+                                                                                url: 'meg_data.php',
+                                                                                data: {
+                                                                                    txt_flg: "update_planskb",
+                                                                                    vehicletransportplanid: vehicletransportplanid, copydiagramlocationskb: document.getElementById("cb_copydiagramlocationskb").value
+
+                                                                                },
+                                                                                success: function (rs) {
+
+                                                                                    window.location.reload();
+                                                                                }
+                                                                            });
+                                                                            save_logprocess('Driver Management', 'Update Plan SKB', '<?= $result_seLogin['PersonCode'] ?>');
                                                                         }
 
         </script>
@@ -8858,8 +11243,14 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             $("#txt_copydiagramemployeename2").autocomplete({
                 source: [txt_copydiagramemployeename2]
             });
+
             if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC')
             {
+                var txt_copydiagramemployeename3 = [<?= $emp ?>];
+                $("#txt_copydiagramemployeename3").autocomplete({
+                    source: [txt_copydiagramemployeename3]
+                });
+            }else if('<?= $_GET['companycode'] ?>' == 'RKL' || '<?= $_GET['companycode'] ?>' == 'SKB'){
                 var txt_copydiagramemployeename3 = [<?= $emp ?>];
                 $("#txt_copydiagramemployeename3").autocomplete({
                     source: [txt_copydiagramemployeename3]
@@ -8954,8 +11345,21 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     });
                 }
             }
+
+            function select_producttyperetrun(data)
+            {
+
+                if (data == 'return')
+                {
+                    $("#modal_producttypereturn").modal();
+                }
+
+
+
+            }
             function select_confrimpriceskb(jobend)
             {
+
                 document.getElementById('txt_confrimjobstart').value = document.getElementById('cb_copydiagramjobstart').value;
                 document.getElementById('txt_confrimcluster').value = document.getElementById('txt_copydiagramzoneskb').value;
                 document.getElementById('txt_confrimjobend').value = jobend;
@@ -8975,16 +11379,81 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 });
 
             }
-            function select_zoneskb()
+
+            function select_zoneskb(VEHICLETRANSPORTPLANID, COL, DATA)
             {
-                $('.selectpicker').on('changed.bs.select', function () {
-                    document.getElementById('txt_copydiagramzoneskb').value = $(this).val();
-                    select_locationskb();
-                });
+
+                document.getElementById('txt_copydiagramzoneskb').value = $('#cb_copydiagramzoneskb').val().toString();
+                update_copydiagram(VEHICLETRANSPORTPLANID, COL, $('#cb_copydiagramzoneskb').val().toString());
+                select_locationskb(VEHICLETRANSPORTPLANID);
+
 
 
 
             }
+            function select_zonettaststc(VEHICLETRANSPORTPLANID, COL, DATA)
+            {
+                //alert(VEHICLETRANSPORTPLANID);alert(COL);alert(DATA);
+                document.getElementById('txt_zonettaststc').value = $('#cb_zonettaststc').val().toString();
+                update_copydiagram(VEHICLETRANSPORTPLANID, COL, $('#txt_zonettaststc').val().toString());
+                select_jobendttaststc(VEHICLETRANSPORTPLANID);
+
+
+
+
+            }
+            function select_jobendttaststc(VEHICLETRANSPORTPLANID)
+            {
+
+                var txtzonettaststc = document.getElementById("txt_zonettaststc").value;
+
+                $.ajax({
+                    type: 'post',
+                    url: 'meg_data.php',
+                    data: {
+                        txt_flg: "show_jobendttaststc", companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', zone: txtzonettaststc,VEHICLETRANSPORTPLANID:VEHICLETRANSPORTPLANID
+                    },
+                    success: function (rs) {
+                       
+                        document.getElementById("data_jobendttaststcsr").innerHTML = rs;
+                        document.getElementById("data_jobendttaststcdef").innerHTML = "";
+
+                        $("#cb_jobendttaststc").html(rs).selectpicker('refresh');
+                        $('.selectpicker').on('changed.bs.select', function () {
+                            document.getElementById('txt_jobendttaststc').value = $(this).val();
+                        });
+                        
+                        //update_copydiagram(VEHICLETRANSPORTPLANID, 'JOBEND', document.getElementById('txt_jobendttaststc').value);
+
+
+                       
+                    }
+                });
+            }
+            
+            function update_copydiagram2(ID, fieldname, editableObj)
+            {
+
+                $.ajax({
+                    type: 'post',
+                    url: 'meg_data.php',
+                    data: {
+                        txt_flg: "edit_vehicletransportplan",
+                        ID: ID,
+                        fieldname: fieldname,
+                        editableObj: editableObj
+
+
+
+                    },
+                    success: function () {
+
+                        select_confrimpriceskb(editableObj);
+
+                    }
+                });
+            }
+
 
             function select_locationskb()
             {
@@ -9005,11 +11474,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         $("#cb_copydiagramlocationskb").html(rs).selectpicker('refresh');
                         $('.selectpicker').on('changed.bs.select', function () {
                             document.getElementById('txt_copydiagramjobendskb').value = $(this).val();
-
-
-
-
                         });
+
+
                         $(function () {
                             $('[data-toggle="popover"]').popover({
                                 html: true,
@@ -9018,8 +11485,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 }
                             });
                         })
-
-
                     }
                 });
             }
@@ -9052,6 +11517,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             {
 
                 var copydiagramthainame = document.getElementById("txt_copydiagramthainame").value;
+                // var copydiagramthainame = document.getElementById("cb_copydiagramthainame").value;
                 var copydiagramjobstart = document.getElementById("txt_copydiagramjobstart").value;
 
                 $.ajax({
@@ -9302,6 +11768,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     url: 'meg_data.php',
                     data: {
                         txt_flg: "showupdate_vehicletransportplan", datestart: document.getElementById("txt_datestartsr").value, dateend: document.getElementById("txt_dateendsr").value, statusnumber: document.getElementById("cb_statussr").value, companycode: '<?= $_GET['companycode'] ?>', customercode: '<?= $_GET['customercode'] ?>', worktype: '<?= $_GET['worktype'] ?>', carrytype: '<?= $_GET['carrytype'] ?>'
+						 , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                     },
                     success: function (rs) {
                         document.getElementById("showdatasr").innerHTML = rs;
@@ -9399,6 +11866,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 document.getElementById("lbl_f").innerHTML = '(' + res[5] + ')';
                                 document.getElementById("lbl_sat").innerHTML = '(' + res[6] + ')';
                                 document.getElementById("lbl_sun").innerHTML = '(' + res[7] + ')';
+
+                                save_logprocess('Planing', 'Select Status Planing', '<?= $result_seLogin['PersonCode'] ?>');
 
                             }
                         });
@@ -9539,8 +12008,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         txt_flg: "save_vehicletransportplan", VEHICLETRANSPORTPLANID: '', CUSTOMERCODE: CUSTOMERCODE, COMPANYCODE: COMPANYCODE, VEHICLEREGISNUMBER1: VEHICLEREGISNUMBER1, VEHICLEREGISNUMBER2: VEHICLEREGISNUMBER2, THAINAME: THAINAME, ENGNAME: ENGNAME, VEHICLETRANSPORTPRICEID: VEHICLETRANSPORTPRICEID, CLUSTER: CLUSTER, DEALERCODE: DEALERCODE, NAME: NAME, SRBASE4L: SRBASE4L, SRBASE8L: SRBASE8L, GWBASE4L: GWBASE4L, GWBASE8L: GWBASE8L, BPBASE4L: BPBASE4L, BPBASE8L: BPBASE8L, OTHBASE4L: OTHBASE4L, OTHBASE8L: OTHBASE8L, E1: E1, E2: E2, E3: E3, E4: E4, C1: C1, C2: C2, C3: C3, C4: C4, C5: C5, C6: C6, C7: C7, C8: C8, C9: C9, O1: O1, O2: O2, O3: O3, O4: O4, JOBSTART: JOBSTART, JOBEND: JOBEND, EMPLOYEECODE1: EMPLOYEECODE1, EMPLOYEENAME1: EMPLOYEENAME1, EMPLOYEECODE2: EMPLOYEECODE2, EMPLOYEENAME2: EMPLOYEENAME2, EMPLOYEECODE3: EMPLOYEECODE3, EMPLOYEENAME3: EMPLOYEENAME3, EMPLOYEECODE4: EMPLOYEECODE4, EMPLOYEENAME4: EMPLOYEENAME4, JOBNO: JOBNO, TRIPNO: TRIPNO, DATEINPUT: DATEINPUT, DATESTART: DATESTART, DATEWORKING: DATEWORKING, DATEWORKSUS: DATEWORKSUS, DATEPRESENT: DATEPRESENT, DATEVLIN: DATEVLIN, DATEVLOUT: DATEVLOUT, DATEDEALERIN: DATEDEALERIN, DATERETURN: DATERETURN, STATUS: STATUS, ACTIVESTATUS: ACTIVESTATUS, REMARK: REMARK
                     },
                     success: function (rs) {
-                        alert(rs);
+
                         window.location.reload();
+                        alert(rs);
                     }
                 });
             }
@@ -9608,10 +12078,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             txt_flg: "save_vehicletransportplan", VEHICLETRANSPORTPLANID: '', CUSTOMERCODE: customercode, COMPANYCODE: companycode, VEHICLEREGISNUMBER1: '', VEHICLEREGISNUMBER2: '', THAINAME: '', ENGNAME: '', VEHICLETRANSPORTPRICEID: '', CLUSTER: '', DEALERCODE: '', NAME: '', SRBASE4L: '', SRBASE8L: '', GWBASE4L: '', GWBASE8L: '', BPBASE4L: '', BPBASE8L: '', OTHBASE4L: '', OTHBASE8L: '', E1: '', E2: '', E3: '', E4: '', C1: '', C2: '', C3: '', C4: '', C5: '', C6: '', C7: '', C8: '', C9: '', O1: '', O2: '', O3: '', O4: '', JOBSTART: '', JOBEND: '', EMPLOYEECODE1: '', EMPLOYEENAME1: employeename1, EMPLOYEECODE2: '', EMPLOYEENAME2: '', EMPLOYEECODE3: '', EMPLOYEENAME3: '', EMPLOYEECODE4: '', EMPLOYEENAME4: '', JOBNO: '<?= $run_jobno ?>', TRIPNO: '', DATEINPUT: '', DATEWORKING: '', DATEWORKSUS: '', DATEPRESENT: '', DATEVLIN: '', DATEVLOUT: '', DATEDEALERIN: '', DATERETURN: '', STATUS: '', ACTIVESTATUS: '', REMARK: ''
                         },
                         success: function (rs) {
-                            alert(rs);
+
                             //alert('เพิ่มแผนการขนส่งเรียบร้อยแล้ว');
 
                             window.location.reload();
+                            alert(rs);
                         }
                     });
                 } else
@@ -9640,7 +12111,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             }
             function delete_vehicletransportplan(vehicletransportplanid)
             {
-
+                // alert(vehicletransportplanid);
                 var confirmation = confirm("ต้องการลบข้อมูล ?");
                 if (confirmation) {
                     $.ajax({
@@ -9759,6 +12230,64 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             function reload()
             {
                 window.location.reload();
+            } 
+            function update_diagramrrcgmt(id, actualprice)
+            {
+                if ('<?= $_GET['customercode'] ?>' == 'GMT-IB')
+                {
+                    var cond7 = '';
+                    var condholiday = '';
+                    var cond8 = '';
+                    if (chkupd_7.checked == true) {
+                        cond7 = '1';
+                    }
+                    if (chkupd_8.checked == true) {
+                        cond8 = '1';
+                    }
+                    if (chkupd_holiday.checked == true) {
+                        condholiday = '1';
+                    }
+
+                    $.ajax({
+                        type: 'post',
+                        url: 'meg_data.php',
+                        data: {
+                            txt_flg: "update_diagramrrcgmt", id: id, actualprice: actualprice, cond7: cond7, cond8: cond8, condholiday: condholiday, customercode: '<?= $_GET['customercode'] ?>'
+                        },
+                        success: function (rs) {
+                            alert(rs);
+                            window.location.reload();
+                        }
+                    });
+                } else
+                {
+                    window.location.reload();
+                }
+
+            }
+             function reload2(ID, fieldname)
+            {
+                // alert(ID);
+                // alert(fieldname);
+                <?php 
+                if ($_GET['customercode'] == 'TTASTSTC') {
+               ?>
+                    var editableObj = document.getElementById('txt_jobendttaststc').value;
+                    update_copydiagram(ID, fieldname, editableObj);
+                    window.location.reload();
+               <?php
+                }else{
+                ?>  
+                    window.location.reload();
+                <?php
+                }
+                ?>
+                
+                    // var editableObj = document.getElementById('txt_jobendttaststc').value;
+                    // update_copydiagram(ID, fieldname, editableObj);
+                    // window.location.reload();
+                  
+                
             }
             function select_vehicletransportplanjobend(editableObj, fieldname, ID, cb_idname1)
             {
@@ -9884,22 +12413,238 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             {
                 if (vehicletransportplanid == '')
                 {
-                    if (document.getElementById("txt_copydiagramdatestart").value == "")
+                    if ('<?= $_GET['carrytype'] ?>' == 'weight')
                     {
-                        alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
-                        return false;
-                    } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
-                    {
-                        alert("พนักงาน (1) เป็นค่าว่าง !!!");
-                        return false;
-                    } else if (document.getElementById("txt_copydiagramthainame").value == "")
-                    {
-                        alert("ชื่อรถ เป็นค่าว่าง !!!");
-                        return false;
+                        if (document.getElementById("txt_copydiagramdatestart").value == "")
+                        {
+                            alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
+                            return false;
+                        } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
+                        {
+                            alert("พนักงาน (1) เป็นค่าว่าง !!!");
+                            return false;
+                        } else if (document.getElementById("txt_copydiagramthainame").value == "")
+                        {
+                            alert("ชื่อรถ เป็นค่าว่าง !!! หรือ สถานะรถเป็น หยุดรถ !!!");
+                            return false;
+                        } else if (document.getElementById("cb_copydiagramcartype").value == "")
+                        {
+                            alert("ประเภทรถ เป็นค่าว่าง !!!");
+                            return false;
+                        } else if (document.getElementById("cb_copydiagramjobstart").value == "")
+                        {
+                            alert("ต้นทาง เป็นค่าว่าง !!!");
+                            return false;
+                        } else if (document.getElementById("txt_copydiagramzone").value == "")
+                        {
+                            alert("โซน เป็นค่าว่าง !!!");
+                            return false;
+                        } else if (document.getElementById("txt_copydiagramjobendton").value == "")
+                        {
+                            alert("ปลายทาง เป็นค่าว่าง !!!");
+                            return false;
+                        } else
+                        {
+                            return true;
+                        }
                     } else
                     {
-                        return true;
+                        if ('<?= $_GET['customercode'] ?>' == 'SKB')
+                        {
+                            if (document.getElementById("txt_copydiagramdatestart").value == "")
+                            {
+                                alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
+                            {
+                                alert("พนักงาน (1) เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramthainame").value == "")
+                            {
+                                alert("ชื่อรถ เป็นค่าว่าง !!! หรือ สถานะรถเป็น หยุดรถ !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramcartype").value == "")
+                            {
+                                alert("ประเภทรถ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramjobstart").value == "")
+                            {
+                                alert("ต้นทาง เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramzoneskb").value == "")
+                            {
+                                alert("โซน เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramjobendskb").value == "")
+                            {
+                                alert("ปลายทาง เป็นค่าว่าง !!!");
+                                return false;
+                            } else
+                            {
+                                return true;
+                            }
+                        } else if ('<?= $_GET['customercode'] ?>' == 'DENSO-THAI')
+                        {
+                            if (document.getElementById("txt_copydiagramdatestart").value == "")
+                            {
+                                alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
+                            {
+                                alert("พนักงาน (1) เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramthainame").value == "")
+                            {
+                                alert("ชื่อรถ เป็นค่าว่าง !!! หรือ สถานะรถเป็น หยุดรถ !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramcartype").value == "")
+                            {
+                                alert("ประเภทรถ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramrouteno").value == "")
+                            {
+                                alert("Route No เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramroutetype").value == "")
+                            {
+                                alert("Route Type เป็นค่าว่าง !!!");
+                                return false;
+                            } else
+                            {
+                                return true;
+                            }
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TMT')
+                        {
+                            if (document.getElementById("txt_copydiagramdatestart").value == "")
+                            {
+                                alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
+                            {
+                                alert("พนักงาน (1) เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramthainame").value == "")
+                            {
+                                alert("ชื่อรถ เป็นค่าว่าง !!! หรือ สถานะรถเป็น หยุดรถ !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramcartype").value == "")
+                            {
+                                alert("ประเภทรถ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramjobstart").value == "")
+                            {
+                                alert("Transportation เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_roundamount").value == "")
+                            {
+                                alert("รอบที่ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramdn").value == "")
+                            {
+                                alert("D/N เป็นค่าว่าง !!!");
+                                return false;
+                            } else
+                            {
+                                return true;
+                            }
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TAW')
+                        {
+                            if (document.getElementById("txt_copydiagramdatestart").value == "")
+                            {
+                                alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
+                            {
+                                alert("พนักงาน (1) เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramthainame").value == "")
+                            {
+                                alert("ชื่อรถ เป็นค่าว่าง !!! หรือ สถานะรถเป็น หยุดรถ !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramcartype").value == "")
+                            {
+                                alert("ประเภทรถ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramjobstart").value == "")
+                            {
+                                alert("Transportation เป็นค่าว่าง !!!");
+                                return false;
+                            } else
+                            {
+                                return true;
+                            }
+                        } else if ('<?= $_GET['customercode'] ?>' == 'STM')
+                        {
+                            if (document.getElementById("txt_copydiagramdatestart").value == "")
+                            {
+                                alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
+                            {
+                                alert("พนักงาน (1) เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramthainame").value == "")
+                            {
+                                alert("ชื่อรถ เป็นค่าว่าง !!! หรือ สถานะรถเป็น หยุดรถ !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramcartype").value == "")
+                            {
+                                alert("ประเภทรถ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramjobstart").value == "")
+                            {
+                                alert("Transportation เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_roundamount").value == "")
+                            {
+                                alert("รอบที่ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramdn").value == "")
+                            {
+                                alert("D/N เป็นค่าว่าง !!!");
+                                return false;
+                            } else
+                            {
+                                return true;
+                            }
+                        } else
+                        {
+                            if (document.getElementById("txt_copydiagramdatestart").value == "")
+                            {
+                                alert("วันที่เริ่มต้น เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramemployeename1").value == "")
+                            {
+                                alert("พนักงาน (1) เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("txt_copydiagramthainame").value == "")
+                            // } else if (document.getElementById("cb_copydiagramthainame").value == "")
+                            {
+                                alert("ชื่อรถ เป็นค่าว่าง !!! หรือ สถานะรถเป็น หยุดรถ !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramcartype").value == "")
+                            {
+                                alert("ประเภทรถ เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramjobstart").value == "")
+                            {
+                                alert("ต้นทาง เป็นค่าว่าง !!!");
+                                return false;
+                            } else if (document.getElementById("cb_copydiagramjobend").value == "")
+                            {
+                                alert("ปลายทาง เป็นค่าว่าง !!!");
+                                return false;
+                            } else
+                            {
+                                return true;
+                            }
+                        }
                     }
+
+
+
+
+
                 } else
                 {
                     return true;
@@ -9933,6 +12678,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             function update_copydiagram(ID, fieldname, editableObj)
             {
 
+                // alert(ID);
+                // alert(fieldname);
+                // alert(editableObj);
 
                 $.ajax({
                     type: 'post',
@@ -9943,14 +12691,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         fieldname: fieldname,
                         editableObj: editableObj
                     },
-                    success: function () {
-
+                    success: function (rs) {
+                        // alert(rs);
                         update_modalrks(ID);
                     }
                 });
             }
             function save_copydiagram()
             {
+                var producttypereturn = "";
                 var dateworking = "";
                 var daterk = "";
                 var datevlin = "";
@@ -10012,9 +12761,30 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 {
 
                     vehicletype = document.getElementById("cb_copydiagramcartype").value;
-                    materialtype = document.getElementById("cb_materialtype").value;
+                    // materialtype = document.getElementById("cb_materialtype").value;
                     goreturn = document.getElementById("cb_copydiagramgoreturn").value;
+                    
+                    if ('<?= $_GET['customercode'] ?>' == 'GMT-IB')
+                    {
+                        if (chk_7.checked == true) {
+                            cond7 = '1';
+                        }
+                        if (chk_8.checked == true) {
+                            cond8 = '1';
+                        }
+                        if (chk_holiday.checked == true) {
+                            condholiday = '1';
+                        }
+                    }
 
+                    if ('<?= $_GET['customercode'] ?>' == 'THAIDAISEN')
+                    {
+                        
+                            materialtype = '';
+                        
+                    }else{
+                            materialtype = document.getElementById("cb_materialtype").value;
+                    }
 
                 } else if ('<?= $_GET['companycode'] ?>' == 'RKL')
                 {
@@ -10026,6 +12796,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             materialtype = '';
                             goreturn = '';
                         } else if ('<?= $_GET['customercode'] ?>' == 'DAIKI')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
+                        } else if ('<?= $_GET['customercode'] ?>' == 'COPPERCORD')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
@@ -10120,6 +12895,21 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = '';
+                        }else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
+                        }else if ('<?= $_GET['customercode'] ?>' == 'VUTEQ')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
+                        } else if ('<?= $_GET['customercode'] ?>' == 'PJW')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
                         }
                     } else if ('<?= $_GET['carrytype'] ?>' == 'weight')
                     {
@@ -10185,13 +12975,38 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                 } else if ('<?= $_GET['companycode'] ?>' == 'RKS')
                 {
-                    if ('<?= $_GET['customercode'] ?>' == 'TGT')
+
+                    if ('<?= $_GET['customercode'] ?>' == 'DENSO-THAI')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
+                        roundamount = '';
+                    } else if ('<?= $_GET['customercode'] ?>' == 'TGT')
                     {
                         vehicletype = document.getElementById("cb_copydiagramcartype").value;
                         materialtype = '';
                         goreturn = '';
                         roundamount = document.getElementById("txt_roundamount").value;
-                    } else if ('<?= $_GET['customercode'] ?>' == 'STM')
+                    } else if ('<?= $_GET['customercode'] ?>' == 'THAITOHKEN')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
+                        roundamount = '';
+                    } else if ('<?= $_GET['customercode'] ?>' == 'COPPERCORD')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
+                        roundamount = '';
+                    }  else if ('<?= $_GET['customercode'] ?>' == 'HINO')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
+                        roundamount = '';
+                    }  else if ('<?= $_GET['customercode'] ?>' == 'STM')
                     {
                         vehicletype = document.getElementById("cb_copydiagramcartype").value;
                         materialtype = '';
@@ -10209,6 +13024,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         materialtype = '';
                         goreturn = '';
                     } else if ('<?= $_GET['customercode'] ?>' == 'DAIKI')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
+                    } else if ('<?= $_GET['customercode'] ?>' == 'NITTSUSHOJI')
                     {
                         vehicletype = document.getElementById("cb_copydiagramcartype").value;
                         materialtype = '';
@@ -10238,6 +13058,23 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         vehicletype = document.getElementById("cb_copydiagramcartype").value;
                         materialtype = '';
                         goreturn = '';
+                    } else if ('<?= $_GET['customercode'] ?>' == 'TTTC')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
+                    }
+                     else if ('<?= $_GET['customercode'] ?>' == 'SWN')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
+                    }
+                     else if ('<?= $_GET['customercode'] ?>' == 'TSAT')
+                    {
+                        vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                        materialtype = '';
+                        goreturn = '';
                     }
                 } else if ('<?= $_GET['companycode'] ?>' == 'RKR')
                 {
@@ -10249,8 +13086,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             materialtype = '';
                             goreturn = '';
 
-                        }
-                        else if ('<?= $_GET['customercode'] ?>' == 'TID')
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TSAT')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
+
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TID')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
@@ -10286,6 +13128,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             materialtype = '';
                             goreturn = '';
 
+                        } else if ('<?= $_GET['customercode'] ?>' == 'CH-AUTO')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
                         } else if ('<?= $_GET['customercode'] ?>' == 'TGT')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
@@ -10346,6 +13193,21 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             materialtype = '';
                             goreturn = '';
 
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TDEM')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
+                        }else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
+                        } else if ('<?= $_GET['customercode'] ?>' == 'PJW')
+                        {
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = '';
                         }
                     } else if ('<?= $_GET['carrytype'] ?>' == 'weight')
                     {
@@ -10372,6 +13234,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTPROCS')
                         {
+
+
+                            vehicletype = document.getElementById("cb_copydiagramcartype").value;
+                            materialtype = '';
+                            goreturn = document.getElementById("cb_copydiagramgoreturn").value;
+
+
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TTAST')
+                        {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
@@ -10380,8 +13251,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         } else if ('<?= $_GET['customercode'] ?>' == 'DAIKI')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
-                            materialtype = '';
+                            materialtype = document.getElementById("cb_producttypereturn").value;//ประเภทงานรับกลับ
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
+
 
 
                         } else if ('<?= $_GET['customercode'] ?>' == 'PARAGON')
@@ -10420,12 +13292,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 {
                     employeename1 = document.getElementById("txt_copydiagramemployeename1").value;
                     employeename2 = document.getElementById("txt_copydiagramemployeename2").value;
-                    if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC')
+                    if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC' || '<?= $_GET['customercode'] ?>' == 'SKB')
                     {
                         employeename3 = document.getElementById("txt_copydiagramemployeename3").value;
                     }
 
                     thainame = document.getElementById("txt_copydiagramthainame").value;
+                    // thainame = document.getElementById("cb_copydiagramthainame").value;
                     if (chk_copydiagramdaterk.checked == true) {
                         daterk = document.getElementById("txt_copydiagramdaterk2").value;
 
@@ -10470,6 +13343,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 {
                     employeename1 = document.getElementById("txt_copydiagramemployeenameupd1").value;
                     employeename2 = document.getElementById("txt_copydiagramemployeenameupd2").value;
+                    if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC' || '<?= $_GET['customercode'] ?>' == 'SKB'){
+                        employeename3 = document.getElementById("txt_copydiagramemployeename3").value;
+                    }
                     thainame = document.getElementById("txt_copydiagramthainameupd").value;
                     if (chk_copydiagramdatevlinupd.checked == true) {
                         daterk = document.getElementById("txt_copydiagramdaterkupd2").value;
@@ -10526,9 +13402,25 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 {
                     if ('<?= $_GET['customercode'] ?>' == 'DENSO-THAI' || '<?= $_GET['customercode'] ?>' == 'DENSO-WGR' || '<?= $_GET['customercode'] ?>' == 'DENSO-SALES' || '<?= $_GET['customercode'] ?>' == 'ANDEN' || '<?= $_GET['customercode'] ?>' == 'SDM' || '<?= $_GET['customercode'] ?>' == 'SKD' || '<?= $_GET['customercode'] ?>' == 'DENSO')
                     {
+
                         jobstart = document.getElementById("cb_copydiagramrouteno").value;
                         jobend = document.getElementById("cb_copydiagramroutetype").value;
                     } else if ('<?= $_GET['customercode'] ?>' == 'TGT')
+                    {
+                        jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                        jobend = document.getElementById("cb_copydiagramjobend").value;
+
+                    } else if ('<?= $_GET['customercode'] ?>' == 'THAITOHKEN')
+                    {
+                        jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                        jobend = document.getElementById("cb_copydiagramjobend").value;
+
+                    } else if ('<?= $_GET['customercode'] ?>' == 'COPPERCORD')
+                    {
+                        jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                        jobend = document.getElementById("cb_copydiagramjobend").value;
+
+                    }  else if ('<?= $_GET['customercode'] ?>' == 'HINO')
                     {
                         jobstart = document.getElementById("cb_copydiagramjobstart").value;
                         jobend = document.getElementById("cb_copydiagramjobend").value;
@@ -10549,6 +13441,12 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         jobend = '';
 
                     } else if ('<?= $_GET['customercode'] ?>' == 'DAIKI')
+                    {
+                        jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                        jobend = document.getElementById("cb_copydiagramjobend").value;
+
+
+                    } else if ('<?= $_GET['customercode'] ?>' == 'NITTSUSHOJI')
                     {
                         jobstart = document.getElementById("cb_copydiagramjobstart").value;
                         jobend = document.getElementById("cb_copydiagramjobend").value;
@@ -10584,17 +13482,40 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         jobend = document.getElementById("cb_copydiagramjobend").value;
 
 
+                    } else if ('<?= $_GET['customercode'] ?>' == 'TTTC')
+                    {
+                        jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                        jobend = document.getElementById("cb_copydiagramjobend").value;
+
+
+                    }
+                    else if ('<?= $_GET['customercode'] ?>' == 'SWN')
+                    {
+                        jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                        jobend = document.getElementById("cb_copydiagramjobend").value;
+
+
+                    }
+                    else if ('<?= $_GET['customercode'] ?>' == 'TSAT')
+                    {
+                        jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                        jobend = document.getElementById("cb_copydiagramjobend").value;
+
+
                     }
                 } else if ('<?= $_GET['companycode'] ?>' == 'RKR')
                 {
                     if ('<?= $_GET['carrytype'] ?>' == 'trip')
                     {
-                        if ('<?= $_GET['customercode'] ?>' == 'TSPT')
+                        if ('<?= $_GET['customercode'] ?>' == 'TSAT')
                         {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             jobend = document.getElementById("cb_copydiagramjobend").value;
-                        } 
-                        else if ('<?= $_GET['customercode'] ?>' == 'TID')
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TSPT')
+                        {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TID')
                         {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             jobend = document.getElementById("cb_copydiagramjobend").value;
@@ -10616,6 +13537,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             jobend = document.getElementById("cb_copydiagramjobend").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTAT')
                         {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'CH-AUTO') {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             jobend = document.getElementById("cb_copydiagramjobend").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'TGT')
@@ -10658,6 +13582,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TDEM') {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL') {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'PJW') {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
                         }
                     } else if ('<?= $_GET['carrytype'] ?>' == 'weight')
                     {
@@ -10677,6 +13610,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             cluster = document.getElementById("txt_copydiagramzone").value;
                             jobend = document.getElementById("txt_copydiagramjobendton").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTPROCS')
+                        {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            cluster = document.getElementById("txt_copydiagramzone").value;
+                            jobend = document.getElementById("txt_copydiagramjobendton").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'TTAST')
                         {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             cluster = document.getElementById("txt_copydiagramzone").value;
@@ -10702,6 +13640,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                 } else if ('<?= $_GET['companycode'] ?>' == 'RRC')
                 {
+                    // if (document.getElementById("txt_roundamountgw").value == ""){
+                    //     alert("รอบที่วิ่งงาน เป็นค่าว่าง !!!");
+                    //     return false;
+                    // }else{
+                         roundamount = document.getElementById("txt_roundamountgw").value;
+                    // }
+					
                     jobstart = document.getElementById("cb_copydiagramjobstart").value;
                     jobend = document.getElementById("cb_copydiagramjobend").value;
                 } else if ('<?= $_GET['companycode'] ?>' == 'RKL')
@@ -10712,6 +13657,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             jobend = document.getElementById("cb_copydiagramjobend").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'DAIKI') {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'COPPERCORD') {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             jobend = document.getElementById("cb_copydiagramjobend").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTTC') {
@@ -10769,6 +13717,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         } else if ('<?= $_GET['customercode'] ?>' == 'TDEM') {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL') {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'VUTEQ') {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
+                        } else if ('<?= $_GET['customercode'] ?>' == 'PJW') {
+                            jobstart = document.getElementById("cb_copydiagramjobstart").value;
+                            jobend = document.getElementById("cb_copydiagramjobend").value;
                         }
                     } else if ('<?= $_GET['carrytype'] ?>' == 'weight')
                     {
@@ -10816,6 +13773,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     }
                 } else if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC')
                 {
+                    // if (document.getElementById("txt_roundamountgw").value == ""){
+                    //     alert("รอบที่วิ่งงาน เป็นค่าว่าง !!!");
+                    //     return false;
+                    // }else{
+                    //     roundamount = document.getElementById("txt_roundamountgw").value;
+                    // }
+
                     if ('<?= $_GET['worktype'] ?>' != 'sh')
                     {
                         jobstart = document.getElementById("txt_copydiagramjobstart").value;
@@ -10842,7 +13806,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                     if (chk_copydiagrammonday.checked == true) {
 
-
+                      
 
                         $.ajax({
                             type: 'post',
@@ -10886,11 +13850,43 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
 
                             },
-                            success: function () {
-
-
+                            success: function (rs) {
+                                save_logprocess('Planing', 'Save Monday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                                // alert(rs);
+                                // alert('RKR_CH');
                             }
                         });
+
+                        //Save Keylocker
+                      
+                        $.ajax({
+                            type: 'post',
+                            url: 'meg_data2.php',
+                            data: {
+
+                                txt_flg: "save_keylocker",
+                                id:'',
+                                regisid: '',
+                                regisnumber: thainame,
+                                jobno:document.getElementById("txt_copydiagramjobnomonday").value,
+                                keylogstatus: 'รถวิ่งงาน',
+                                datepickup: datepresent,
+                                datereturn: '' ,
+                                keypicker: employeename1,
+                                keyreturnperson: '',
+                                keylogdetail: '',
+                                keylogremark: '',
+                                createdate:'',
+                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                            },
+                            success: function (rs) {
+
+                                // alert(rs);   
+                                // alert("บันทึกข้อมูลเรียบร้อย");
+                                // window.location.reload();
+                            }
+                        });
+                        //End Save Keylocker
                     }
                     if (chk_copydiagramtuesday.checked == true) {
 
@@ -10936,10 +13932,41 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function () {
-
+                                save_logprocess('Planing', 'Save Tuesday Planing', '<?= $result_seLogin['PersonCode'] ?>');
 
                             }
                         });
+
+                        //Save Keylocker
+                        $.ajax({
+                            type: 'post',
+                            url: 'meg_data2.php',
+                            data: {
+
+                                txt_flg: "save_keylocker",
+                                id:'',
+                                regisid: '',
+                                regisnumber: thainame,
+                                jobno:document.getElementById("txt_copydiagramjobnotuesday").value,
+                                keylogstatus: 'รถวิ่งงาน',
+                                datepickup: datepresent,
+                                datereturn: '' ,
+                                keypicker: employeename1,
+                                keyreturnperson: '',
+                                keylogdetail: '',
+                                keylogremark: '',
+                                createdate:'',
+                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                            },
+                            success: function (rs) {
+
+                                // alert(rs);   
+                                // alert("บันทึกข้อมูลเรียบร้อย");
+                                // window.location.reload();
+                            }
+                        });
+                        //End Save Keylocker
+
                     }
                     if (chk_copydiagramwednesday.checked == true) {
 
@@ -10984,13 +14011,45 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
 
                             },
-                            success: function () {
-
-
+                            success: function (rs) {
+                                // alert(rs);
+                                save_logprocess('Planing', 'Save Wednesday Planing', '<?= $result_seLogin['PersonCode'] ?>');
                             }
                         });
+
+                        //Save Keylocker
+                        $.ajax({
+                            type: 'post',
+                            url: 'meg_data2.php',
+                            data: {
+
+                                txt_flg: "save_keylocker",
+                                id:'',
+                                regisid: '',
+                                regisnumber: thainame,
+                                jobno:document.getElementById("txt_copydiagramjobnowednesday").value,
+                                keylogstatus: 'รถวิ่งงาน',
+                                datepickup: datepresent,
+                                datereturn: '' ,
+                                keypicker: employeename1,
+                                keyreturnperson: '',
+                                keylogdetail: '',
+                                keylogremark: '',
+                                createdate:'',
+                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                            },
+                            success: function (rs) {
+
+                                // alert(rs);   
+                                // alert("บันทึกข้อมูลเรียบร้อย");
+                                // window.location.reload();
+                            }
+                        });
+                        //End Save Keylocker
                     }
                     if (chk_copydiagramthursday.checked == true) {
+
+                        
 
                         $.ajax({
                             type: 'post',
@@ -11033,13 +14092,46 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
 
                             },
-                            success: function () {
-
-
+                            success: function (rs) {
+                                // alert(rs);
+                                // save_logprocess('Planing', 'Save Thursday Planing', '<?= $result_seLogin['PersonCode'] ?>');
                             }
                         });
+
+                        //Save Keylocker
+                        $.ajax({
+                            type: 'post',
+                            url: 'meg_data2.php',
+                            data: {
+
+                                txt_flg: "save_keylocker",
+                                id:'',
+                                regisid: '',
+                                regisnumber: thainame,
+                                jobno:document.getElementById("txt_copydiagramjobnothursday").value,
+                                keylogstatus: 'รถวิ่งงาน',
+                                datepickup: datepresent,
+                                datereturn: '' ,
+                                keypicker: employeename1,
+                                keyreturnperson: '',
+                                keylogdetail: '',
+                                keylogremark: '',
+                                createdate:'',
+                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                            },
+                            success: function (rs) {
+
+                                // alert(rs);   
+                                // alert("บันทึกข้อมูลเรียบร้อย");
+                                // window.location.reload();
+                            }
+                        });
+                        //End Save Keylocker
+
                     }
                     if (chk_copydiagramfriday.checked == true) {
+
+                        
 
                         $.ajax({
                             type: 'post',
@@ -11083,12 +14175,47 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function () {
+                                save_logprocess('Planing', 'Save Friday Planing', '<?= $result_seLogin['PersonCode'] ?>');
 
-
+                                
                             }
                         });
+
+                        //Save Keylocker
+                        
+                        $.ajax({
+                            type: 'post',
+                            url: 'meg_data2.php',
+                            data: {
+
+                                txt_flg: "save_keylocker",
+                                id:'',
+                                regisid: '',
+                                regisnumber: thainame,
+                                jobno:document.getElementById("txt_copydiagramjobnofriday").value,
+                                keylogstatus: 'รถวิ่งงาน',
+                                datepickup: datepresent,
+                                datereturn: '' ,
+                                keypicker: employeename1,
+                                keyreturnperson: '',
+                                keylogdetail: '',
+                                keylogremark: '',
+                                createdate:'',
+                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                            },
+                            success: function (rs) {
+
+                                // alert(rs);   
+                                // alert("บันทึกข้อมูลเรียบร้อย");
+                                // window.location.reload();
+                            }
+                        });
+                        //End Save Keylocker
+
                     }
                     if (chk_copydiagramsaturday.checked == true) {
+                        
+                        
 
                         $.ajax({
                             type: 'post',
@@ -11131,13 +14258,49 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
 
                             },
-                            success: function () {
+                            success: function (rs) {
+                                // alert(rs);
+                                save_logprocess('Planing', 'Save Saturday Planing', '<?= $result_seLogin['PersonCode'] ?>');
 
-
+                                
                             }
                         });
+                        
+                        //Save Keylocker
+                        $.ajax({
+                            type: 'post',
+                            url: 'meg_data2.php',
+                            data: {
+
+                                txt_flg: "save_keylocker",
+                                id:'',
+                                regisid: '',
+                                regisnumber: thainame,
+                                jobno:document.getElementById("txt_copydiagramjobnosaturday").value,
+                                keylogstatus: 'รถวิ่งงาน',
+                                datepickup: datepresent,
+                                datereturn: '' ,
+                                keypicker: employeename1,
+                                keyreturnperson: '',
+                                keylogdetail: '',
+                                keylogremark: '',
+                                createdate:'',
+                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                            },
+                            success: function (rs) {
+
+                                // alert(rs);   
+                                // alert("บันทึกข้อมูลเรียบร้อย");
+                                // window.location.reload();
+                            }
+                        });
+                        //End Save Keylocker
+                        
+
                     }
                     if (chk_copydiagramsunday.checked == true) {
+
+                        
 
                         $.ajax({
                             type: 'post',
@@ -11181,19 +14344,56 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function () {
-
-
+                                save_logprocess('Planing', 'Save Sunday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                                
+                                
                             }
                         });
+
+                        //Save Keylocker
+                        $.ajax({
+                            type: 'post',
+                            url: 'meg_data2.php',
+                            data: {
+
+                                txt_flg: "save_keylocker",
+                                id:'',
+                                regisid: '',
+                                regisnumber: thainame,
+                                jobno:document.getElementById("txt_copydiagramjobnosunday").value,
+                                keylogstatus: 'รถวิ่งงาน',
+                                datepickup: datepresent,
+                                datereturn: '' ,
+                                keypicker: employeename1,
+                                keyreturnperson: '',
+                                keylogdetail: '',
+                                keylogremark: '',
+                                createdate:'',
+                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                            },
+                            success: function (rs) {
+
+                                // alert(rs);   
+                                // alert("บันทึกข้อมูลเรียบร้อย");
+                                // window.location.reload();
+                            }
+                        });
+                        //End Save Keylocker
+
+                       
+                        
                     }
+
+                    
                     alert('บันทึกข้อมูลเรียบร้อย');
                     window.location.reload();
                 }
+                
             }
             function save_copyjob() {
 
                 var JOBNO = document.getElementById("txt_jobno").value;
-                //alert(JOBNO);
+                // alert(JOBNO);
                 //RKS-190701-000-091
                 $.ajax({
                     type: 'post',
@@ -11201,8 +14401,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     data: {
                         txt_flg: "save_copyjobvehicletransportplan", JOBNO: JOBNO, ROWSAMOUNT: document.getElementById("txt_rowsamount").value
                     },
-                    success: function () {
-
+                    success: function (rs) {
+                        alert(rs);
                         window.location.reload();
                     }
                 });
@@ -11302,6 +14502,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             }
             function show_timepresent(data)
             {
+                // alert(data);
                 if (chk_copydiagramdaterk.checked == true) {
 
                     if (data.substr(11, 2) == '00')
@@ -11310,8 +14511,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         document.getElementById("txt_copydiagramdatepresent").value = rs;
                     } else if (parseInt(data.substring(0, 2)) == '01' || parseInt(data.substring(0, 2)) == '02' || parseInt(data.substring(0, 2)) == '03' || parseInt(data.substring(0, 2)) == '04' || parseInt(data.substring(0, 2)) == '05' || parseInt(data.substring(0, 2)) == '06' || parseInt(data.substring(0, 2)) == '07' || parseInt(data.substring(0, 2)) == '08' || parseInt(data.substring(0, 2)) == '09')
                     {
-                        var rs = parseInt(data.substr(11, 2)) - 1;
+                        var rs = parseInt(data) - 2;
                         rs = rs + data.substr(13, 5);
+                        alert(rs);
                         document.getElementById("txt_copydiagramdatepresent").value = rs;
                     } else
                     {
@@ -11450,7 +14652,20 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 }
             }
         </script>
+        <script language="JavaScript">
 
+
+        function onDelete()
+        {
+            if (confirm('ยืนยันการลบข้อมูล ?') == true)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
+        </script>
     </body>
 
 

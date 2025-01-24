@@ -93,8 +93,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
         <link href="../dist/css/bootstrap-select.css" rel="stylesheet">
         <link href="../dist/css/select2.min.css" rel="stylesheet">
          
-        <!-- <link href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" rel="stylesheet">
-        <link href="https://cdn.datatables.net/buttons/3.0.0/css/buttons.dataTables.css" rel="stylesheet"> -->
+        <link href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/3.0.0/css/buttons.dataTables.css" rel="stylesheet">
+
         <script>
             $(function () {
                 $('[data-toggle="popover"]').popover({
@@ -408,7 +409,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 <button class="btn btn-secondary"  id="btn_checkdriver" onclick="select_checkdriversr('2')"  name="btn_checkdriver" data-toggle="modal"  data-target="#modal_checkdriver"><span class="fa fa-check"></span> พขร.(2)</button>
                             </div>
                             <?php
-                            if ($_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC') {
+                            if ($_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC' ) {
                                 ?>
                                 <div class="col-lg-2">
                                     <label>พขร.(ควบคุม)(3) :</label>
@@ -438,19 +439,19 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     <?php
                                 }
                             }else if ($_GET['companycode'] == 'RKL' || $_GET['companycode'] == 'SKB' ) {
-                                ?>
-                                <div class="col-lg-2">
-                                    <label>พขร.(3):</label>
-                                    <input type="text"  class="form-control" name="txt_copydiagramemployeename3" id="txt_copydiagramemployeename3">
-                                </div>
-                                <div class="col-lg-2">
-                                    <label>&nbsp;</label><br>
-                                    <button class="btn btn-secondary"  id="btn_checkdriver" onclick="select_checkdriversr('3')"  name="btn_checkdriver" data-toggle="modal"  data-target="#modal_checkdriver"><span class="fa fa-check"></span> พขร.(3)</button>
-                                </div>
-
-
-                                <?php
-                            
+                                    ?>
+                                    <div class="col-lg-2">
+                                        <label>พขร.(3):</label>
+                                        <input type="text"  class="form-control" name="txt_copydiagramemployeename3" id="txt_copydiagramemployeename3">
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label>&nbsp;</label><br>
+                                        <button class="btn btn-secondary"  id="btn_checkdriver" onclick="select_checkdriversr('3')"  name="btn_checkdriver" data-toggle="modal"  data-target="#modal_checkdriver"><span class="fa fa-check"></span> พขร.(3)</button>
+                                    </div>
+    
+    
+                                    <?php
+                                
                             }
                             ?>
 
@@ -458,7 +459,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         </div>
                         <div class="row">
                             <?php
-                            if ($_GET['companycode'] == 'RKL') {
+                            if ($_GET['companycode'] == 'RKL') {    
                                 if ($_GET['customercode'] == 'SKB') {
                                     ?>
                                     <div class="col-lg-2">
@@ -550,15 +551,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                                 
                                                 $condiFrom1 = "AND a.THAINAME != '-' 
-                                                    AND( a.ENGNAME  LIKE '%R-%' OR a.ENGNAME  LIKE '%RA-%' OR a.ENGNAME  LIKE '%T-%' 
+                                                    AND( a.ENGNAME  LIKE '%R-%' OR a.ENGNAME  LIKE '%RA-%'  OR a.ENGNAME  LIKE '%T-%' 
                                                     OR a.THAINAME LIKE '%ดินแดง%' OR a.THAINAME  LIKE '%อุทัยธานี%' OR a.THAINAME  LIKE '%G-%'
                                                     OR a.THAINAME  LIKE '%คลองเขื่อน%'  OR a.THAINAME LIKE '%RP-%' OR a.THAINAME  LIKE '%สวนผึ้ง%' 
                                                     OR a.THAINAME  LIKE '%ด่านช้าง%' OR a.ENGNAME LIKE '%Khao Chamao%' 
                                                     OR a.ENGNAME LIKE '%Kerry%' OR a.ENGNAME LIKE '%Chaloem Prakiat%' 
                                                     OR a.THAINAME LIKE '%แปลงยาว%' OR a.THAINAME LIKE '%สนามชัยเขต%' 
                                                     OR a.THAINAME LIKE '%ชัยนาท%' OR a.THAINAME LIKE '%วานรนิวาส%' OR a.THAINAME LIKE '%เฉลิมพระเกียรติ%'
-                                                    OR a.THAINAME LIKE '%ประจันตคาม%' OR a.THAINAME LIKE '%น่าน%'  OR a.THAINAME LIKE '%พรหมพิราม%'
-													OR a.THAINAME LIKE '%คง%' OR a.THAINAME LIKE '%ชัยภูมิ%')";
+                                                    OR a.THAINAME LIKE '%ประจันตคาม%'  OR a.THAINAME LIKE '%น่าน%'  OR a.THAINAME LIKE '%พรหมพิราม%' 
+                                                    OR a.THAINAME LIKE '%คง%' OR a.THAINAME LIKE '%ชัยภูมิ%')";
                                                 $sql_seFrom = "{call megVehicleinfo_v2(?,?)}";
                                                 $params_seFrom = array(
                                                 array('select_vehicleinfo', SQLSRV_PARAM_IN),
@@ -588,9 +589,10 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 ?>
                                 <div class="col-lg-2">
                                     <font style="color: red">* </font><label>ชื่อรถRKS :</label>
-                                    <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame" style="display:none">
-                                    
-                                    <div class="dropdown bootstrap-select show-tick form-control" >
+                                    <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame" >
+
+                                    <!-- <input type="text" class="form-control"  id="txt_copydiagramthainame" name="txt_copydiagramthainame" style="display:none"> -->
+                                    <!-- <div class="dropdown bootstrap-select show-tick form-control" >
                                         <select   onchange="check_thainamerksrkr(this.value)" id="cb_copydiagramthainame" name="cb_copydiagramthainame"   class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก ทะเบียนรถ..." data-hide-disabled="true" data-actions-box="false" data-virtual-scroll="false" tabindex="-98" >
                                             <option value="" selected="selected">เลือกทะเบียนรถ</option>
                                             <?php
@@ -614,8 +616,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             }
                                             ?>
                                         </select>
-                                        <!-- <input class="form-control"  style=""  id="txt_copydiagramzone" name="txt_copydiagramzone" maxlength="500" value="" > -->
-                                    </div>
+                                        
+                                    </div> -->
                                 </div>
                                 <div class="col-lg-2">
                                     <label>ชื่อรถ(หาง) :</label>
@@ -656,7 +658,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="col-lg-1">
-                                        <label>ประเภทวัสดุ :</label>
+                                        <label>ประเภทวัสดุRRC :</label>
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
@@ -756,7 +758,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
+                                            $condStatus = " AND SUBDOMAIN = 'status'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -852,7 +854,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
+                                            $condStatus = " AND SUBDOMAIN = 'status'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -948,7 +950,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
+                                            $condStatus = " AND SUBDOMAIN = 'status'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -1044,7 +1046,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
+                                            $condStatus = " AND SUBDOMAIN = 'status'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -1140,7 +1142,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         <select id="cb_materialtype" name="cb_materialtype" class="form-control"  title="เลือกประเภทวัสดุ..." >
                                             <option value="">เลือกประเภทวัสดุ</option>
                                             <?php
-                                            $condStatus = " AND SUBDOMAIN = 'StatusNew'";
+                                            $condStatus = " AND SUBDOMAIN = 'status'";
                                             $sql_seStatus = "{call megStatus_v2(?,?)}";
                                             $params_seStatus = array(
                                                 array('select_status', SQLSRV_PARAM_IN),
@@ -1795,7 +1797,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 ?>
                                             </select>
                                         </div>
-
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTAT') {
@@ -2789,8 +2790,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <?php
-                                    }
-                                    else if ($_GET['customercode'] == 'TDEM') {
+                                    }else if ($_GET['customercode'] == 'TDEM') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -2860,7 +2860,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    } else if ($_GET['customercode'] == 'RNSTEEL') {
+                                    }else if ($_GET['customercode'] == 'RNSTEEL') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -2929,7 +2929,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
                                         <?php
-                                    } else if ($_GET['customercode'] == 'PJW') {
+                                    }else if ($_GET['customercode'] == 'PJW') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -3124,8 +3124,35 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
-
+                                                                   
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงาน TTAST(STC):</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
+                                        <!-- <div class="col-lg-2">
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div>             -->
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
                                         ?>
@@ -3249,6 +3276,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 </div>
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงาน TTAST(CS):</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
                                         </div>
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
@@ -3374,7 +3411,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงาน TTPRO(STC) :</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
 
 
                                         <?php
@@ -3627,7 +3673,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงาน DAIKI(WEIGHT) :</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'PARAGON') {
@@ -3879,7 +3934,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงาน TTAST(OT_WEIGHT) :</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>            
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTTCSTC') {
                                         ?>
@@ -4004,7 +4068,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงาน TTTCSTC :</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
                                     <?php                
                                     }
                                 }
@@ -4432,8 +4505,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'TID') {
+                                    }else if ($_GET['customercode'] == 'TID') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -4503,8 +4575,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'SUTT') {
+                                    }else if ($_GET['customercode'] == 'SUTT') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -4574,8 +4645,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'HINO') {
+                                    }else if ($_GET['customercode'] == 'HINO') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -4645,8 +4715,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'SKB') {
+                                    }else if ($_GET['customercode'] == 'SKB') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -4778,8 +4847,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             <div id="data_copydiagramlocationsr"></div>
                                         </div>
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'GMT') {
+                                    }else if ($_GET['customercode'] == 'GMT') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -4849,8 +4917,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'TMT') {
+                                    }else if ($_GET['customercode'] == 'TMT') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -4920,8 +4987,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'YNP') {
+                                    }else if ($_GET['customercode'] == 'YNP') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -4991,8 +5057,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'WSBT') {
+                                    }else if ($_GET['customercode'] == 'WSBT') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5062,8 +5127,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'NITTSUSHOJI') {
+                                    }else if ($_GET['customercode'] == 'NITTSUSHOJI') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5133,8 +5197,85 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'TSAT') {
+                                    }else if ($_GET['customercode'] == 'TSAT') {
+                                        ?>
+                                        <!-- RKLTSAT -->
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="">เลือกประเภทรถ</option>
+                                                <?php
+                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seCartype = array(
+                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                    array($condiCartype1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
+                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-1">
+                                            <font style="color: red">* </font><label>มีรับกลับ :</label>
+                                            <select id="cb_copydiagramgoreturn" name="cb_copydiagramgoreturn" class="form-control"  title="เลือกประเภทรถ..." >
+                                                <option value="return">มี</option>
+                                                <option value="go">ไม่มี</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ต้นทาง :</label>
+                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                                <option value="">เลือก ต้นทาง</option>
+                                                <?php
+                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seFrom = array(
+                                                    array('select_from', SQLSRV_PARAM_IN),
+                                                    array($condiFrom1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <font style="color: red">* </font><label>ปลายทาง :</label>
+                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                                <option value="">เลือก ปลายทาง</option>
+                                                <?php
+                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                                $params_seTo = array(
+                                                    array('select_to', SQLSRV_PARAM_IN),
+                                                    array($condiTo1, SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN),
+                                                    array('', SQLSRV_PARAM_IN)
+                                                );
+                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                    ?>
+                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <?php
+                                    }else if ($_GET['customercode'] == 'TTAT') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5204,8 +5345,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'TTAT') {
+                                    }else if ($_GET['customercode'] == 'CH-AUTO') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5275,8 +5415,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'CH-AUTO') {
+                                    }else if ($_GET['customercode'] == 'TSPT') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5346,8 +5485,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'TSPT') {
+                                    }else if ($_GET['customercode'] == 'TKT') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5417,8 +5555,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'TKT') {
+                                    }else if ($_GET['customercode'] == 'TDEM') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5488,8 +5625,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </div>
 
                                         <?php
-                                    }
-                                    if ($_GET['customercode'] == 'TDEM') {
+                                    }else if ($_GET['customercode'] == 'RNSTEEL') {
                                         ?>
                                         <div class="col-lg-2">
                                             <font style="color: red">* </font><label>ประเภทรถ :</label>
@@ -5558,75 +5694,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </select>
                                         </div>
 
-                                        <?php
-                                    } else if ($_GET['customercode'] == 'RNSTEEL') {
-                                        ?>
-                                        <div class="col-lg-2">
-                                            <font style="color: red">* </font><label>ประเภทรถ :</label>
-                                            <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control"  title="เลือกประเภทรถ..." >
-                                                <option value="">เลือกประเภทรถ</option>
-                                                <?php
-                                                $condiCartype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
-                                                $sql_seCartype = "{call megVehicletransportprice_v2(?,?,?,?)}";
-                                                $params_seCartype = array(
-                                                    array('select_vehicletype', SQLSRV_PARAM_IN),
-                                                    array($condiCartype1, SQLSRV_PARAM_IN),
-                                                    array('', SQLSRV_PARAM_IN),
-                                                    array('', SQLSRV_PARAM_IN)
-                                                );
-                                                $query_seCartype = sqlsrv_query($conn, $sql_seCartype, $params_seCartype);
-                                                while ($result_seCartype = sqlsrv_fetch_array($query_seCartype, SQLSRV_FETCH_ASSOC)) {
-                                                    ?>
-                                                    <option value="<?= $result_seCartype['VEHICLETYPE'] ?>"><?= $result_seCartype['VEHICLETYPE'] ?></option>
-                                                    <?php
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <font style="color: red">* </font><label>ต้นทาง :</label>
-                                            <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
-                                                <option value="">เลือก ต้นทาง</option>
-                                                <?php
-                                                $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
-                                                $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
-                                                $params_seFrom = array(
-                                                    array('select_from', SQLSRV_PARAM_IN),
-                                                    array($condiFrom1, SQLSRV_PARAM_IN),
-                                                    array('', SQLSRV_PARAM_IN),
-                                                    array('', SQLSRV_PARAM_IN)
-                                                );
-                                                $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
-                                                while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
-                                                    ?>
-                                                    <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
-                                                    <?php
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <font style="color: red">* </font><label>ปลายทาง :</label>
-                                            <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
-                                                <option value="">เลือก ปลายทาง</option>
-                                                <?php
-                                                $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
-                                                $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
-                                                $params_seTo = array(
-                                                    array('select_to', SQLSRV_PARAM_IN),
-                                                    array($condiTo1, SQLSRV_PARAM_IN),
-                                                    array('', SQLSRV_PARAM_IN),
-                                                    array('', SQLSRV_PARAM_IN)
-                                                );
-                                                $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
-                                                while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
-                                                    ?>
-                                                    <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
-                                                    <?php
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
                                         <?php
                                     }else if ($_GET['customercode'] == 'VUTEQ') {
                                         ?>
@@ -5894,7 +5961,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงานL TTAST(STC):</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
@@ -6020,7 +6096,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงานL TTAST(CS):</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
@@ -6146,7 +6231,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงานL TTPRO(STC):</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTAST') {
                                         ?>
@@ -6271,7 +6365,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงานL TTAST(OT_WEIGHT):</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
 
 
                                         <?php
@@ -6524,7 +6627,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงานL DAIKI:</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTTCSTC') {
@@ -6650,7 +6762,16 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             </div>
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>รอบที่วิ่งงานL TTTC(STC):</label>
+                                            <select id="txt_roundamount" name="txt_roundamount" class="form-control">
+                                                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
+                                                <option value="1">รอบที่ 1</option>
+                                                <option value="2">รอบที่ 2</option>
+                                                <option value="3">รอบที่ 3</option>
+                                                <option value="4">รอบที่ 4</option>
+                                            </select>                                
+                                        </div>
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'PARAGON') {
@@ -8322,32 +8443,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             ?>
 
                         </div>
-<?php if ($_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC') { ?>
-    <div class="row">                            
-        <div class="col-lg-2">
-            <label>รอบที่วิ่งงาน :</label>
-            <select id="txt_roundamountgw" name="txt_roundamountgw" class="form-control">
-                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
-                <option value="1">รอบที่ 1</option>
-                <option value="2">รอบที่ 2</option>
-                <option value="3">รอบที่ 3</option>
-                <option value="4">รอบที่ 4</option>
-            </select>                                
-        </div>
-    </div>
-<?php } ?>
-<?php if ($_GET['companycode'] == 'RRC') { ?>
-    <div class="row">                            
-        <div class="col-lg-2">
-            <label>รอบที่วิ่งงาน :</label>
-            <select id="txt_roundamountgw" name="txt_roundamountgw" class="form-control">
-                <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
-                <option value="Normal">Normal</option>
-                <option value="Extra">Extra</option>
-            </select>                                
-        </div>
-    </div>
-<?php } ?>
 
                         <div class="row">&nbsp;</div>
                         <div class="row">
@@ -8915,26 +9010,26 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                     <!-- Tab panes -->
                                     <div class="tab-content">
                                         <p>&nbsp;</p>
-                                
+                                    
                                        
                                         <div class="tab-pane fade active in" id="mondaydef">
                                             <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
                                                 <div id="show_mondaydef">
                                                 <form name="frmMain" action="meg_deletetransportplan.php" method="post" OnSubmit="return onDelete();">
-
+                                                    
                                                     <input type="text" id="url" name="url" value="<?= $_SERVER['REQUEST_URI'] ?>" style="display: none">
                                                     <table  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example11" role="grid" aria-describedby="dataTables-example11" style="width: 100%;">
                                                         <thead >
                                                             <tr>    
-                                                                <th style="text-align: center;"><label style="width: 50px"><input type="submit" name="btnDelete" class="btn btn-default btn-circle" value="ลบss"></label></th>
+                                                                <th class="ExportLabelTD" style="text-align: center;"><label style="width: 50px"><input type="submit" name="btnDelete" class="btn btn-default btn-circle" value="ลบss"></label></th>
                                                                 <th style="text-align: center;"><label style="width: 50px">DELETE JOB1</label></th>
-                                                                <th style="text-align: center;"><label style="width: 50px">EDIT JOB</label></th>
+                                                                <th style="text-align: center;"><label style="width: 50px;">EDIT JOB</label></th>
                                                                 <!--<th style="text-align: center;"><label style="width: 50px">COPY ROOT</label></th>-->
                                                                 <!--<th style="text-align: center;"><label style="width: 50px">ADD DN</label></th>-->
                                                                 <th style="text-align: center;"><label style="width: 50px">COPY JOB</label></th>
 
                                                                 <th style="text-align: center;"><label style="width: 50px">รอบวิ่ง</label></th>
-                                                                <th style="text-align: center;"><label style="width: 80px">ชื่อรถ1</label></th>
+                                                                <th style="text-align: center;"><label style="width: 80px">ชื่อรถ</label></th>
                                                                 <th style="text-align: center;"><label style="width: 140px">พนักงาน(1)</label></th>
                                                                 <th style="text-align: center;"><label style="width: 140px">พนักงาน(2)</label></th>
                                                                 <?php
@@ -8984,6 +9079,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                         <tbody>
 
                                                             <?php
+                                                            
                                                             if ($_GET['companycode'] == 'RKL' && $_GET['customercode'] == 'SKB') {
                                                                 $i1 = 1;
 
@@ -9183,6 +9279,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             <?php
                                                                         }
                                                                         ?>
+                                                                        
                                                                         <td><?= $result_sePlanmonday['DATEPRESENT'] ?></td>
                                                                         <td><?= $result_sePlanmonday['JOBSTART'] ?></td>
                                                                         <td><?= $VAR_CLUSTER ?></td>
@@ -9201,6 +9298,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         <td ><?= $result_sePlanmonday['JOBNO'] ?></td>
                                                                         <td ><?= $result_sePlanmonday['TRIPNO'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEINPUT'] ?></td>
+                                                                        
                                                                         <td><?= $result_sePlanmonday['DATERK'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEVLIN'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEVLOUT'] ?></td>
@@ -9269,7 +9367,11 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                     </tr>
                                                                     <?php
                                                                     $i1++;
+                                                                   
                                                                 }
+                                                                
+                                                               
+                                                               
                                                             } else {
                                                                 $i1 = 1;
 
@@ -9443,28 +9545,55 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             <?php
                                                                         }
                                                                         ?>
+                                                                        <!-- รอบวิ่งงาน -->
+                                                                        <!-- ROUNDAMOUNT รอบวิ่งงาน วันจ-->
+                                                                        <?php
+                                                                        if ($result_sePlanmonday['COMPANYCODE'] == 'RKL' || $result_sePlanmonday['COMPANYCODE'] == 'RKR') {
+                                                                        ?>
+                                                                            <?php
+                                                                            if (($_GET['carrytype'] =='weight') && 
+                                                                                ($result_sePlanmonday['CUSTOMERCODE'] == 'TTASTSTC'  || $result_sePlanmonday['CUSTOMERCODE'] == 'TTAST'    ||
+                                                                                $result_sePlanmonday['CUSTOMERCODE']  == 'TTASTCS'   || $result_sePlanmonday['CUSTOMERCODE'] == 'TTPROSTC' ||
+                                                                                $result_sePlanmonday['CUSTOMERCODE']  == 'TTTCSTC'   || $result_sePlanmonday['CUSTOMERCODE'] == 'DAIKI')
+                                                                                 
+                                                                                ) {
+                                                                            ?>
 
-
-                                                                        <td style="text-align: center">
-                                                                            <?php if($_GET['companycode'] == 'RRC') { ?>
-                                                                                <select id="txt_roundamountgw" name="txt_roundamountgw" class="form-control" onchange="update_copydiagram('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
-                                                                                    <option value disabled selected>--</option>
-                                                                                    <?php
-                                                                                        $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
-                                                                                        $query_slram = sqlsrv_query($conn, $sql_slram);
-                                                                                        while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
-                                                                                        $selected = "";
-                                                                                        $SePY_CCID = $result_sePlanmonday['ROUNDAMOUNT'];
-                                                                                            $SeCC_ID = $result_slram['NAME'];
-                                                                                        if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
-                                                                                    ?>
-                                                                                    <option value="<?=$result_slram['NAME']?>" <?= $selected ?>><?php echo $result_slram["NAME"];?></option>
+                                                                                <td style="text-align: center">
+                                                                                    <?php if($result_sePlanmonday['ROUNDAMOUNT'] != '' || $result_sePlanmonday['ROUNDAMOUNT'] == '') { ?>
+                                                                                        <select id="txt_roundamount" name="txt_roundamount" class="form-control" onchange="update_copydiagram('<?= $result_sePlanmonday['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                                                                            <option value disabled selected>--</option>                                                                                        
+                                                                                                <?php
+                                                                                                    $sql_slram = "SELECT [NAME] FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(1,2,5,6)";
+                                                                                                    $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                                                                    while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                                                                    $selected = "";
+                                                                                                    $SePY_CCID = $result_sePlanmonday['ROUNDAMOUNT'];
+                                                                                                    // $SePY_CCID = 1;
+                                                                                                    $SeCC_ID = $result_slram['NAME'];
+                                                                                                if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                                                                                ?>
+                                                                                            <option value="<?=$result_slram['NAME']?>" <?= $selected ?>>รอบที่ <?php echo $result_slram["NAME"];?></option>
+                                                                                            <?php } ?>
+                                                                                        </select>  
                                                                                     <?php } ?>
-                                                                                </select>   
-                                                                            <?php }else { ?>
-                                                                                <?= $result_sePlanmonday['ROUNDAMOUNT'] ?>
-                                                                            <?php } ?>
-                                                                        </td>
+                                                                                </td>
+
+                                                                            <?php
+                                                                            }else {
+                                                                            ?>
+                                                                                <td style="text-align: center"><?= $result_sePlanmonday['ROUNDAMOUNT'] ?></td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                        <?php
+                                                                        }else{
+                                                                        ?>
+                                                                            <td style="text-align: center"><?= $result_sePlanmonday['ROUNDAMOUNT'] ?></td>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                        
                                                                         <?php
                                                                         if ($result_seStatusmon['STATUSTRUCK'] == 'หยุดรถ' || $result_seStatusmon['STATUSTRUCK'] == 'จ่ายงาน' || $result_seStatusmon['STATUSTRUCK'] == 'รอดำเนินการ') {
                                                                          ?>
@@ -9492,8 +9621,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         }
                                                                         ?>
                                                                         <td><?= $result_sePlanmonday['JOBEND'] ?></td>
-                                                                        <td ><?= $result_sePlanmonday['JOBNO'] ?></td>
-                                                                        <td ><?= $result_sePlanmonday['TRIPNO'] ?></td>
+                                                                        <td><?= $result_sePlanmonday['JOBNO'] ?></td>
+                                                                        <td><?= $result_sePlanmonday['TRIPNO'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEINPUT'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATERK'] ?></td>
                                                                         <td><?= $result_sePlanmonday['DATEVLIN'] ?></td>
@@ -9657,15 +9786,15 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
         <script src="../dist/js/select2.js"></script>
 
         <!-- Data Table Export File -->
-       
-        <!-- <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+        <!-- <script src="https://code.jquery.com/jquery-3.7.1.js"></script> -->
+        <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
         <script src="https://cdn.datatables.net/buttons/3.0.0/js/dataTables.buttons.js"></script>
         <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.dataTables.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-        
+        <!-- <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script> -->
         <script src="//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json"></script>
         <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.html5.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.colVis.min.js"></script> -->
+        <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.colVis.min.js"></script>
         
         <!-- Sweet Alert -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
@@ -9691,8 +9820,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
         } else if ($_GET['companycode'] == 'RATC' && $_GET['customercode'] == 'TTT') {
             $job = select_jobautocomplatestarttttsh('megVehicletransportprice_v2', 'select_fromtttsh', '');
         }
+
         if ($_GET['companycode'] == 'RRC' || $_GET['companycode'] == 'RCC' || $_GET['companycode'] == 'RATC') {
-            $thainame = select_carautocomplate('megVehicleinfo_v2', 'selectcond_vehicleinfo', " AND a.THAINAME != '-' AND (a.ENGNAME  LIKE '%R-%' OR a.ENGNAME  LIKE '%RA-%' OR a.ENGNAME  LIKE '%T-%' OR a.ENGNAME  LIKE '%G-%'", " OR a.THAINAME LIKE '%ดินแดง%'  OR a.THAINAME  LIKE '%อุทัยธานี%'  OR a.THAINAME  LIKE '%คลองเขื่อน%'  ", " OR a.THAINAME LIKE '%RP-%' OR a.THAINAME  LIKE '%สวนผึ้ง%' OR a.THAINAME  LIKE '%ด่านช้าง%'", " OR a.ENGNAME LIKE '%Khao Chamao%' OR a.ENGNAME LIKE '%Kerry%' OR a.ENGNAME LIKE '%Chaloem Prakiat%' OR a.THAINAME LIKE '%แปลงยาว%' OR a.THAINAME LIKE '%สนามชัยเขต%' OR a.THAINAME LIKE '%วานรนิวาส%' OR a.THAINAME LIKE '%เฉลิมพระเกียรติ%' OR a.THAINAME LIKE '%ชัยนาท%'  OR a.THAINAME LIKE '%พรหมพิราม%' OR a.THAINAME LIKE '%คง%' OR a.THAINAME LIKE '%ชัยภูมิ%')");
+            $thainame = select_carautocomplate('megVehicleinfo_v2', 'selectcond_vehicleinfo', " AND a.THAINAME != '-' AND (a.ENGNAME  LIKE '%R-%' OR a.ENGNAME  LIKE '%RA-%' OR a.ENGNAME  LIKE '%T-%'  OR a.ENGNAME  LIKE '%G-%'", " OR a.THAINAME LIKE '%ดินแดง%'  OR a.THAINAME  LIKE '%อุทัยธานี%'  OR a.THAINAME  LIKE '%คลองเขื่อน%'  ", " OR a.THAINAME LIKE '%RP-%' OR a.THAINAME  LIKE '%สวนผึ้ง%' OR a.THAINAME  LIKE '%ด่านช้าง%'", " OR a.ENGNAME LIKE '%Khao Chamao%' OR a.ENGNAME LIKE '%Kerry%' OR a.ENGNAME LIKE '%Chaloem Prakiat%' OR a.THAINAME LIKE '%แปลงยาว%' OR a.THAINAME LIKE '%สนามชัยเขต%' OR a.THAINAME LIKE '%วานรนิวาส%' OR a.THAINAME LIKE '%เฉลิมพระเกียรติ%' OR a.THAINAME LIKE '%ชัยนาท%' OR a.THAINAME LIKE '%พรหมพิราม%' OR a.THAINAME LIKE '%คง%' OR a.THAINAME LIKE '%ชัยภูมิ%')");
         } else {
             $thainame = select_vehiclenumberautocomplate('megVehicleinfo_v2', 'select_vehicleinfo', '');
         }
@@ -9709,15 +9839,17 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
         ?>
 
 
-        <script type="text/javascript"> 
+        <script type="text/javascript">
+
                                                                         function showLoading() {
                                                                             $("#loading").show();
-                                                                            
+                                                                            // document.getElementById("lbl_tu").toggleClass('disabled');
                                                                         }
 
                                                                         function hideLoading() {
                                                                             $("#loading").hide();
                                                                         }
+
                                                                         function excel_planningprintout()
                                                                         {
                                                                             var companycode     = '<?=$_GET['companycode']?>';
@@ -9760,6 +9892,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             
 
                                                                         }
+
                                                                         function check_thainamerksrkr(thainame){
                                                                             // alert(thainame);
                                                                             $.ajax({
@@ -9913,7 +10046,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     document.getElementById("show_friday").innerHTML = "";
                                                                                     document.getElementById("show_saturday").innerHTML = "";
                                                                                     document.getElementById("show_sunday").innerHTML = "";
-
                                                                                     $('#dataTables-example11').DataTable({
 
                                                                                         order: [[0, "desc"]],
@@ -9965,7 +10097,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         }
                                                                         function show_wednesday()
                                                                         {
-                                                                            
                                                                             showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
@@ -10000,7 +10131,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         }
                                                                         function show_thursday()
                                                                         {
-
                                                                             showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
@@ -10041,7 +10171,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                                                         //    alert(startweek);
                                                                         //    alert(endweek);
-
                                                                             showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
@@ -10074,8 +10203,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             });
                                                                         }
                                                                         function show_saturday()
-                                                                        {   
-
+                                                                        {
                                                                             showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
@@ -10106,8 +10234,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                             });
                                                                         }
                                                                         function show_sunday()
-                                                                        {   
-
+                                                                        {
                                                                             showLoading();
                                                                             $.ajax({
                                                                                 type: 'post',
@@ -10117,7 +10244,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     , url: '<?= $_SERVER['REQUEST_URI'] ?>'
                                                                                 },
                                                                                 success: function (rs) {
-
+                                                                                    
                                                                                     hideLoading();
                                                                                     document.getElementById("show_monday").innerHTML = "";
                                                                                     document.getElementById("show_mondaydef").innerHTML = "";
@@ -10446,10 +10573,12 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                     $("#txt_copydiagramthainameupdrkr2").autocomplete({
                                                                                         source: [txt_copydiagramthainameupdrkr2]
                                                                                     });
+
                                                                                     var txt_copydiagramemployeenameupdrkr1 = [<?= $emp ?>];
                                                                                     $("#txt_copydiagramemployeenameupdrkr1").autocomplete({
                                                                                         source: [txt_copydiagramemployeenameupdrkr1]
                                                                                     });
+                                                                                    
                                                                                     var txt_copydiagramemployeenameupdrkr2 = [<?= $emp ?>];
                                                                                     $("#txt_copydiagramemployeenameupdrkr2").autocomplete({
                                                                                         source: [txt_copydiagramemployeenameupdrkr2]
@@ -10626,6 +10755,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                         }
                                                                         function update_modalrrc(vehicletransportplanid)
                                                                         {
+
+                                                                            // alert(vehicletransportplanid);
                                                                             $.ajax({
                                                                                 type: 'post',
                                                                                 url: 'meg_data.php',
@@ -11244,8 +11375,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 source: [txt_copydiagramemployeename2]
             });
 
-            if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC')
-            {
+            if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC'){
                 var txt_copydiagramemployeename3 = [<?= $emp ?>];
                 $("#txt_copydiagramemployeename3").autocomplete({
                     source: [txt_copydiagramemployeename3]
@@ -11434,6 +11564,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             function update_copydiagram2(ID, fieldname, editableObj)
             {
 
+
                 $.ajax({
                     type: 'post',
                     url: 'meg_data.php',
@@ -11546,6 +11677,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             {
                 var datestart = document.getElementById("txt_datestartsr").value;
                 var dateend = document.getElementById("txt_dateendsr").value;
+
+                
                 window.open('pdf_transportplan.php?datestart=' + datestart + '&dateend=' + dateend, '_blank');
 
 
@@ -11617,13 +11750,52 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
             });
         </script>
         <script>
-
+            
             $(document).ready(function () {
+                
                 $('#dataTables-example11').DataTable({
+                    
 
                     order: [[0, "desc"]],
                     scrollX: true,
                     scrollY: '500px',
+                    
+                    // language: { label: "" },
+                    // order: [[0, 'asc']],
+                    // scrollX: true,
+                    // scrollY: '500px',
+                    // charset: 'UTF-8',
+                    // fieldSeparator: ';',
+                    // stripHtml: true,
+                    // bom: true,
+                    // // dom: 'Bfrtip',
+                    // lengthMenu: [
+                    //             [ 10, 15, 20, -1 ],
+                    //             // [ '10 rows', '15 rows', '20 rows', 'Show all' ]
+                    //             [ '10 rows',  'Show all' ]
+                    //         ],
+                    // layout: {
+                    //     topStart: {
+                                
+                    //         buttons: [
+                    //             {
+                                    
+                    //                 extend: 'pageLength'
+                    //             },
+                    //             'colvis'
+                    //             ,
+                    //             {
+                    //                 exportOptions: {    
+                    //                     columns: ':visible',
+                    //                     stripHtml: true,
+                    //                 },
+                    //                 extend: 'excelHtml5',
+                                    
+                    //             }
+                    //         ],
+                    //     },
+                    // },
+
                 });
 
 
@@ -11762,7 +11934,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
             function dateendsr()
             {
-
+                
                 $.ajax({
                     type: 'post',
                     url: 'meg_data.php',
@@ -12010,7 +12182,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     success: function (rs) {
 
                         window.location.reload();
-                        alert(rs);
+                        // alert(rs);
                     }
                 });
             }
@@ -12054,7 +12226,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function (rs) {
-                                alert(rs);
+                                // alert(rs);
                                 showupdate_vehicletransportdocument(vehicletransportplanid);
                             }
                         });
@@ -12082,7 +12254,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             //alert('เพิ่มแผนการขนส่งเรียบร้อยแล้ว');
 
                             window.location.reload();
-                            alert(rs);
+                            // alert(rs);
                         }
                     });
                 } else
@@ -12255,7 +12427,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             txt_flg: "update_diagramrrcgmt", id: id, actualprice: actualprice, cond7: cond7, cond8: cond8, condholiday: condholiday, customercode: '<?= $_GET['customercode'] ?>'
                         },
                         success: function (rs) {
-                            alert(rs);
+                            // alert(rs);
                             window.location.reload();
                         }
                     });
@@ -12671,7 +12843,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     },
                     success: function () {
 
-                        alert();
+                        // alert();
                     }
                 });
             }
@@ -12729,19 +12901,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     if ('<?= $_GET['customercode'] ?>' == 'STM')
                     {
                         dn = document.getElementById("cb_copydiagramdn").value;
+                        billing = "";
                     } else if ('<?= $_GET['customercode'] ?>' == 'TMT')
                     {
                         dn = document.getElementById("cb_copydiagramdn").value;
+                        billing = "";
                     } else if ('<?= $_GET['customercode'] ?>' == 'TGT')
                     {
                         dn = document.getElementById("cb_copydiagramdn").value;
+                        billing = "";
                     } else
                     {
                         dn = "";
+                        billing = "";
                     }
                 } else
                 {
                     dn = "";
+                    billing = "";
                 }
 
                 var vehicletransportplanid = '';
@@ -12869,7 +13046,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
-                            goreturn = '';
+                            goreturn = document.getElementById("cb_copydiagramgoreturn").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTAT')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
@@ -12895,12 +13072,12 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = '';
-                        }else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL')
+                        } else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = '';
-                        }else if ('<?= $_GET['customercode'] ?>' == 'VUTEQ')
+                        } else if ('<?= $_GET['customercode'] ?>' == 'VUTEQ')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
@@ -13121,7 +13298,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = '';
-
+                            roundamount = document.getElementById("txt_roundamount").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTAT')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
@@ -13198,7 +13375,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = '';
-                        }else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL')
+                        } else if ('<?= $_GET['customercode'] ?>' == 'RNSTEEL')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
@@ -13216,21 +13393,21 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
-
+                            roundamount = document.getElementById("txt_roundamount").value;
 
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTASTCS')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
-
+                            roundamount = document.getElementById("txt_roundamount").value;
 
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTPROSTC')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
-
+                            roundamount = document.getElementById("txt_roundamount").value;
 
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTPROCS')
                         {
@@ -13246,14 +13423,14 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
-
+                            roundamount = document.getElementById("txt_roundamount").value;
 
                         } else if ('<?= $_GET['customercode'] ?>' == 'DAIKI')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = document.getElementById("cb_producttypereturn").value;//ประเภทงานรับกลับ
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
-
+                            roundamount = document.getElementById("txt_roundamount").value;
 
 
                         } else if ('<?= $_GET['customercode'] ?>' == 'PARAGON')
@@ -13268,7 +13445,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = document.getElementById("cb_copydiagramgoreturn").value;
-
+                            roundamount = document.getElementById("txt_roundamount").value;
 
                         }
                     }
@@ -13292,8 +13469,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 {
                     employeename1 = document.getElementById("txt_copydiagramemployeename1").value;
                     employeename2 = document.getElementById("txt_copydiagramemployeename2").value;
-                    if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC' || '<?= $_GET['customercode'] ?>' == 'SKB')
-                    {
+                    if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC' || '<?= $_GET['customercode'] ?>' == 'SKB'){
                         employeename3 = document.getElementById("txt_copydiagramemployeename3").value;
                     }
 
@@ -13599,6 +13775,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             cluster = document.getElementById("txt_copydiagramzone").value;
                             jobend = document.getElementById("txt_copydiagramjobendton").value;
+                            
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTASTCS')
                         {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
@@ -13640,13 +13817,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                 } else if ('<?= $_GET['companycode'] ?>' == 'RRC')
                 {
-                    // if (document.getElementById("txt_roundamountgw").value == ""){
-                    //     alert("รอบที่วิ่งงาน เป็นค่าว่าง !!!");
-                    //     return false;
-                    // }else{
-                         roundamount = document.getElementById("txt_roundamountgw").value;
-                    // }
-					
                     jobstart = document.getElementById("cb_copydiagramjobstart").value;
                     jobend = document.getElementById("cb_copydiagramjobend").value;
                 } else if ('<?= $_GET['companycode'] ?>' == 'RKL')
@@ -13734,6 +13904,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
                             cluster = document.getElementById("txt_copydiagramzone").value;
                             jobend = document.getElementById("txt_copydiagramjobendton").value;
+                            
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTASTCS')
                         {
                             jobstart = document.getElementById("cb_copydiagramjobstart").value;
@@ -13773,13 +13944,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     }
                 } else if ('<?= $_GET['companycode'] ?>' == 'RCC' || '<?= $_GET['companycode'] ?>' == 'RATC')
                 {
-                    // if (document.getElementById("txt_roundamountgw").value == ""){
-                    //     alert("รอบที่วิ่งงาน เป็นค่าว่าง !!!");
-                    //     return false;
-                    // }else{
-                    //     roundamount = document.getElementById("txt_roundamountgw").value;
-                    // }
-
                     if ('<?= $_GET['worktype'] ?>' != 'sh')
                     {
                         jobstart = document.getElementById("txt_copydiagramjobstart").value;
@@ -13797,16 +13961,89 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 var dateinput = document.getElementById("txt_copydiagramdateinput").value;
                 var datepresent = document.getElementById("txt_copydiagramdatepresent").value;
 
-
+               
 
 
                 if (checknull_copydiagram(vehicletransportplanid)) {
 
+                    // alert(vehicletransportplanid);
                     dateworking = document.getElementById("txt_copydiagramdaterk").value;
 
                     if (chk_copydiagrammonday.checked == true) {
 
-                      
+                            //alert('monday');
+
+                            // var planid    = vehicletransportplanid;
+                            // var datestart = copydiagramdatestart;
+                            // var dateend = copydiagramdatestart;
+                            // var customercode ='<?= $_GET['customercode'] ?>';
+                            // var companycode = '<?= $_GET['companycode'] ?>';
+                            // var thainame = thainame;
+                            // var jobstart = jobstart;
+                            // var cluster = cluster;
+                            // var jobend = jobend;
+                            // var emp1 = employeename1;
+                            // var emp2 = employeename2;
+                            // var emp3 = employeename3;
+                            // var jobno = document.getElementById("txt_copydiagramjobnomonday").value;
+                            // var dateinput = dateinput;
+                            // var daterk = daterk;
+                            // var datepresent = datepresent;
+                            // var dateworking = dateworking;
+                            // var datevlin = datevlin;  
+                            // var datevlout = datevlout;
+                            // var dealerin = dealerin;
+                            // var datereturn = datereturn;
+                            // var vehicletype = vehicletype;
+                            // var materialtype = materialtype;
+                            // var goreturn  = goreturn;
+                            // var worktype = '<?= $_GET['worktype'] ?>';
+                            // var load = load;
+                            // var route = route;
+                            // var unit = copydiagramunit;
+                            // var roundamount = roundamount;
+                            // var dn = dn;
+                            // var carrytype = '<?= $_GET['carrytype'] ?>';
+                            // var thainame2 = thainame2;
+                            // var billing = billing;  
+                            // var createby =  '<?= $result_seEmployee["PersonCode"] ?>';
+                          
+                            // alert(vehicletransportplanid);
+                            // alert(datestart);
+                            // alert(dateend);
+                            // alert(customercode);
+                            // alert(companycode);
+                            // alert(thainame);
+                            // alert(jobstart);
+                            // alert(cluster);
+                            // alert(jobend);
+                            // alert(emp1);
+                            // alert(emp2);
+                            // alert(emp3);
+                            // alert(jobno);
+                            // alert(dateinput);
+                            // alert(daterk);
+                            // alert(datepresent);
+                            // alert(dateworking);
+                            // alert(datevlin);
+                            // alert(datevlout);
+                            // alert(dealerin);
+                            // alert(datereturn);
+                            // alert(vehicletype);
+                            // alert(materialtype);
+                            // alert(goreturn);
+                            // alert(worktype);
+                            // alert(load);
+                            // alert(route);
+                            // alert(unit);
+                            // alert(roundamount);
+                            // alert(dn);
+                            // alert(carrytype);
+                            // alert(thainame2);
+                            // alert(billing);
+                            // alert(createby);
+
+
 
                         $.ajax({
                             type: 'post',
@@ -13848,47 +14085,49 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 BILLING: billing,
                                 CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
 
-
                             },
                             success: function (rs) {
-                                save_logprocess('Planing', 'Save Monday Planing', '<?= $result_seLogin['PersonCode'] ?>');
-                                // alert(rs);
-                                // alert('RKR_CH');
+                                //alert(rs);
+                                // save_logprocess('Planing', 'Save Monday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                               
+                          
                             }
                         });
 
                         //Save Keylocker
                       
-                        $.ajax({
-                            type: 'post',
-                            url: 'meg_data2.php',
-                            data: {
+                        // $.ajax({
+                        //     type: 'post',
+                        //     url: 'meg_data2.php',
+                        //     data: {
 
-                                txt_flg: "save_keylocker",
-                                id:'',
-                                regisid: '',
-                                regisnumber: thainame,
-                                jobno:document.getElementById("txt_copydiagramjobnomonday").value,
-                                keylogstatus: 'รถวิ่งงาน',
-                                datepickup: datepresent,
-                                datereturn: '' ,
-                                keypicker: employeename1,
-                                keyreturnperson: '',
-                                keylogdetail: '',
-                                keylogremark: '',
-                                createdate:'',
-                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
-                            },
-                            success: function (rs) {
+                        //         txt_flg: "save_keylocker",
+                        //         id:'',
+                        //         regisid: '',
+                        //         regisnumber: thainame,
+                        //         jobno:document.getElementById("txt_copydiagramjobnomonday").value,
+                        //         keylogstatus: 'รถวิ่งงาน',
+                        //         datepickup: datepresent,
+                        //         datereturn: '' ,
+                        //         keypicker: employeename1,
+                        //         keyreturnperson: '',
+                        //         keylogdetail: '',
+                        //         keylogremark: '',
+                        //         createdate:'',
+                        //         createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                        //     },
+                        //     success: function (rs) {
 
-                                // alert(rs);   
-                                // alert("บันทึกข้อมูลเรียบร้อย");
-                                // window.location.reload();
-                            }
-                        });
+                        //         // alert(rs);   
+                        //         // alert("บันทึกข้อมูลเรียบร้อย");
+                        //         // window.location.reload();
+                        //     }
+                        // });
                         //End Save Keylocker
                     }
                     if (chk_copydiagramtuesday.checked == true) {
+
+                        // alert('tuesday');
 
                         $.ajax({
                             type: 'post',
@@ -13932,43 +14171,46 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function () {
-                                save_logprocess('Planing', 'Save Tuesday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                                // alert(rs);
+                                // save_logprocess('Planing', 'Save Tuesday Planing', '<?= $result_seLogin['PersonCode'] ?>');
 
                             }
                         });
 
                         //Save Keylocker
-                        $.ajax({
-                            type: 'post',
-                            url: 'meg_data2.php',
-                            data: {
+                        // $.ajax({
+                        //     type: 'post',
+                        //     url: 'meg_data2.php',
+                        //     data: {
 
-                                txt_flg: "save_keylocker",
-                                id:'',
-                                regisid: '',
-                                regisnumber: thainame,
-                                jobno:document.getElementById("txt_copydiagramjobnotuesday").value,
-                                keylogstatus: 'รถวิ่งงาน',
-                                datepickup: datepresent,
-                                datereturn: '' ,
-                                keypicker: employeename1,
-                                keyreturnperson: '',
-                                keylogdetail: '',
-                                keylogremark: '',
-                                createdate:'',
-                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
-                            },
-                            success: function (rs) {
+                        //         txt_flg: "save_keylocker",
+                        //         id:'',
+                        //         regisid: '',
+                        //         regisnumber: thainame,
+                        //         jobno:document.getElementById("txt_copydiagramjobnotuesday").value,
+                        //         keylogstatus: 'รถวิ่งงาน',
+                        //         datepickup: datepresent,
+                        //         datereturn: '' ,
+                        //         keypicker: employeename1,
+                        //         keyreturnperson: '',
+                        //         keylogdetail: '',
+                        //         keylogremark: '',
+                        //         createdate:'',
+                        //         createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                        //     },
+                        //     success: function (rs) {
 
-                                // alert(rs);   
-                                // alert("บันทึกข้อมูลเรียบร้อย");
-                                // window.location.reload();
-                            }
-                        });
+                        //         // alert(rs);   
+                        //         // alert("บันทึกข้อมูลเรียบร้อย");
+                        //         // window.location.reload();
+                        //     }
+                        // });
                         //End Save Keylocker
 
                     }
                     if (chk_copydiagramwednesday.checked == true) {
+
+                        // alert('wednesday');
 
                         $.ajax({
                             type: 'post',
@@ -14013,43 +14255,43 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             },
                             success: function (rs) {
                                 // alert(rs);
-                                save_logprocess('Planing', 'Save Wednesday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                                // save_logprocess('Planing', 'Save Wednesday Planing', '<?= $result_seLogin['PersonCode'] ?>');
                             }
                         });
 
                         //Save Keylocker
-                        $.ajax({
-                            type: 'post',
-                            url: 'meg_data2.php',
-                            data: {
+                        // $.ajax({
+                        //     type: 'post',
+                        //     url: 'meg_data2.php',
+                        //     data: {
 
-                                txt_flg: "save_keylocker",
-                                id:'',
-                                regisid: '',
-                                regisnumber: thainame,
-                                jobno:document.getElementById("txt_copydiagramjobnowednesday").value,
-                                keylogstatus: 'รถวิ่งงาน',
-                                datepickup: datepresent,
-                                datereturn: '' ,
-                                keypicker: employeename1,
-                                keyreturnperson: '',
-                                keylogdetail: '',
-                                keylogremark: '',
-                                createdate:'',
-                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
-                            },
-                            success: function (rs) {
+                        //         txt_flg: "save_keylocker",
+                        //         id:'',
+                        //         regisid: '',
+                        //         regisnumber: thainame,
+                        //         jobno:document.getElementById("txt_copydiagramjobnowednesday").value,
+                        //         keylogstatus: 'รถวิ่งงาน',
+                        //         datepickup: datepresent,
+                        //         datereturn: '' ,
+                        //         keypicker: employeename1,
+                        //         keyreturnperson: '',
+                        //         keylogdetail: '',
+                        //         keylogremark: '',
+                        //         createdate:'',
+                        //         createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                        //     },
+                        //     success: function (rs) {
 
-                                // alert(rs);   
-                                // alert("บันทึกข้อมูลเรียบร้อย");
-                                // window.location.reload();
-                            }
-                        });
+                        //         // alert(rs);   
+                        //         // alert("บันทึกข้อมูลเรียบร้อย");
+                        //         // window.location.reload();
+                        //     }
+                        // });
                         //End Save Keylocker
                     }
                     if (chk_copydiagramthursday.checked == true) {
 
-                        
+                        // alert('thursday');
 
                         $.ajax({
                             type: 'post',
@@ -14093,45 +14335,45 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function (rs) {
-                                // alert(rs);
+                                alert(rs);
                                 // save_logprocess('Planing', 'Save Thursday Planing', '<?= $result_seLogin['PersonCode'] ?>');
                             }
                         });
 
                         //Save Keylocker
-                        $.ajax({
-                            type: 'post',
-                            url: 'meg_data2.php',
-                            data: {
+                        // $.ajax({
+                        //     type: 'post',
+                        //     url: 'meg_data2.php',
+                        //     data: {
 
-                                txt_flg: "save_keylocker",
-                                id:'',
-                                regisid: '',
-                                regisnumber: thainame,
-                                jobno:document.getElementById("txt_copydiagramjobnothursday").value,
-                                keylogstatus: 'รถวิ่งงาน',
-                                datepickup: datepresent,
-                                datereturn: '' ,
-                                keypicker: employeename1,
-                                keyreturnperson: '',
-                                keylogdetail: '',
-                                keylogremark: '',
-                                createdate:'',
-                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
-                            },
-                            success: function (rs) {
+                        //         txt_flg: "save_keylocker",
+                        //         id:'',
+                        //         regisid: '',
+                        //         regisnumber: thainame,
+                        //         jobno:document.getElementById("txt_copydiagramjobnothursday").value,
+                        //         keylogstatus: 'รถวิ่งงาน',
+                        //         datepickup: datepresent,
+                        //         datereturn: '' ,
+                        //         keypicker: employeename1,
+                        //         keyreturnperson: '',
+                        //         keylogdetail: '',
+                        //         keylogremark: '',
+                        //         createdate:'',
+                        //         createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                        //     },
+                        //     success: function (rs) {
 
-                                // alert(rs);   
-                                // alert("บันทึกข้อมูลเรียบร้อย");
-                                // window.location.reload();
-                            }
-                        });
+                        //         // alert(rs);   
+                        //         // alert("บันทึกข้อมูลเรียบร้อย");
+                        //         // window.location.reload();
+                        //     }
+                        // });
                         //End Save Keylocker
 
                     }
                     if (chk_copydiagramfriday.checked == true) {
 
-                        
+                        alert('friday');
 
                         $.ajax({
                             type: 'post',
@@ -14175,7 +14417,8 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function () {
-                                save_logprocess('Planing', 'Save Friday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                                // alert(rs);
+                                // save_logprocess('Planing', 'Save Friday Planing', '<?= $result_seLogin['PersonCode'] ?>');
 
                                 
                             }
@@ -14183,39 +14426,110 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                         //Save Keylocker
                         
-                        $.ajax({
-                            type: 'post',
-                            url: 'meg_data2.php',
-                            data: {
+                        // $.ajax({
+                        //     type: 'post',
+                        //     url: 'meg_data2.php',
+                        //     data: {
 
-                                txt_flg: "save_keylocker",
-                                id:'',
-                                regisid: '',
-                                regisnumber: thainame,
-                                jobno:document.getElementById("txt_copydiagramjobnofriday").value,
-                                keylogstatus: 'รถวิ่งงาน',
-                                datepickup: datepresent,
-                                datereturn: '' ,
-                                keypicker: employeename1,
-                                keyreturnperson: '',
-                                keylogdetail: '',
-                                keylogremark: '',
-                                createdate:'',
-                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
-                            },
-                            success: function (rs) {
+                        //         txt_flg: "save_keylocker",
+                        //         id:'',
+                        //         regisid: '',
+                        //         regisnumber: thainame,
+                        //         jobno:document.getElementById("txt_copydiagramjobnofriday").value,
+                        //         keylogstatus: 'รถวิ่งงาน',
+                        //         datepickup: datepresent,
+                        //         datereturn: '' ,
+                        //         keypicker: employeename1,
+                        //         keyreturnperson: '',
+                        //         keylogdetail: '',
+                        //         keylogremark: '',
+                        //         createdate:'',
+                        //         createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                        //     },
+                        //     success: function (rs) {
 
-                                // alert(rs);   
-                                // alert("บันทึกข้อมูลเรียบร้อย");
-                                // window.location.reload();
-                            }
-                        });
+                        //         // alert(rs);   
+                        //         // alert("บันทึกข้อมูลเรียบร้อย");
+                        //         // window.location.reload();
+                        //     }
+                        // });
                         //End Save Keylocker
 
                     }
                     if (chk_copydiagramsaturday.checked == true) {
                         
                         
+                            // alert('saturday');
+
+                            // var planid    = vehicletransportplanid;
+                            // var datestart = copydiagramdatestart;
+                            // var dateend = copydiagramdatestart;
+                            // var customercode ='<?= $_GET['customercode'] ?>';
+                            // var companycode = '<?= $_GET['companycode'] ?>';
+                            // var thainame = thainame;
+                            // var jobstart = jobstart;
+                            // var cluster = cluster;
+                            // var jobend = jobend;
+                            // var emp1 = employeename1;
+                            // var emp2 = employeename2;
+                            // var emp3 = employeename3;
+                            // var jobno = document.getElementById("txt_copydiagramjobnosaturday").value;
+                            // var dateinput = dateinput;
+                            // var daterk = daterk;
+                            // var datepresent = datepresent;
+                            // var dateworking = dateworking;
+                            // var datevlin = datevlin;  
+                            // var datevlout = datevlout;
+                            // var dealerin = dealerin;
+                            // var datereturn = datereturn;
+                            // var vehicletype = vehicletype;
+                            // var materialtype = materialtype;
+                            // var goreturn  = goreturn;
+                            // var worktype = '<?= $_GET['worktype'] ?>';
+                            // var load = load;
+                            // var route = route;
+                            // var unit = copydiagramunit;
+                            // var roundamount = roundamount;
+                            // var dn = dn;
+                            // var carrytype = '<?= $_GET['carrytype'] ?>';
+                            // var thainame2 = document.getElementById("txt_copydiagramthainame2").value;
+                            // var billing = billing;  
+                            // var createby =  '<?= $result_seEmployee["PersonCode"] ?>';
+                          
+                            // alert(planid);
+                            // alert(datestart);
+                            // alert(dateend);
+                            // alert(customercode);
+                            // alert(companycode);
+                            // alert(thainame);
+                            // alert(jobstart);
+                            // alert(cluster);
+                            // alert(jobend);
+                            // alert(emp1);
+                            // alert(emp2);
+                            // alert(emp3);
+                            // alert(jobno);
+                            // alert(dateinput);
+                            // alert(daterk);
+                            // alert(datepresent);
+                            // alert(dateworking);
+                            // alert(datevlin);
+                            // alert(datevlout);
+                            // alert(dealerin);
+                            // alert(datereturn);
+                            // alert(vehicletype);
+                            // alert(materialtype);
+                            // alert(goreturn);
+                            // alert(worktype);
+                            // alert(load);
+                            // alert(route);
+                            // alert(unit);
+                            // alert(roundamount);
+                            // alert(dn);
+                            // alert(carrytype);
+                            // alert(thainame2);
+                            // alert(billing);
+                            // alert(createby);
 
                         $.ajax({
                             type: 'post',
@@ -14260,47 +14574,47 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             },
                             success: function (rs) {
                                 // alert(rs);
-                                save_logprocess('Planing', 'Save Saturday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                                // save_logprocess('Planing', 'Save Saturday Planing', '<?= $result_seLogin['PersonCode'] ?>');
 
-                                
+                               
                             }
                         });
                         
                         //Save Keylocker
-                        $.ajax({
-                            type: 'post',
-                            url: 'meg_data2.php',
-                            data: {
+                        // $.ajax({
+                        //     type: 'post',
+                        //     url: 'meg_data2.php',
+                        //     data: {
 
-                                txt_flg: "save_keylocker",
-                                id:'',
-                                regisid: '',
-                                regisnumber: thainame,
-                                jobno:document.getElementById("txt_copydiagramjobnosaturday").value,
-                                keylogstatus: 'รถวิ่งงาน',
-                                datepickup: datepresent,
-                                datereturn: '' ,
-                                keypicker: employeename1,
-                                keyreturnperson: '',
-                                keylogdetail: '',
-                                keylogremark: '',
-                                createdate:'',
-                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
-                            },
-                            success: function (rs) {
+                        //         txt_flg: "save_keylocker",
+                        //         id:'',
+                        //         regisid: '',
+                        //         regisnumber: thainame,
+                        //         jobno:document.getElementById("txt_copydiagramjobnosaturday").value,
+                        //         keylogstatus: 'รถวิ่งงาน',
+                        //         datepickup: datepresent,
+                        //         datereturn: '' ,
+                        //         keypicker: employeename1,
+                        //         keyreturnperson: '',
+                        //         keylogdetail: '',
+                        //         keylogremark: '',
+                        //         createdate:'',
+                        //         createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                        //     },
+                        //     success: function (rs) {
 
-                                // alert(rs);   
-                                // alert("บันทึกข้อมูลเรียบร้อย");
-                                // window.location.reload();
-                            }
-                        });
+                        //         // alert(rs);   
+                        //         // alert("บันทึกข้อมูลเรียบร้อย");
+                        //         // window.location.reload();
+                        //     }
+                        // });
                         //End Save Keylocker
                         
 
                     }
                     if (chk_copydiagramsunday.checked == true) {
 
-                        
+                        // alert('sunday');
 
                         $.ajax({
                             type: 'post',
@@ -14344,40 +14658,41 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                             },
                             success: function () {
-                                save_logprocess('Planing', 'Save Sunday Planing', '<?= $result_seLogin['PersonCode'] ?>');
+                                // alert(rs);
+                                // save_logprocess('Planing', 'Save Sunday Planing', '<?= $result_seLogin['PersonCode'] ?>');
                                 
                                 
                             }
                         });
 
                         //Save Keylocker
-                        $.ajax({
-                            type: 'post',
-                            url: 'meg_data2.php',
-                            data: {
+                        // $.ajax({
+                        //     type: 'post',
+                        //     url: 'meg_data2.php',
+                        //     data: {
 
-                                txt_flg: "save_keylocker",
-                                id:'',
-                                regisid: '',
-                                regisnumber: thainame,
-                                jobno:document.getElementById("txt_copydiagramjobnosunday").value,
-                                keylogstatus: 'รถวิ่งงาน',
-                                datepickup: datepresent,
-                                datereturn: '' ,
-                                keypicker: employeename1,
-                                keyreturnperson: '',
-                                keylogdetail: '',
-                                keylogremark: '',
-                                createdate:'',
-                                createby: '<?= $result_seEmployee["PersonCode"] ?>'
-                            },
-                            success: function (rs) {
+                        //         txt_flg: "save_keylocker",
+                        //         id:'',
+                        //         regisid: '',
+                        //         regisnumber: thainame,
+                        //         jobno:document.getElementById("txt_copydiagramjobnosunday").value,
+                        //         keylogstatus: 'รถวิ่งงาน',
+                        //         datepickup: datepresent,
+                        //         datereturn: '' ,
+                        //         keypicker: employeename1,
+                        //         keyreturnperson: '',
+                        //         keylogdetail: '',
+                        //         keylogremark: '',
+                        //         createdate:'',
+                        //         createby: '<?= $result_seEmployee["PersonCode"] ?>'
+                        //     },
+                        //     success: function (rs) {
 
-                                // alert(rs);   
-                                // alert("บันทึกข้อมูลเรียบร้อย");
-                                // window.location.reload();
-                            }
-                        });
+                        //         // alert(rs);   
+                        //         // alert("บันทึกข้อมูลเรียบร้อย");
+                        //         // window.location.reload();
+                        //     }
+                        // });
                         //End Save Keylocker
 
                        
@@ -14402,7 +14717,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         txt_flg: "save_copyjobvehicletransportplan", JOBNO: JOBNO, ROWSAMOUNT: document.getElementById("txt_rowsamount").value
                     },
                     success: function (rs) {
-                        alert(rs);
+                        // alert(rs);
                         window.location.reload();
                     }
                 });
@@ -14513,7 +14828,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     {
                         var rs = parseInt(data) - 2;
                         rs = rs + data.substr(13, 5);
-                        alert(rs);
+                        // alert(rs);
                         document.getElementById("txt_copydiagramdatepresent").value = rs;
                     } else
                     {
