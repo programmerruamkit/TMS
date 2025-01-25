@@ -8203,6 +8203,77 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <?php
+                                }else if ($_GET['customercode'] == 'TSAT') {
+                                    ?>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ประเภทรถ :</label>
+                                        <select id="cb_copydiagramcartype" name="cb_copydiagramcartype" class="form-control">
+                                            <option value="">เลือก ประเภทรถ</option>
+                                            <?php
+                                            $condiVehicletype1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seVehicletype = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seVehicletype = array(
+                                                array('select_vehicletype', SQLSRV_PARAM_IN),
+                                                array($condiVehicletype1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seVehicletype = sqlsrv_query($conn, $sql_seVehicletype, $params_seVehicletype);
+                                            while ($result_seVehicletype = sqlsrv_fetch_array($query_seVehicletype, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seVehicletype['VEHICLETYPE'] ?>"><?= $result_seVehicletype['VEHICLETYPE'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ต้นทาง :</label>
+                                        <select id="cb_copydiagramjobstart" name="cb_copydiagramjobstart" class="form-control">
+                                            <option value="">เลือก ต้นทาง</option>
+                                            <?php
+                                            $condiFrom1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seFrom = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seFrom = array(
+                                                array('select_from', SQLSRV_PARAM_IN),
+                                                array($condiFrom1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seFrom = sqlsrv_query($conn, $sql_seFrom, $params_seFrom);
+                                            while ($result_seFrom = sqlsrv_fetch_array($query_seFrom, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seFrom['FROM'] ?>"><?= $result_seFrom['FROM'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>ปลายทาง :</label>
+                                        <select id="cb_copydiagramjobend" name="cb_copydiagramjobend" class="form-control" >
+                                            <option value="">เลือก ปลายทาง</option>
+                                            <?php
+                                            $condiTo1 = " AND COMPANYCODE = '" . $_GET['companycode'] . "' AND CUSTOMERCODE = '" . $_GET['customercode'] . "'";
+                                            $sql_seTo = "{call megVehicletransportprice_v2(?,?,?,?)}";
+                                            $params_seTo = array(
+                                                array('select_to', SQLSRV_PARAM_IN),
+                                                array($condiTo1, SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN),
+                                                array('', SQLSRV_PARAM_IN)
+                                            );
+                                            $query_seTo = sqlsrv_query($conn, $sql_seTo, $params_seTo);
+                                            while ($result_seTo = sqlsrv_fetch_array($query_seTo, SQLSRV_FETCH_ASSOC)) {
+                                                ?>
+                                                <option value="<?= $result_seTo['TO'] ?>"><?= $result_seTo['TO'] ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
                                 }
                                 else if ($_GET['customercode'] == 'TSAT') {
                                     ?>
