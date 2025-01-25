@@ -333,6 +333,9 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
             }
             /////////////////////////////////////////////////////////////////////////////
 
+            // FEEDBACK จากพนักงานลงข้อมูล อาจจะมีการลงข้อมูลที่ช้ากว่าแผนงาน จึงไม่ได้ล็อคเวลา 25/01/2025
+            // จากเดิม CHECK ใน ELSE จะเป็น NO เสมอ
+
             // CHECK การลงข้อมูล P1
             if ($result_seData['PARKINGTIME_PLAN_4HUR_P1'] != '') {
                 //CHECKTIME P1 
@@ -343,11 +346,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK4HURP1 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK4HURP1 = 'NO';
+                    $CHK4HURP1 = 'YES';
+                    //   $CHK4HURP1 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK4HURP1 = 'NO';
+                $CHK4HURP1 = 'YES';
+                //   $CHK4HURP1 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
                 
@@ -361,11 +366,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK2HURP1 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK2HURP1 = 'NO';
+                    $CHK2HURP1 = 'YES';
+                    //   $CHK2HURP1 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK2HURP1 = 'NO';
+                $CHK2HURP1 = 'YES';
+                //   $CHK2HURP1 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
             ///////////////////////////////////////////////////////////////////////////////////
@@ -380,11 +387,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK4HURP2 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK4HURP2 = 'NO';
+                    $CHK4HURP2 = 'YES';
+                    //   $CHK4HURP2 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK4HURP2 = 'NO';
+                $CHK4HURP2 = 'NO';
+                //   $CHK4HURP2 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
                 
@@ -398,11 +407,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK2HURP2 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK2HURP2 = 'NO';
+                    $CHK2HURP2 = 'YES';
+                    //   $CHK2HURP2 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK2HURP2 = 'NO';
+                $CHK2HURP2 = 'YES';
+                //   $CHK2HURP2 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
             ///////////////////////////////////////////////////////////////////////////////////
@@ -417,11 +428,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK4HURP3 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK4HURP3 = 'NO';
+                    $CHK4HURP3 = 'YES';
+                    //   $CHK4HURP3 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK4HURP3 = 'NO';
+                $CHK4HURP3 = 'YES';
+                //   $CHK4HURP3 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
                 
@@ -435,11 +448,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK2HURP3 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK2HURP3 = 'NO';
+                    $CHK2HURP3 = 'YES';
+                    //   $CHK2HURP3 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK2HURP3 = 'NO';
+                $CHK2HURP3 = 'YES';
+                //   $CHK2HURP3 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
             ///////////////////////////////////////////////////////////////////////////////////
@@ -454,11 +469,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK4HURP4 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK4HURP4 = 'NO';
+                    $CHK4HURP4 = 'YES';
+                    //   $CHK4HURP4 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK4HURP4 = 'NO';
+                $CHK4HURP4 = 'YES';
+                //   $CHK4HURP4 = 'NO'$CHK4HURP4 = 'YES';;
                 // $CHKDIS = 'disabled=""';
             }
                 
@@ -472,11 +489,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK2HURP4 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK2HURP4 = 'NO';
+                    $CHK2HURP4 = 'YES';
+                    //   $CHK2HURP4 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK2HURP4 = 'NO';
+                $CHK2HURP4 = 'YES';
+                //   $CHK2HURP4 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
             ///////////////////////////////////////////////////////////////////////////////////        
@@ -491,11 +510,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK4HURP5 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK4HURP5 = 'NO';
+                    $CHK4HURP5 = 'YES';
+                    //   $CHK4HURP5 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK4HURP5 = 'NO';
+                $CHK4HURP5 = 'YES';
+                //   $CHK4HURP5 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
                 
@@ -509,11 +530,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK2HURP5 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK2HURP5 = 'NO';
+                    $CHK2HURP5 = 'YES';
+                    //   $CHK2HURP5 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK2HURP5 = 'NO';
+                $CHK2HURP5 = 'YES';
+                //   $CHK2HURP5 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
             ///////////////////////////////////////////////////////////////////////////////////        
@@ -528,11 +551,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK4HURP6 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK4HURP6 = 'NO';
+                    $CHK4HURP6 = 'YES';
+                    //   $CHK4HURP6 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK4HURP6 = 'NO';
+                $CHK4HURP6 = 'YES';
+                //   $CHK4HURP6 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
                 
@@ -546,11 +571,13 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                       $CHK2HURP6 = 'YES';
                     // $CHKDIS = 'disabled=""';
                 }else{
-                      $CHK2HURP6 = 'NO';
+                    $CHK2HURP6 = 'YES';
+                    //   $CHK2HURP6 = 'NO';
                     // $CHKDIS = 'disabled=""';
                 }
             }else{
-                  $CHK2HURP6 = 'NO';
+                $CHK2HURP6 = 'YES';
+                //   $CHK2HURP6 = 'NO';
                 // $CHKDIS = 'disabled=""';
             }
             ///////////////////////////////////////////////////////////////////////////////////        

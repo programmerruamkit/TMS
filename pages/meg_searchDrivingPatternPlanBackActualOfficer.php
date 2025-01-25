@@ -4151,7 +4151,7 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
         // FUNCTION สำหรับปุ่ม ยืนยันข้อมูล P1
         
-        function confirmdatap1(checkClient){
+        function confirmdatap1(checkClient,chkp1){
 
             var confirmby   = $("#txt_username").val();
             var drivingpatternreturnid = '<?=$_GET['drivingbackplanid']?>';
@@ -4192,12 +4192,12 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
                     document.getElementById('txt_confirm_p1').value = myArray[0]; 
                     document.getElementById('txt_dateconfirm_p1').value = myArray[1]; 
 
-                    save_actualp1(drivingpatternreturnid,checkClient);
+                    save_actualp1(drivingpatternreturnid,checkClient,chkp1);
 
                 }
             }); 
         }
-        function save_actualp1(checkBackId,checkClient) {
+        function save_actualp1(checkBackId,checkClient,chkp1) {
             
             // alert('actual save P1');
             
@@ -4477,13 +4477,23 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
                     // alert(rs);
 
-                    swal.fire({
-                        title: "Success!",
-                        text: "ยืนยันข้อมูล (ช่วงที่1) เรียบร้อย !!!",
-                        icon: "success",
-                        showConfirmButton: true,
-                        allowOutsideClick: false,
-                    });
+                    if (chkp1 == 'CONALL') {
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });    
+                    }else{
+                        swal.fire({
+                            title: "Success!",
+                            text: "ยืนยันข้อมูล (ช่วงที่1) เรียบร้อย !!!",
+                            icon: "success",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }
 
                     
                 }
@@ -4492,7 +4502,7 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
         //////////////////////////////////////////////////////////////////////////////
 
         // FUNCTION สำหรับปุ่มยืนยันข้อมูล P2
-        function confirmdatap2(checkClient){
+        function confirmdatap2(checkClient,chkp2){
 
             var confirmby   = $("#txt_username").val();
             var drivingpatternreturnid = '<?=$_GET['drivingbackplanid']?>';
@@ -4533,11 +4543,11 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
                     document.getElementById('txt_confirm_p2').value = myArray[0]; 
                     document.getElementById('txt_dateconfirm_p2').value = myArray[1]; 
 
-                    save_actualp2(drivingpatternreturnid,checkClient);
+                    save_actualp2(drivingpatternreturnid,checkClient,chkp2);
                 }
             }); 
         }
-        function save_actualp2(checkBackId,checkClient) {
+        function save_actualp2(checkBackId,checkClient,chkp2) {
             
             // alert('actual save P2');
             
@@ -4772,13 +4782,23 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
                     // alert(rs);
 
-                    swal.fire({
-                        title: "Success!",
-                        text: "ยืนยันข้อมูล (ช่วงที่2) เรียบร้อย !!!",
-                        icon: "success",
-                        showConfirmButton: true,
-                        allowOutsideClick: false,
-                    });
+                    if (chkp2 == 'CONALL') {
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });    
+                    }else{
+                        swal.fire({
+                            title: "Success!",
+                            text: "ยืนยันข้อมูล (ช่วงที่2) เรียบร้อย !!!",
+                            icon: "success",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }
 
                     
                 }
@@ -4789,7 +4809,7 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
         //////////////////////////////////////////////////////////////////////////////
 
         // FUNCTION สำหรับปุ่มยืนยันข้อมูล P3
-        function confirmdatap3(checkClient){
+        function confirmdatap3(checkClient,chkp3){
 
             var confirmby   = $("#txt_username").val();
             var drivingpatternreturnid = '<?=$_GET['drivingbackplanid']?>';
@@ -4830,11 +4850,11 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
                     document.getElementById('txt_confirm_p3').value = myArray[0]; 
                     document.getElementById('txt_dateconfirm_p3').value = myArray[1]; 
 
-                    save_actualp3(drivingpatternreturnid,checkClient);
+                    save_actualp3(drivingpatternreturnid,checkClient,chkp3);
                 }
             }); 
         }
-        function save_actualp3(checkBackId,checkClient) {
+        function save_actualp3(checkBackId,checkClient,chkp3) {
             
             // alert('actual save P3');
             
@@ -5069,13 +5089,23 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
                     // alert(rs);
 
-                    swal.fire({
-                        title: "Success!",
-                        text: "ยืนยันข้อมูล (ช่วงที่3) เรียบร้อย !!!",
-                        icon: "success",
-                        showConfirmButton: true,
-                        allowOutsideClick: false,
-                    });
+                    if (chkp3 == 'CONALL') {
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });    
+                    }else{
+                        swal.fire({
+                            title: "Success!",
+                            text: "ยืนยันข้อมูล (ช่วงที่3) เรียบร้อย !!!",
+                            icon: "success",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }
 
                     
                 }
@@ -5084,7 +5114,7 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
         //////////////////////////////////////////////////////////////////////////////
 
         // FUNCTION สำหรับปุ่มยืนยันข้อมูล P4
-        function confirmdatap4(checkClient){
+        function confirmdatap4(checkClient,chkp4){
 
             var confirmby   = $("#txt_username").val();
             var drivingpatternreturnid = '<?=$_GET['drivingbackplanid']?>';
@@ -5125,11 +5155,11 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
                     document.getElementById('txt_confirm_p4').value = myArray[0]; 
                     document.getElementById('txt_dateconfirm_p4').value = myArray[1]; 
 
-                    save_actualp4(drivingpatternreturnid,checkClient);
+                    save_actualp4(drivingpatternreturnid,checkClient,chkp4);
                 }
             }); 
         }
-        function save_actualp4(checkGoId,checkClient) {
+        function save_actualp4(checkGoId,checkClient,chkp4) {
             
             // alert('actual save P4');
             
@@ -5363,13 +5393,23 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
                     // alert(rs);
 
-                    swal.fire({
-                        title: "Success!",
-                        text: "ยืนยันข้อมูล (ช่วงที่4) เรียบร้อย !!!",
-                        icon: "success",
-                        showConfirmButton: true,
-                        allowOutsideClick: false,
-                    });
+                    if (chkp4 == 'CONALL') {
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });    
+                    }else{
+                        swal.fire({
+                            title: "Success!",
+                            text: "ยืนยันข้อมูล (ช่วงที่4) เรียบร้อย !!!",
+                            icon: "success",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }
 
                     
                 }
@@ -5378,7 +5418,7 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
         //////////////////////////////////////////////////////////////////////////////
 
         // FUNCTION สำหรับปุ่มยืนยันข้อมูล P5
-        function confirmdatap5(checkClient){
+        function confirmdatap5(checkClient,chkp5){
 
             var confirmby   = $("#txt_username").val();
             var drivingpatternreturnid = '<?=$_GET['drivingbackplanid']?>';
@@ -5419,11 +5459,11 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
                     document.getElementById('txt_confirm_p5').value = myArray[0]; 
                     document.getElementById('txt_dateconfirm_p5').value = myArray[1]; 
 
-                    save_actualp5(drivingpatternreturnid,checkClient);
+                    save_actualp5(drivingpatternreturnid,checkClient,chkp5);
                 }
             }); 
         }
-        function save_actualp5(checkGoId,checkClient) {
+        function save_actualp5(checkGoId,checkClient,chkp5) {
             
             // alert('actual save P5');
             
@@ -5659,13 +5699,23 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
                     // alert(rs);
 
-                    swal.fire({
-                        title: "Success!",
-                        text: "ยืนยันข้อมูล (ช่วงที่5) เรียบร้อย !!!",
-                        icon: "success",
-                        showConfirmButton: true,
-                        allowOutsideClick: false,
-                    });
+                    if (chkp5 == 'CONALL') {
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });    
+                    }else{
+                        swal.fire({
+                            title: "Success!",
+                            text: "ยืนยันข้อมูล (ช่วงที่5) เรียบร้อย !!!",
+                            icon: "success",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }
 
                     
                 }
@@ -5674,7 +5724,7 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
         //////////////////////////////////////////////////////////////////////////////
 
         // FUNCTION สำหรับปุ่มยืนยันข้อมูล P6
-        function confirmdatap6(checkClient){
+        function confirmdatap6(checkClient,chkp6){
 
             var confirmby   = $("#txt_username").val();
             var drivingpatternreturnid = '<?=$_GET['drivingbackplanid']?>';
@@ -5715,11 +5765,11 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
                     document.getElementById('txt_confirm_p6').value = myArray[0]; 
                     document.getElementById('txt_dateconfirm_p6').value = myArray[1]; 
 
-                    save_actualp6(drivingpatternreturnid,checkClient);
+                    save_actualp6(drivingpatternreturnid,checkClient,chkp6);
                 }
             }); 
         }
-        function save_actualp6(checkBackId,checkClient) {
+        function save_actualp6(checkBackId,checkClient,chkp6) {
             
             // alert('actual save P6');
             
@@ -5954,13 +6004,23 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
                     // alert(rs);
 
-                    swal.fire({
-                        title: "Success!",
-                        text: "ยืนยันข้อมูล (ช่วงที่6) เรียบร้อย !!!",
-                        icon: "success",
-                        showConfirmButton: true,
-                        allowOutsideClick: false,
-                    });
+                    if (chkp6 == 'CONALL') {
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });    
+                    }else{
+                        swal.fire({
+                            title: "Success!",
+                            text: "ยืนยันข้อมูล (ช่วงที่1) เรียบร้อย !!!",
+                            icon: "success",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }
 
                     
                 }
@@ -5968,7 +6028,7 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
         }
         //////////////////////////////////////////////////////////////////////////////
 
-        function confirmdataactualload(checkClient){
+        function confirmdataactualload(checkClient,chkallload){
 
             var confirmby   = $("#txt_username").val();
             var drivingpatternreturnid = '<?=$_GET['drivingbackplanid']?>';
@@ -6010,11 +6070,11 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
                     document.getElementById('txt_confirm_actualload').value = myArray[0]; 
                     document.getElementById('txt_dateconfirm_actualload').value = myArray[1]; 
 
-                    save_actualload(drivingpatternreturnid,checkClient);
+                    save_actualload(drivingpatternreturnid,checkClient,chkallload);
                 }
             }); 
         }
-        function save_actualload(checkBackId,checkClient) {
+        function save_actualload(checkBackId,checkClient,chkallload) {
             
             // alert('actual save actual load');
             
@@ -6187,13 +6247,23 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
 
                     // alert(rs);
 
-                    swal.fire({
-                        title: "Success!",
-                        text: "ลงข้อมูลโหลดรถลง เรียบร้อย !!!",
-                        icon: "success",
-                        showConfirmButton: true,
-                        allowOutsideClick: false,
-                    });
+                    if (chkallload == 'CONALL') {
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });    
+                    }else{
+                        swal.fire({
+                            title: "Success!",
+                            text: "ยืนยันข้อมูลขากลับทั้งหมด เรียบร้อย !!!",
+                            icon: "success",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        }); 
+                    }
 
                     
                 }
@@ -6208,137 +6278,269 @@ $result_seEmpchk = sqlsrv_fetch_array($query_seEmpchk, SQLSRV_FETCH_ASSOC);
             // alert(drivingpatterngoid);
             // alert(confirmby);
 
-            if ($("#txt_confirm_p1").val() == '' || $("#txt_dateconfirm_p1").val() == '') {
+            // if ($("#txt_confirm_p1").val() == '' || $("#txt_dateconfirm_p1").val() == '') {
                 
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่1)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่1)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
 
-            }else if(($("#txt_drivernameplan_p2").val() != '') && ($("#txt_confirm_p2").val() == '' || $("#txt_dateconfirm_p2").val() == '')){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่2)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(($("#txt_drivernameplan_p3").val() != '') && ($("#txt_confirm_p3").val() == '' || $("#txt_dateconfirm_p3").val() == '')){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่3)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(($("#txt_drivernameplan_p4").val() != '') && ($("#txt_confirm_p4").val() == '' || $("#txt_dateconfirm_p4").val() == '')){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่4)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(($("#txt_drivernameplan_p5").val() != '') && ($("#txt_confirm_p5").val() == '' || $("#txt_dateconfirm_p5").val() == '')){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่5)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(($("#txt_drivernameplan_p6").val() != '') && ($("#txt_confirm_p6").val() == '' || $("#txt_dateconfirm_p6").val() == '')){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่6)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if($("#txt_confirm_actualload").val() == '' || $("#txt_dateconfirm_actualload").val() == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการยืนยันข้อมูล (โหลดรถลง)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if($("#txt_parkingtimedealer1plan").val() == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบเวลาจอดแผนขากลับ",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if($("#txt_dealer2plan").val() != '' && $("#txt_sumtimedealer2plan").val() == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการคำนวณเวลาแผนขากลับ (VL)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if($("#txt_parkingtimedealer1actual").val() == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบเวลาจอดวิ่งจริงขากลับ",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if($("#txt_dealer2actual").val() != '' && $("#txt_sumtimedealer2actual").val() == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "กรุณาตรวจสอบการคำนวณเวลาวิ่งจริงขากลับ (VL)",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else{
+            // }else if(($("#txt_drivernameplan_p2").val() != '') && ($("#txt_confirm_p2").val() == '' || $("#txt_dateconfirm_p2").val() == '')){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่2)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(($("#txt_drivernameplan_p3").val() != '') && ($("#txt_confirm_p3").val() == '' || $("#txt_dateconfirm_p3").val() == '')){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่3)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(($("#txt_drivernameplan_p4").val() != '') && ($("#txt_confirm_p4").val() == '' || $("#txt_dateconfirm_p4").val() == '')){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่4)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(($("#txt_drivernameplan_p5").val() != '') && ($("#txt_confirm_p5").val() == '' || $("#txt_dateconfirm_p5").val() == '')){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่5)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(($("#txt_drivernameplan_p6").val() != '') && ($("#txt_confirm_p6").val() == '' || $("#txt_dateconfirm_p6").val() == '')){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการยืนยันข้อมูล (ช่วงที่6)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if($("#txt_confirm_actualload").val() == '' || $("#txt_dateconfirm_actualload").val() == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการยืนยันข้อมูล (โหลดรถลง)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if($("#txt_parkingtimedealer1plan").val() == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบเวลาจอดแผนขากลับ",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if($("#txt_dealer2plan").val() != '' && $("#txt_sumtimedealer2plan").val() == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการคำนวณเวลาแผนขากลับ (VL)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if($("#txt_parkingtimedealer1actual").val() == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบเวลาจอดวิ่งจริงขากลับ",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if($("#txt_dealer2actual").val() != '' && $("#txt_sumtimedealer2actual").val() == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "กรุณาตรวจสอบการคำนวณเวลาวิ่งจริงขากลับ (VL)",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else{
                 
-                $.ajax({
-                    type: 'post',
-                    url: 'meg_data_drivingpattern_officer.php',
-                    data: {
-                        txt_flg: "confirm_actual_back",
-                        employeecode:'',
-                        condition1:drivingpatternbackid ,
-                        condition2:confirmby,
-                        condition3:'',
-                        condition4:'',
-                        condition5:'',
-                    },
-                    success: function (rs) {
-                        // alert(chkid);
-                        // select_searchDrivingPattern(checkdata,chkid,employeecode)
+                    $.ajax({
+                        type: 'post',
+                        url: 'meg_data_drivingpattern_officer.php',
+                        data: {
+                            txt_flg: "confirm_actual_back",
+                            employeecode:'',
+                            condition1:drivingpatternbackid ,
+                            condition2:confirmby,
+                            condition3:'',
+                            condition4:'',
+                            condition5:'',
+                        },
+                        success: function (rs) {
+                            // alert(chkid);
+                            // select_searchDrivingPattern(checkdata,chkid,employeecode)
 
-                        alert(rs);
+                            // alert(rs);
 
+                            // swal.fire({
+                            //     title: "Success!",
+                            //     text: "ลงข้อมูลโหลดรถลง เรียบร้อย !!!",
+                            //     icon: "success",
+                            //     showConfirmButton: true,
+                            //     allowOutsideClick: false,
+                            // });
+
+                            let text = rs;
+                            const myArray = text.split("|");
+
+                            
+                            // alert(replacetext); 
+                            document.getElementById('txt_officerconfirm').value = myArray[0]; 
+                            document.getElementById('txt_datetimeofficerconfirm').value = myArray[1]; 
+
+                            
+                        }
+                    }); 
+
+                    // P1
+                    if (($("#txt_drivernameplan_p1").val() != '') && ($("#txt_drivernameactual_p1").val() != '')) {
+                        // alert('P1');
+
+                        confirmdatap1('<?=$checkClient?>','CONALL');
+                    }else if (($("#txt_drivernameplan_p1").val() != '') && ($("#txt_drivernameactual_p1").val() == '')){
                         swal.fire({
-                            title: "Success!",
-                            text: "ลงข้อมูลโหลดรถลง เรียบร้อย !!!",
-                            icon: "success",
+                            title: "Warning!",
+                            text: "กรุณาตรวจสอบข้อมูลช่วงที่ 1",
+                            icon: "warning",
                             showConfirmButton: true,
                             allowOutsideClick: false,
                         });
-
-                        let text = rs;
-                        const myArray = text.split("|");
-
-                        
-                        // alert(replacetext); 
-                        document.getElementById('txt_officerconfirm').value = myArray[0]; 
-                        document.getElementById('txt_datetimeofficerconfirm').value = myArray[1]; 
-
+                    }else{
                         
                     }
-                }); 
 
-            }
+                    // P2
+                    if (($("#txt_drivernameplan_p2").val() != '') && ($("#txt_drivernameactual_p2").val() != '')) {
+                        // alert('P2');
+
+                        confirmdatap2('<?=$checkClient?>','CONALL');
+                    }else if (($("#txt_drivernameplan_p2").val() != '') && ($("#txt_drivernameactual_p2").val() == '')){
+                        swal.fire({
+                            title: "Warning!",
+                            text: "กรุณาตรวจสอบข้อมูลช่วงที่ 2",
+                            icon: "warning",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }else{
+                        
+                    }
+
+                    // P3
+                    if (($("#txt_drivernameplan_p3").val() != '') && ($("#txt_drivernameactual_p3").val() != '')) {
+                        // alert('P3');
+
+                        confirmdatap3('<?=$checkClient?>','CONALL');
+                    }else if (($("#txt_drivernameplan_p3").val() != '') && ($("#txt_drivernameactual_p3").val() == '')){
+                        swal.fire({
+                            title: "Warning!",
+                            text: "กรุณาตรวจสอบข้อมูลช่วงที่ 3",
+                            icon: "warning",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }else{
+                        
+                    }
+
+                    // P4
+                    if (($("#txt_drivernameplan_p4").val() != '') && ($("#txt_drivernameactual_p4").val() != '')) {
+                        // alert('P4');
+
+                        confirmdatap4('<?=$checkClient?>','CONALL');
+                    }else if (($("#txt_drivernameplan_p4").val() != '') && ($("#txt_drivernameactual_p4").val() == '')){
+                        swal.fire({
+                            title: "Warning!",
+                            text: "กรุณาตรวจสอบข้อมูลช่วงที่ 4",
+                            icon: "warning",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }else{
+                        
+                    }
+
+                    // P5
+                    if (($("#txt_drivernameplan_p5").val() != '') && ($("#txt_drivernameactual_p5").val() != '')) {
+                        // alert('P5');
+
+                        confirmdatap5('<?=$checkClient?>','CONALL');
+                    }else if (($("#txt_drivernameplan_p5").val() != '') && ($("#txt_drivernameactual_p5").val() == '')){
+                        swal.fire({
+                            title: "Warning!",
+                            text: "กรุณาตรวจสอบข้อมูลช่วงที่ 5",
+                            icon: "warning",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }else{
+                        
+                    }
+
+                    // P6
+                    if (($("#txt_drivernameplan_p6").val() != '') && ($("#txt_drivernameactual_p6").val() != '')) {
+                        // alert('p6');
+
+                        confirmdatap6('<?=$checkClient?>','CONALL');
+                    }else if (($("#txt_drivernameplan_p6").val() != '') && ($("#txt_drivernameactual_p6").val() == '')){
+                        swal.fire({
+                            title: "Warning!",
+                            text: "กรุณาตรวจสอบข้อมูลช่วงที่ 6",
+                            icon: "warning",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }else{
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });   
+                    }
+
+                    // ALL LOAD
+                    if (($("#txt_parkingtimedealer1plan").val() != '') && ($("#txt_parkingtimedealer1actual").val() != '')) {
+                        // alert('p6');
+
+                        confirmdataactualload('<?=$checkClient?>','CONALL');
+                    }else if (($("#txt_parkingtimedealer1plan").val() != '') && ($("#txt_parkingtimedealer1actual").val() == '')){
+                        swal.fire({
+                            title: "Warning!",
+                            text: "กรุณาตรวจสอบข้อมูลโหลดรถลง(วิ่งจริงขากลับ)",
+                            icon: "warning",
+                            showConfirmButton: true,
+                            allowOutsideClick: false,
+                        });
+                    }else{
+                        // swal.fire({
+                        //     title: "Success!",
+                        //     text: "ยืนยันข้อมูลขาไปทั้งหมด เรียบร้อย !!!",
+                        //     icon: "success",
+                        //     showConfirmButton: true,
+                        //     allowOutsideClick: false,
+                        // });   
+                    }
+
+
+            // }
 
 
         }
