@@ -13298,7 +13298,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
                             materialtype = '';
                             goreturn = '';
-                            roundamount = document.getElementById("txt_roundamount").value;
+                            //roundamount = document.getElementById("txt_roundamount").value;
                         } else if ('<?= $_GET['customercode'] ?>' == 'TTAT')
                         {
                             vehicletype = document.getElementById("cb_copydiagramcartype").value;
