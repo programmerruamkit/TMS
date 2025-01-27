@@ -307,7 +307,7 @@
                                  $JOBONE=='GMT 2->NTS,ICP1' ||$JOBONE=='GMT 2->NTS,ICP2'||$JOBONE=='GMT 2->NTS,GJ' ||$JOBONE=='GMT 2->NTS,KIRIU' ||
                                  $JOBONE=='GMT 2->GJ,ICP1'  ||$JOBONE=='GMT 2->GJ,ICP2' ||$JOBONE=='GMT 2->GJ,NTS' ||$JOBONE=='GMT 2->GJ,KIRIU'  ||
                                  $JOBONE=='GMT 2->ICP1'     ||$JOBONE=='GMT 2->ICP2'    ||$JOBONE=='GMT 2->NTS'    ||$JOBONE=='GMT 2->GJ'        ||
-                                 $JOBONE=='GMT 2->KIRIU'    ||$JOBONE=='GMT 2->KIRIU กรณีตีเปล่า'  ||$JOBONE=='GMT 2->TSMT สระบุรี'  ||$JOBONE=='GMT 2->KIRIU กรณีตีเปล่า'){
+                                 $JOBONE=='GMT 2->KIRIU'    ||$JOBONE=='GMT 2->KIRIU กรณีตีเปล่า'  ||$JOBONE=='GMT 2->TSMT สระบุรี'  ||$JOBONE=='GMT 2->GJ กรณีตีเปล่า'){
                                 // }else if($JOBONE=='GMT 2->ICP1'||$JOBONE=='GMT 2->ICP2'||$JOBONE=='GMT 2->NTS'||$JOBONE=='GMT 2->GJ'||$JOBONE=='GMT 2->KIRIU'||
                                 //          $JOBTWO=='GMT 2->ICP1'||$JOBTWO=='GMT 2->ICP2'||$JOBTWO=='GMT 2->NTS'||$JOBTWO=='GMT 2->GJ'||$JOBTWO=='GMT 2->KIRIU'){
                             $MONEYTOTAL='0';   
