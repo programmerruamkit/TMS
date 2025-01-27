@@ -404,17 +404,17 @@ if ($_POST['txt_flg'] == "select_compensation") {
                                 }
                             </script>
                         <?php }else{ ?>
-                            <td style="width: 100px"><?= $result_seVehicletransportplanadmin['EMPLOYEECODE1'] ?></td>
-                            <td style="width: 200px"><?= $result_seVehicletransportplanadmin['EMPLOYEENAME1'] ?></td>
-                            <td style="width: 100px"><?= $result_seVehicletransportplanadmin['EMPLOYEECODE2'] ?></td>
-                            <td style="width: 200px"><?= $result_seVehicletransportplanadmin['EMPLOYEENAME2'] ?></td>
+                            <td style="width: 100px"><?= $result_seVehicletransportplan['EMPLOYEECODE1'] ?></td>
+                            <td style="width: 200px"><?= $result_seVehicletransportplan['EMPLOYEENAME1'] ?></td>
+                            <td style="width: 100px"><?= $result_seVehicletransportplan['EMPLOYEECODE2'] ?></td>
+                            <td style="width: 200px"><?= $result_seVehicletransportplan['EMPLOYEENAME2'] ?></td>
                             
                             <!-- พขร.3 แสดงเฉพาะ  SKB-->
                             <?php
-                            if ($result_seVehicletransportplanadmin['COMPANYCODE'] == 'RKL' && $result_seVehicletransportplanadmin['CUSTOMERCODE'] == 'SKB') {
+                            if ($result_seVehicletransportplan['COMPANYCODE'] == 'RKL' && $result_seVehicletransportplan['CUSTOMERCODE'] == 'SKB') {
                             ?>
-                                <td style="width: 100px"><?= $result_seVehicletransportplanadmin['EMPLOYEECODE3'] ?></td>
-                                <td style="width: 200px"><?= $result_seVehicletransportplanadmin['EMPLOYEENAME3'] ?></td>
+                                <td style="width: 100px"><?= $result_seVehicletransportplan['EMPLOYEECODE3'] ?></td>
+                                <td style="width: 200px"><?= $result_seVehicletransportplan['EMPLOYEENAME3'] ?></td>
                             <?php
                             }else{
                             ?>
