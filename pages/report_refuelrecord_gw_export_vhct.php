@@ -119,7 +119,7 @@ if ($EXCELVHCT != "") {
         // OPEN SECTION
             $detail="รายงานเติมน้ำมันแยกประเภท (GW)";
 
-            $objPHPExcel->getActiveSheet()->mergeCells('A1:W1');
+            $objPHPExcel->getActiveSheet()->mergeCells('A1:AB1');
             $sheet = $objPHPExcel->getActiveSheet();$sheet->setCellValueByColumnAndRow(0, 1, $detail);$sheet->mergeCells('A1:R3');$objPHPExcel->getActiveSheet()->getStyle('A1:S3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
             
             $objDrawing = new PHPExcel_Worksheet_HeaderFooterDrawing();
@@ -144,20 +144,21 @@ if ($EXCELVHCT != "") {
             ->setCellValue('M3', 'ไมล์ต้น')
             ->setCellValue('N3', 'ไมล์ปลาย')
             ->setCellValue('O3', 'ระยะทาง')
-            ->setCellValue('P3', 'มาตรฐานเรท : ค่าเฉลี่ยที่ได้')
-            ->setCellValue('Q3', 'ต้นทาง')
-            ->setCellValue('R3', 'เส้นทาง')
-            ->setCellValue('S3', 'รอบวิ่งงาน')
-            ->setCellValue('T3', 'ประเภทงาน')
-            ->setCellValue('U3', 'พขร.1')
-            ->setCellValue('U4', 'รหัส')
-            ->setCellValue('V4', 'ชื่อ-สกุล')
-            ->setCellValue('W3', 'พขร.2')
-            ->setCellValue('W4', 'รหัส')
-            ->setCellValue('X4', 'ชื่อ-สกุล')
-            ->setCellValue('Y3', 'เลข JOB จากแผน')
-            ->setCellValue('Z3', 'เลข JOB จากน้ำมัน')
-            ->setCellValue('AA3', 'หมายเหตุ');
+            ->setCellValue('P3', 'ค่าเฉลี่ยที่ได้')
+            ->setCellValue('Q3', 'มาตรฐานเรท')
+            ->setCellValue('R3', 'ต้นทาง')
+            ->setCellValue('S3', 'เส้นทาง')
+            ->setCellValue('T3', 'รอบวิ่งงาน')
+            ->setCellValue('U3', 'ประเภทงาน')
+            ->setCellValue('V3', 'พขร.1')
+            ->setCellValue('V4', 'รหัส')
+            ->setCellValue('W4', 'ชื่อ-สกุล')
+            ->setCellValue('X3', 'พขร.2')
+            ->setCellValue('X4', 'รหัส')
+            ->setCellValue('Y4', 'ชื่อ-สกุล')
+            ->setCellValue('Z3', 'เลข JOB จากแผน')
+            ->setCellValue('AA3', 'เลข JOB จากน้ำมัน')
+            ->setCellValue('AB3', 'หมายเหตุ');
             $objPHPExcel->getActiveSheet()->mergeCells('A3:A4');
             $objPHPExcel->getActiveSheet()->mergeCells('B3:B4');
             $objPHPExcel->getActiveSheet()->mergeCells('C3:C4');
@@ -178,22 +179,23 @@ if ($EXCELVHCT != "") {
             $objPHPExcel->getActiveSheet()->mergeCells('R3:R4');
             $objPHPExcel->getActiveSheet()->mergeCells('S3:S4');
             $objPHPExcel->getActiveSheet()->mergeCells('T3:T4');  
-            $objPHPExcel->getActiveSheet()->mergeCells('U3:V3');  
-            $objPHPExcel->getActiveSheet()->mergeCells('W3:X3');   
-            $objPHPExcel->getActiveSheet()->mergeCells('Y3:Y4');   
-            $objPHPExcel->getActiveSheet()->mergeCells('Z3:Z4');  
-            $objPHPExcel->getActiveSheet()->mergeCells('AA3:AA4');   
+            $objPHPExcel->getActiveSheet()->mergeCells('U3:U4');  
+            $objPHPExcel->getActiveSheet()->mergeCells('V3:W3');  
+            $objPHPExcel->getActiveSheet()->mergeCells('X3:Y3');   
+            $objPHPExcel->getActiveSheet()->mergeCells('Z3:Z4');   
+            $objPHPExcel->getActiveSheet()->mergeCells('AA3:AA4');  
+            $objPHPExcel->getActiveSheet()->mergeCells('AB3:AB4');   
             
-            $sheet->getStyle("A3:T4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("U3:X3")->applyFromArray(array('borders' => array('top' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("V3:V4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("X3:X4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("U4:X4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("Y3:AA4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-        
-            $sheet->getStyle('A3:Z4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => '9ACD32'))));
-            $sheet->getStyle('AA3:AA4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FF8C00'))));
-            $objPHPExcel->getActiveSheet()->getStyle('A3:AA4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $sheet->getStyle("A3:U4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("V3:Y3")->applyFromArray(array('borders' => array('top' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("W3:W4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("Y3:Y4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("V4:Y4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("Z3:AB4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+
+            $sheet->getStyle('A3:AA4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => '9ACD32'))));
+            $sheet->getStyle('AB3:AB4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FF8C00'))));
+            $objPHPExcel->getActiveSheet()->getStyle('A3:AB4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             $sheet->getColumnDimension('A')->setWidth(5);
             $sheet->getColumnDimension('B')->setWidth(12);
             $sheet->getColumnDimension('C')->setWidth(12);
@@ -209,25 +211,26 @@ if ($EXCELVHCT != "") {
             $sheet->getColumnDimension('M')->setWidth(12);
             $sheet->getColumnDimension('N')->setWidth(12);
             $sheet->getColumnDimension('O')->setWidth(12);
-            $sheet->getColumnDimension('P')->setWidth(21);
-            $sheet->getColumnDimension('Q')->setWidth(20);
+            $sheet->getColumnDimension('P')->setWidth(12);
+            $sheet->getColumnDimension('Q')->setWidth(12);
             $sheet->getColumnDimension('R')->setWidth(20);
-            $sheet->getColumnDimension('S')->setWidth(12);
+            $sheet->getColumnDimension('S')->setWidth(20);
             $sheet->getColumnDimension('T')->setWidth(12);
-            $sheet->getColumnDimension('U')->setWidth(8);
-            $sheet->getColumnDimension('V')->setWidth(20);
-            $sheet->getColumnDimension('W')->setWidth(8);
-            $sheet->getColumnDimension('X')->setWidth(20);
+            $sheet->getColumnDimension('U')->setWidth(12);
+            $sheet->getColumnDimension('V')->setWidth(8);
+            $sheet->getColumnDimension('W')->setWidth(20);
+            $sheet->getColumnDimension('X')->setWidth(8);
             $sheet->getColumnDimension('Y')->setWidth(20);
             $sheet->getColumnDimension('Z')->setWidth(20);
-            $sheet->getColumnDimension('AA')->setWidth(50);
+            $sheet->getColumnDimension('AA')->setWidth(20);
+            $sheet->getColumnDimension('AB')->setWidth(50);
             
             $sheet->getStyle("H5:K500")->getNumberFormat()->setFormatCode('0.00'); 
             $objPHPExcel->getActiveSheet()->getStyle('A:G')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('H:O')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle('P:T')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle('Y:Z')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-
+            $objPHPExcel->getActiveSheet()->getStyle('P:U')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle('Z:AB')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+  
             $stmm1 = "SELECT * FROM vwRPRFE_VHCT_GW_RCCRATC WHERE REFUELINGDATE BETWEEN '$startymd' AND '$endymd' ORDER BY REFUEL ASC";
             $querystmm1 = sqlsrv_query($conn, $stmm1 );
             $i = 5;
@@ -325,23 +328,28 @@ if ($EXCELVHCT != "") {
                 $objPHPExcel->getActiveSheet()->setCellValue('M' . $i, $MST);
                 $objPHPExcel->getActiveSheet()->setCellValue('N' . $i, $MLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('O' . $i, $DTE);
-                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $OTG.' : '.$CALOAVG);
-                $objPHPExcel->getActiveSheet()->setCellValue('Q' . $i, $JOBSTART);
-                $objPHPExcel->getActiveSheet()->setCellValue('R' . $i, $JOBEND);
-                $objPHPExcel->getActiveSheet()->setCellValue('S' . $i, $ROUNDAMOUNT);
-                $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, $WORKTYPE);
-                $objPHPExcel->getActiveSheet()->setCellValue('U' . $i, $EMP1);
-                $objPHPExcel->getActiveSheet()->setCellValue('V' . $i, $EMPN1);
-                $objPHPExcel->getActiveSheet()->setCellValue('W' . $i, $EMP2);
-                $objPHPExcel->getActiveSheet()->setCellValue('X' . $i, $EMPN2);
-                $objPHPExcel->getActiveSheet()->setCellValue('Y' . $i, $JNPLAN);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z' . $i, $JNOIL);
-                $objPHPExcel->getActiveSheet()->setCellValue('AA' . $i, $REMARK.$RSREMARK);
+                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $CALOAVG);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q' . $i, $OTG);
+                $objPHPExcel->getActiveSheet()->setCellValue('R' . $i, $JOBSTART);
+                $objPHPExcel->getActiveSheet()->setCellValue('S' . $i, $JOBEND);
+                $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, $ROUNDAMOUNT);
+                $objPHPExcel->getActiveSheet()->setCellValue('U' . $i, $WORKTYPE);
+                $objPHPExcel->getActiveSheet()->setCellValue('V' . $i, $EMP1);
+                $objPHPExcel->getActiveSheet()->setCellValue('W' . $i, $EMPN1);
+                $objPHPExcel->getActiveSheet()->setCellValue('X' . $i, $EMP2);
+                $objPHPExcel->getActiveSheet()->setCellValue('Y' . $i, $EMPN2);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z' . $i, $JNPLAN);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA' . $i, $JNOIL);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB' . $i, $REMARK.$RSREMARK);
+
+                $objPHPExcel->getActiveSheet()->getStyle('P' . $i)->getFont()->getColor()->setRGB('FF0000'); // สีน้ำเงินสำหรับ $CALOAVG
+                $objPHPExcel->getActiveSheet()->getStyle('Q' . $i)->getFont()->getColor()->setRGB('0000FF'); // สีน้ำเงินสำหรับ $OTG
+              
             $i++;
             }                    
             $objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':G'.$i);
             $objPHPExcel->getActiveSheet()->mergeCells('M'.$i.':N'.$i);
-            $objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':AA'.$i);
+            $objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':AB'.$i);
             $objPHPExcel->getActiveSheet()->setCellValue('A' . $i, 'รวม');
             $objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setBold( true );                    
             $sheet->getStyle('H'.$i.':P'.$i)->getNumberFormat()->setFormatCode('0.00');
@@ -355,8 +363,8 @@ if ($EXCELVHCT != "") {
             $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, '=O'.$i.'/K'.$i);           
 
             $objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $sheet->getStyle('A5:AA'.$i)->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle('A'.$i.':AA'.$i)->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FFFF99'))));
+            $sheet->getStyle('A5:AB'.$i)->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle('A'.$i.':AB'.$i)->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FFFF99'))));
         // CLOSE SECTION 
         $objPHPExcel->getActiveSheet()->setTitle('RCC-RATC');
 
@@ -367,7 +375,7 @@ if ($EXCELVHCT != "") {
         // OPEN SECTION
             $detail="รายงานเติมน้ำมันแยกประเภท (GW)";
 
-            $objPHPExcel->getActiveSheet()->mergeCells('A1:V1');
+            $objPHPExcel->getActiveSheet()->mergeCells('A1:AA1');
             $sheet = $objPHPExcel->getActiveSheet();$sheet->setCellValueByColumnAndRow(0, 1, $detail);$sheet->mergeCells('A1:R3');$objPHPExcel->getActiveSheet()->getStyle('A1:S3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
             
             $objDrawing = new PHPExcel_Worksheet_HeaderFooterDrawing();
@@ -392,19 +400,20 @@ if ($EXCELVHCT != "") {
             ->setCellValue('M3', 'ไมล์ต้น')
             ->setCellValue('N3', 'ไมล์ปลาย')
             ->setCellValue('O3', 'ระยะทาง')
-            ->setCellValue('P3', 'มาตรฐานเรท : ค่าเฉลี่ยที่ได้')
-            ->setCellValue('Q3', 'ต้นทาง')
-            ->setCellValue('R3', 'เส้นทาง')
-            ->setCellValue('S3', 'รอบวิ่งงาน')
-            ->setCellValue('T3', 'พขร.1')
-            ->setCellValue('T4', 'รหัส')
-            ->setCellValue('U4', 'ชื่อ-สกุล')
-            ->setCellValue('V3', 'พขร.2')
-            ->setCellValue('V4', 'รหัส')
-            ->setCellValue('W4', 'ชื่อ-สกุล')
-            ->setCellValue('X3', 'เลข JOB จากแผน')
-            ->setCellValue('Y3', 'เลข JOB จากน้ำมัน')
-            ->setCellValue('Z3', 'หมายเหตุ');
+            ->setCellValue('P3', 'ค่าเฉลี่ยที่ได้')
+            ->setCellValue('Q3', 'มาตรฐานเรท')
+            ->setCellValue('R3', 'ต้นทาง')
+            ->setCellValue('S3', 'เส้นทาง')
+            ->setCellValue('T3', 'รอบวิ่งงาน')
+            ->setCellValue('U3', 'พขร.1')
+            ->setCellValue('U4', 'รหัส')
+            ->setCellValue('V4', 'ชื่อ-สกุล')
+            ->setCellValue('W3', 'พขร.2')
+            ->setCellValue('W4', 'รหัส')
+            ->setCellValue('X4', 'ชื่อ-สกุล')
+            ->setCellValue('Y3', 'เลข JOB จากแผน')
+            ->setCellValue('Z3', 'เลข JOB จากน้ำมัน')
+            ->setCellValue('AA3', 'หมายเหตุ');
             $objPHPExcel->getActiveSheet()->mergeCells('A3:A4');
             $objPHPExcel->getActiveSheet()->mergeCells('B3:B4');
             $objPHPExcel->getActiveSheet()->mergeCells('C3:C4');
@@ -424,22 +433,23 @@ if ($EXCELVHCT != "") {
             $objPHPExcel->getActiveSheet()->mergeCells('Q3:Q4');
             $objPHPExcel->getActiveSheet()->mergeCells('R3:R4');
             $objPHPExcel->getActiveSheet()->mergeCells('S3:S4');
-            $objPHPExcel->getActiveSheet()->mergeCells('T3:U3');  
-            $objPHPExcel->getActiveSheet()->mergeCells('V3:W3');   
-            $objPHPExcel->getActiveSheet()->mergeCells('X3:X4');   
-            $objPHPExcel->getActiveSheet()->mergeCells('Y3:Y4');  
-            $objPHPExcel->getActiveSheet()->mergeCells('Z3:Z4');
+            $objPHPExcel->getActiveSheet()->mergeCells('T3:T4');
+            $objPHPExcel->getActiveSheet()->mergeCells('U3:V3');  
+            $objPHPExcel->getActiveSheet()->mergeCells('W3:X3');   
+            $objPHPExcel->getActiveSheet()->mergeCells('Y3:Y4');   
+            $objPHPExcel->getActiveSheet()->mergeCells('Z3:Z4');  
+            $objPHPExcel->getActiveSheet()->mergeCells('AA3:AA4');
             
-            $sheet->getStyle("A3:S4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("T3:W3")->applyFromArray(array('borders' => array('top' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("U3:U4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("W3:W4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("T4:W4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle("X3:Z4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("A3:T4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("U3:X3")->applyFromArray(array('borders' => array('top' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("V3:V4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("X3:X4")->applyFromArray(array('borders' => array('right' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("U4:X4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle("Y3:Y4")->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
         
-            $sheet->getStyle('A3:Y4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => '9ACD32'))));
-            $sheet->getStyle('Z3:Z4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FF8C00'))));
-            $objPHPExcel->getActiveSheet()->getStyle('A3:Z4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('A3:Z4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => '9ACD32'))));
+            $sheet->getStyle('AA3:AA4')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FF8C00'))));
+            $objPHPExcel->getActiveSheet()->getStyle('A3:AA4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             $sheet->getColumnDimension('A')->setWidth(5);
             $sheet->getColumnDimension('B')->setWidth(12);
             $sheet->getColumnDimension('C')->setWidth(12);
@@ -455,23 +465,24 @@ if ($EXCELVHCT != "") {
             $sheet->getColumnDimension('M')->setWidth(12);
             $sheet->getColumnDimension('N')->setWidth(12);
             $sheet->getColumnDimension('O')->setWidth(12);
-            $sheet->getColumnDimension('P')->setWidth(21);
-            $sheet->getColumnDimension('Q')->setWidth(20);
+            $sheet->getColumnDimension('P')->setWidth(12);
+            $sheet->getColumnDimension('Q')->setWidth(12);
             $sheet->getColumnDimension('R')->setWidth(20);
-            $sheet->getColumnDimension('S')->setWidth(12);
-            $sheet->getColumnDimension('T')->setWidth(8);
-            $sheet->getColumnDimension('U')->setWidth(20);
-            $sheet->getColumnDimension('V')->setWidth(8);
-            $sheet->getColumnDimension('W')->setWidth(20);
+            $sheet->getColumnDimension('S')->setWidth(20);
+            $sheet->getColumnDimension('T')->setWidth(12);
+            $sheet->getColumnDimension('U')->setWidth(8);
+            $sheet->getColumnDimension('V')->setWidth(20);
+            $sheet->getColumnDimension('W')->setWidth(8);
             $sheet->getColumnDimension('X')->setWidth(20);
             $sheet->getColumnDimension('Y')->setWidth(20);
-            $sheet->getColumnDimension('Z')->setWidth(50);
+            $sheet->getColumnDimension('Z')->setWidth(20);
+            $sheet->getColumnDimension('AA')->setWidth(50);
             
             $sheet->getStyle("H5:K500")->getNumberFormat()->setFormatCode('0.00'); 
             $objPHPExcel->getActiveSheet()->getStyle('A:G')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('H:O')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle('P:S')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle('X:Y')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle('P:T')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle('Y:Z')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
             $stmm2 = "SELECT * FROM vwRPRFE_VHCT_GW_RRC WHERE REFUELINGDATE BETWEEN '$startymd' AND '$endymd' ORDER BY REFUEL ASC";
                     // ORDER BY VHCTPP.VEHICLETYPE,VHCTPP.EMPLOYEECODE1 ASC";
@@ -571,22 +582,27 @@ if ($EXCELVHCT != "") {
                 $objPHPExcel->getActiveSheet()->setCellValue('M' . $i, $MST);
                 $objPHPExcel->getActiveSheet()->setCellValue('N' . $i, $MLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('O' . $i, $DTE);
-                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $OTG.' : '.$CALOAVG);
-                $objPHPExcel->getActiveSheet()->setCellValue('Q' . $i, $JOBSTART);
-                $objPHPExcel->getActiveSheet()->setCellValue('R' . $i, $JOBEND);
-                $objPHPExcel->getActiveSheet()->setCellValue('S' . $i, $ROUNDAMOUNT);
-                $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, $EMP1);
-                $objPHPExcel->getActiveSheet()->setCellValue('U' . $i, $EMPN1);
-                $objPHPExcel->getActiveSheet()->setCellValue('V' . $i, $EMP2);
-                $objPHPExcel->getActiveSheet()->setCellValue('W' . $i, $EMPN2);
-                $objPHPExcel->getActiveSheet()->setCellValue('X' . $i, $JNPLAN);
-                $objPHPExcel->getActiveSheet()->setCellValue('Y' . $i, $JNOIL);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z' . $i, $REMARK.$RSREMARK);
+                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $CALOAVG);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q' . $i, $OTG);
+                $objPHPExcel->getActiveSheet()->setCellValue('R' . $i, $JOBSTART);
+                $objPHPExcel->getActiveSheet()->setCellValue('S' . $i, $JOBEND);
+                $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, $ROUNDAMOUNT);
+                $objPHPExcel->getActiveSheet()->setCellValue('U' . $i, $EMP1);
+                $objPHPExcel->getActiveSheet()->setCellValue('V' . $i, $EMPN1);
+                $objPHPExcel->getActiveSheet()->setCellValue('W' . $i, $EMP2);
+                $objPHPExcel->getActiveSheet()->setCellValue('X' . $i, $EMPN2);
+                $objPHPExcel->getActiveSheet()->setCellValue('Y' . $i, $JNPLAN);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z' . $i, $JNOIL);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA' . $i, $REMARK.$RSREMARK);
+                
+                $objPHPExcel->getActiveSheet()->getStyle('P' . $i)->getFont()->getColor()->setRGB('FF0000'); // สีน้ำเงินสำหรับ $CALOAVG
+                $objPHPExcel->getActiveSheet()->getStyle('Q' . $i)->getFont()->getColor()->setRGB('0000FF'); // สีน้ำเงินสำหรับ $OTG
+    
             $i++;
             }                    
             $objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':G'.$i);
             $objPHPExcel->getActiveSheet()->mergeCells('M'.$i.':N'.$i);
-            $objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':Z'.$i);
+            $objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':AA'.$i);
             $objPHPExcel->getActiveSheet()->setCellValue('A' . $i, 'รวม');
             $objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setBold( true );                    
             $sheet->getStyle('H'.$i.':P'.$i)->getNumberFormat()->setFormatCode('0.00');
@@ -600,8 +616,8 @@ if ($EXCELVHCT != "") {
             $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, '=O'.$i.'/K'.$i);       
 
             $objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $sheet->getStyle('A5:Z'.$i)->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
-            $sheet->getStyle('A'.$i.':Z'.$i)->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FFFF99'))));
+            $sheet->getStyle('A5:AA'.$i)->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle('A'.$i.':AA'.$i)->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FFFF99'))));
         // CLOSE SECTION 
         $objPHPExcel->getActiveSheet()->setTitle('RRC');
 
