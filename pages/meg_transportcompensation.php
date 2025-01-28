@@ -2856,6 +2856,150 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                                                                         }
                                                                                         // function คำนวณค่าเที่ยว
+                                                                                        function edit_vehicletransportdocumentdriverconm_stc(ID, ID2,COMPANYCODE,CUSTOMERCODE) {
+
+                                                                                            // alert(COMPANYCODE);
+                                                                                            // alert(CUSTOMERCODE);
+
+                                                                                            // รวมค่าเที่ยวคนที่ 1 
+                                                                                            //เช็คในการกด คำนวณรอบแรก กรณี compensation1 เป็น NULL ,ว่าง  หรือ 0 จะใช้ E1 แทน
+                                                                                            
+                                                                                            var e1 = (document.getElementById('txt_e1').value != "") ? document.getElementById('txt_e1').value : 0;
+                                                                                            var e2 = (document.getElementById('txt_e2').value != "") ? document.getElementById('txt_e2').value : 0;
+                                                                                            var e3 = (document.getElementById('txt_e3').value != "") ? document.getElementById('txt_e3').value : 0;
+                                                                                            var eempty1 = (document.getElementById('txt_eempty1').value != "") ? document.getElementById('txt_eempty1').value : 0;
+                                                                                            var eempty2 = (document.getElementById('txt_eempty2').value != "") ? document.getElementById('txt_eempty2').value : 0;
+                                                                                            var eempty3 = (document.getElementById('txt_eempty3').value != "") ? document.getElementById('txt_eempty3').value : 0;
+                                                                                            var crosswork = (document.getElementById('txt_crosswork').value != "") ? document.getElementById('txt_crosswork').value : 0;
+
+                                                                                            // if (document.getElementById('txt_compensation1').value == "" || document.getElementById('txt_compensation1').value == 0) {
+                                                                                            //     // alert('1');
+                                                                                            //     var e1 = (document.getElementById('txt_e1').value != "") ? document.getElementById('txt_e1').value : 0;
+                                                                                            // }else{
+                                                                                            //     // alert('2');
+                                                                                            //     var e1 = (document.getElementById('txt_compensation1').value != "") ? document.getElementById('txt_compensation1').value : 0;
+                                                                                            // }
+
+                                                                                            // //เช็คในการกด คำนวณรอบแรก กรณี compensation2 เป็น NULL ,ว่าง  หรือ 0  จะใช้ E2 แทน
+                                                                                            // if (document.getElementById('txt_compensation2').value == "" || document.getElementById('txt_compensation2').value == 0) {
+                                                                                            //     // alert('1');
+                                                                                            //     var e2 = (document.getElementById('txt_e2').value != "") ? document.getElementById('txt_e2').value : 0;
+                                                                                            // }else{
+                                                                                            //     // alert('2');
+                                                                                            //     var e2 = (document.getElementById('txt_compensation2').value != "") ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // }
+
+                                                                                            // var e2 = (document.getElementById('txt_compensation2').value != "") ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_compensation3').value != "") ? document.getElementById('txt_compensation3').value : 0;
+                                                                                            // var eempty1 = (document.getElementById('txt_compensation_empty1').value != "") ? document.getElementById('txt_compensation_empty1').value : 0;
+                                                                                            // var eempty2 = (document.getElementById('txt_compensation_empty2').value != "") ? document.getElementById('txt_compensation_empty2').value : 0;
+                                                                                            // var eempty3 = (document.getElementById('txt_compensation_empty3').value != "") ? document.getElementById('txt_compensation_empty3').value : 0;
+                                                                                            // var othermoney = (document.getElementById('txt_orthermoney').value != "") ? document.getElementById('txt_orthermoney').value : 0;
+                                                                                            
+                                                                                            // alert(e1);
+                                                                                            // alert(e2);
+                                                                                            // alert(e3);
+                                                                                            // alert(crosswork);
+                                                                                            // //กรณีเลือก รับงาน 2 โรง ได้รับเพิ่ม 50 บาท สำหรับสายงาน TGT
+                                                                                            // if(chk_50trip.checked == true){
+                                                                                            //     var tgt50trip = 50;
+
+                                                                                            // }else{
+                                                                                            //     var tgt50trip = 0;
+                                                                                            // }
+
+                                                                                            // //กรณีเลือก วิ่งงาน 2 Drop รับเพิ่ม 50 บาท THAITOHKEN
+                                                                                            // if(chk_2dropthaitohken.checked == true){
+                                                                                            //     var twodropthaitohken = 50;
+
+                                                                                            // }else{
+                                                                                            //     var twodropthaitohken = 0;
+                                                                                            // }
+
+                                                                                            // //กรณีเลือก วิ่งงาน 3 Drop รับเพิ่ม 100 บาท THAITOHKEN
+                                                                                            // if(chk_3dropthaitohken.checked == true){
+                                                                                                
+                                                                                            //     var threedropthaitohken = 100;
+                                                                                            // }else{
+                                                                                            //     var threedropthaitohken = 0;
+                                                                                            // }
+
+
+                                                                                            // แสดงค่าเที่ยวรวม
+                                                                                            document.getElementById('txt_compensation').value = parseInt(e1) + parseInt(e2) + parseInt(e3) + parseInt(eempty1) + parseInt(eempty2) + parseInt(eempty3) 
+                                                                                                                                    + parseInt(crosswork);
+                                                                                            // แสดงค่าเที่ยวรวมทั้งหมด
+                                                                                            document.getElementById('txt_compensationall').value = parseInt(e1) + parseInt(e2) + parseInt(e3) + parseInt(eempty1) + parseInt(eempty2) + parseInt(eempty3) 
+                                                                                                                                    + parseInt(crosswork);
+                                                                                            // แสดงค่า พนักงาน 1
+                                                                                            document.getElementById('txt_e1').value = parseInt(e1);
+                                                                                            // แสดงค่า พนักงาน 2
+                                                                                            document.getElementById('txt_e2').value = parseInt(e2);
+                                                                                            
+                                                                                            
+                                                                                            // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_e1').value, ID: ID, fieldname: 'E1'
+                                                                                                },
+                                                                                                success: function () {
+
+
+                                                                                                }
+                                                                                            });
+
+                                                                                            
+
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation').value, ID: ID2, fieldname: 'TOTALCOMPEN'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation').value, ID: ID2, fieldname: 'COMPENSATION'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation').value, ID: ID2, fieldname: 'COMPENSATION1'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_e2').value, ID: ID2, fieldname: 'COMPENSATION2'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                        }
+                                                                                        // function คำนวณค่าเที่ยว
                                                                                         function edit_vehicletransportdocumentdriverconm(ID, ID2,COMPANYCODE,CUSTOMERCODE) {
 
                                                                                             // alert(COMPANYCODE);

@@ -918,6 +918,24 @@ $result_seLogin = sqlsrv_fetch_array($query_seLogin, SQLSRV_FETCH_ASSOC);
                         </div>
                         <div id="data_copydiagramjobendtonsr"></div>
                       </div>
+                      <div class="col-lg-2">
+                          <label>ค่าเที่ยว</label>
+                          <input onKeyUp="if (isNaN(this.value)) {
+                              alert('กรุณากรอกตัวเลข');
+                          this.value = '';
+                          } else {
+                              
+                          }"  class="form-control" type="text" size="10"   onchange="update_copydiagram('<?= $result_sePlan1['VEHICLETRANSPORTPLANID'] ?>', 'E1', this.value)" value="<?=$result_sePlan1['E1'] ?>" id="txt_e1" name="txt_e1">                               
+                      </div>        
+                      <div class="col-lg-2">
+                          <label>ค่าควบ</label>
+                          <input onKeyUp="if (isNaN(this.value)) {
+                              alert('กรุณากรอกตัวเลข');
+                          this.value = '';
+                          } else {
+                              
+                          }"  class="form-control" type="text" size="10"   onchange="update_copydiagram('<?= $result_sePlan1['VEHICLETRANSPORTPLANID'] ?>', 'E4', this.value)" value="<?=$result_sePlan1['E4'] ?>" id="txt_crosswork" name="txt_crosswork">                               
+                      </div>   
 
                       <?php
                     }else if ($_GET['customercode'] == 'TTAST') {
@@ -1410,8 +1428,25 @@ $result_seLogin = sqlsrv_fetch_array($query_seLogin, SQLSRV_FETCH_ASSOC);
                             </div>
 
                             <div id="data_copydiagramjobendrkltonsr"></div>
-                          </div>
-
+                        </div>
+                        <div class="col-lg-2">
+                            <label>ค่าเที่ยว</label>
+                            <input onKeyUp="if (isNaN(this.value)) {
+                                alert('กรุณากรอกตัวเลข');
+                            this.value = '';
+                            } else {
+                                
+                            }"  class="form-control" type="text" size="10"   onchange="update_copydiagram('<?= $result_sePlan1['VEHICLETRANSPORTPLANID'] ?>', 'E1', this.value)" value="<?=$result_sePlan1['E1'] ?>" id="txt_e1" name="txt_e1">                               
+                        </div>        
+                        <div class="col-lg-2">
+                            <label>ค่าควบ</label>
+                            <input onKeyUp="if (isNaN(this.value)) {
+                                alert('กรุณากรอกตัวเลข');
+                            this.value = '';
+                            } else {
+                                
+                            }"  class="form-control" type="text" size="10"   onchange="update_copydiagram('<?= $result_sePlan1['VEHICLETRANSPORTPLANID'] ?>', 'E4', this.value)" value="<?=$result_sePlan1['E4'] ?>" id="txt_crosswork" name="txt_crosswork">                               
+                        </div>    
                           <?php
                         }
                         ?>

@@ -3135,6 +3135,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="4">รอบที่ 4</option>
                                             </select>                                
                                         </div>
+                                        <div class="col-lg-2">
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div> 
                                         <!-- <div class="col-lg-2">
                                             <label>ค่าเที่ยว</label>
                                             <input onKeyUp="if (isNaN(this.value)) {
@@ -5962,7 +5980,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             <div id="data_copydiagramjobendtonsr"></div>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>รอบที่วิ่งงานL TTAST(STC):</label>
+                                            <label>รอบที่วิ่งงาน TTAST(STC):</label>
                                             <select id="txt_roundamount" name="txt_roundamount" class="form-control">
                                                 <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>
                                                 <option value="1">รอบที่ 1</option>
@@ -5971,7 +5989,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="4">รอบที่ 4</option>
                                             </select>                                
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div>             
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
                                         ?>
@@ -14032,7 +14067,27 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 var dateinput = document.getElementById("txt_copydiagramdateinput").value;
                 var datepresent = document.getElementById("txt_copydiagramdatepresent").value;
 
-               
+                 // ค่าเที่ยว ค่าควบ TTAST STC
+               if ('<?= $_GET['companycode'] ?>' == 'RKL' || '<?= $_GET['companycode'] ?>' == 'RKR') {
+
+                    if ('<?= $_GET['carrytype'] ?>' == 'weight') {
+                        
+                        if ('<?= $_GET['customercode'] ?>' == 'TTASTSTC') {
+                            e1 = document.getElementById("txt_e1").value;
+                            crosswork = document.getElementById("txt_crosswork").value;
+                        }else{
+                            e1 = '';
+                            crosswork = '';
+                        }
+
+                    }else{
+                        e1 = '';
+                        crosswork = '';
+                    }
+                }else{
+                    e1 = '';
+                    crosswork = '';
+                }
 
 
                 if (checknull_copydiagram(vehicletransportplanid)) {
@@ -14154,7 +14209,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CARRYTYPE: '<?= $_GET['carrytype'] ?>',
                                 THAINAME2: document.getElementById("txt_copydiagramthainame2").value,
                                 BILLING: billing,
-                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
+                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>',
+                                NO7: e1,
+                                NO8: crosswork
 
                             },
                             success: function (rs) {
@@ -14238,7 +14295,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CARRYTYPE: '<?= $_GET['carrytype'] ?>',
                                 THAINAME2: document.getElementById("txt_copydiagramthainame2").value,
                                 BILLING: billing,
-                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
+                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>',
+                                NO7: e1,
+                                NO8: crosswork
 
                             },
                             success: function () {
@@ -14321,7 +14380,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CARRYTYPE: '<?= $_GET['carrytype'] ?>',
                                 THAINAME2: document.getElementById("txt_copydiagramthainame2").value,
                                 BILLING: billing,
-                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
+                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>',
+                                NO7: e1,
+                                NO8: crosswork
 
                             },
                             success: function (rs) {
@@ -14402,7 +14463,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CARRYTYPE: '<?= $_GET['carrytype'] ?>',
                                 THAINAME2: document.getElementById("txt_copydiagramthainame2").value,
                                 BILLING: billing,
-                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
+                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>',
+                                NO7: e1,
+                                NO8: crosswork
 
                             },
                             success: function (rs) {
@@ -14484,7 +14547,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CARRYTYPE: '<?= $_GET['carrytype'] ?>',
                                 THAINAME2: document.getElementById("txt_copydiagramthainame2").value,
                                 BILLING: billing,
-                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
+                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>',
+                                NO7: e1,
+                                NO8: crosswork
 
                             },
                             success: function () {
@@ -14640,7 +14705,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CARRYTYPE: '<?= $_GET['carrytype'] ?>',
                                 THAINAME2: document.getElementById("txt_copydiagramthainame2").value,
                                 BILLING: billing,
-                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
+                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>',
+                                NO7: e1,
+                                NO8: crosswork
 
                             },
                             success: function (rs) {
@@ -14725,7 +14792,9 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                 CARRYTYPE: '<?= $_GET['carrytype'] ?>',
                                 THAINAME2: document.getElementById("txt_copydiagramthainame2").value,
                                 BILLING: billing,
-                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>'
+                                CREATEBY: '<?= $result_seEmployee["PersonCode"] ?>',
+                                NO7: e1,
+                                NO8: crosswork
 
                             },
                             success: function () {
