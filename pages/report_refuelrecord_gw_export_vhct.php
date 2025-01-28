@@ -18,6 +18,7 @@
 
     require_once 'PHPExcel-1.8/Classes/PHPExcel.php';
     require_once 'PHPExcel-1.8/Classes/PHPExcel/IOFactory.php';
+    use PhpOffice\PhpSpreadsheet\RichText\RichText;
 
     $datestartoil = $_POST["txt_datestartoilvhct"];
     $startdateoil = explode(" ", $datestartoil);
@@ -143,7 +144,7 @@ if ($EXCELVHCT != "") {
             ->setCellValue('M3', 'ไมล์ต้น')
             ->setCellValue('N3', 'ไมล์ปลาย')
             ->setCellValue('O3', 'ระยะทาง')
-            ->setCellValue('P3', 'ค่าเฉลี่ยที่ได้')
+            ->setCellValue('P3', 'มาตรฐานเรท : ค่าเฉลี่ยที่ได้')
             ->setCellValue('Q3', 'ต้นทาง')
             ->setCellValue('R3', 'เส้นทาง')
             ->setCellValue('S3', 'รอบวิ่งงาน')
@@ -208,7 +209,7 @@ if ($EXCELVHCT != "") {
             $sheet->getColumnDimension('M')->setWidth(12);
             $sheet->getColumnDimension('N')->setWidth(12);
             $sheet->getColumnDimension('O')->setWidth(12);
-            $sheet->getColumnDimension('P')->setWidth(12);
+            $sheet->getColumnDimension('P')->setWidth(21);
             $sheet->getColumnDimension('Q')->setWidth(20);
             $sheet->getColumnDimension('R')->setWidth(20);
             $sheet->getColumnDimension('S')->setWidth(12);
@@ -324,7 +325,7 @@ if ($EXCELVHCT != "") {
                 $objPHPExcel->getActiveSheet()->setCellValue('M' . $i, $MST);
                 $objPHPExcel->getActiveSheet()->setCellValue('N' . $i, $MLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('O' . $i, $DTE);
-                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $CALOAVG);
+                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $OTG.' : '.$CALOAVG);
                 $objPHPExcel->getActiveSheet()->setCellValue('Q' . $i, $JOBSTART);
                 $objPHPExcel->getActiveSheet()->setCellValue('R' . $i, $JOBEND);
                 $objPHPExcel->getActiveSheet()->setCellValue('S' . $i, $ROUNDAMOUNT);
@@ -391,7 +392,7 @@ if ($EXCELVHCT != "") {
             ->setCellValue('M3', 'ไมล์ต้น')
             ->setCellValue('N3', 'ไมล์ปลาย')
             ->setCellValue('O3', 'ระยะทาง')
-            ->setCellValue('P3', 'ค่าเฉลี่ยที่ได้')
+            ->setCellValue('P3', 'มาตรฐานเรท : ค่าเฉลี่ยที่ได้')
             ->setCellValue('Q3', 'ต้นทาง')
             ->setCellValue('R3', 'เส้นทาง')
             ->setCellValue('S3', 'รอบวิ่งงาน')
@@ -454,7 +455,7 @@ if ($EXCELVHCT != "") {
             $sheet->getColumnDimension('M')->setWidth(12);
             $sheet->getColumnDimension('N')->setWidth(12);
             $sheet->getColumnDimension('O')->setWidth(12);
-            $sheet->getColumnDimension('P')->setWidth(12);
+            $sheet->getColumnDimension('P')->setWidth(21);
             $sheet->getColumnDimension('Q')->setWidth(20);
             $sheet->getColumnDimension('R')->setWidth(20);
             $sheet->getColumnDimension('S')->setWidth(12);
@@ -570,7 +571,7 @@ if ($EXCELVHCT != "") {
                 $objPHPExcel->getActiveSheet()->setCellValue('M' . $i, $MST);
                 $objPHPExcel->getActiveSheet()->setCellValue('N' . $i, $MLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('O' . $i, $DTE);
-                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $CALOAVG);
+                $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $OTG.' : '.$CALOAVG);
                 $objPHPExcel->getActiveSheet()->setCellValue('Q' . $i, $JOBSTART);
                 $objPHPExcel->getActiveSheet()->setCellValue('R' . $i, $JOBEND);
                 $objPHPExcel->getActiveSheet()->setCellValue('S' . $i, $ROUNDAMOUNT);
