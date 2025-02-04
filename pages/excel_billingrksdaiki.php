@@ -123,7 +123,7 @@ $result_seduedate = sqlsrv_fetch_array($query_seduedate, SQLSRV_FETCH_ASSOC);
 $i = 1;
 $sql_seBilling = "{call megVehicletransportdocumentdriver_v2(?,?,?)}";
 $params_seBilling = array(
-    array('select_pdfvehicletransportdocumentdriver', SQLSRV_PARAM_IN),
+    array('select_pdfvehicletransportdocumentdriver-daiki', SQLSRV_PARAM_IN),
     array($condBilling1, SQLSRV_PARAM_IN),
     array($condBilling2, SQLSRV_PARAM_IN)
 );

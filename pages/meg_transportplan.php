@@ -721,6 +721,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             ?>
                                         </select>
                                     </div>
+                                    <br><br><br><br><br>
+                                    <div class="col-lg-3">
+                                        <font style="color: red">* </font><label>เลือกรอบที่วิ่งงาน :</label>
+                                        <select id="txt_roundamount" name="txt_roundamount" class="form-control" onchange="update_copydiagram('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                            <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>              
+                                            <?php
+                                                $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
+                                                $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                $selected = "";
+                                                $SePY_CCID = $result_seOps['ROUNDAMOUNT'];
+                                                    $SeCC_ID = $result_slram['NAME'];
+                                                if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                            ?>
+                                            <option value="<?=$result_slram['NAME']?>" <?= $selected ?>>รอบที่ <?php echo $result_slram["NAME"];?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
                                     <?php
                                 } else if ($_GET['customercode'] == 'SWN') {
                                     ?>
@@ -815,6 +833,23 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <?php
                                             }
                                             ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <font style="color: red">* </font><label>เลือกรอบที่วิ่งงาน :</label>
+                                        <select id="txt_roundamount" name="txt_roundamount" class="form-control" onchange="update_copydiagram('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                            <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>              
+                                            <?php
+                                                $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
+                                                $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                $selected = "";
+                                                $SePY_CCID = $result_seOps['ROUNDAMOUNT'];
+                                                    $SeCC_ID = $result_slram['NAME'];
+                                                if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                            ?>
+                                            <option value="<?=$result_slram['NAME']?>" <?= $selected ?>>รอบที่ <?php echo $result_slram["NAME"];?></option>
+                                            <?php } ?>
                                         </select>
                                     </div>
                                     <?php
@@ -913,6 +948,23 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             ?>
                                         </select>
                                     </div>
+                                    <div class="col-lg-3">
+                                        <font style="color: red">* </font><label>เลือกรอบที่วิ่งงาน :</label>
+                                        <select id="txt_roundamount" name="txt_roundamount" class="form-control" onchange="update_copydiagram('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                            <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>              
+                                            <?php
+                                                $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
+                                                $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                $selected = "";
+                                                $SePY_CCID = $result_seOps['ROUNDAMOUNT'];
+                                                    $SeCC_ID = $result_slram['NAME'];
+                                                if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                            ?>
+                                            <option value="<?=$result_slram['NAME']?>" <?= $selected ?>>รอบที่ <?php echo $result_slram["NAME"];?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
                                     <?php
                                 } else if ($_GET['customercode'] == 'TTAST') {
                                     ?>
@@ -1009,6 +1061,23 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             ?>
                                         </select>
                                     </div>
+                                    <div class="col-lg-3">
+                                        <font style="color: red">* </font><label>เลือกรอบที่วิ่งงาน :</label>
+                                        <select id="txt_roundamount" name="txt_roundamount" class="form-control" onchange="update_copydiagram('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                            <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>              
+                                            <?php
+                                                $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
+                                                $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                $selected = "";
+                                                $SePY_CCID = $result_seOps['ROUNDAMOUNT'];
+                                                    $SeCC_ID = $result_slram['NAME'];
+                                                if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                            ?>
+                                            <option value="<?=$result_slram['NAME']?>" <?= $selected ?>>รอบที่ <?php echo $result_slram["NAME"];?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
                                     <?php
                                 } else if ($_GET['customercode'] == 'TTTC') {
                                     ?>
@@ -1103,6 +1172,23 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <?php
                                             }
                                             ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <font style="color: red">* </font><label>เลือกรอบที่วิ่งงาน :</label>
+                                        <select id="txt_roundamount" name="txt_roundamount" class="form-control" onchange="update_copydiagram('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                            <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>              
+                                            <?php
+                                                $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
+                                                $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                $selected = "";
+                                                $SePY_CCID = $result_seOps['ROUNDAMOUNT'];
+                                                    $SeCC_ID = $result_slram['NAME'];
+                                                if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                            ?>
+                                            <option value="<?=$result_slram['NAME']?>" <?= $selected ?>>รอบที่ <?php echo $result_slram["NAME"];?></option>
+                                            <?php } ?>
                                         </select>
                                     </div>
                                     <?php
@@ -1297,6 +1383,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <?php
                                             }
                                             ?>
+                                        </select>
+                                    </div>
+                                    <br>
+                                    <div class="col-lg-2">
+                                        <font style="color: red">* </font><label>เลือกรอบที่วิ่งงาน :</label>
+                                        <select id="txt_roundamount" name="txt_roundamount" class="form-control" onchange="update_copydiagram('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', 'ROUNDAMOUNT', this.value)">
+                                            <option value disabled selected>-เลือกรอบที่วิ่งงาน-</option>              
+                                            <?php
+                                                $sql_slram = "SELECT * FROM [dbo].[ROUNDAMOUNT] WHERE ID IN(3,4)";
+                                                $query_slram = sqlsrv_query($conn, $sql_slram);
+                                                while($result_slram = sqlsrv_fetch_array($query_slram, SQLSRV_FETCH_ASSOC)) {
+                                                $selected = "";
+                                                $SePY_CCID = $result_seOps['ROUNDAMOUNT'];
+                                                    $SeCC_ID = $result_slram['NAME'];
+                                                if ($SePY_CCID == $SeCC_ID) { $selected = "selected"; }
+                                            ?>
+                                            <option value="<?=$result_slram['NAME']?>" <?= $selected ?>>รอบที่ <?php echo $result_slram["NAME"];?></option>
+                                            <?php } ?>
                                         </select>
                                     </div>
                                     <?php
@@ -3153,24 +3257,6 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 
                                             }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
                                         </div> 
-                                        <!-- <div class="col-lg-2">
-                                            <label>ค่าเที่ยว</label>
-                                            <input onKeyUp="if (isNaN(this.value)) {
-                                                alert('กรุณากรอกตัวเลข');
-                                            this.value = '';
-                                            } else {
-                                                
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
-                                        </div>        
-                                        <div class="col-lg-2">
-                                            <label>ค่าควบ</label>
-                                            <input onKeyUp="if (isNaN(this.value)) {
-                                                alert('กรุณากรอกตัวเลข');
-                                            this.value = '';
-                                            } else {
-                                                
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
-                                        </div>             -->
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
                                         ?>
@@ -3305,6 +3391,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="4">รอบที่ 4</option>
                                             </select>                                
                                         </div>
+                                        <div class="col-lg-2">
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div> 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
                                         ?>
@@ -3961,7 +4065,27 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="3">รอบที่ 3</option>
                                                 <option value="4">รอบที่ 4</option>
                                             </select>                                
-                                        </div>            
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <br>
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <br>
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div>           
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTTCSTC') {
                                         ?>
@@ -6141,7 +6265,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="4">รอบที่ 4</option>
                                             </select>                                
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div>
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
                                         ?>
@@ -6410,7 +6551,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="4">รอบที่ 4</option>
                                             </select>                                
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div>  
 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTPROCS') {
@@ -6807,7 +6965,24 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                 <option value="4">รอบที่ 4</option>
                                             </select>                                
                                         </div>
-
+                                        <div class="col-lg-2">
+                                            <label>ค่าเที่ยว</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                        </div>        
+                                        <div class="col-lg-2">
+                                            <label>ค่าควบ</label>
+                                            <input onKeyUp="if (isNaN(this.value)) {
+                                                alert('กรุณากรอกตัวเลข');
+                                            this.value = '';
+                                            } else {
+                                                
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                        </div>
                                         <?php
                                     } else if ($_GET['customercode'] == 'PARAGON') {
                                         ?>
@@ -13046,6 +13221,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                     vehicletype = document.getElementById("cb_copydiagramcartype").value;
                     // materialtype = document.getElementById("cb_materialtype").value;
                     goreturn = document.getElementById("cb_copydiagramgoreturn").value;
+                    roundamount = document.getElementById("txt_roundamount").value;
                     
                     if ('<?= $_GET['customercode'] ?>' == 'GMT-IB')
                     {
@@ -14072,7 +14248,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                     if ('<?= $_GET['carrytype'] ?>' == 'weight') {
                         
-                        if ('<?= $_GET['customercode'] ?>' == 'TTASTSTC') {
+                        if ('<?= $_GET['customercode'] ?>' == 'TTASTSTC' || '<?= $_GET['customercode'] ?>' == 'TTAST' || '<?= $_GET['customercode'] ?>' == 'TTASTCS') {
                             e1 = document.getElementById("txt_e1").value;
                             crosswork = document.getElementById("txt_crosswork").value;
                         }else{

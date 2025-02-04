@@ -274,7 +274,7 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                                             </div>
                                         <!-- </div> -->
                                     </form> 
-                                    <form action="report_refuelrecord_gw_avgday.php" method="post" target="_blank">
+                                    <!-- <form action="report_refuelrecord_gw_avgday.php" method="post" target="_blank">
                                         <hr>
                                         <h3><u>สรุปค่าเฉลี่ยน้ำมันรายวัน</u> <small><font color="red">***อัพเดทข้อมูลเวลา 23:00 น. ของทุกวัน</font></small></h3>
                                         <div class="col-lg-2">
@@ -293,7 +293,7 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                                             <label>&nbsp;</label><br>                                               
                                             <button type="submit" class="btn btn-success btn-md" name="EXCELDAY" value="EXCELDAY"><li class="fa fa-file-excel-o"></li> <b>Excel</b></button>
                                         </div> 
-                                    </form>  
+                                    </form>  -->
                                     <form action="report_refuelrecord_gw_export_avgday.php" method="post" target="_blank">
                                         <hr>
                                         <u><h3>สรุปค่าเฉลี่ยน้ำมันรายเดือน</h3></u>

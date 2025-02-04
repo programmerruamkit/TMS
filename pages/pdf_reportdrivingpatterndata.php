@@ -1,674 +1,1151 @@
-<!DOCTYPE html>
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
 <?php
 session_start();
-date_default_timezone_set("Asia/Bangkok");
-include("../MobileDetect/Mobile_Detect.php");
 require_once("../class/meg_function.php");
-ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+require_once("../mpdf/autoload.php");
+ini_set('max_execution_time', 300);
+// set_time_limit(500);
 $conn = connect("RTMS");
 
 
-$detect = new Mobile_Detect();
-// Check for any mobile device.
-if ($detect->isMobile()){
-   // mobile content
-   $checkClient = 'MB';
-}
-else {
-   // other content for desktops
-   $checkClient = 'DT';
-}
-/////////////////////////////////////////////////////
-$employee1 = " AND a.PersonCode = '" .$_SESSION["USERNAME"] . "'";
-$sql_seEmp1 = "{call megEmployeeEHR_v2(?,?)}";
-$params_seEmp1 = array(
+
+$conditionEHR = " AND a.PersonCode='" . $_GET['employeecode'] . "'";
+$sql_seEHR = "{call megEmployeeEHR_v2(?,?)}";
+$params_seEHR = array(
     array('select_employeeehr2', SQLSRV_PARAM_IN),
-    array($employee1, SQLSRV_PARAM_IN)
+    array($conditionEHR, SQLSRV_PARAM_IN)
 );
-$query_seEmp1 = sqlsrv_query($conn, $sql_seEmp1, $params_seEmp1);
-$result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
-
-// echo $_SESSION["USERNAME"];
-//////////////////////////////////////////////////////
-
-// if ($_GET['type'] == "officercheck") {
-//     $checktype = "เจ้าหน้าที่ตรวจสอบข้อมูล";
-// }else{
-//     $checktype = "พนักงานลงข้อมูล";
-// }
-// //////////////////////////////////////////////////////
-
-// $checkArea = substr($_GET['employeecode'],0,2);
-
-$sql_seChkDataPlan = "SELECT JOBNO,VEHICLETRANSPORTPLANID,EMPLOYEECODE1,EMPLOYEENAME1,EMPLOYEECODE2,EMPLOYEENAME2,THAINAME,JOBSTART,JOBEND
-FROM [dbo].[VEHICLETRANSPORTPLAN] 
-WHERE  CONVERT(DATE,CREATEDATE,103) = CONVERT(DATE,GETDATE(),103)
-AND CREATEBY ='".$result_seEmp1['PersonCode']."'";
-$params_seChkDataPlan = array();
-$query_seChkDataPlan  = sqlsrv_query($conn, $sql_seChkDataPlan, $params_seChkDataPlan);
-$result_seChkDataPlan = sqlsrv_fetch_array($query_seChkDataPlan, SQLSRV_FETCH_ASSOC);
+$query_seEHR = sqlsrv_query($conn, $sql_seEHR, $params_seEHR);
+$result_seEHR = sqlsrv_fetch_array($query_seEHR, SQLSRV_FETCH_ASSOC);
 
 
 
-$employee2 = " AND a.PersonCode = '" .$result_seChkDataPlan['EMPLOYEECODE2'] . "'";
-$sql_seEmp2 = "{call megEmployeeEHR_v2(?,?)}";
-$params_seEmp2 = array(
+
+
+// CHECK DRIVINGPATTERN ID
+$sql_seDrivinpattrenID = "SELECT b.DRIVINGPATTERNGO_ID,d.DRIVINGPATTERNRETURN_ID,a.EMPLOYEECODE1,a.EMPLOYEECODE2,b.PLANID1,b.PLANID2 
+FROM VEHICLETRANSPORTPLAN a 
+INNER JOIN [dbo].[DRIVINGPATTERN_GO] b ON b.PLANID1 = a.VEHICLETRANSPORTPLANID
+INNER JOIN [dbo].[DRIVINGPATTERN_RETURN] d ON d.DRIVINGPATTERNRETURN_ID = b.DRIVINGPATTERNRETURN_ID
+INNER JOIN VEHICLEINFO c ON c.THAINAME = a.THAINAME
+WHERE a.ACTIVESTATUS = '1'
+AND c.ACTIVESTATUS ='1'
+AND (a.EMPLOYEECODE1 ='".$_GET['employeecode']."' OR a.EMPLOYEECODE2 ='".$_GET['employeecode']."')
+AND CONVERT(DATE,a.DATEWORKING,103) = CONVERT(DATE,'".$_GET['datestart']."',103) ";
+$params_seDrivinpattrenID = array(
     array('select_employeeehr2', SQLSRV_PARAM_IN),
-    array($employee2, SQLSRV_PARAM_IN)
+    array($conditionEHR, SQLSRV_PARAM_IN)
 );
-$query_seEmp2 = sqlsrv_query($conn, $sql_seEmp2, $params_seEmp2);
-$result_seEmp2 = sqlsrv_fetch_array($query_seEmp2, SQLSRV_FETCH_ASSOC);
+$query_seDrivinpattrenID = sqlsrv_query($conn, $sql_seDrivinpattrenID, $params_seDrivinpattrenID);
+$result_seDrivinpattrenID = sqlsrv_fetch_array($query_seDrivinpattrenID, SQLSRV_FETCH_ASSOC);
 
-?>
-<html lang="en">
-    <head>
-        <link rel="shortcut icon" href="../images/logo.ico" />
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <title>เอกสารรูปแบบการวิ่งงาน</title>
+// CHECK DATA PLAN
+$sql_seplandata = "SELECT b.DRIVINGPATTERNGO_ID,d.DRIVINGPATTERNRETURN_ID,a.EMPLOYEECODE1,a.EMPLOYEENAME1,a.EMPLOYEECODE2,a.EMPLOYEENAME2,b.PLANID1,b.PLANID2 
+FROM VEHICLETRANSPORTPLAN a 
+INNER JOIN [dbo].[DRIVINGPATTERN_GO] b ON b.PLANID1 = a.VEHICLETRANSPORTPLANID
+INNER JOIN [dbo].[DRIVINGPATTERN_RETURN] d ON d.DRIVINGPATTERNRETURN_ID = b.DRIVINGPATTERNRETURN_ID
+INNER JOIN VEHICLEINFO c ON c.THAINAME = a.THAINAME
+WHERE a.ACTIVESTATUS = '1'
+AND c.ACTIVESTATUS ='1'
+AND (a.EMPLOYEECODE1 ='".$_GET['employeecode']."' OR a.EMPLOYEECODE2 ='".$_GET['employeecode']."')
+AND CONVERT(DATE,a.DATEWORKING,103) = CONVERT(DATE,'".$_GET['datestart']."',103) ";
+$params_seplandata = array();
+$query_seplandata = sqlsrv_query($conn, $sql_seplandata, $params_seplandata);
+$result_seplandata = sqlsrv_fetch_array($query_seplandata, SQLSRV_FETCH_ASSOC);
 
-        
-        <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-        <link href="../dist/css/jquery.autocomplete.css" rel="stylesheet">
-        <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.form.min.js"></script>
-        <script type="text/javascript" src="../vendor/bootstrap/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="../dist/js/jquery.autocomplete.js"></script> 
-        <link href="../js/bootstrap-datepicker.css" rel="stylesheet">
-        <link href="../js/jquery.datetimepicker.css" rel="stylesheet">
-        <link href="../dist/css/jquery.autocomplete.css" rel="stylesheet">
-        <link href="../dist/css/buttons.dataTables.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
-        <!-- <link href="../vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
-        <link href="../vendor/datatables-responsive/dataTables.responsive.css" rel="stylesheet"> -->
-        <style>
-            .navbar-default {
+// CHECK WORKING AGE EMP1
+$sql_seworkingage1 = "SELECT yearw AS 'YEARW',monthw AS 'MONTHW' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_seplandata['EMPLOYEECODE1']."' ";
+$params_seworkingage1  = array();
+$query_seworkingage1   = sqlsrv_query($conn, $sql_seworkingage1, $params_seworkingage1);
+$result_seworkingage1  = sqlsrv_fetch_array($query_seworkingage1, SQLSRV_FETCH_ASSOC);
 
-                border-color: #ffcb0b;
-            }
-            /* #page-wrapper {
-                border-left: 1px solid #ffcb0b;
-            }
-            .popover-content {
-                padding: 10px 10px;
-                width: 200px;
-            } */
+// CHECK WORKING AGE EMP2
+$sql_seworkingage2 = "SELECT yearw AS 'YEARW',monthw AS 'MONTHW' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_seplandata['EMPLOYEECODE2']."' ";
+$params_seworkingage2  = array();
+$query_seworkingage2   = sqlsrv_query($conn, $sql_seworkingage2, $params_seworkingage2);
+$result_seworkingage2  = sqlsrv_fetch_array($query_seworkingage2, SQLSRV_FETCH_ASSOC);
 
-            #loading {
-                display:none;   
-                opacity: 0.5;
-                /* border-radius: 50%; */
-                /* border-top: 12px ; */
-                width: 10px;
-                left: 50px;
-                right: 850px;
-                top:10px;
-                bottom: 350px;
-                height: 10px;
-                
-                /* animation: spin 1s linear infinite; */
-            }
-            .center {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                margin: auto;
-            }
-            
-            .swal2-popup {
-                font-size: 16px !important;
-                padding: 17px;
-                border: 1px solid #F0E1A1;
-                display: block;
-                margin: 22px;
-                text-align: center;
-                color: #61534e;
-            }
-            
-            
-            .button {
-            display: inline-block;
-            padding: 15px 25px;
-            font-size: 24px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            outline: none;
-            color: #fff;
-            background-color: #4CAF50;
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 9px #999;
-            }
+// $mpdf = new mPDF('th', 'A4-L', '0', '');
+$mpdf = new mPDF('th', 'A3-L', '0', '', 5, 5, 5, 5, 5, 5);
 
-            .button:hover {background-color: #3e8e41}
+// $mpdf = new mPDF('th', 'A4-L', '0', '', ซ้าย, บน, ล่าง, 5, 5, 5);
+$style = '
+<style>
+	body{
+		font-family: "Garuda";//เรียกใช้font Garuda สำหรับแสดงผล ภาษาไทย
+	}
+</style>';
 
-            .button:active {
-            background-color: #3e8e41;
-            box-shadow: 0 5px #666;
-            transform: translateY(10px);
-            }
 
-            .button1 {
-            display: inline-block;
-            padding: 15px 25px;
-            font-size: 20px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            outline: none;
-            color: #fff;
-            background-color: #4c8baf;
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 9px #999;
-            }
 
-            .button1:hover {background-color: #4c8baf}
-
-            .button1:active {
-            background-color: #3e568e;
-            box-shadow: 0 5px #999;
-            transform: translateY(10px);
-            }
-            /*Self2yes css  */
-            /* self2yes > input[type="radio"] {
-                display: none;
-            }
-            self2yes > input[type="radio"] + *::before {
-                content: "";
-                display: inline-block;
-                vertical-align: bottom;
-                width: 3rem;
-                height: 3rem;
-                margin-right: 0.3rem;
-                border-radius: 50%;
-                border-style: solid;
-                border-width: 0.1rem;
-                border-color: gray;
-            }
-            self2yes > input[type="radio"]:checked + *::before {
-                background: radial-gradient(teal 0%, teal 40%, transparent 50%, transparent);
-                border-color: teal;
-            } */
-
-            table {
-                font-family: arial, sans-serif;
-                border-collapse: collapse;
-                width: 100%;
-            }
-
-            td, th {
-                border: 1px solid #000000;
-                text-align: left;
-                padding: 8px;
-            }
-
-            /* tr:nth-child(even) {
-                background-color: #dddddd;
-            } */
-
-        </style>
-    </head>
-    <body>
-
-        <!-- <div id="wrapper">
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header" >
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="index.php"><font style="color: #000;font-size: 14px"><img src="../images/logo.ico" height="30"> <strong>Transport Management System</strong></font></a>
-        </div>
-        <ul class="nav navbar-top-links navbar-right">
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-user">
-
-                    <li><a href="meg_logout.php"><i class="fa fa-sign-out fa-fw"></i> ออกจากระบบ</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-        </nav> -->
-
-        <?php 
-            // $sql_sePlandata = "SELECT JOBSTART,JOBEND,VEHICLETRANSPORTPLANID FROM VEHICLETRANSPORTPLAN WHERE JOBNO ='".$_GET['jobno']."'";
-            // $params_sePlandata = array();
-            // $query_sePlandata = sqlsrv_query($conn, $sql_sePlandata, $params_sePlandata);
-            // $result_sePlandata = sqlsrv_fetch_array($query_sePlandata, SQLSRV_FETCH_ASSOC);  
-            
-            
-                
-            // เช็คข้อมูลล่าสุดของพนักงานในการลงข้อมูลแผนงานขาไป 
-            // ถ้า STATUS เป็น inprogess จะไม่สามารถลงข้อมูลใหม่ได้ จนกว่าสถานะจะเป็น complete
-        
-            $sql_seCheckDataGoPlan = "SELECT TOP 1 DRIVINGPATTERNGO_ID AS 'CHK_ID',DRIVINGPATTERNGO_STATUS AS 'CHK_STATUSGO'  
-                FROM [dbo].[DRIVINGPATTERN_GO]
-                WHERE CREATEBY_PLANGO ='".$result_seEmp1['PersonCode']."'
-                ORDER BY CREATEDATE_PLANGO DESC";
-            $params_seCheckDataGoPlan = array();
-            $query_seCheckDataGoPlan = sqlsrv_query($conn, $sql_seCheckDataGoPlan, $params_seCheckDataGoPlan);
-            $result_seCheckDataGoPlan = sqlsrv_fetch_array($query_seCheckDataGoPlan, SQLSRV_FETCH_ASSOC);
-
-            $sql_seCheckDataReturnPlan = "SELECT TOP 1 DRIVINGPATTERNRETURN_ID AS 'CHK_ID',DRIVINGPATTERNRETURN_STATUS AS 'CHK_STATUSBACK'  
-                FROM [dbo].[DRIVINGPATTERN_RETURN]
-                WHERE CREATEBY_PLANRETURN ='".$result_seEmp1['PersonCode']."'
-                ORDER BY CREATEDATE_PLANRETURN DESC";
-            $params_seCheckDataReturnPlan = array();
-            $query_seCheckDataReturnPlan = sqlsrv_query($conn, $sql_seCheckDataReturnPlan, $params_seCheckDataReturnPlan);
-            $result_seCheckDataReturnPlan = sqlsrv_fetch_array($query_seCheckDataReturnPlan, SQLSRV_FETCH_ASSOC);
-
-        ?>
-            <div id="page-wrapper">
-                <p>&nbsp;</p>
-
-                <div id="datade_edit">
-                    <div class="row" id="list-data">
-                        <div class="col-lg-12">&nbsp;</div>
-                        <div class="col-lg-12" style="font-size: 30px;text-align: center;">เลือกเมนูที่จะลงข้อมูล</div>
-                        <div class="col-lg-4" style="font-size: 30px;text-align: center;">วันที่: <b><?=date("d-m-Y")?></b></div>
-                        <div class="col-lg-4" style="font-size: 30px;text-align: center;">ชื่อ-นามสกุล:<b> <?=$result_seEmp1['nameT']?></b></div>
-                        <div class="col-lg-4" style="font-size: 30px;text-align: center;">รหัสพนักงาน:<b> <?=$result_seEmp1['PersonCode']?></b></div>
-                        <div class="col-lg-12">&nbsp;</div>
-                        <div class="col-lg-12">&nbsp;</div>
+      $sql_seData = "SELECT DRIVINGPATTERNGO_ID,DRIVINGPATTERNRETURN_ID,EMPLOYEECODE1,EMPLOYEENAME1,EMPLOYEECODE2,EMPLOYEENAME2,THAINAME_ID,PLANING_ROUTE,ACTUAL_ROUTE,DRIVINGPATTERN_DATE,OFFICERCHECK_GO,
+            PLANID1,PLANID2,TNKP_CHECK,TUBON_CHECK,TTHAIYEN_CHECK,TKAN_CHECK,JOBSTARTPLAN,DATESTARTPLAN,
+            DRIVERNAME_PLAN_P1,DATESTART_PLAN_P1,PARKINGTIME_PLAN_4HUR_P1,DEPARTURETIME_PLAN_4HUR_P1,LOCATION_PLAN_4HUR_P1,PARKINGTIME_PLAN_2HUR_P1,DEPARTURETIME_PLAN_2HUR_P1,LOCATION_PLAN_2HUR_P1,
+            DRIVERNAME_PLAN_P2,DATESTART_PLAN_P2,PARKINGTIME_PLAN_4HUR_P2,DEPARTURETIME_PLAN_4HUR_P2,LOCATION_PLAN_4HUR_P2,PARKINGTIME_PLAN_2HUR_P2,DEPARTURETIME_PLAN_2HUR_P2,LOCATION_PLAN_2HUR_P2,
+            DRIVERNAME_PLAN_P3,DATESTART_PLAN_P3,PARKINGTIME_PLAN_4HUR_P3,DEPARTURETIME_PLAN_4HUR_P3,LOCATION_PLAN_4HUR_P3,PARKINGTIME_PLAN_2HUR_P3,DEPARTURETIME_PLAN_2HUR_P3,LOCATION_PLAN_2HUR_P3,
+            DRIVERNAME_PLAN_P4,DATESTART_PLAN_P4,PARKINGTIME_PLAN_4HUR_P4,DEPARTURETIME_PLAN_4HUR_P4,LOCATION_PLAN_4HUR_P4,PARKINGTIME_PLAN_2HUR_P4,DEPARTURETIME_PLAN_2HUR_P4,LOCATION_PLAN_2HUR_P4,
+            DRIVERNAME_PLAN_P5,DATESTART_PLAN_P5,PARKINGTIME_PLAN_4HUR_P5,DEPARTURETIME_PLAN_4HUR_P5,LOCATION_PLAN_4HUR_P5,PARKINGTIME_PLAN_2HUR_P5,DEPARTURETIME_PLAN_2HUR_P5,LOCATION_PLAN_2HUR_P5,
+            DRIVERNAME_PLAN_P6,DATESTART_PLAN_P6,PARKINGTIME_PLAN_4HUR_P6,DEPARTURETIME_PLAN_4HUR_P6,LOCATION_PLAN_4HUR_P6,PARKINGTIME_PLAN_2HUR_P6,DEPARTURETIME_PLAN_2HUR_P6,LOCATION_PLAN_2HUR_P6,
                         
+            DEALER1_PLAN,PARKINGTIME_PLAN_DEALER1,DEPARTURETIME_PLAN_DEALER1,SUM_PLAN_DEALER1,
+            DEALER2_PLAN,PARKINGTIME_PLAN_DEALER2,DEPARTURETIME_PLAN_DEALER2,SUM_PLAN_DEALER2,
+            DEALER3_PLAN,PARKINGTIME_PLAN_DEALER3,DEPARTURETIME_PLAN_DEALER3,SUM_PLAN_DEALER3,
+            DEALER4_PLAN,PARKINGTIME_PLAN_DEALER4,DEPARTURETIME_PLAN_DEALER4,SUM_PLAN_DEALER4,
+            CREATEBY_PLANGO,CONVERT(VARCHAR(16),CREATEDATE_PLANGO,20) AS 'CREATEDATE_PLANGO',MODIFIEDBY_PLANGO,MODIFIEDDATE_PLANGO,DRIVINGPATTERNGO_STATUS
 
-                        <?php
-                        if ($result_seChkDataPlan['JOBNO'] == '') {
-                        ?>  
-                            <div class="col-lg-12" style="font-size: 30px;text-align: center;color:red"><b><u>พบข้อผิดพลาดเนื่องจาก</u></b></div>
-                            <div class="col-lg-12">&nbsp;</div>
-                            <div class="col-lg-12" style="font-size: 30px;text-align: center;color:red"><b><u>1.ไม่พบข้อมูลการวางแผนงานของพนักงาน</u></b></div>
-                            <div class="col-lg-12">&nbsp;</div>
-                            <div class="col-lg-12" style="font-size: 30px;text-align: center;color:red"><b><u>2.พนักงานขับรถคนที่สองไม่สามารถลงข้อมูลเอกสารรูปแบบการวิ่งงานได้</u></b></div>
-                            <div class="col-lg-12">&nbsp;</div>
-                            <div class="col-lg-12" style="font-size: 30px;text-align: center;color:red"><b><u>3.พนักงานที่จะลงข้อมูลจะต้องเป็นพนักงานขับรถคนแรกเท่านั้น</u></b></div>
-                        <?php
-                        }else {
-                        ?>
-                            <div class = "row" style="height:150px;"></div>
-                            <div class="col-lg-12" style="font-size: 30px;text-align: center;">เอกสารรูปแบบการวิ่งงาน Driver (Driving Pattern)</div>
-                            <div class="col-lg-12">&nbsp;</div>
-                            <div class="col-lg-12" style="text-align: center;">
-                                <b style="font-size: 18px"></b>
-                                <?php
-                                //  echo $result_seCheckDataGoPlan['CHK_STATUSGO'];   
-                                if ($result_seCheckDataGoPlan['CHK_STATUSGO'] == 'inprogess' ) {
-                                ?>
-                                  &nbsp;<button  class="button" style="width:50%;font-size: 25px;background-color: #f78686;border:solid 2px;color:black"  onclick="alert_goplan('<?=$result_seCheckDataGoPlan['CHK_ID']?>')">แผนขาไป</button>
-                                <?php
-                                }else{
-                                ?>
-                                   &nbsp;<button  class="button" style="width:50%;font-size: 25px;background-color: #93f786;border:solid 2px;color:black"  onclick="create_drivingpatternid('GoPlan')">แผนขาไป</button>
+            JOBSTARTACTUAL,DATESTARTACTUAL,
+            DRIVERNAME_ACTUAL_P1,DATESTART_ACTUAL_P1,PARKINGTIME_ACTUAL_4HUR_P1,DEPARTURETIME_ACTUAL_4HUR_P1,LOCATION_ACTUAL_4HUR_P1,PARKINGTIME_ACTUAL_2HUR_P1,DEPARTURETIME_ACTUAL_2HUR_P1,LOCATION_ACTUAL_2HUR_P1,
+            LAT_ACTUAL_4HUR_P1,LONG_ACTUAL_4HUR_P1,LAT_ACTUAL_2HUR_P1,LONG_ACTUAL_2HUR_P1,
+            DRIVERNAME_ACTUAL_P2,DATESTART_ACTUAL_P2,PARKINGTIME_ACTUAL_4HUR_P2,DEPARTURETIME_ACTUAL_4HUR_P2,LOCATION_ACTUAL_4HUR_P2,PARKINGTIME_ACTUAL_2HUR_P2,DEPARTURETIME_ACTUAL_2HUR_P2,LOCATION_ACTUAL_2HUR_P2,
+            LAT_ACTUAL_4HUR_P2,LONG_ACTUAL_4HUR_P2,LAT_ACTUAL_2HUR_P2,LONG_ACTUAL_2HUR_P2,
+            DRIVERNAME_ACTUAL_P3,DATESTART_ACTUAL_P3,PARKINGTIME_ACTUAL_4HUR_P3,DEPARTURETIME_ACTUAL_4HUR_P3,LOCATION_ACTUAL_4HUR_P3,PARKINGTIME_ACTUAL_2HUR_P3,DEPARTURETIME_ACTUAL_2HUR_P3,LOCATION_ACTUAL_2HUR_P3,
+            LAT_ACTUAL_4HUR_P3,LONG_ACTUAL_4HUR_P3,LAT_ACTUAL_2HUR_P3,LONG_ACTUAL_2HUR_P3,
+            DRIVERNAME_ACTUAL_P4,DATESTART_ACTUAL_P4,PARKINGTIME_ACTUAL_4HUR_P4,DEPARTURETIME_ACTUAL_4HUR_P4,LOCATION_ACTUAL_4HUR_P4,PARKINGTIME_ACTUAL_2HUR_P4,DEPARTURETIME_ACTUAL_2HUR_P4,LOCATION_ACTUAL_2HUR_P4,
+            LAT_ACTUAL_4HUR_P4,LONG_ACTUAL_4HUR_P4,LAT_ACTUAL_2HUR_P4,LONG_ACTUAL_2HUR_P4,
+            DRIVERNAME_ACTUAL_P5,DATESTART_ACTUAL_P5,PARKINGTIME_ACTUAL_4HUR_P5,DEPARTURETIME_ACTUAL_4HUR_P5,LOCATION_ACTUAL_4HUR_P5,PARKINGTIME_ACTUAL_2HUR_P5,DEPARTURETIME_ACTUAL_2HUR_P5,LOCATION_ACTUAL_2HUR_P5,
+            LAT_ACTUAL_4HUR_P5,LONG_ACTUAL_4HUR_P5,LAT_ACTUAL_2HUR_P5,LONG_ACTUAL_2HUR_P5,
+            DRIVERNAME_ACTUAL_P6,DATESTART_ACTUAL_P6,PARKINGTIME_ACTUAL_4HUR_P6,DEPARTURETIME_ACTUAL_4HUR_P6,LOCATION_ACTUAL_4HUR_P6,PARKINGTIME_ACTUAL_2HUR_P6,DEPARTURETIME_ACTUAL_2HUR_P6,LOCATION_ACTUAL_2HUR_P6,
+            LAT_ACTUAL_4HUR_P6,LONG_ACTUAL_4HUR_P6,LAT_ACTUAL_2HUR_P6,LONG_ACTUAL_2HUR_P6,
+
+            DEALER1_ACTUAL,PARKINGTIME_ACTUAL_DEALER1,DEPARTURETIME_ACTUAL_DEALER1,SUM_ACTUAL_DEALER1,
+            DEALER2_ACTUAL,PARKINGTIME_ACTUAL_DEALER2,DEPARTURETIME_ACTUAL_DEALER2,SUM_ACTUAL_DEALER2,
+            DEALER3_ACTUAL,PARKINGTIME_ACTUAL_DEALER3,DEPARTURETIME_ACTUAL_DEALER3,SUM_ACTUAL_DEALER3,
+            DEALER4_ACTUAL,PARKINGTIME_ACTUAL_DEALER4,DEPARTURETIME_ACTUAL_DEALER4,SUM_ACTUAL_DEALER4,
+            CREATEBY_ACTUALGO,CREATEDATE_ACTUALGO,MODIFIEDBY_ACTUALGO,MIDIFIEDDATE_ACTUALGO,CONFIRMEDBY_ACTUALGO,CONVERT(VARCHAR,CONFIRMEDDATE_ACTUALGO,20) AS 'CONFIRMEDDATE_ACTUALGO',
+
+            CONFIRMEDBY_P1,CONVERT(VARCHAR,CONFIRMEDDATE_P1,20) AS 'CONFIRMEDDATE_P1',CONFIRMEDBY_P2,CONVERT(VARCHAR,CONFIRMEDDATE_P2,20) AS 'CONFIRMEDDATE_P2',CONFIRMEDBY_P3,CONVERT(VARCHAR,CONFIRMEDDATE_P3,20) AS 'CONFIRMEDDATE_P3',
+            CONFIRMEDBY_P4,CONVERT(VARCHAR,CONFIRMEDDATE_P4,20) AS 'CONFIRMEDDATE_P4',CONFIRMEDBY_P5,CONVERT(VARCHAR,CONFIRMEDDATE_P5,20) AS 'CONFIRMEDDATE_P5',CONFIRMEDBY_P6,CONVERT(VARCHAR,CONFIRMEDDATE_P6,20) AS 'CONFIRMEDDATE_P6',
+            CONFIRMEDBY_ACTUAL_DEALER,CONVERT(VARCHAR,CONFIRMEDDATE_ACTUAL_DEALER,20) AS 'CONFIRMEDDATE_ACTUAL_DEALER',
+            DRIVINGPATTERNGO_STATUS
+
+            
+            FROM DRIVINGPATTERN_GO
+            WHERE DRIVINGPATTERNGO_ID ='".$result_seDrivinpattrenID['DRIVINGPATTERNGO_ID']."'";
+      $params_seData    = array();
+      $query_seData     = sqlsrv_query($conn, $sql_seData, $params_seData);
+      $result_seData    = sqlsrv_fetch_array($query_seData, SQLSRV_FETCH_ASSOC);
+
+
+
+      $currect    = "<img src='../images/ok.png' width='20px' height='20px'>";
+      $square     = "<img src='../images/square.png' width='15px' height='15px'>";
+      $TNKP       = ($result_seData['TNKP_CHECK'] == "1") ? "<img src='../images/check-square.png' width='20px' height='20px'>" : "<img src='../images/square.png' width='20px' height='20px'>";
+      $TUBON      = ($result_seData['TUBON_CHECK'] == "1") ? "<img src='../images/check-square.png' width='20px' height='20px'>" : "<img src='../images/square.png' width='20px' height='20px'>";
+      $TTHAIYEN   = ($result_seData['TTHAIYEN_CHECK'] == "1") ? "<img src='../images/check-square.png' width='20px' height='20px'>" : "<img src='../images/square.png' width='20px' height='20px'>";
+      $TKAN       = ($result_seData['TKAN_CHECK'] == "1") ? "<img src='../images/check-square.png' width='20px' height='20px'>" : "<img src='../images/square.png' width='20px' height='20px'>";
+
+      
+
+// แผนขาไป
+$table_begin_goplan = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size: 10px;">';
+
+    $tr_goplan = '<thead>
+     <tr style="border:1px solid #000;" >
+         <td colspan="80" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>เอกสารรูปแบบการวิ่งงาน (Driving Pattern) หน้า 1</h4></td>
+         <td colspan="10" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>เบอร์รถ</h4></td>
+         <td colspan="20" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>'.str_replace("(4L)","",$result_seData['THAINAME_ID']).'</h4></td>
+         <td colspan="20" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>รูทงานตามแผน</h4></td>
+         <td colspan="20" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>'.$result_seData['PLANING_ROUTE'].'</h4></td>
+         <td colspan="20" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>รูทงานวิ่งจริง</h4></td>
+         <td colspan="20" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>'.$result_seData['ACTUAL_ROUTE'].'</h4></td>
+         <td colspan="20" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>วัน/เดือน/ปี</h4></td>
+         <td colspan="30" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>'.$result_seData['CREATEDATE_PLANGO'].'</h4></td>
+     </tr>
+
+      <tr style="border:1px solid #000;padding:1px;" >
+         <td colspan="80" style="font-size: 12px;border-right:5px">
+               <b><u>วัตถุประสงค์</u></b>
+               <br><br>
+               <b>&nbsp;&nbsp;1.การขับขี่ต่อเนื่องต้องไม่เกิน 4 ชม. และต้องพักอย่างน้อย 30 นาที</b>
+               <br><br>
+               <b>&nbsp;&nbsp;2.สามารถขับขี่ได้ 6 ชม. ต้องเปลี่ยนมือ</b>
+               <br><br>
+               <b>&nbsp;&nbsp;3.หากพบสิ่งผิดปกติให้ หยุด เรียก รอ</b>
+               <br><br>
+               <b>&nbsp;&nbsp;4.ง่วงไม่ฝืนขับ</b>
+               <br><br>
+               <b>&nbsp;&nbsp;5.ปรับสลักเป็น 4x2 หรือต่ำกว่า ก่อนไปยัง ดีลเลอร์ ที่มีปัญหาเรื่องความสูง </b>
+               <br>&nbsp;<b>(ทำเครื่องหมาย '.$currect.' ในช่อง '.$square .' เพื่อยืนยันว่ามีการปรับแล้ว)</b>
+               <br><br>
+               <b>&nbsp;&nbsp;&nbsp;<p>โตโยต้า นครพิงค์ '.$TNKP .'&nbsp;&nbsp;&nbsp;โตโยต้า อุบลราชธานี '.$TUBON .'&nbsp;&nbsp;&nbsp;โตโยต้า อุบลราชธานี '.$TTHAIYEN .'&nbsp;&nbsp;&nbsp;โตโยต้า อุบลราชธานี '.$TKAN .'</p></b>
+               
+         </td>
+         <td colspan="80" style="font-size: 12px;border:1px solid #000;padding:1px;">
+               <b><u>วิธีการ</u></b>
+               <br><br>
+               <b>&nbsp;<u>ขั้นตอนเท็งโกะเริ่มงาน :</u> ให้ พขร.และผู้ควบคุมร่วมกันวางแผนการวิ่งงานทั้งขาไปและขากลับ</b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <b>และให้ พขร. แบ่งหน้าที่ว่าใครจะเป็น นาย A และ B</b>
+               <br><br>
+               <b>&nbsp;<u>ขั้นตอนเท็งโกะเลิกงาน :</u> ให้ พขร.ลงบันทึกการขับขี่จริงพร้อมยื่นให้เจ้าหน้าที่เท็งโกะ</b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <b>ตรวจสอบการวิ่งงานจริง</b>
+               <br><br><br><br><br><br><br><br>
+         </td>
+         <td colspan="80" style="font-size: 12px;border-right:1px solid #000;padding:1px;">
+               
+               <b><u>โปรดลงชื่อรับทราบในขั้นตอนการทำเท็งโกะเริ่มงาน</u></b>
+               <br><br>
+               <b>&nbsp;<u>นาย A :</u> รหัสพนักงาน&nbsp;&nbsp;=> '.$result_seplandata['EMPLOYEECODE1'].'</b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <b>ชื่อ-นามสกุล&nbsp;&nbsp;=> '.$result_seplandata['EMPLOYEENAME1'].'</b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <b>อายุงาน&nbsp;&nbsp;=> '.$result_seworkingage1['YEARW'].' ปี&nbsp;&nbsp;'.$result_seworkingage1['MONTHW'].' เดือน</b>
+               <br><br><br><br>
+               <b>&nbsp;<u>นาย B :</u> รหัสพนักงาน&nbsp;&nbsp;=> '.$result_seplandata['EMPLOYEECODE1'].'</b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <b>ชื่อ-นามสกุล&nbsp;&nbsp;=> '.$result_seplandata['EMPLOYEENAME2'].' </b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <b>อายุงาน&nbsp;&nbsp;=> '.$result_seworkingage2['YEARW'].' ปี&nbsp;&nbsp;'.$result_seworkingage2['MONTHW'].' เดือน</b>
+               <br><br><br>
+         </td>
+      </tr>
+      
+      
+       <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:2px;text-align:right;font-size: 12px;">
+                ผู้ตรวจแผนขาไป : ' . $result_seData['CONFIRMEDBY_ACTUALGO'] . '  
+         </td> 
+       </tr>
+       <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+       <tr style="border:1px solid #000;" >
+         <td colspan="100" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>แผนขาไป</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>ออกเดินทางจาก</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>'.$result_seData['JOBSTARTPLAN'].'</b></td>
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>เวลา</b></td> 
+         <td colspan="65" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>'.str_replace("T"," ",$result_seData['DATESTARTPLAN']).'</b></td>  
+       </tr>
+    </thead>';
+
+
+$i = 1;
+
+
+
+      $td_goplan .= '<tbody>
+         <tr style="border:1px solid #000;" >
+            <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่1) : '.$result_seData['DRIVERNAME_PLAN_P1'].'</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_PLAN_P1']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_4HUR_P1'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_2HUR_P1'].'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่2) : '.$result_seData['DRIVERNAME_PLAN_P2'].'</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_PLAN_P2']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_4HUR_P2'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_2HUR_P2'].'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่3) : '.$result_seData['DRIVERNAME_PLAN_P3'].'</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_PLAN_P3']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_4HUR_P3'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_2HUR_P3'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่4) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_PLAN_P4']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_4HUR_P4'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_2HUR_P4'].'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่5) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_PLAN_P5']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_4HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_4HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_4HUR_P5'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_2HUR_P5'].'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่6) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_PLAN_P6']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_4HUR_P6'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_PLAN_2HUR_P6'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>โหลดรถลง :</u></b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 1 : '.$result_seData['DEALER1_PLAN'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_DEALER1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_DEALER1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_PLAN_DEALER1']).'</b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 2 : '.$result_seData['DEALER2_PLAN'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_DEALER2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_DEALER2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_PLAN_DEALER2']).'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>โหลดรถลง :</u></b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 3 : '.$result_seData['DEALER3_PLAN'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_DEALER3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_DEALER3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_PLAN_DEALER3']).'</b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 4 : '.$result_seData['DEALER4_PLAN'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_PLAN_DEALER4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_PLAN_DEALER4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_PLAN_DEALER4']).'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                 
+            </td>
+         </tr>
+       </tbody>';
+
+
+$table_end_goplan = '
+   <tfoot>
+      <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+   </tfoot>
+</table>';
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// วิ่งจริงขาไป
+$table_begin_goactual = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size: 10px;">';
+
+    $tr_goactual = '<thead>
+       <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+       <tr style="border:1px solid #000;" >
+         <td colspan="100" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>วิ่งจริงขาไป</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>ออกเดินทางจาก</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>RRR</b></td>
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>เวลา</b></td> 
+         <td colspan="65" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>17/01/2025 17:40</b></td>  
+       </tr>
+    </thead>';
+
+
+      $td_goactual .= '<tbody>
+         <tr style="border:1px solid #000;" >
+            <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+         </tr>
+         <tr>
+            <td colspan="55" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่1) : '.$result_seData['DRIVERNAME_ACTUAL_P1'].'</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_ACTUAL_P1']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_4HUR_P1'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_2HUR_P1'].'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่2) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_ACTUAL_P2']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_4HUR_P2'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_2HUR_P2'].'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่3) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_ACTUAL_P3']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_4HUR_P3'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_2HUR_P3'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="55" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่4) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_ACTUAL_P4']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_4HUR_P4'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_2HUR_P4'].'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่5) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_ACTUAL_P5']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_4HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_4HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_4HUR_P5'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_2HUR_P5'].'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่6) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seData['DATESTART_ACTUAL_P6']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_4HUR_P6'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seData['LOCATION_ACTUAL_2HUR_P6'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="55" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>โหลดรถลง :</u></b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 1 : '.$result_seData['DEALER1_ACTUAL'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_DEALER1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_DEALER1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_ACTUAL_DEALER1']).'</b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 2 : '.$result_seData['DEALER2_ACTUAL'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_DEALER2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_DEALER2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_ACTUAL_DEALER2']).'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>โหลดรถลง :</u></b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 3 : '.$result_seData['DEALER3_ACTUAL'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_DEALER3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_DEALER3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_ACTUAL_DEALER3']).'</b>
+                  <br><br>
+                  <b><u>ดีลเลอร์ 4 : '.$result_seData['DEALER4_ACTUAL'].'</u></b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['PARKINGTIME_ACTUAL_DEALER4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['DEPARTURETIME_ACTUAL_DEALER4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seData['SUM_ACTUAL_DEALER4']).'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                 
+            </td>
+         </tr>
+       </tbody>';
+
+
+$table_end_goactual = '
+   <tfoot>
+      <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+   </tfoot>
+</table>';
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$sql_seDataBack = "SELECT DRIVINGPATTERNGO_ID,DRIVINGPATTERNRETURN_ID,EMPLOYEECODE1,EMPLOYEENAME1,EMPLOYEECODE2,EMPLOYEENAME2,THAINAME_ID,PLANING_ROUTE,ACTUAL_ROUTE,DRIVINGPATTERN_DATE,OFFICERCHECK_RETURN,
+            PLANID1,PLANID2,TNKP_CHECK,TUBON_CHECK,TTHAIYEN_CHECK,TKAN_CHECK,JOBSTARTPLAN,DATESTARTPLAN,
+            DRIVERNAME_PLAN_P1,DATESTART_PLAN_P1,PARKINGTIME_PLAN_4HUR_P1,DEPARTURETIME_PLAN_4HUR_P1,LOCATION_PLAN_4HUR_P1,PARKINGTIME_PLAN_2HUR_P1,DEPARTURETIME_PLAN_2HUR_P1,LOCATION_PLAN_2HUR_P1,
+            DRIVERNAME_PLAN_P2,DATESTART_PLAN_P2,PARKINGTIME_PLAN_4HUR_P2,DEPARTURETIME_PLAN_4HUR_P2,LOCATION_PLAN_4HUR_P2,PARKINGTIME_PLAN_2HUR_P2,DEPARTURETIME_PLAN_2HUR_P2,LOCATION_PLAN_2HUR_P2,
+            DRIVERNAME_PLAN_P3,DATESTART_PLAN_P3,PARKINGTIME_PLAN_4HUR_P3,DEPARTURETIME_PLAN_4HUR_P3,LOCATION_PLAN_4HUR_P3,PARKINGTIME_PLAN_2HUR_P3,DEPARTURETIME_PLAN_2HUR_P3,LOCATION_PLAN_2HUR_P3,
+            DRIVERNAME_PLAN_P4,DATESTART_PLAN_P4,PARKINGTIME_PLAN_4HUR_P4,DEPARTURETIME_PLAN_4HUR_P4,LOCATION_PLAN_4HUR_P4,PARKINGTIME_PLAN_2HUR_P4,DEPARTURETIME_PLAN_2HUR_P4,LOCATION_PLAN_2HUR_P4,
+            DRIVERNAME_PLAN_P5,DATESTART_PLAN_P5,PARKINGTIME_PLAN_4HUR_P5,DEPARTURETIME_PLAN_4HUR_P5,LOCATION_PLAN_4HUR_P5,PARKINGTIME_PLAN_2HUR_P5,DEPARTURETIME_PLAN_2HUR_P5,LOCATION_PLAN_2HUR_P5,
+            DRIVERNAME_PLAN_P6,DATESTART_PLAN_P6,PARKINGTIME_PLAN_4HUR_P6,DEPARTURETIME_PLAN_4HUR_P6,LOCATION_PLAN_4HUR_P6,PARKINGTIME_PLAN_2HUR_P6,DEPARTURETIME_PLAN_2HUR_P6,LOCATION_PLAN_2HUR_P6,
                                     
-                                <?php
-                                }
-                                ?>
-                                
-                            </div>
-                            <div class = "col-lg-12" style="height:50px;"></div>
-                            <div class="col-lg-12" style="text-align: center;">
-                                <b style="font-size: 18px"></b>
-                                <?php
-                                // echo $result_seCheckDataGoPlan['CHK_STATUS'];   
-                                if ($result_seCheckDataReturnPlan['CHK_STATUSBACK'] == 'inprogess'){
-                                ?>
-                                    &nbsp;<button  class="button" style="width:50%;font-size: 25px;background-color: #f78686;border:solid 2px;color:black"  onclick="alert_backplan('<?=$result_seCheckDataReturnPlan['CHK_ID']?>')">แผนขากลับ</button>
-                                    
-                                <?php
-                                }else{
-                                ?>
-                                    &nbsp;<button  class="button" style="width:50%;font-size: 25px;background-color: #93f786;border:solid 2px;color:black"  onclick="create_drivingpatternid('BackPlan')">แผนขากลับ</button>
-                                <?php
-                                }
-                                ?>
-                                
-                            </div>
-                        <?php
-                        }
-                        ?>
+            DEALER1_PLAN,PARKINGTIME_PLAN_DEALER1,DEPARTURETIME_PLAN_DEALER1,SUM_PLAN_DEALER1,
+            DEALER2_PLAN,PARKINGTIME_PLAN_DEALER2,DEPARTURETIME_PLAN_DEALER2,SUM_PLAN_DEALER2,
+            DEALER3_PLAN,PARKINGTIME_PLAN_DEALER3,DEPARTURETIME_PLAN_DEALER3,SUM_PLAN_DEALER3,
+            DEALER4_PLAN,PARKINGTIME_PLAN_DEALER4,DEPARTURETIME_PLAN_DEALER4,SUM_PLAN_DEALER4,
+            CREATEBY_PLANRETURN,CONVERT(VARCHAR(16),CREATEDATE_PLANRETURN,20) AS 'CREATEDATE_PLANRETURN',MODIFIEDBY_PLANRETURN,MODIFIEDDATE_PLANRETURN,
+
+            JOBSTARTACTUAL,DATESTARTACTUAL,
+            DRIVERNAME_ACTUAL_P1,DATESTART_ACTUAL_P1,PARKINGTIME_ACTUAL_4HUR_P1,DEPARTURETIME_ACTUAL_4HUR_P1,LOCATION_ACTUAL_4HUR_P1,PARKINGTIME_ACTUAL_2HUR_P1,DEPARTURETIME_ACTUAL_2HUR_P1,LOCATION_ACTUAL_2HUR_P1,
+            DRIVERNAME_ACTUAL_P2,DATESTART_ACTUAL_P2,PARKINGTIME_ACTUAL_4HUR_P2,DEPARTURETIME_ACTUAL_4HUR_P2,LOCATION_ACTUAL_4HUR_P2,PARKINGTIME_ACTUAL_2HUR_P2,DEPARTURETIME_ACTUAL_2HUR_P2,LOCATION_ACTUAL_2HUR_P2,
+            DRIVERNAME_ACTUAL_P3,DATESTART_ACTUAL_P3,PARKINGTIME_ACTUAL_4HUR_P3,DEPARTURETIME_ACTUAL_4HUR_P3,LOCATION_ACTUAL_4HUR_P3,PARKINGTIME_ACTUAL_2HUR_P3,DEPARTURETIME_ACTUAL_2HUR_P3,LOCATION_ACTUAL_2HUR_P3,
+            DRIVERNAME_ACTUAL_P4,DATESTART_ACTUAL_P4,PARKINGTIME_ACTUAL_4HUR_P4,DEPARTURETIME_ACTUAL_4HUR_P4,LOCATION_ACTUAL_4HUR_P4,PARKINGTIME_ACTUAL_2HUR_P4,DEPARTURETIME_ACTUAL_2HUR_P4,LOCATION_ACTUAL_2HUR_P4,
+            DRIVERNAME_ACTUAL_P5,DATESTART_ACTUAL_P5,PARKINGTIME_ACTUAL_4HUR_P5,DEPARTURETIME_ACTUAL_4HUR_P5,LOCATION_ACTUAL_4HUR_P5,PARKINGTIME_ACTUAL_2HUR_P5,DEPARTURETIME_ACTUAL_2HUR_P5,LOCATION_ACTUAL_2HUR_P5,
+            DRIVERNAME_ACTUAL_P6,DATESTART_ACTUAL_P6,PARKINGTIME_ACTUAL_4HUR_P6,DEPARTURETIME_ACTUAL_4HUR_P6,LOCATION_ACTUAL_4HUR_P6,PARKINGTIME_ACTUAL_2HUR_P6,DEPARTURETIME_ACTUAL_2HUR_P6,LOCATION_ACTUAL_2HUR_P6,
+                                                
+            DEALER1_ACTUAL,PARKINGTIME_ACTUAL_DEALER1,DEPARTURETIME_ACTUAL_DEALER1,SUM_ACTUAL_DEALER1,
+            DEALER2_ACTUAL,PARKINGTIME_ACTUAL_DEALER2,DEPARTURETIME_ACTUAL_DEALER2,SUM_ACTUAL_DEALER2,
+            DEALER3_ACTUAL,PARKINGTIME_ACTUAL_DEALER3,DEPARTURETIME_ACTUAL_DEALER3,SUM_ACTUAL_DEALER3,
+            DEALER4_ACTUAL,PARKINGTIME_ACTUAL_DEALER4,DEPARTURETIME_ACTUAL_DEALER4,SUM_ACTUAL_DEALER4,
+            CREATEBY_ACTUALRETURN,CREATEDATE_ACTUALRETURN,MODIFIEDBY_ACTUALRETURN,MIDIFIEDDATE_ACTUALRETURN,CONFIRMEDBY_ACTUALRETURN,CONVERT(VARCHAR,CONFIRMEDDATE_ACTUALRETURN,20) AS 'CONFIRMEDDATE_ACTUALRETURN',
+
+            CONFIRMEDBY_P1,CONVERT(VARCHAR,CONFIRMEDDATE_P1,20) AS 'CONFIRMEDDATE_P1',CONFIRMEDBY_P2,CONVERT(VARCHAR,CONFIRMEDDATE_P2,20) AS 'CONFIRMEDDATE_P2',CONFIRMEDBY_P3,CONVERT(VARCHAR,CONFIRMEDDATE_P3,20) AS 'CONFIRMEDDATE_P3',
+            CONFIRMEDBY_P4,CONVERT(VARCHAR,CONFIRMEDDATE_P4,20) AS 'CONFIRMEDDATE_P4',CONFIRMEDBY_P5,CONVERT(VARCHAR,CONFIRMEDDATE_P5,20) AS 'CONFIRMEDDATE_P5',CONFIRMEDBY_P6,CONVERT(VARCHAR,CONFIRMEDDATE_P6,20) AS 'CONFIRMEDDATE_P6',
+            CONFIRMEDBY_ACTUAL_DEALER,CONVERT(VARCHAR,CONFIRMEDDATE_ACTUAL_DEALER,20) AS 'CONFIRMEDDATE_ACTUAL_DEALER',
+            DRIVINGPATTERNRETURN_STATUS
+
                         
-                        <div class="col-lg-12">&nbsp;</div>
-                    </div>
-                </div>
+            FROM [dbo].[DRIVINGPATTERN_RETURN] 
+            WHERE DRIVINGPATTERNRETURN_ID ='".$result_seDrivinpattrenID['DRIVINGPATTERNRETURN_ID']."'";
+      $params_seDataBack    = array();
+      $query_seDataBack     = sqlsrv_query($conn, $sql_seDataBack, $params_seDataBack);
+      $result_seDataBack    = sqlsrv_fetch_array($query_seDataBack, SQLSRV_FETCH_ASSOC);
 
-                <!-- START -->
-                   
+// แผนขากลับ
+$table_begin_backplan = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size: 10px;">';
 
-                <!-- END -->
+    $tr_backplan = '<thead>
+     <tr style="border:1px solid #000;" >
+         <td colspan="80" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"><h4>เอกสารรูปแบบการวิ่งงาน (Driving Pattern) หน้า 2</h4></td>
+         <td colspan="160" style="padding:3px;border-right:1px solid #000;text-align:left;font-size: 12px;"></td>
+
+      <tr style="border:1px solid #000;padding:1px;" >
+         <td colspan="80" style="font-size: 12px;border-right:5px">
+               <b><u>วัตถุประสงค์</u></b>
+               <br><br>
+               <b>&nbsp;&nbsp;1.การขับขี่ต่อเนื่องต้องไม่เกิน 4 ชม. และต้องพักอย่างน้อย 30 นาที</b>
+               <br><br>
+               <b>&nbsp;&nbsp;2.สามารถขับขี่ได้ 6 ชม. ต้องเปลี่ยนมือ</b>
+               <br><br>
+               <b>&nbsp;&nbsp;3.หากพบสิ่งผิดปกติให้ หยุด เรียก รอ</b>
+               <br><br>
+               <b>&nbsp;&nbsp;4.ง่วงไม่ฝืนขับ</b>
+               <br><br>
+         </td>
+         <td colspan="80" style="font-size: 12px;border:1px solid #000;padding:1px;">
+               <b><u>วิธีการ</u></b>
+               <br><br>
+               <b>&nbsp;<u>ขั้นตอนเท็งโกะเริ่มงาน :</u> ให้ พขร.และผู้ควบคุมร่วมกันวางแผนการวิ่งงานทั้งขาไปและขากลับ</b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <b>และให้ พขร. แบ่งหน้าที่ว่าใครจะเป็น นาย A และ B</b>
+               <br><br>
+               <b>&nbsp;<u>ขั้นตอนเท็งโกะเลิกงาน :</u> ให้ พขร.ลงบันทึกการขับขี่จริงพร้อมยื่นให้เจ้าหน้าที่เท็งโกะ</b>
+               <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <b>ตรวจสอบการวิ่งงานจริง</b>
+               <br><br><br><br><br><br><br><br>
+         </td>
+         <td colspan="80" style="font-size: 12px;border-right:1px solid #000;padding:1px;">
+               
+               
+         </td>
+      </tr>
+      
+      
+       <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:2px;text-align:right;font-size: 12px;">
+                ผู้ตรวจแผนขากลับ : ' . $result_seDataBack['CONFIRMEDBY_ACTUALRETURN'] . '    
+         </td> 
+       </tr>
+       <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+       <tr style="border:1px solid #000;" >
+         <td colspan="100" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>แผนขากลับ</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>ออกเดินทางจาก</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>RRR</b></td>
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>เวลา</b></td> 
+         <td colspan="65" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>17/01/2025 17:40</b></td>  
+       </tr>
+    </thead>';
 
 
-                
-                <div id="datasr_edit">
+$i = 1;
 
-                </div>
-                <div class="row" >
-                    <div class="col-lg-12">
-                        &nbsp;
 
-                    </div>
-                </div>
+      $td_backplan .= '<tbody>
+         <tr style="border:1px solid #000;" >
+            <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ข่วงที่1) : '.$result_seDataBack['DRIVERNAME_PLAN_P1'].'</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_PLAN_P1']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_4HUR_P1'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_2HUR_P1'].'</b>
                   
-                
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่2) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_PLAN_P2']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_4HUR_P2'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_2HUR_P2'].'</b>
+            </td>
+            <td colspan="115" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่3) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_PLAN_P3']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_4HUR_P3'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_2HUR_P3'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่4) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_PLAN_P4']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_4HUR_P4'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_2HUR_P4'].'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่5) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_PLAN_P5']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_4HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_4HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_4HUR_P5'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_2HUR_P5'].'</b>
+            </td>
+            <td colspan="115" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่6) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_PLAN_P6']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_4HUR_P6'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_PLAN_2HUR_P6'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ปลายทาง/โหลดรถลง</u></b>
+                  <br><br>
+                  <b><u>สถานที่ : '.$result_seDataBack['DEALER1_PLAN'].'</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.$result_seDataBack['PARKINGTIME_PLAN_DEALER1'].'</b>
+                  <br><br>
+                  <b><u>VL : '.$result_seDataBack['DEALER2_PLAN'].'</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.$result_seDataBack['PARKINGTIME_PLAN_DEALER2'].'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.$result_seDataBack['DEPARTURETIME_PLAN_DEALER2'].'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.$result_seDataBack['SUM_PLAN_DEALER2'].'</b>
+            </td>
+            <td colspan="65" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  
+            </td>
+            <td colspan="115" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                 
+            </td>
+         </tr>
+       </tbody>';
+
+
+$table_end_backplan = '
+   <tfoot>
+      <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+   </tfoot>
+</table>';
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// วิ่งจริงขากลับ
+$table_begin_backactual = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size: 10px;">';
+
+    $tr_backactual = '<thead>
+       <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+       <tr style="border:1px solid #000;" >
+         <td colspan="100" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>วิ่งจริงขากลับ</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>ออกเดินทางจาก</b></td> 
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>RRR</b></td>
+         <td colspan="25" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>เวลา</b></td> 
+         <td colspan="65" style="border-right:1px solid #000;padding:2px;text-align:center;font-size: 12px;"><b>17/01/2025 17:40</b></td>  
+       </tr>
+    </thead>';
+
+
+      $td_backactual .= '<tbody>
+         <tr style="border:1px solid #000;" >
+            <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่1) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_ACTUAL_P1']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_4HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_4HUR_P1'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_2HUR_P1']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_2HUR_P1'].'</b>
+                  
+            </td>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่2) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_ACTUAL_P2']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_4HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_4HUR_P2'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_2HUR_P2']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_2HUR_P2'].'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่3) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_ACTUAL_P3']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_4HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_4HUR_P3'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_2HUR_P3']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_2HUR_P3'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่4) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_ACTUAL_P4']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_4HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_4HUR_P3'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_2HUR_P4']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_2HUR_P4'].'</b>
+            </td>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่5) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_ACTUAL_P5']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_PLAN_ACTUAL_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_PLAN_ACTUAL_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_4HUR_P5'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_2HUR_P5']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_2HUR_P5'].'</b>
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ชื่อผู้ขับ (ช่วงที่6) :</u></b>
+                  <br><br>
+                  <b><u>เวลาเริ่มขับ : '.str_replace("T"," ",$result_seDataBack['DATESTART_ACTUAL_P6']).'</u></b>
+                  <br><br>
+                  <b><u>4 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_4HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_4HUR_P6'].'</b>
+                  <br><br>
+                  <b><u>2 ชั่วโมง :</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['PARKINGTIME_ACTUAL_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.str_replace("T"," ",$result_seDataBack['DEPARTURETIME_ACTUAL_2HUR_P6']).'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>สถานที่&nbsp;&nbsp;=> '.$result_seDataBack['LOCATION_ACTUAL_2HUR_P6'].'</b>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  <br>
+                  <b><u>ปลายทาง/โหลดรถลง</u></b>
+                  <br><br>
+                  <b><u>สถานที่ : '.$result_seDataBack['DEALER1_ACTUAL'].'</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.$result_seDataBack['PARKINGTIME_ACTUAL_DEALER1'].'</b>
+                  <br><br>
+                  <b><u>VL : '.$result_seDataBack['DEALER2_ACTUAL'].'</u> </b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาจอด&nbsp;&nbsp;=> '.$result_seDataBack['PARKINGTIME_ACTUAL_DEALER2'].'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>เวลาออก&nbsp;&nbsp;=> '.$result_seDataBack['DEPARTURETIME_ACTUAL_DEALER2'].'</b>
+                  <br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>รวม&nbsp;&nbsp;=> '.$result_seDataBack['SUM_ACTUAL_DEALER2'].'</b>
+            </td>
+            <td colspan="60" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                  
+            </td>
+            <td colspan="120" style="border:1px solid #000;padding:2px;text-align;left;font-size: 12px;">
+                 
+            </td>
+         </tr>
+       </tbody>';
+
+
+$table_end_backactual = '
+   <tfoot>
+      <tr style="border:1px solid #000;" >
+         <td colspan="240" style="border-right:1px solid #000;padding:5px;text-align:right;font-size: 12px;background-color: #ccc"></td> 
+       </tr>
+   </tfoot>
+</table>';
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-            </div>
+$mpdf->WriteHTML($style);
+// แผนขาไป
+$mpdf->WriteHTML($table_begin_goplan);
+$mpdf->WriteHTML($tr_goplan);
+$mpdf->WriteHTML($td_goplan);
+$mpdf->WriteHTML($table_end_goplan);
 
-        </div>
-            
-        
+$mpdf->AddPage();
 
-        
-        <!-- this will show our spinner -->
-        <div  id="loading" class="center" >
-            <p><img style="" src="../images/Truckload5.gif" /></p>
-        </div>
-        
-        <script src="../vendor/jquery/jquery.min.js"></script>
-        <script src="../js/jquery.datetimepicker.full.js"></script>
-        <script src="../js/bootstrap-datepicker.min.js"></script>
-        <script src="../js/bootstrap-datepicker.th.min.js"></script>
-        <!-- <script src="../vendor/datatables/js/jquery.dataTables.min.js"></script>
-        <script src="../vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-        <script src="../vendor/datatables-responsive/dataTables.responsive.js"></script> -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-        <script type="text/javascript">
+// วิ่งจริงขาไป
+$mpdf->WriteHTML($table_begin_goactual);
+$mpdf->WriteHTML($tr_goactual);
+$mpdf->WriteHTML($td_goactual);
+$mpdf->WriteHTML($table_end_goactual);
 
-        
+$mpdf->AddPage();
 
-        
+// แผนขากลับ
+$mpdf->WriteHTML($table_begin_backplan);
+$mpdf->WriteHTML($tr_backplan);
+$mpdf->WriteHTML($td_backplan);
+$mpdf->WriteHTML($table_end_backplan);
 
-            // $(document).ready(function () {
-            //     $('#dataTables-exampleshow').DataTable({
-            //         responsive: true,
-            //     });
-            // });
+$mpdf->AddPage();
 
+// วิ่งจริงขากลับ
+$mpdf->WriteHTML($table_begin_backactual);
+$mpdf->WriteHTML($tr_backactual);
+$mpdf->WriteHTML($td_backactual);
+$mpdf->WriteHTML($table_end_backactual);
 
-            // function auto_caltimeformobile(){
-            //     var checkClient = document.getElementById('txt_clientchk').value;
-            //     timesleepselfrestcheck(checkClient);
-            //     // alert(checkClient);
-                
+$mpdf->Output();
 
-            // }
-            
-            // // run the function
-            // var chkautofunc = document.getElementById('txt_autocallchk').value;
-            // alert(chkautofunc);
-            // if(chkautofunc == '1'){
-                
-            // }else{
-            //     document.getElementById('txt_autocallchk').value = '1';
-            //     // auto_caltimeformobile();
-            // }
-            // $(function () {
-            //     $('[data-toggle="popover"]').popover({
-            //     html: true,
-            //         content: function () {
-            //             return $('#popover-content').html();
-            //         }
-            //     });
-            // })
-            
-            function showLoading() {
-                $("#loading").show();
-            
-            }
-
-            function hideLoading() {
-                $("#loading").hide();
-            }
-
-            function alert_goplan(params) {
-                var chkid = params;
-
-                swal.fire({
-                    title: "Warning !",
-                    html: '<div style="text-align: center;">ข้อมูลรูปแบบการวิ่งงานแผนขาไปล่าสุด ยังไม่ครบสมบูรณ์<br><b>หมายเลขไอดี</b>&nbsp;: '+chkid.bold()+'<br></div>',
-                    // text: "ข้อมูลรูปแบบการวิ่งงานล่าสุด ยังไม่ครบถ้วนสมบูรณ์ หมายเลขไอดี",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-
-                // By Pass Error
-                // select_searchDrivingPattern('GoPlan','8','100007')
-            }
-            function alert_backplan(params) {
-                var chkid = params;
-
-                swal.fire({
-                    title: "Warning !",
-                    html: '<div style="text-align: center;">ข้อมูลรูปแบบการวิ่งงานแผนขากลับล่าสุด ยังไม่ครบสมบูรณ์<br><b>หมายเลขไอดี</b>&nbsp;: '+chkid.bold()+'<br></div>',
-                    // text: "ข้อมูลรูปแบบการวิ่งงานล่าสุด ยังไม่ครบถ้วนสมบูรณ์ หมายเลขไอดี",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-
-                 // By Pass Error
-                // select_searchDrivingPattern('BackPlan','8','100007')
-            }
-
-            function create_drivingpatternid(checkdata){
-
-                    
-                employeecode = '<?=$result_seEmp1['PersonCode']?>';
-                // alert(checkdata);
-
-                
-                if (checkdata == 'GoPlan') {
-
-                    $.ajax({
-                        type: 'post',
-                        url: 'meg_data_drivingpattern_driver.php',
-                        data: {
-                            txt_flg: "create_drivingpatterngoplanid",
-                            employeecode:employeecode,
-                            condition1:'',
-                            condition2:'',
-                            condition3:'',
-                            condition4:'',
-                            condition5:'',
-                        },
-                        success: function (chkid) {
-                            // alert(chkid);
-                            select_searchDrivingPattern(checkdata,chkid,employeecode)
-                        }
-                    }); 
-
-                    // select_searchDrivingPattern(checkdata,chkid,employeecode)
-                }else{
-
-                    // select_searchDrivingPattern(checkdata,'16')
-                    // alert('back plan');
-
-                    $.ajax({
-                        type: 'post',
-                        url: 'meg_data_drivingpattern_driver.php',
-                        data: {
-                            txt_flg: "create_drivingpatternbackplanid",
-                            employeecode:employeecode,
-                            condition1:'',
-                            condition2:'',
-                            condition3:'',
-                            condition4:'',
-                            condition5:'',
-                        },
-                        success: function (chkid) {
-                            // alert(chkid);
-                            select_searchDrivingPattern(checkdata,chkid,employeecode)
-                        }
-                    }); 
-
-                    // select_searchDrivingPattern(checkdata,'2','100007')
-                }
-                    
-
-                    
-            }
-            function select_searchDrivingPattern(checkdata,chkid,employeecode){
-                // alert(checkdata);
-                // showLoading();
-
-                if (checkdata == 'GoPlan') {
-                    // alert('Go Plan')
-                    
-                    window.open('meg_searchDrivingPatternGoPlanDriver.php?drivinggoplanid=' + chkid + '&employeecode1=' + employeecode, '_blank');
-                    window.location.reload();
-
-                    // $.ajax({
-                    //     type: 'post',
-                    //     url: 'meg_searchDrivingPatternGoPlanDriver.php',
-                    //     data: {
-                    //         truckdata: '',monthnumeric: '',month: '',years:'',goplanid:chkid
-                    //     },
-                    //     success: function (response) {
-                    //         if (response)
-                    //         {
-                    //             hideLoading();
-                    //             swal.fire({
-                    //                 title: "Good Job!",
-                    //                 text: "โหลดข้อมูลเรียบร้อย",
-                    //                 icon: "success",
-                    //                 showConfirmButton: true,
-                    //                 allowOutsideClick: false,
-                    //             });
-
-                    //             document.getElementById("list-data").innerHTML = "";
-                    //             document.getElementById("datade_edit").innerHTML = response;
-                    //             // $('[data-toggle="popover"]').popover({
-                    //             //     html: true,
-                    //             //     content: function () {
-                    //             //         return $('#popover-content').html();
-                    //             //     }
-
-                                    
-                    //             // });
-
-                                
-                    //         }
-                            
-                    //         $(function () {
-                    //             $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                    //             // กรณีใช้แบบ input
-                    //             $(".dateen").datetimepicker({
-                    //                 timepicker: true,
-                    //                 dateformat: 'Y-m-d' , // กำหนดรูปแบบวันที่ ที่ใช้ เป็น 00 - 00 - 0000
-                    //                 lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                    //                 timeFormat: "HH:mm"
-
-                    //             }
-                    //             );
-                    //         });
-
-
-                    //     }
-                    // });   
-
-                }else{
-
-                    // alert('Back Plan')
-                    window.open('meg_searchDrivingPatternBackPlanDriver.php?drivingbackplanid=' + chkid + '&employeecode1=' + employeecode, '_blank');
-                    window.location.reload();
-
-                    // $.ajax({
-                    //     type: 'post',
-                    //     url: 'meg_searchDrivingPatternBackPlanDriver.php',
-                    //     data: {
-                    //         truckdata: '',monthnumeric: '',month: '',years:'',backplanid:chkid
-                    //     },
-                    //     success: function (response) {
-                    //         if (response)
-                    //         {
-                    //             hideLoading();
-                    //             swal.fire({
-                    //                 title: "Good Job!",
-                    //                 text: "โหลดข้อมูลเรียบร้อย",
-                    //                 icon: "success",
-                    //                 showConfirmButton: true,
-                    //                 allowOutsideClick: false,
-                    //             });
-
-                    //             document.getElementById("list-data").innerHTML = "";
-                    //             document.getElementById("datade_edit").innerHTML = response;
-                    //             // $('[data-toggle="popover"]').popover({
-                    //             //     html: true,
-                    //             //     content: function () {
-                    //             //         return $('#popover-content').html();
-                    //             //     }
-
-                                    
-                    //             // });
-
-                                
-                    //         }
-                            
-                    //         $(function () {
-                    //             $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                    //             // กรณีใช้แบบ input
-                    //             $(".dateen").datetimepicker({
-                    //                 timepicker: true,
-                    //                 dateformat: 'Y-m-d' , // กำหนดรูปแบบวันที่ ที่ใช้ เป็น 00 - 00 - 0000
-                    //                 lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                    //                 timeFormat: "HH:mm"
-
-                    //             }
-                    //             );
-                    //         });
-
-
-                    //     }
-                    // });
-       
-                }
-                
-            }   
-
-              
-            
-
-            // $(function () {
-            //     $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-            //     // กรณีใช้แบบ input
-            //     $(".dateen").datetimepicker({
-            //         timepicker: true,
-            //         dateformat: 'Y-m-d' , // กำหนดรูปแบบวันที่ ที่ใช้ เป็น 00 - 00 - 0000
-            //         lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-            //         timeFormat: "HH:mm"
-
-            //     }
-            //     );
-            // });
-
-            
-                
-            
-
-        </script>
-
-
-
-
-
-
-    </body>
-
-</html>
-<?php
 sqlsrv_close($conn);
 ?>
+
