@@ -126,21 +126,18 @@
                     $numpage = "1";
                     /* Table_1 */
                         /* SQL QUERY */ 
-                            // Query ใหม่ ดึงจาก Table TEMP_OILAVERAGE_GW และ นำมาคำนวณ และ แสดงผล ใช้เวลาไม่ถึง 1 วินาที
-                                ${"s_1".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='1' AND DWK='$start_ymd_new'"; 
-                                ${"s_2".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='2' AND DWK='$start_ymd_new'";
-                                ${"s_3".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='3' AND DWK='$start_ymd_new'";
-                                ${"s_4".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='4' AND DWK='$start_ymd_new'";
-                                ${"s_5".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='5' AND DWK='$start_ymd_new'";
-                                ${"s_6".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='6' AND DWK='$start_ymd_new'";
-                                ${"s_7".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='7' AND DWK='$start_ymd_new'";
-                                ${"s_8".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='8' AND DWK='$start_ymd_new'";
-                                ${"s_9".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='9' AND DWK='$start_ymd_new'";
-                                ${"s_10".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='10' AND DWK='$start_ymd_new'";
-                                ${"s_11".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='11' AND DWK='$start_ymd_new'";
-                                ${"s_12".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='12' AND DWK='$start_ymd_new'";
-                                ${"s_13".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='13' AND DWK='$start_ymd_new'";
-                                ${"s_14".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_GW WHERE NUMBERROW='14' AND DWK='$start_ymd_new'";
+                            // Query ใหม่ ดึงจาก Table TEMP_OILAVERAGE_AMT และ นำมาคำนวณ และ แสดงผล ใช้เวลาไม่ถึง 1 วินาที
+                                ${"s_1".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='1' AND DWK='$start_ymd_new'"; 
+                                ${"s_2".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='2' AND DWK='$start_ymd_new'";
+                                ${"s_3".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='3' AND DWK='$start_ymd_new'";
+                                ${"s_4".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='4' AND DWK='$start_ymd_new'";
+                                ${"s_5".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='5' AND DWK='$start_ymd_new'";
+                                ${"s_6".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='6' AND DWK='$start_ymd_new'";
+                                ${"s_7".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='7' AND DWK='$start_ymd_new'";
+                                ${"s_8".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='8' AND DWK='$start_ymd_new'";
+                                ${"s_9".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='9' AND DWK='$start_ymd_new'";
+                                ${"s_10".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='10' AND DWK='$start_ymd_new'";
+                                ${"s_11".$work_sheet} = "SELECT DISTINCT * FROM TEMP_OILAVERAGE_AMT WHERE NUMBERROW='11' AND DWK='$start_ymd_new'";
                                 ${"q_1".$work_sheet} = sqlsrv_query($conn, ${"s_1".$work_sheet});${"r_1".$work_sheet} = sqlsrv_fetch_array(${"q_1".$work_sheet}, SQLSRV_FETCH_ASSOC);
                                 ${"q_2".$work_sheet} = sqlsrv_query($conn, ${"s_2".$work_sheet});${"r_2".$work_sheet} = sqlsrv_fetch_array(${"q_2".$work_sheet}, SQLSRV_FETCH_ASSOC);
                                 ${"q_3".$work_sheet} = sqlsrv_query($conn, ${"s_3".$work_sheet});${"r_3".$work_sheet} = sqlsrv_fetch_array(${"q_3".$work_sheet}, SQLSRV_FETCH_ASSOC);
@@ -152,9 +149,6 @@
                                 ${"q_9".$work_sheet} = sqlsrv_query($conn, ${"s_9".$work_sheet});${"r_9".$work_sheet} = sqlsrv_fetch_array(${"q_9".$work_sheet}, SQLSRV_FETCH_ASSOC);
                                 ${"q_10".$work_sheet} = sqlsrv_query($conn, ${"s_10".$work_sheet});${"r_10".$work_sheet} = sqlsrv_fetch_array(${"q_10".$work_sheet}, SQLSRV_FETCH_ASSOC);
                                 ${"q_11".$work_sheet} = sqlsrv_query($conn, ${"s_11".$work_sheet});${"r_11".$work_sheet} = sqlsrv_fetch_array(${"q_11".$work_sheet}, SQLSRV_FETCH_ASSOC);
-                                ${"q_12".$work_sheet} = sqlsrv_query($conn, ${"s_12".$work_sheet});${"r_12".$work_sheet} = sqlsrv_fetch_array(${"q_12".$work_sheet}, SQLSRV_FETCH_ASSOC);
-                                ${"q_13".$work_sheet} = sqlsrv_query($conn, ${"s_13".$work_sheet});${"r_13".$work_sheet} = sqlsrv_fetch_array(${"q_13".$work_sheet}, SQLSRV_FETCH_ASSOC);
-                                ${"q_14".$work_sheet} = sqlsrv_query($conn, ${"s_14".$work_sheet});${"r_14".$work_sheet} = sqlsrv_fetch_array(${"q_14".$work_sheet}, SQLSRV_FETCH_ASSOC);
                             // Total_1
                                 ${"totalTargetrow_1".$work_sheet}       = !empty(${"r_1".$work_sheet}['TARGET']) ? ${"r_1".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_1".$work_sheet}        = !empty(${"r_1".$work_sheet}['TRIPS']) ? ${"r_1".$work_sheet}['TRIPS'] : 0;
@@ -169,8 +163,8 @@
                                 ${"totalOkrow_1".$work_sheet}           = !empty(${"r_1".$work_sheet}['OK']) ? ${"r_1".$work_sheet}['OK'] : 0;
                                 ${"totalNgrow_1".$work_sheet}           = !empty(${"r_1".$work_sheet}['NG']) ? ${"r_1".$work_sheet}['NG'] : 0;
                                 ${"percentage_valuesrow_1".$work_sheet} = [${"r_1".$work_sheet}['PERCENTAGE']];
-                                ${"totalPercentagerow_1".$work_sheet}   = !empty(${"percentage_valuesrow_1".$work_sheet}) ? array_sum(${"percentage_valuesrow_1".$work_sheet}) / count(${"percentage_valuesrow_1".$work_sheet}) : 0;
-                                ${"totalDriverrow_1".$work_sheet}       = !empty(${"r_1".$work_sheet}['DRIVER']) ? ${"r_1".$work_sheet}['DRIVER'] : 0.00;
+                                ${"totalPercentagerow_1".$work_sheet}   = !empty(${"percentage_valuesrow_1".$work_sheet}) ? array_sum(${"percentage_valuesrow_1".$work_sheet}) / count(${"percentage_valuesrow_1".$work_sheet}) : 0;                                
+                                ${"totalDriverrow_1".$work_sheet}       = !empty(${"r_1".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_1".$work_sheet}['DRIVER'])) : 0.00;
                                 
                                 ${"total2groub_1".$work_sheet}          = ${"totalTripsrow_1".$work_sheet};
                                 ${"total3groub_1".$work_sheet}          = ${"totalMileagerow_1".$work_sheet};
@@ -182,7 +176,7 @@
                                 ${"total9groub_1".$work_sheet}          = ${"totalNgrow_1".$work_sheet};
                                 ${"total10groub_1".$work_sheet}         = round(${"totalPercentagerow_1".$work_sheet});
                                 ${"total11groub_1".$work_sheet}         = ${"totalDriverrow_1".$work_sheet};
-                                
+                            
                             // Total_2
                                 ${"totalTargetrow_2".$work_sheet}       = !empty(${"r_2".$work_sheet}['TARGET']) ? ${"r_2".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_2".$work_sheet}        = !empty(${"r_2".$work_sheet}['TRIPS']) ? ${"r_2".$work_sheet}['TRIPS'] : 0;
@@ -231,18 +225,7 @@
                                 ${"percentage_valuesrow_4".$work_sheet} = [${"r_4".$work_sheet}['PERCENTAGE']];
                                 ${"totalPercentagerow_4".$work_sheet}   = !empty(${"percentage_valuesrow_4".$work_sheet}) ? array_sum(${"percentage_valuesrow_4".$work_sheet}) / count(${"percentage_valuesrow_4".$work_sheet}) : 0;
                                 ${"totalDriverrow_4".$work_sheet}       = !empty(${"r_4".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_4".$work_sheet}['DRIVER'])) : 0.00;
-                                
-                                ${"total2groub_2".$work_sheet}          = ${"totalTripsrow_2".$work_sheet} + ${"totalTripsrow_3".$work_sheet} + ${"totalTripsrow_4".$work_sheet};
-                                ${"total3groub_2".$work_sheet}          = ${"totalMileagerow_2".$work_sheet} + ${"totalMileagerow_3".$work_sheet} + ${"totalMileagerow_4".$work_sheet};
-                                ${"total4groub_2".$work_sheet}          = ${"totalLiterrow_2".$work_sheet} + ${"totalLiterrow_3".$work_sheet} + ${"totalLiterrow_4".$work_sheet};
-                                ${"total5groub_2".$work_sheet}          = (${"totalActualrow_2".$work_sheet} + ${"totalActualrow_3".$work_sheet} + ${"totalActualrow_4".$work_sheet}) / 3;
-                                ${"total6groub_2".$work_sheet}          = (${"totalMinrow_2".$work_sheet} + ${"totalMinrow_3".$work_sheet} + ${"totalMinrow_4".$work_sheet}) / 3;
-                                ${"total7groub_2".$work_sheet}          = (${"totalMaxrow_2".$work_sheet} + ${"totalMaxrow_3".$work_sheet} + ${"totalMaxrow_4".$work_sheet}) / 3;
-                                ${"total8groub_2".$work_sheet}          = ${"totalOkrow_2".$work_sheet} + ${"totalOkrow_3".$work_sheet} + ${"totalOkrow_4".$work_sheet};
-                                ${"total9groub_2".$work_sheet}          = ${"totalNgrow_2".$work_sheet} + ${"totalNgrow_3".$work_sheet} + ${"totalNgrow_4".$work_sheet};
-                                ${"total10groub_2".$work_sheet}         = round((${"totalPercentagerow_2".$work_sheet} + ${"totalPercentagerow_3".$work_sheet} + ${"totalPercentagerow_4".$work_sheet}) / 3);
-                                ${"total11groub_2".$work_sheet}         = ${"totalDriverrow_2".$work_sheet} + ${"totalDriverrow_3".$work_sheet} + ${"totalDriverrow_4".$work_sheet};
-                            // Total_3
+
                                 ${"totalTargetrow_5".$work_sheet}       = !empty(${"r_5".$work_sheet}['TARGET']) ? ${"r_5".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_5".$work_sheet}        = !empty(${"r_5".$work_sheet}['TRIPS']) ? ${"r_5".$work_sheet}['TRIPS'] : 0;
                                 ${"totalMileagerow_5".$work_sheet}      = !empty(${"r_5".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_5".$work_sheet}['MILEAGE'])) : 0.00;
@@ -259,6 +242,18 @@
                                 ${"totalPercentagerow_5".$work_sheet}   = !empty(${"percentage_valuesrow_5".$work_sheet}) ? array_sum(${"percentage_valuesrow_5".$work_sheet}) / count(${"percentage_valuesrow_5".$work_sheet}) : 0;
                                 ${"totalDriverrow_5".$work_sheet}       = !empty(${"r_5".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_5".$work_sheet}['DRIVER'])) : 0.00;
                                 
+                                ${"total2groub_2".$work_sheet}          = ${"totalTripsrow_2".$work_sheet}+${"totalTripsrow_3".$work_sheet}+${"totalTripsrow_4".$work_sheet}+${"totalTripsrow_5".$work_sheet};
+                                ${"total3groub_2".$work_sheet}          = ${"totalMileagerow_2".$work_sheet}+${"totalMileagerow_3".$work_sheet}+${"totalMileagerow_4".$work_sheet}+${"totalMileagerow_5".$work_sheet};
+                                ${"total4groub_2".$work_sheet}          = ${"totalLiterrow_2".$work_sheet}+${"totalLiterrow_3".$work_sheet}+${"totalLiterrow_4".$work_sheet}+${"totalLiterrow_5".$work_sheet};
+                                ${"total5groub_2".$work_sheet}          = (${"totalActualrow_2".$work_sheet}+${"totalActualrow_3".$work_sheet}+${"totalActualrow_4".$work_sheet}+${"totalActualrow_5".$work_sheet}) / 4;
+                                ${"total6groub_2".$work_sheet}          = (${"totalMinrow_2".$work_sheet}+${"totalMinrow_3".$work_sheet}+${"totalMinrow_4".$work_sheet}+${"totalMinrow_5".$work_sheet}) / 4;
+                                ${"total7groub_2".$work_sheet}          = (${"totalMaxrow_2".$work_sheet}+${"totalMaxrow_3".$work_sheet}+${"totalMaxrow_4".$work_sheet}+${"totalMaxrow_5".$work_sheet}) / 4;
+                                ${"total8groub_2".$work_sheet}          = ${"totalOkrow_2".$work_sheet}+${"totalOkrow_3".$work_sheet}+${"totalOkrow_4".$work_sheet}+${"totalOkrow_5".$work_sheet};
+                                ${"total9groub_2".$work_sheet}          = ${"totalNgrow_2".$work_sheet}+${"totalNgrow_3".$work_sheet}+${"totalNgrow_4".$work_sheet}+${"totalNgrow_5".$work_sheet};
+                                ${"total10groub_2".$work_sheet}         = round((${"totalPercentagerow_2".$work_sheet}+${"totalPercentagerow_3".$work_sheet}+${"totalPercentagerow_4".$work_sheet}+${"totalPercentagerow_5".$work_sheet})/4);
+                                ${"total11groub_2".$work_sheet}         = ${"totalDriverrow_2".$work_sheet}+${"totalDriverrow_3".$work_sheet}+${"totalDriverrow_4".$work_sheet}+${"totalDriverrow_5".$work_sheet};
+                            
+                            // Total_3
                                 ${"totalTargetrow_6".$work_sheet}       = !empty(${"r_6".$work_sheet}['TARGET']) ? ${"r_6".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_6".$work_sheet}        = !empty(${"r_6".$work_sheet}['TRIPS']) ? ${"r_6".$work_sheet}['TRIPS'] : 0;
                                 ${"totalMileagerow_6".$work_sheet}      = !empty(${"r_6".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_6".$work_sheet}['MILEAGE'])) : 0.00;
@@ -274,7 +269,19 @@
                                 ${"percentage_valuesrow_6".$work_sheet} = [${"r_6".$work_sheet}['PERCENTAGE']];
                                 ${"totalPercentagerow_6".$work_sheet}   = !empty(${"percentage_valuesrow_6".$work_sheet}) ? array_sum(${"percentage_valuesrow_6".$work_sheet}) / count(${"percentage_valuesrow_6".$work_sheet}) : 0;
                                 ${"totalDriverrow_6".$work_sheet}       = !empty(${"r_6".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_6".$work_sheet}['DRIVER'])) : 0.00;
-                                
+
+                                ${"total2groub_3".$work_sheet}          = ${"totalTripsrow_6".$work_sheet};
+                                ${"total3groub_3".$work_sheet}          = ${"totalMileagerow_6".$work_sheet};
+                                ${"total4groub_3".$work_sheet}          = ${"totalLiterrow_6".$work_sheet};
+                                ${"total5groub_3".$work_sheet}          = ${"totalActualrow_6".$work_sheet};
+                                ${"total6groub_3".$work_sheet}          = ${"totalMinrow_6".$work_sheet} ;
+                                ${"total7groub_3".$work_sheet}          = ${"totalMaxrow_6".$work_sheet};
+                                ${"total8groub_3".$work_sheet}          = ${"totalOkrow_6".$work_sheet};
+                                ${"total9groub_3".$work_sheet}          = ${"totalNgrow_6".$work_sheet};
+                                ${"total10groub_3".$work_sheet}         = round(${"totalPercentagerow_6".$work_sheet});
+                                ${"total11groub_3".$work_sheet}         = ${"totalDriverrow_6".$work_sheet};
+                            
+                            // Total_4
                                 ${"totalTargetrow_7".$work_sheet}       = !empty(${"r_7".$work_sheet}['TARGET']) ? ${"r_7".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_7".$work_sheet}        = !empty(${"r_7".$work_sheet}['TRIPS']) ? ${"r_7".$work_sheet}['TRIPS'] : 0;
                                 ${"totalMileagerow_7".$work_sheet}      = !empty(${"r_7".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_7".$work_sheet}['MILEAGE'])) : 0.00;
@@ -290,18 +297,7 @@
                                 ${"percentage_valuesrow_7".$work_sheet} = [${"r_7".$work_sheet}['PERCENTAGE']];
                                 ${"totalPercentagerow_7".$work_sheet}   = !empty(${"percentage_valuesrow_7".$work_sheet}) ? array_sum(${"percentage_valuesrow_7".$work_sheet}) / count(${"percentage_valuesrow_7".$work_sheet}) : 0;
                                 ${"totalDriverrow_7".$work_sheet}       = !empty(${"r_7".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_7".$work_sheet}['DRIVER'])) : 0.00;
-                                
-                                ${"total2groub_3".$work_sheet}          = ${"totalTripsrow_5".$work_sheet} + ${"totalTripsrow_6".$work_sheet} + ${"totalTripsrow_7".$work_sheet};
-                                ${"total3groub_3".$work_sheet}          = ${"totalMileagerow_5".$work_sheet} + ${"totalMileagerow_6".$work_sheet} + ${"totalMileagerow_7".$work_sheet};
-                                ${"total4groub_3".$work_sheet}          = ${"totalLiterrow_5".$work_sheet} + ${"totalLiterrow_6".$work_sheet} + ${"totalLiterrow_7".$work_sheet};
-                                ${"total5groub_3".$work_sheet}          = (${"totalActualrow_5".$work_sheet} + ${"totalActualrow_6".$work_sheet} + ${"totalActualrow_7".$work_sheet}) / 3;
-                                ${"total6groub_3".$work_sheet}          = (${"totalMinrow_5".$work_sheet} + ${"totalMinrow_6".$work_sheet} + ${"totalMinrow_7".$work_sheet}) / 3;
-                                ${"total7groub_3".$work_sheet}          = (${"totalMaxrow_5".$work_sheet} + ${"totalMaxrow_6".$work_sheet} + ${"totalMaxrow_7".$work_sheet}) / 3;
-                                ${"total8groub_3".$work_sheet}          = ${"totalOkrow_5".$work_sheet} + ${"totalOkrow_6".$work_sheet} + ${"totalOkrow_7".$work_sheet};
-                                ${"total9groub_3".$work_sheet}          = ${"totalNgrow_5".$work_sheet} + ${"totalNgrow_6".$work_sheet} + ${"totalNgrow_7".$work_sheet};
-                                ${"total10groub_3".$work_sheet}         = round((${"totalPercentagerow_5".$work_sheet} + ${"totalPercentagerow_6".$work_sheet} + ${"totalPercentagerow_7".$work_sheet}) / 3);
-                                ${"total11groub_3".$work_sheet}         = ${"totalDriverrow_5".$work_sheet} + ${"totalDriverrow_6".$work_sheet} + ${"totalDriverrow_7".$work_sheet};
-                            // Total_4
+
                                 ${"totalTargetrow_8".$work_sheet}       = !empty(${"r_8".$work_sheet}['TARGET']) ? ${"r_8".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_8".$work_sheet}        = !empty(${"r_8".$work_sheet}['TRIPS']) ? ${"r_8".$work_sheet}['TRIPS'] : 0;
                                 ${"totalMileagerow_8".$work_sheet}      = !empty(${"r_8".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_8".$work_sheet}['MILEAGE'])) : 0.00;
@@ -317,7 +313,19 @@
                                 ${"percentage_valuesrow_8".$work_sheet} = [${"r_8".$work_sheet}['PERCENTAGE']];
                                 ${"totalPercentagerow_8".$work_sheet}   = !empty(${"percentage_valuesrow_8".$work_sheet}) ? array_sum(${"percentage_valuesrow_8".$work_sheet}) / count(${"percentage_valuesrow_8".$work_sheet}) : 0;
                                 ${"totalDriverrow_8".$work_sheet}       = !empty(${"r_8".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_8".$work_sheet}['DRIVER'])) : 0.00;
-                                
+                            
+                                ${"total2groub_4".$work_sheet}          = ${"totalTripsrow_7".$work_sheet}+${"totalTripsrow_8".$work_sheet};
+                                ${"total3groub_4".$work_sheet}          = ${"totalMileagerow_7".$work_sheet}+${"totalMileagerow_8".$work_sheet};
+                                ${"total4groub_4".$work_sheet}          = ${"totalLiterrow_7".$work_sheet}+${"totalLiterrow_8".$work_sheet};
+                                ${"total5groub_4".$work_sheet}          = (${"totalActualrow_7".$work_sheet}+${"totalActualrow_8".$work_sheet}) / 2;
+                                ${"total6groub_4".$work_sheet}          = (${"totalMinrow_7".$work_sheet}+${"totalMinrow_8".$work_sheet}) / 2;
+                                ${"total7groub_4".$work_sheet}          = (${"totalMaxrow_7".$work_sheet}+${"totalMaxrow_8".$work_sheet}) / 2;
+                                ${"total8groub_4".$work_sheet}          = ${"totalOkrow_7".$work_sheet}+${"totalOkrow_8".$work_sheet};
+                                ${"total9groub_4".$work_sheet}          = ${"totalNgrow_7".$work_sheet}+${"totalNgrow_8".$work_sheet};
+                                ${"total10groub_4".$work_sheet}         = round((${"totalPercentagerow_7".$work_sheet}+${"totalPercentagerow_8".$work_sheet})/2);
+                                ${"total11groub_4".$work_sheet}         = ${"totalDriverrow_7".$work_sheet}+${"totalDriverrow_8".$work_sheet};
+
+                            // Total_5
                                 ${"totalTargetrow_9".$work_sheet}       = !empty(${"r_9".$work_sheet}['TARGET']) ? ${"r_9".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_9".$work_sheet}        = !empty(${"r_9".$work_sheet}['TRIPS']) ? ${"r_9".$work_sheet}['TRIPS'] : 0;
                                 ${"totalMileagerow_9".$work_sheet}      = !empty(${"r_9".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_9".$work_sheet}['MILEAGE'])) : 0.00;
@@ -328,12 +336,12 @@
                                 ${"totalMinrow_9".$work_sheet}          = !empty(${"min_valuesrow_9".$work_sheet}) ? array_sum(${"min_valuesrow_9".$work_sheet}) / count(${"min_valuesrow_9".$work_sheet}) : 0;
                                 ${"max_valuesrow_9".$work_sheet}        = [${"r_9".$work_sheet}['MAX'] === '-9,999,999,999.00' ? 0.00 : ${"r_9".$work_sheet}['MAX']];
                                 ${"totalMaxrow_9".$work_sheet}          = !empty(${"max_valuesrow_9".$work_sheet}) ? array_sum(${"max_valuesrow_9".$work_sheet}) / count(${"max_valuesrow_9".$work_sheet}) : 0;
-                                ${"totalOkrow_9".$work_sheet}           = !empty(${"r_9".$work_sheet}['OK']) ? ${"r_9".$work_sheet}['OK'] : 0;
+                                ${"totalOkrow_9".$work_sheet}           = !empty(${"r_9".$work_sheet}['OK']) ? ${"r_9".$work_sheet}['OK'] : 0;    
                                 ${"totalNgrow_9".$work_sheet}           = !empty(${"r_9".$work_sheet}['NG']) ? ${"r_9".$work_sheet}['NG'] : 0;
                                 ${"percentage_valuesrow_9".$work_sheet} = [${"r_9".$work_sheet}['PERCENTAGE']];
                                 ${"totalPercentagerow_9".$work_sheet}   = !empty(${"percentage_valuesrow_9".$work_sheet}) ? array_sum(${"percentage_valuesrow_9".$work_sheet}) / count(${"percentage_valuesrow_9".$work_sheet}) : 0;
                                 ${"totalDriverrow_9".$work_sheet}       = !empty(${"r_9".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_9".$work_sheet}['DRIVER'])) : 0.00;
-                                
+
                                 ${"totalTargetrow_10".$work_sheet}      = !empty(${"r_10".$work_sheet}['TARGET']) ? ${"r_10".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_10".$work_sheet}       = !empty(${"r_10".$work_sheet}['TRIPS']) ? ${"r_10".$work_sheet}['TRIPS'] : 0;
                                 ${"totalMileagerow_10".$work_sheet}     = !empty(${"r_10".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_10".$work_sheet}['MILEAGE'])) : 0.00;
@@ -349,7 +357,7 @@
                                 ${"percentage_valuesrow_10".$work_sheet}= [${"r_10".$work_sheet}['PERCENTAGE']];
                                 ${"totalPercentagerow_10".$work_sheet}  = !empty(${"percentage_valuesrow_10".$work_sheet}) ? array_sum(${"percentage_valuesrow_10".$work_sheet}) / count(${"percentage_valuesrow_10".$work_sheet}) : 0;
                                 ${"totalDriverrow_10".$work_sheet}      = !empty(${"r_10".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_10".$work_sheet}['DRIVER'])) : 0.00;
-                                
+
                                 ${"totalTargetrow_11".$work_sheet}      = !empty(${"r_11".$work_sheet}['TARGET']) ? ${"r_11".$work_sheet}['TARGET'] : 0.00;
                                 ${"totalTripsrow_11".$work_sheet}       = !empty(${"r_11".$work_sheet}['TRIPS']) ? ${"r_11".$work_sheet}['TRIPS'] : 0;
                                 ${"totalMileagerow_11".$work_sheet}     = !empty(${"r_11".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_11".$work_sheet}['MILEAGE'])) : 0.00;
@@ -365,76 +373,29 @@
                                 ${"percentage_valuesrow_11".$work_sheet}= [${"r_11".$work_sheet}['PERCENTAGE']];
                                 ${"totalPercentagerow_11".$work_sheet}  = !empty(${"percentage_valuesrow_11".$work_sheet}) ? array_sum(${"percentage_valuesrow_11".$work_sheet}) / count(${"percentage_valuesrow_11".$work_sheet}) : 0;
                                 ${"totalDriverrow_11".$work_sheet}      = !empty(${"r_11".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_11".$work_sheet}['DRIVER'])) : 0.00;
-                                
-                                ${"totalTargetrow_12".$work_sheet}      = !empty(${"r_12".$work_sheet}['TARGET']) ? ${"r_12".$work_sheet}['TARGET'] : 0.00;
-                                ${"totalTripsrow_12".$work_sheet}       = !empty(${"r_12".$work_sheet}['TRIPS']) ? ${"r_12".$work_sheet}['TRIPS'] : 0;
-                                ${"totalMileagerow_12".$work_sheet}     = !empty(${"r_12".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_12".$work_sheet}['MILEAGE'])) : 0.00;
-                                ${"totalLiterrow_12".$work_sheet}       = !empty(${"r_12".$work_sheet}['LITER']) ? floatval(str_replace(',', '', ${"r_12".$work_sheet}['LITER'])) : 0.00;
-                                ${"actual_valuesrow_12".$work_sheet}    = [${"r_12".$work_sheet}['ACTUAL']];
-                                ${"totalActualrow_12".$work_sheet}      = !empty(${"actual_valuesrow_12".$work_sheet}) ? array_sum(${"actual_valuesrow_12".$work_sheet}) / count(${"actual_valuesrow_12".$work_sheet}) : 0;
-                                ${"min_valuesrow_12".$work_sheet}       = [${"r_12".$work_sheet}['MIN'] === '9,999,999,999.00' ? 0.00 : ${"r_12".$work_sheet}['MIN']];
-                                ${"totalMinrow_12".$work_sheet}         = !empty(${"min_valuesrow_12".$work_sheet}) ? array_sum(${"min_valuesrow_12".$work_sheet}) / count(${"min_valuesrow_12".$work_sheet}) : 0;
-                                ${"max_valuesrow_12".$work_sheet}       = [${"r_12".$work_sheet}['MAX'] === '-9,999,999,999.00' ? 0.00 : ${"r_12".$work_sheet}['MAX']];
-                                ${"totalMaxrow_12".$work_sheet}         = !empty(${"max_valuesrow_12".$work_sheet}) ? array_sum(${"max_valuesrow_12".$work_sheet}) / count(${"max_valuesrow_12".$work_sheet}) : 0;
-                                ${"totalOkrow_12".$work_sheet}          = !empty(${"r_12".$work_sheet}['OK']) ? ${"r_12".$work_sheet}['OK'] : 0;
-                                ${"totalNgrow_12".$work_sheet}          = !empty(${"r_12".$work_sheet}['NG']) ? ${"r_12".$work_sheet}['NG'] : 0;
-                                ${"percentage_valuesrow_12".$work_sheet}= [${"r_12".$work_sheet}['PERCENTAGE']];
-                                ${"totalPercentagerow_12".$work_sheet}  = !empty(${"percentage_valuesrow_12".$work_sheet}) ? array_sum(${"percentage_valuesrow_12".$work_sheet}) / count(${"percentage_valuesrow_12".$work_sheet}) : 0;
-                                ${"totalDriverrow_12".$work_sheet}      = !empty(${"r_12".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_12".$work_sheet}['DRIVER'])) : 0.00;
-                                
-                                ${"totalTargetrow_13".$work_sheet}      = !empty(${"r_13".$work_sheet}['TARGET']) ? ${"r_13".$work_sheet}['TARGET'] : 0.00;
-                                ${"totalTripsrow_13".$work_sheet}       = !empty(${"r_13".$work_sheet}['TRIPS']) ? ${"r_13".$work_sheet}['TRIPS'] : 0;
-                                ${"totalMileagerow_13".$work_sheet}     = !empty(${"r_13".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_13".$work_sheet}['MILEAGE'])) : 0.00;
-                                ${"totalLiterrow_13".$work_sheet}       = !empty(${"r_13".$work_sheet}['LITER']) ? floatval(str_replace(',', '', ${"r_13".$work_sheet}['LITER'])) : 0.00;
-                                ${"actual_valuesrow_13".$work_sheet}    = [${"r_13".$work_sheet}['ACTUAL']];
-                                ${"totalActualrow_13".$work_sheet}      = !empty(${"actual_valuesrow_13".$work_sheet}) ? array_sum(${"actual_valuesrow_13".$work_sheet}) / count(${"actual_valuesrow_13".$work_sheet}) : 0;
-                                ${"min_valuesrow_13".$work_sheet}       = [${"r_13".$work_sheet}['MIN'] === '9,999,999,999.00' ? 0.00 : ${"r_13".$work_sheet}['MIN']];
-                                ${"totalMinrow_13".$work_sheet}         = !empty(${"min_valuesrow_13".$work_sheet}) ? array_sum(${"min_valuesrow_13".$work_sheet}) / count(${"min_valuesrow_13".$work_sheet}) : 0;
-                                ${"max_valuesrow_13".$work_sheet}       = [${"r_13".$work_sheet}['MAX'] === '-9,999,999,999.00' ? 0.00 : ${"r_13".$work_sheet}['MAX']];
-                                ${"totalMaxrow_13".$work_sheet}         = !empty(${"max_valuesrow_13".$work_sheet}) ? array_sum(${"max_valuesrow_13".$work_sheet}) / count(${"max_valuesrow_13".$work_sheet}) : 0;
-                                ${"totalOkrow_13".$work_sheet}          = !empty(${"r_13".$work_sheet}['OK']) ? ${"r_13".$work_sheet}['OK'] : 0;
-                                ${"totalNgrow_13".$work_sheet}          = !empty(${"r_13".$work_sheet}['NG']) ? ${"r_13".$work_sheet}['NG'] : 0;
-                                ${"percentage_valuesrow_13".$work_sheet}= [${"r_13".$work_sheet}['PERCENTAGE']];
-                                ${"totalPercentagerow_13".$work_sheet}  = !empty(${"percentage_valuesrow_13".$work_sheet}) ? array_sum(${"percentage_valuesrow_13".$work_sheet}) / count(${"percentage_valuesrow_13".$work_sheet}) : 0;
-                                ${"totalDriverrow_13".$work_sheet}      = !empty(${"r_13".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_13".$work_sheet}['DRIVER'])) : 0.00;
-                                
-                                ${"totalTargetrow_14".$work_sheet}      = !empty(${"r_14".$work_sheet}['TARGET']) ? ${"r_14".$work_sheet}['TARGET'] : 0.00;
-                                ${"totalTripsrow_14".$work_sheet}       = !empty(${"r_14".$work_sheet}['TRIPS']) ? ${"r_14".$work_sheet}['TRIPS'] : 0;
-                                ${"totalMileagerow_14".$work_sheet}     = !empty(${"r_14".$work_sheet}['MILEAGE']) ? floatval(str_replace(',', '', ${"r_14".$work_sheet}['MILEAGE'])) : 0.00;
-                                ${"totalLiterrow_14".$work_sheet}       = !empty(${"r_14".$work_sheet}['LITER']) ? floatval(str_replace(',', '', ${"r_14".$work_sheet}['LITER'])) : 0.00;
-                                ${"actual_valuesrow_14".$work_sheet}    = [${"r_14".$work_sheet}['ACTUAL']];
-                                ${"totalActualrow_14".$work_sheet}      = !empty(${"actual_valuesrow_14".$work_sheet}) ? array_sum(${"actual_valuesrow_14".$work_sheet}) / count(${"actual_valuesrow_14".$work_sheet}) : 0;
-                                ${"min_valuesrow_14".$work_sheet}       = [${"r_14".$work_sheet}['MIN'] === '9,999,999,999.00' ? 0.00 : ${"r_14".$work_sheet}['MIN']];
-                                ${"totalMinrow_14".$work_sheet}         = !empty(${"min_valuesrow_14".$work_sheet}) ? array_sum(${"min_valuesrow_14".$work_sheet}) / count(${"min_valuesrow_14".$work_sheet}) : 0;
-                                ${"max_valuesrow_14".$work_sheet}       = [${"r_14".$work_sheet}['MAX'] === '-9,999,999,999.00' ? 0.00 : ${"r_14".$work_sheet}['MAX']];
-                                ${"totalMaxrow_14".$work_sheet}         = !empty(${"max_valuesrow_14".$work_sheet}) ? array_sum(${"max_valuesrow_14".$work_sheet}) / count(${"max_valuesrow_14".$work_sheet}) : 0;
-                                ${"totalOkrow_14".$work_sheet}          = !empty(${"r_14".$work_sheet}['OK']) ? ${"r_14".$work_sheet}['OK'] : 0;
-                                ${"totalNgrow_14".$work_sheet}          = !empty(${"r_14".$work_sheet}['NG']) ? ${"r_14".$work_sheet}['NG'] : 0;
-                                ${"percentage_valuesrow_14".$work_sheet}= [${"r_14".$work_sheet}['PERCENTAGE']];
-                                ${"totalPercentagerow_14".$work_sheet}  = !empty(${"percentage_valuesrow_14".$work_sheet}) ? array_sum(${"percentage_valuesrow_14".$work_sheet}) / count(${"percentage_valuesrow_14".$work_sheet}) : 0;
-                                ${"totalDriverrow_14".$work_sheet}      = !empty(${"r_14".$work_sheet}['DRIVER']) ? floatval(str_replace(',', '', ${"r_14".$work_sheet}['DRIVER'])) : 0.00;
-                                
-                                ${"total2groub_4".$work_sheet}          = ${"totalTripsrow_8".$work_sheet} + ${"totalTripsrow_9".$work_sheet} + ${"totalTripsrow_10".$work_sheet} + ${"totalTripsrow_11".$work_sheet} + ${"totalTripsrow_12".$work_sheet} + ${"totalTripsrow_13".$work_sheet} + ${"totalTripsrow_14".$work_sheet};
-                                ${"total3groub_4".$work_sheet}          = ${"totalMileagerow_8".$work_sheet} + ${"totalMileagerow_9".$work_sheet} + ${"totalMileagerow_10".$work_sheet} + ${"totalMileagerow_11".$work_sheet} + ${"totalMileagerow_12".$work_sheet} + ${"totalMileagerow_13".$work_sheet} + ${"totalMileagerow_14".$work_sheet};
-                                ${"total4groub_4".$work_sheet}          = ${"totalLiterrow_8".$work_sheet} + ${"totalLiterrow_9".$work_sheet} + ${"totalLiterrow_10".$work_sheet} + ${"totalLiterrow_11".$work_sheet} + ${"totalLiterrow_12".$work_sheet} + ${"totalLiterrow_13".$work_sheet} + ${"totalLiterrow_14".$work_sheet};
-                                ${"total5groub_4".$work_sheet}          = (${"totalActualrow_8".$work_sheet} + ${"totalActualrow_9".$work_sheet} + ${"totalActualrow_10".$work_sheet} + ${"totalActualrow_11".$work_sheet} + ${"totalActualrow_12".$work_sheet} + ${"totalActualrow_13".$work_sheet} + ${"totalActualrow_14".$work_sheet}) / 7;
-                                ${"total6groub_4".$work_sheet}          = (${"totalMinrow_8".$work_sheet} + ${"totalMinrow_9".$work_sheet} + ${"totalMinrow_10".$work_sheet} + ${"totalMinrow_11".$work_sheet} + ${"totalMinrow_12".$work_sheet} + ${"totalMinrow_13".$work_sheet} + ${"totalMinrow_14".$work_sheet}) / 7;
-                                ${"total7groub_4".$work_sheet}          = (${"totalMaxrow_8".$work_sheet} + ${"totalMaxrow_9".$work_sheet} + ${"totalMaxrow_10".$work_sheet} + ${"totalMaxrow_11".$work_sheet} + ${"totalMaxrow_12".$work_sheet} + ${"totalMaxrow_13".$work_sheet} + ${"totalMaxrow_14".$work_sheet}) / 7;
-                                ${"total8groub_4".$work_sheet}          = ${"totalOkrow_8".$work_sheet} + ${"totalOkrow_9".$work_sheet} + ${"totalOkrow_10".$work_sheet} + ${"totalOkrow_11".$work_sheet} + ${"totalOkrow_12".$work_sheet} + ${"totalOkrow_13".$work_sheet} + ${"totalOkrow_14".$work_sheet};
-                                ${"total9groub_4".$work_sheet}          = ${"totalNgrow_8".$work_sheet} + ${"totalNgrow_9".$work_sheet} + ${"totalNgrow_10".$work_sheet} + ${"totalNgrow_11".$work_sheet} + ${"totalNgrow_12".$work_sheet} + ${"totalNgrow_13".$work_sheet} + ${"totalNgrow_14".$work_sheet};
-                                ${"total10groub_4".$work_sheet}         = round((${"totalPercentagerow_8".$work_sheet} + ${"totalPercentagerow_9".$work_sheet} + ${"totalPercentagerow_10".$work_sheet} + ${"totalPercentagerow_11".$work_sheet} + ${"totalPercentagerow_12".$work_sheet} + ${"totalPercentagerow_13".$work_sheet} + ${"totalPercentagerow_14".$work_sheet}) / 7);
-                                ${"total11groub_4".$work_sheet}         = ${"totalDriverrow_8".$work_sheet} + ${"totalDriverrow_9".$work_sheet} + ${"totalDriverrow_10".$work_sheet} + ${"totalDriverrow_11".$work_sheet} + ${"totalDriverrow_12".$work_sheet} + ${"totalDriverrow_13".$work_sheet} + ${"totalDriverrow_14".$work_sheet};
-                            // Total_5
-                                ${"alltotal2".$work_sheet}              = ${"total2groub_1".$work_sheet} + ${"total2groub_2".$work_sheet} + ${"total2groub_3".$work_sheet} + ${"total2groub_4".$work_sheet};
-                                ${"alltotal3".$work_sheet}              = ${"total3groub_1".$work_sheet} + ${"total3groub_2".$work_sheet} + ${"total3groub_3".$work_sheet} + ${"total3groub_4".$work_sheet};
-                                ${"alltotal4".$work_sheet}              = ${"total4groub_1".$work_sheet} + ${"total4groub_2".$work_sheet} + ${"total4groub_3".$work_sheet} + ${"total4groub_4".$work_sheet};
-                                ${"alltotal5".$work_sheet}              = (${"total5groub_1".$work_sheet} + ${"total5groub_2".$work_sheet} + ${"total5groub_3".$work_sheet} + ${"total5groub_4".$work_sheet}) / 4;
-                                ${"alltotal6".$work_sheet}              = (${"total6groub_1".$work_sheet} + ${"total6groub_2".$work_sheet} + ${"total6groub_3".$work_sheet} + ${"total6groub_4".$work_sheet}) / 4;
-                                ${"alltotal7".$work_sheet}              = (${"total7groub_1".$work_sheet} + ${"total7groub_2".$work_sheet} + ${"total7groub_3".$work_sheet} + ${"total7groub_4".$work_sheet}) / 4;
-                                ${"alltotal8".$work_sheet}              = ${"total8groub_1".$work_sheet} + ${"total8groub_2".$work_sheet} + ${"total8groub_3".$work_sheet} + ${"total8groub_4".$work_sheet};
-                                ${"alltotal9".$work_sheet}              = ${"total9groub_1".$work_sheet} + ${"total9groub_2".$work_sheet} + ${"total9groub_3".$work_sheet} + ${"total9groub_4".$work_sheet};
-                                ${"alltotal10".$work_sheet}             = round((${"total10groub_1".$work_sheet} + ${"total10groub_2".$work_sheet} + ${"total10groub_3".$work_sheet} + ${"total10groub_4".$work_sheet}) / 4);
-                                ${"alltotal11".$work_sheet}             = ${"total11groub_1".$work_sheet} + ${"total11groub_2".$work_sheet} + ${"total11groub_3".$work_sheet} + ${"total11groub_4".$work_sheet};
+
+                                ${"total2groub_5".$work_sheet}          = ${"totalTripsrow_9".$work_sheet}+${"totalTripsrow_10".$work_sheet}+${"totalTripsrow_11".$work_sheet};
+                                ${"total3groub_5".$work_sheet}          = ${"totalMileagerow_9".$work_sheet}+${"totalMileagerow_10".$work_sheet}+${"totalMileagerow_11".$work_sheet};
+                                ${"total4groub_5".$work_sheet}          = ${"totalLiterrow_9".$work_sheet}+${"totalLiterrow_10".$work_sheet}+${"totalLiterrow_11".$work_sheet};
+                                ${"total5groub_5".$work_sheet}          = (${"totalActualrow_9".$work_sheet}+${"totalActualrow_10".$work_sheet}+${"totalActualrow_11".$work_sheet}) / 3;
+                                ${"total6groub_5".$work_sheet}          = (${"totalMinrow_9".$work_sheet}+${"totalMinrow_10".$work_sheet}+${"totalMinrow_11".$work_sheet}) / 3;
+                                ${"total7groub_5".$work_sheet}          = (${"totalMaxrow_9".$work_sheet}+${"totalMaxrow_10".$work_sheet}+${"totalMaxrow_11".$work_sheet}) / 3;
+                                ${"total8groub_5".$work_sheet}          = ${"totalOkrow_9".$work_sheet}+${"totalOkrow_10".$work_sheet}+${"totalOkrow_11".$work_sheet};
+                                ${"total9groub_5".$work_sheet}          = ${"totalNgrow_9".$work_sheet}+${"totalNgrow_10".$work_sheet}+${"totalNgrow_11".$work_sheet};
+                                ${"total10groub_5".$work_sheet}         = round((${"totalPercentagerow_9".$work_sheet}+${"totalPercentagerow_10".$work_sheet}+${"totalPercentagerow_11".$work_sheet})/3);
+                                ${"total11groub_5".$work_sheet}         = ${"totalDriverrow_9".$work_sheet}+${"totalDriverrow_10".$work_sheet}+${"totalDriverrow_11".$work_sheet};
+
+                            // Total_6
+                                ${"alltotal2".$work_sheet}              = ${"total2groub_1".$work_sheet} + ${"total2groub_2".$work_sheet} + ${"total2groub_3".$work_sheet} + ${"total2groub_4".$work_sheet} + ${"total2groub_5".$work_sheet};
+                                ${"alltotal3".$work_sheet}              = ${"total3groub_1".$work_sheet} + ${"total3groub_2".$work_sheet} + ${"total3groub_3".$work_sheet} + ${"total3groub_4".$work_sheet} + ${"total3groub_5".$work_sheet};
+                                ${"alltotal4".$work_sheet}              = ${"total4groub_1".$work_sheet} + ${"total4groub_2".$work_sheet} + ${"total4groub_3".$work_sheet} + ${"total4groub_4".$work_sheet} + ${"total4groub_5".$work_sheet};
+                                ${"alltotal5".$work_sheet}              = (${"total5groub_1".$work_sheet} + ${"total5groub_2".$work_sheet} + ${"total5groub_3".$work_sheet} + ${"total5groub_4".$work_sheet} + ${"total5groub_5".$work_sheet}) / 5;
+                                ${"alltotal6".$work_sheet}              = (${"total6groub_1".$work_sheet} + ${"total6groub_2".$work_sheet} + ${"total6groub_3".$work_sheet} + ${"total6groub_4".$work_sheet} + ${"total6groub_5".$work_sheet}) / 5;
+                                ${"alltotal7".$work_sheet}              = (${"total7groub_1".$work_sheet} + ${"total7groub_2".$work_sheet} + ${"total7groub_3".$work_sheet} + ${"total7groub_4".$work_sheet} + ${"total7groub_5".$work_sheet}) / 5;
+                                ${"alltotal8".$work_sheet}              = ${"total8groub_1".$work_sheet} + ${"total8groub_2".$work_sheet} + ${"total8groub_3".$work_sheet} + ${"total8groub_4".$work_sheet} + ${"total8groub_5".$work_sheet};
+                                ${"alltotal9".$work_sheet}              = ${"total9groub_1".$work_sheet} + ${"total9groub_2".$work_sheet} + ${"total9groub_3".$work_sheet} + ${"total9groub_4".$work_sheet} + ${"total9groub_5".$work_sheet};
+                                ${"alltotal10".$work_sheet}             = round((${"total10groub_1".$work_sheet} + ${"total10groub_2".$work_sheet} + ${"total10groub_3".$work_sheet} + ${"total10groub_4".$work_sheet} + ${"total10groub_5".$work_sheet}) / 5);
+                                ${"alltotal11".$work_sheet}             = ${"total11groub_1".$work_sheet} + ${"total11groub_2".$work_sheet} + ${"total11groub_3".$work_sheet} + ${"total11groub_4".$work_sheet} + ${"total11groub_5".$work_sheet};
 
                         /* Table Width */ 
                             $sheet->getColumnDimension('A')->setWidth(15);
@@ -451,21 +412,21 @@
                             $sheet->getColumnDimension('L')->setWidth(10);
                             $sheet->getColumnDimension('M')->setWidth(20);
                         /* Table Border */
-                            $sheet->getStyle('A4:M25')->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+                            $sheet->getStyle('A4:M23')->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
                         /* Table Center */ 
                             $objPHPExcel->getActiveSheet()->getStyle('A4:M6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-                            $objPHPExcel->getActiveSheet()->getStyle('A7:B24')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                            $objPHPExcel->getActiveSheet()->getStyle('A7:C24')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                             $objPHPExcel->getActiveSheet()->getStyle('D7:D26')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                             $objPHPExcel->getActiveSheet()->getStyle('E7:F26')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
                             $objPHPExcel->getActiveSheet()->getStyle('G7:K26')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                             $objPHPExcel->getActiveSheet()->getStyle('L7:M26')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
                         /* Table Style */
-                            $sheet->getStyle('A7:M25')->applyFromArray(array('font' => array('bold' => true)));
+                            $sheet->getStyle('A7:M23')->applyFromArray(array('font' => array('bold' => true)));
                             $sheet->getStyle('J7:J25')->applyFromArray(array('font' => array('bold' => true,'color' => array('rgb' => '0000FF'))));
                             $sheet->getStyle('K7:K25')->applyFromArray(array('font' => array('bold' => true,'color' => array('rgb' => 'FF0000'))));
                             $sheet->getStyle('B7:B23')->getNumberFormat()->setFormatCode('0.00');
-                            $sheet->getStyle('E7:I25')->getNumberFormat()->setFormatCode('0.00');
-                            $sheet->getStyle('M7:M25')->getNumberFormat()->setFormatCode('0.00');
+                            $sheet->getStyle('E7:I23')->getNumberFormat()->setFormatCode('0.00');
+                            $sheet->getStyle('M7:M23')->getNumberFormat()->setFormatCode('0.00');
                         /* Head Value */ 
                             $objPHPExcel->getActiveSheet()->
                             setCellValue('A4', 'Type')->
@@ -498,10 +459,10 @@
                         /* HEAD Style */
                             $sheet->getStyle('A4:M6')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
 
-                        /* 4L */
-                            $objPHPExcel->getActiveSheet()->setCellValue('A7','4L');
+                        /* 6W */
+                            $objPHPExcel->getActiveSheet()->setCellValue('A7','6W');
                             $objPHPExcel->getActiveSheet()->setCellValue('B7', number_format(${"totalTargetrow_1".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C7','TTT(NM)');
+                            $objPHPExcel->getActiveSheet()->setCellValue('C7','TGT');
                             $objPHPExcel->getActiveSheet()->setCellValue('D7', number_format(${"totalTripsrow_1".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('E7', number_format(${"totalMileagerow_1".$work_sheet},2));                      
                             $objPHPExcel->getActiveSheet()->setCellValue('F7', number_format(${"totalLiterrow_1".$work_sheet},2));
@@ -524,17 +485,17 @@
                             $objPHPExcel->getActiveSheet()->setCellValue('L8', number_format(${"total10groub_1".$work_sheet}).'%');
                             $objPHPExcel->getActiveSheet()->setCellValue('M8', number_format(${"total11groub_1".$work_sheet},2));
 
-                        /* 4L Merge */ 
+                        /* 6W Merge */ 
                             $objPHPExcel->getActiveSheet()->mergeCells('A7:A8');
                             $objPHPExcel->getActiveSheet()->mergeCells('B8:C8');
-                        /* 4L Style */
+                        /* 6W Style */
                             $sheet->getStyle('B8:M8')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
                             $objPHPExcel->getActiveSheet()->getStyle('B8')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 
-                        /* 8L RCC */
-                            $objPHPExcel->getActiveSheet()->setCellValue('A9','8L RCC');
+                        /* 10W */
+                            $objPHPExcel->getActiveSheet()->setCellValue('A9','10W');
                             $objPHPExcel->getActiveSheet()->setCellValue('B9', number_format(${"totalTargetrow_2".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C9','TTT(SH)');
+                            $objPHPExcel->getActiveSheet()->setCellValue('C9','STM-SR');
                             $objPHPExcel->getActiveSheet()->setCellValue('D9', number_format(${"totalTripsrow_2".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('E9', number_format(${"totalMileagerow_2".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('F9', number_format(${"totalLiterrow_2".$work_sheet},2));
@@ -546,7 +507,7 @@
                             $objPHPExcel->getActiveSheet()->setCellValue('L9', number_format(${"totalPercentagerow_2".$work_sheet}).'%');
                             $objPHPExcel->getActiveSheet()->setCellValue('M9', number_format(${"totalDriverrow_2".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('B10', number_format(${"totalTargetrow_3".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C10','TTT(NM)');
+                            $objPHPExcel->getActiveSheet()->setCellValue('C10','T.TOHKEN');
                             $objPHPExcel->getActiveSheet()->setCellValue('D10', number_format(${"totalTripsrow_3".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('E10', number_format(${"totalMileagerow_3".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('F10', number_format(${"totalLiterrow_3".$work_sheet},2));
@@ -558,7 +519,7 @@
                             $objPHPExcel->getActiveSheet()->setCellValue('L10', number_format(${"totalPercentagerow_3".$work_sheet}).'%');
                             $objPHPExcel->getActiveSheet()->setCellValue('M10', number_format(${"totalDriverrow_3".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('B11', number_format(${"totalTargetrow_4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C11','TTT(LR)');
+                            $objPHPExcel->getActiveSheet()->setCellValue('C11','STC');
                             $objPHPExcel->getActiveSheet()->setCellValue('D11', number_format(${"totalTripsrow_4".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('E11', number_format(${"totalMileagerow_4".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('F11', number_format(${"totalLiterrow_4".$work_sheet},2));
@@ -569,40 +530,40 @@
                             $objPHPExcel->getActiveSheet()->setCellValue('K11', number_format(${"totalNgrow_4".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('L11', number_format(${"totalPercentagerow_4".$work_sheet}).'%');
                             $objPHPExcel->getActiveSheet()->setCellValue('M11', number_format(${"totalDriverrow_4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B12','Total');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D12', number_format(${"total2groub_2".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E12', number_format(${"total3groub_2".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F12', number_format(${"total4groub_2".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G12', number_format(${"total5groub_2".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H12', number_format(${"total6groub_2".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I12', number_format(${"total7groub_2".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J12', number_format(${"total8groub_2".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K12', number_format(${"total9groub_2".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L12', number_format(${"total10groub_2".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M12', number_format(${"total11groub_2".$work_sheet},2));
-                        /* 8L RCC Merge */ 
-                            $objPHPExcel->getActiveSheet()->mergeCells('A9:A12');
-                            $objPHPExcel->getActiveSheet()->mergeCells('B12:C12');
-                        /* 8L RCC Style */
-                            $sheet->getStyle('B12:M12')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
-                            $objPHPExcel->getActiveSheet()->getStyle('B12')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                            $objPHPExcel->getActiveSheet()->setCellValue('B12', number_format(${"totalTargetrow_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('C12','CS');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D12', number_format(${"totalTripsrow_5".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E12', number_format(${"totalMileagerow_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F12', number_format(${"totalLiterrow_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G12', number_format(${"totalActualrow_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H12', number_format(${"totalMinrow_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I12', number_format(${"totalMaxrow_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J12', number_format(${"totalOkrow_5".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K12', number_format(${"totalNgrow_5".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L12', number_format(${"totalPercentagerow_5".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M12', number_format(${"totalDriverrow_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('B13','Total');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D13', number_format(${"total2groub_2".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E13', number_format(${"total3groub_2".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F13', number_format(${"total4groub_2".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G13', number_format(${"total5groub_2".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H13', number_format(${"total6groub_2".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I13', number_format(${"total7groub_2".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J13', number_format(${"total8groub_2".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K13', number_format(${"total9groub_2".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L13', number_format(${"total10groub_2".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M13', number_format(${"total11groub_2".$work_sheet},2));
+                        /* 10W Merge */ 
+                            $objPHPExcel->getActiveSheet()->mergeCells('A9:A13');
+                            $objPHPExcel->getActiveSheet()->mergeCells('B13:C13');
+                        /* 10W Style */
+                            $sheet->getStyle('B13:M13')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
+                            $objPHPExcel->getActiveSheet()->getStyle('B13')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                         
-                        /* 8L RATC */
-                            $objPHPExcel->getActiveSheet()->setCellValue('A13','8L RATC');
-                            $objPHPExcel->getActiveSheet()->setCellValue('B13', number_format(${"totalTargetrow_5".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C13','TTT(SH)');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D13', number_format(${"totalTripsrow_5".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E13', number_format(${"totalMileagerow_5".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F13', number_format(${"totalLiterrow_5".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G13', number_format(${"totalActualrow_5".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H13', number_format(${"totalMinrow_5".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I13', number_format(${"totalMaxrow_5".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J13', number_format(${"totalOkrow_5".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K13', number_format(${"totalNgrow_5".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L13', number_format(${"totalPercentagerow_5".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M13', number_format(${"totalDriverrow_5".$work_sheet},2));
+                        /* 6W TL */
+                            $objPHPExcel->getActiveSheet()->setCellValue('A14','6W TL');
                             $objPHPExcel->getActiveSheet()->setCellValue('B14', number_format(${"totalTargetrow_6".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C14','TTT(NM)');
+                            $objPHPExcel->getActiveSheet()->setCellValue('C14','KUBOTA');
                             $objPHPExcel->getActiveSheet()->setCellValue('D14', number_format(${"totalTripsrow_6".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('E14', number_format(${"totalMileagerow_6".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('F14', number_format(${"totalLiterrow_6".$work_sheet},2));
@@ -613,40 +574,40 @@
                             $objPHPExcel->getActiveSheet()->setCellValue('K14', number_format(${"totalNgrow_6".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('L14', number_format(${"totalPercentagerow_6".$work_sheet}).'%');
                             $objPHPExcel->getActiveSheet()->setCellValue('M14', number_format(${"totalDriverrow_6".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B15', number_format(${"totalTargetrow_7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C15','TTT(LR)');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D15', number_format(${"totalTripsrow_7".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E15', number_format(${"totalMileagerow_7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F15', number_format(${"totalLiterrow_7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G15', number_format(${"totalActualrow_7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H15', number_format(${"totalMinrow_7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I15', number_format(${"totalMaxrow_7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J15', number_format(${"totalOkrow_7".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K15', number_format(${"totalNgrow_7".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L15', number_format(${"totalPercentagerow_7".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M15', number_format(${"totalDriverrow_7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B16','Total');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D16', number_format(${"total2groub_3".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E16', number_format(${"total3groub_3".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F16', number_format(${"total4groub_3".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G16', number_format(${"total5groub_3".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H16', number_format(${"total6groub_3".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I16', number_format(${"total7groub_3".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J16', number_format(${"total8groub_3".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K16', number_format(${"total9groub_3".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L16', number_format(${"total10groub_3".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M16', number_format(${"total11groub_3".$work_sheet},2));
-                        /* 8L RATC Merge */ 
-                            $objPHPExcel->getActiveSheet()->mergeCells('A13:A16');
-                            $objPHPExcel->getActiveSheet()->mergeCells('B16:C16');
-                        /* 8L RATC Style */
-                            $sheet->getStyle('B16:M16')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
-                            $objPHPExcel->getActiveSheet()->getStyle('B16')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                            $objPHPExcel->getActiveSheet()->setCellValue('B15','Total');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D15', number_format(${"total2groub_3".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E15', number_format(${"total3groub_3".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F15', number_format(${"total4groub_3".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G15', number_format(${"total5groub_3".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H15', number_format(${"total6groub_3".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I15', number_format(${"total7groub_3".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J15', number_format(${"total8groub_3".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K15', number_format(${"total9groub_3".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L15', number_format(${"total10groub_3".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M15', number_format(${"total11groub_3".$work_sheet},2));
+                        /* 6W TL Merge */ 
+                            $objPHPExcel->getActiveSheet()->mergeCells('A14:A15');
+                            $objPHPExcel->getActiveSheet()->mergeCells('B15:C15');
+                        /* 6W TL Style */
+                            $sheet->getStyle('B15:M15')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
+                            $objPHPExcel->getActiveSheet()->getStyle('B15')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                                                 
-                        /* RRC */
-                            $objPHPExcel->getActiveSheet()->setCellValue('A17','RRC');
+                        /* 10W TL */
+                            $objPHPExcel->getActiveSheet()->setCellValue('A16','10W TL');
+                            $objPHPExcel->getActiveSheet()->setCellValue('B16', number_format(${"totalTargetrow_7".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('C16','STC-TL');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D16', number_format(${"totalTripsrow_7".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E16', number_format(${"totalMileagerow_7".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F16', number_format(${"totalLiterrow_7".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G16', number_format(${"totalActualrow_7".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H16', number_format(${"totalMinrow_7".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I16', number_format(${"totalMaxrow_7".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J16', number_format(${"totalOkrow_7".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K16', number_format(${"totalNgrow_7".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L16', number_format(${"totalPercentagerow_7".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M16', number_format(${"totalDriverrow_7".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('B17', number_format(${"totalTargetrow_8".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C17','10W VAN');
+                            $objPHPExcel->getActiveSheet()->setCellValue('C17','KUBOTA');
                             $objPHPExcel->getActiveSheet()->setCellValue('D17', number_format(${"totalTripsrow_8".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('E17', number_format(${"totalMileagerow_8".$work_sheet},2));
                             $objPHPExcel->getActiveSheet()->setCellValue('F17', number_format(${"totalLiterrow_8".$work_sheet},2));
@@ -657,113 +618,99 @@
                             $objPHPExcel->getActiveSheet()->setCellValue('K17', number_format(${"totalNgrow_8".$work_sheet},0));
                             $objPHPExcel->getActiveSheet()->setCellValue('L17', number_format(${"totalPercentagerow_8".$work_sheet}).'%');
                             $objPHPExcel->getActiveSheet()->setCellValue('M17', number_format(${"totalDriverrow_8".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B18', number_format(${"totalTargetrow_9".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C18','10W');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D18', number_format(${"totalTripsrow_9".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E18', number_format(${"totalMileagerow_9".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F18', number_format(${"totalLiterrow_9".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G18', number_format(${"totalActualrow_9".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H18', number_format(${"totalMinrow_9".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I18', number_format(${"totalMaxrow_9".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J18', number_format(${"totalOkrow_9".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K18', number_format(${"totalNgrow_9".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L18', number_format(${"totalPercentagerow_9".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M18', number_format(${"totalDriverrow_9".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B19', number_format(${"totalTargetrow_10".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C19','10W (Hook)');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D19', number_format(${"totalTripsrow_10".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E19', number_format(${"totalMileagerow_10".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F19', number_format(${"totalLiterrow_10".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G19', number_format(${"totalActualrow_10".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H19', number_format(${"totalMinrow_10".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I19', number_format(${"totalMaxrow_10".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J19', number_format(${"totalOkrow_10".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K19', number_format(${"totalNgrow_10".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L19', number_format(${"totalPercentagerow_10".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M19', number_format(${"totalDriverrow_10".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B20', number_format(${"totalTargetrow_11".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C20','22W');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D20', number_format(${"totalTripsrow_11".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E20', number_format(${"totalMileagerow_11".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F20', number_format(${"totalLiterrow_11".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G20', number_format(${"totalActualrow_11".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H20', number_format(${"totalMinrow_11".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I20', number_format(${"totalMaxrow_11".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J20', number_format(${"totalOkrow_11".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K20', number_format(${"totalNgrow_11".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L20', number_format(${"totalPercentagerow_11".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M20', number_format(${"totalDriverrow_11".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B21', number_format(${"totalTargetrow_12".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C21','Semi');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D21', number_format(${"totalTripsrow_12".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E21', number_format(${"totalMileagerow_12".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F21', number_format(${"totalLiterrow_12".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G21', number_format(${"totalActualrow_12".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H21', number_format(${"totalMinrow_12".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I21', number_format(${"totalMaxrow_12".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J21', number_format(${"totalOkrow_12".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K21', number_format(${"totalNgrow_12".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L21', number_format(${"totalPercentagerow_12".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M21', number_format(${"totalDriverrow_12".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B22', number_format(${"totalTargetrow_13".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C22','TTAST');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D22', number_format(${"totalTripsrow_13".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E22', number_format(${"totalMileagerow_13".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F22', number_format(${"totalLiterrow_13".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G22', number_format(${"totalActualrow_13".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H22', number_format(${"totalMinrow_13".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I22', number_format(${"totalMaxrow_13".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J22', number_format(${"totalOkrow_13".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K22', number_format(${"totalNgrow_13".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L22', number_format(${"totalPercentagerow_13".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M22', number_format(${"totalDriverrow_13".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B23', number_format(${"totalTargetrow_14".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('C23','TTAST (260 cc)');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D23', number_format(${"totalTripsrow_14".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E23', number_format(${"totalMileagerow_14".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F23', number_format(${"totalLiterrow_14".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G23', number_format(${"totalActualrow_14".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H23', number_format(${"totalMinrow_14".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I23', number_format(${"totalMaxrow_14".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J23', number_format(${"totalOkrow_14".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K23', number_format(${"totalNgrow_14".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L23', number_format(${"totalPercentagerow_14".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M23', number_format(${"totalDriverrow_14".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('B24','Total');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D24', number_format(${"total2groub_4".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E24', number_format(${"total3groub_4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F24', number_format(${"total4groub_4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G24', number_format(${"total5groub_4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H24', number_format(${"total6groub_4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I24', number_format(${"total7groub_4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J24', number_format(${"total8groub_4".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K24', number_format(${"total9groub_4".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L24', number_format(${"total10groub_4".$work_sheet}).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M24', number_format(${"total11groub_4".$work_sheet},2));
-                        /* RRC Merge */ 
-                            $objPHPExcel->getActiveSheet()->mergeCells('A17:A24');
-                            $objPHPExcel->getActiveSheet()->mergeCells('B24:C24');
-                        /* RRC Style */
-                            $sheet->getStyle('B24:M24')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
-                            $objPHPExcel->getActiveSheet()->getStyle('B24')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                            $objPHPExcel->getActiveSheet()->setCellValue('B18','Total');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D18', number_format(${"total2groub_4".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E18', number_format(${"total3groub_4".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F18', number_format(${"total4groub_4".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G18', number_format(${"total5groub_4".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H18', number_format(${"total6groub_4".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I18', number_format(${"total7groub_4".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J18', number_format(${"total8groub_4".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K18', number_format(${"total9groub_4".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L18', number_format(${"total10groub_4".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M18', number_format(${"total11groub_4".$work_sheet},2));
+                        /* 10W TL Merge */ 
+                            $objPHPExcel->getActiveSheet()->mergeCells('A16:A18');
+                            $objPHPExcel->getActiveSheet()->mergeCells('B18:C18');
+                        /* 10W TL Style */
+                            $sheet->getStyle('B18:M18')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
+                            $objPHPExcel->getActiveSheet()->getStyle('B18')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                                          
+                        /* Amata */
+                            $objPHPExcel->getActiveSheet()->setCellValue('A19','Amata');
+                            $objPHPExcel->getActiveSheet()->setCellValue('B19', number_format(${"totalTargetrow_9".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('C19','DAIKI');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D19', number_format(${"totalTripsrow_9".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E19', number_format(${"totalMileagerow_9".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F19', number_format(${"totalLiterrow_9".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G19', number_format(${"totalActualrow_9".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H19', number_format(${"totalMinrow_9".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I19', number_format(${"totalMaxrow_9".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J19', number_format(${"totalOkrow_9".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K19', number_format(${"totalNgrow_9".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L19', number_format(${"totalPercentagerow_9".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M19', number_format(${"totalDriverrow_9".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('B20', number_format(${"totalTargetrow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('C20','STC 10W');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D20', number_format(${"totalTripsrow_10".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E20', number_format(${"totalMileagerow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F20', number_format(${"totalLiterrow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G20', number_format(${"totalActualrow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H20', number_format(${"totalMinrow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I20', number_format(${"totalMaxrow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J20', number_format(${"totalOkrow_10".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K20', number_format(${"totalNgrow_10".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L20', number_format(${"totalPercentagerow_10".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M20', number_format(${"totalDriverrow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('B21', number_format(${"totalTargetrow_10".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('C21','STC-TL');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D21', number_format(${"totalTripsrow_11".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E21', number_format(${"totalMileagerow_11".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F21', number_format(${"totalLiterrow_11".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G21', number_format(${"totalActualrow_11".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H21', number_format(${"totalMinrow_11".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I21', number_format(${"totalMaxrow_11".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J21', number_format(${"totalOkrow_11".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K21', number_format(${"totalNgrow_11".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L21', number_format(${"totalPercentagerow_11".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M21', number_format(${"totalDriverrow_11".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('B22','Total');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D22', number_format(${"total2groub_5".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E22', number_format(${"total3groub_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F22', number_format(${"total4groub_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G22', number_format(${"total5groub_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H22', number_format(${"total6groub_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I22', number_format(${"total7groub_5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J22', number_format(${"total8groub_5".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K22', number_format(${"total9groub_5".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L22', number_format(${"total10groub_5".$work_sheet}).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M22', number_format(${"total11groub_5".$work_sheet},2));
+                        /* Amata Merge */ 
+                            $objPHPExcel->getActiveSheet()->mergeCells('A19:A22');
+                            $objPHPExcel->getActiveSheet()->mergeCells('B22:C22');
+                        /* Amata Style */
+                            $sheet->getStyle('A19:A22')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FFFF00')),'font' => array('bold' => true)));
+                            $sheet->getStyle('B22:M22')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FFFF00')),'font' => array('bold' => true)));
+                            $sheet->getStyle('B19:M21')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'FFFF99')),'font' => array('bold' => true)));
+                            $objPHPExcel->getActiveSheet()->getStyle('B22')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                         
                         /* Total */
-                            $objPHPExcel->getActiveSheet()->setCellValue('A25','Total All Type');
-                            $objPHPExcel->getActiveSheet()->setCellValue('D25', number_format(${"alltotal2".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('E25', number_format(${"alltotal3".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('F25', number_format(${"alltotal4".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('G25', number_format(${"alltotal5".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('H25', number_format(${"alltotal6".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('I25', number_format(${"alltotal7".$work_sheet},2));
-                            $objPHPExcel->getActiveSheet()->setCellValue('J25', number_format(${"alltotal8".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('K25', number_format(${"alltotal9".$work_sheet},0));
-                            $objPHPExcel->getActiveSheet()->setCellValue('L25', number_format(${"alltotal10".$work_sheet},0).'%');
-                            $objPHPExcel->getActiveSheet()->setCellValue('M25', number_format(${"alltotal11".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('A23','Total All Type');
+                            $objPHPExcel->getActiveSheet()->setCellValue('D23', number_format(${"alltotal2".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('E23', number_format(${"alltotal3".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('F23', number_format(${"alltotal4".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('G23', number_format(${"alltotal5".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('H23', number_format(${"alltotal6".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('I23', number_format(${"alltotal7".$work_sheet},2));
+                            $objPHPExcel->getActiveSheet()->setCellValue('J23', number_format(${"alltotal8".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('K23', number_format(${"alltotal9".$work_sheet},0));
+                            $objPHPExcel->getActiveSheet()->setCellValue('L23', number_format(${"alltotal10".$work_sheet},0).'%');
+                            $objPHPExcel->getActiveSheet()->setCellValue('M23', number_format(${"alltotal11".$work_sheet},2));
                         /* Total Merge */ 
-                            $objPHPExcel->getActiveSheet()->mergeCells('A25:C25');
+                            $objPHPExcel->getActiveSheet()->mergeCells('A23:C23');
                         /* Total Style */
-                            $sheet->getStyle('A25:M25')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
-                            $objPHPExcel->getActiveSheet()->getStyle('B25')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                            $sheet->getStyle('A23:M23')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
+                            $objPHPExcel->getActiveSheet()->getStyle('B23')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                         /* Check SQL */
                             // $objPHPExcel->getActiveSheet()->setCellValue('A28', ${"s_1".$work_sheet});
                             // $objPHPExcel->getActiveSheet()->setCellValue('A29', ${"s_2".$work_sheet});
@@ -783,7 +730,7 @@
                     
                     /* Table_2 */
                         /* SQL QUERY */ 
-                            $sql_low = "SELECT DISTINCT PSC,NAME,SURNAME,[SECTION],NUMBER,ROUTE,TYPE,MILE,TARGET,ACTUAL,CAUSE,CPNC,CUSCODE,WOTY,DWK FROM dbo.TEMP_OILAVERAGE_GW_LOW WHERE DWK='$start_ymd_new'";
+                            $sql_low = "SELECT DISTINCT PSC,NAME,SURNAME,[SECTION],NUMBER,ROUTE,TYPE,MILE,TARGET,ACTUAL,CAUSE,CPNC,CUSCODE,WOTY,DWK,NUMBERROW FROM dbo.TEMP_OILAVERAGE_AMT_LOW WHERE DWK='$start_ymd_new' ORDER BY NUMBERROW ASC";
                             $query_low = sqlsrv_query($conn, $sql_low);
                         /* Table Width */ 
                             $sheet->getColumnDimension('O')->setWidth(10);
@@ -881,20 +828,17 @@
         $styleText = array('font'  => array('bold'  => false,'color' => array('rgb' => '000000'),'size'  => 10,'name'  => 'Verdana'));  
         $sheet->getDefaultStyle()->applyFromArray($styleText);
         /* SQL QUERY */ 
-            $s2_1 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='1' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_2 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='2' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_3 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='3' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_4 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='4' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_5 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='5' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_6 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='6' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_7 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='7' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_8 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='8' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_9 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='9' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_10 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='10' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL'GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_11 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='11' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL'GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_12 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='12' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_13 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='13' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
-            $s2_14 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_GW WHERE NUMBERROW='14' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_1 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='1' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_2 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='2' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_3 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='3' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_4 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='4' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_5 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='5' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_6 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='6' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_7 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='7' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_8 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='8' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_9 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='9' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_10 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='10' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
+            $s2_11 = "SELECT DISTINCT CPNC,TYPE,TARGET,ROUTE,WOTY,SUM(CAST(TRIPS AS INT)) AS TOTAL_TRIPS,FORMAT(SUM(CAST(REPLACE(MILEAGE,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_MILEAGE,FORMAT(SUM(CAST(REPLACE(LITER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_LITER,FORMAT(ROUND(AVG(CAST(REPLACE(ACTUAL,',','') AS DECIMAL(18,2))), 2),'N2') AS TOTAL_ACTUAL,ROUND(AVG(CASE WHEN [MIN] = '9,999,999,999.00' THEN NULL ELSE CAST([MIN] AS FLOAT) END), 2) AS TOTAL_MIN,ROUND(AVG(CASE WHEN [MAX] = '-9,999,999,999.00' THEN NULL ELSE CAST([MAX] AS FLOAT) END), 2) AS TOTAL_MAX,FORMAT(SUM(CAST(REPLACE(OK,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_OK,FORMAT(SUM(CAST(REPLACE(NG,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_NG,CONCAT(CAST(ROUND(AVG(CAST(REPLACE(REPLACE(PERCENTAGE,',',''),'%','') AS DECIMAL(18,2))),0) AS INT),'%') AS TOTAL_PERCENTAGE,FORMAT(SUM(CAST(REPLACE(DRIVER,',','') AS DECIMAL(18,2))),'N2') AS TOTAL_DRIVER FROM dbo.TEMP_OILAVERAGE_AMT WHERE NUMBERROW='11' AND DWK BETWEEN '$startsumSQL' AND '$endsumSQL' GROUP BY CPNC,TYPE,TARGET,ROUTE,WOTY"; 
             $q2_1 = sqlsrv_query($conn, $s2_1);$r2_1 = sqlsrv_fetch_array($q2_1, SQLSRV_FETCH_ASSOC);
             $q2_2 = sqlsrv_query($conn, $s2_2);$r2_2 = sqlsrv_fetch_array($q2_2, SQLSRV_FETCH_ASSOC);
             $q2_3 = sqlsrv_query($conn, $s2_3);$r2_3 = sqlsrv_fetch_array($q2_3, SQLSRV_FETCH_ASSOC);
@@ -906,9 +850,6 @@
             $q2_9 = sqlsrv_query($conn, $s2_9);$r2_9 = sqlsrv_fetch_array($q2_9, SQLSRV_FETCH_ASSOC);
             $q2_10 = sqlsrv_query($conn, $s2_10);$r2_10 = sqlsrv_fetch_array($q2_10, SQLSRV_FETCH_ASSOC);
             $q2_11 = sqlsrv_query($conn, $s2_11);$r2_11 = sqlsrv_fetch_array($q2_11, SQLSRV_FETCH_ASSOC);
-            $q2_12 = sqlsrv_query($conn, $s2_12);$r2_12 = sqlsrv_fetch_array($q2_12, SQLSRV_FETCH_ASSOC);
-            $q2_13 = sqlsrv_query($conn, $s2_13);$r2_13 = sqlsrv_fetch_array($q2_13, SQLSRV_FETCH_ASSOC);
-            $q2_14 = sqlsrv_query($conn, $s2_14);$r2_14 = sqlsrv_fetch_array($q2_14, SQLSRV_FETCH_ASSOC);
             // Total
             for($i21=1;$i21<=14;$i21++){$TOTAL_TRIPS += floatval(str_replace(',','', ${"r2_".$i21}['TOTAL_TRIPS']));}
             for($i22=1;$i22<=14;$i22++){$TOTAL_MILEAGE += floatval(str_replace(',','', ${"r2_".$i22}['TOTAL_MILEAGE']));}
@@ -937,7 +878,7 @@
             $sheet->getColumnDimension('L')->setWidth(10);
             $sheet->getColumnDimension('M')->setWidth(20);
         /* Table Border */
-            $sheet->getStyle('A4:M21')->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
+            $sheet->getStyle('A4:M18')->applyFromArray(array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN,'color' => array('rgb' => '000000')))));
         /* Table Center */ 
             $objPHPExcel->getActiveSheet()->getStyle('A4:M6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('A7:B24')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::VERTICAL_CENTER);
@@ -946,12 +887,10 @@
             $objPHPExcel->getActiveSheet()->getStyle('G7:K26')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('L7:M26')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
         /* Table Style */
-            $sheet->getStyle('A7:M21')->applyFromArray(array('font' => array('bold' => true)));
-            $sheet->getStyle('J7:J21')->applyFromArray(array('font' => array('bold' => true,'color' => array('rgb' => '0000FF'))));
-            $sheet->getStyle('K7:K21')->applyFromArray(array('font' => array('bold' => true,'color' => array('rgb' => 'FF0000'))));
-            $sheet->getStyle('B7:B23')->getNumberFormat()->setFormatCode('0.00');
-            $sheet->getStyle('E7:I21')->getNumberFormat()->setFormatCode('0.00');
-            $sheet->getStyle('M7:M21')->getNumberFormat()->setFormatCode('0.00');
+            $sheet->getStyle('A7:M18')->applyFromArray(array('font' => array('bold' => true)));
+            $sheet->getStyle('B7:B18')->getNumberFormat()->setFormatCode('0.00');
+            $sheet->getStyle('E7:I18')->getNumberFormat()->setFormatCode('0.00');
+            $sheet->getStyle('M7:M18')->getNumberFormat()->setFormatCode('0.00');
         /* Head Value */ 
             $objPHPExcel->getActiveSheet()->
             setCellValue('A4', 'Type')->
@@ -983,10 +922,11 @@
             $objPHPExcel->getActiveSheet()->mergeCells('L5:L6');
         /* HEAD Style */
             $sheet->getStyle('A4:M6')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
-        /* 4L */
-            $objPHPExcel->getActiveSheet()->setCellValue('A7','4L');
+
+        /* 6W */
+            $objPHPExcel->getActiveSheet()->setCellValue('A7','6W');
             $objPHPExcel->getActiveSheet()->setCellValue('B7', $r2_1['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C7','TTT(NM)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C7','TGT');
             $objPHPExcel->getActiveSheet()->setCellValue('D7', $r2_1['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E7', $r2_1['TOTAL_MILEAGE']);                      
             $objPHPExcel->getActiveSheet()->setCellValue('F7', $r2_1['TOTAL_LITER']);
@@ -997,10 +937,10 @@
             $objPHPExcel->getActiveSheet()->setCellValue('K7', $r2_1['TOTAL_NG']);
             $objPHPExcel->getActiveSheet()->setCellValue('L7', $r2_1['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M7', $r2_1['TOTAL_DRIVER']);
-        /* 8L RCC */
-            $objPHPExcel->getActiveSheet()->setCellValue('A8','8L RCC');
+        /* 10W */
+            $objPHPExcel->getActiveSheet()->setCellValue('A8','10W');
             $objPHPExcel->getActiveSheet()->setCellValue('B8', $r2_2['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C8','TTT(SH)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C8','STM-SR');
             $objPHPExcel->getActiveSheet()->setCellValue('D8', $r2_2['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E8', $r2_2['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F8', $r2_2['TOTAL_LITER']);
@@ -1012,7 +952,7 @@
             $objPHPExcel->getActiveSheet()->setCellValue('L8', $r2_2['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M8', $r2_2['TOTAL_DRIVER']);
             $objPHPExcel->getActiveSheet()->setCellValue('B9', $r2_3['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C9','TTT(NM)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C9','T.TOHKEN');
             $objPHPExcel->getActiveSheet()->setCellValue('D9', $r2_3['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E9', $r2_3['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F9', $r2_3['TOTAL_LITER']);
@@ -1024,7 +964,7 @@
             $objPHPExcel->getActiveSheet()->setCellValue('L9', $r2_3['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M9', $r2_3['TOTAL_DRIVER']);
             $objPHPExcel->getActiveSheet()->setCellValue('B10', $r2_4['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C10','TTT(LR)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C10','STC');
             $objPHPExcel->getActiveSheet()->setCellValue('D10', $r2_4['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E10', $r2_4['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F10', $r2_4['TOTAL_LITER']);
@@ -1035,12 +975,8 @@
             $objPHPExcel->getActiveSheet()->setCellValue('K10', $r2_4['TOTAL_NG']);
             $objPHPExcel->getActiveSheet()->setCellValue('L10', $r2_4['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M10', $r2_4['TOTAL_DRIVER']);
-        /* 8L RCC Merge */ 
-            $objPHPExcel->getActiveSheet()->mergeCells('A8:A10');
-        /* 8L RATC */
-            $objPHPExcel->getActiveSheet()->setCellValue('A11','8L RATC');
             $objPHPExcel->getActiveSheet()->setCellValue('B11', $r2_5['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C11','TTT(SH)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C11','CS');
             $objPHPExcel->getActiveSheet()->setCellValue('D11', $r2_5['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E11', $r2_5['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F11', $r2_5['TOTAL_LITER']);
@@ -1051,8 +987,12 @@
             $objPHPExcel->getActiveSheet()->setCellValue('K11', $r2_5['TOTAL_NG']);
             $objPHPExcel->getActiveSheet()->setCellValue('L11', $r2_5['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M11', $r2_5['TOTAL_DRIVER']);
+        /* 10W Merge */ 
+            $objPHPExcel->getActiveSheet()->mergeCells('A8:A11');
+        /* 6W TL */
+            $objPHPExcel->getActiveSheet()->setCellValue('A12','6W TL');
             $objPHPExcel->getActiveSheet()->setCellValue('B12', $r2_6['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C12','TTT(NM)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C12','KUBOTA');
             $objPHPExcel->getActiveSheet()->setCellValue('D12', $r2_6['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E12', $r2_6['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F12', $r2_6['TOTAL_LITER']);
@@ -1063,8 +1003,11 @@
             $objPHPExcel->getActiveSheet()->setCellValue('K12', $r2_6['TOTAL_NG']);
             $objPHPExcel->getActiveSheet()->setCellValue('L12', $r2_6['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M12', $r2_6['TOTAL_DRIVER']);
+                   
+        /* 10W TL */
+            $objPHPExcel->getActiveSheet()->setCellValue('A13','10W TL');
             $objPHPExcel->getActiveSheet()->setCellValue('B13', $r2_7['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C13','TTT(LR)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C13','STC-TL');
             $objPHPExcel->getActiveSheet()->setCellValue('D13', $r2_7['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E13', $r2_7['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F13', $r2_7['TOTAL_LITER']);
@@ -1075,13 +1018,8 @@
             $objPHPExcel->getActiveSheet()->setCellValue('K13', $r2_7['TOTAL_NG']);
             $objPHPExcel->getActiveSheet()->setCellValue('L13', $r2_7['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M13', $r2_7['TOTAL_DRIVER']);
-        /* 8L RATC Merge */ 
-            $objPHPExcel->getActiveSheet()->mergeCells('A11:A13');
-                                
-        /* RRC */
-            $objPHPExcel->getActiveSheet()->setCellValue('A14','RRC');
             $objPHPExcel->getActiveSheet()->setCellValue('B14', $r2_8['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C14','10W VAN');
+            $objPHPExcel->getActiveSheet()->setCellValue('C14','KUBOTA');
             $objPHPExcel->getActiveSheet()->setCellValue('D14', $r2_8['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E14', $r2_8['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F14', $r2_8['TOTAL_LITER']);
@@ -1092,8 +1030,13 @@
             $objPHPExcel->getActiveSheet()->setCellValue('K14', $r2_8['TOTAL_NG']);
             $objPHPExcel->getActiveSheet()->setCellValue('L14', $r2_8['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M14', $r2_8['TOTAL_DRIVER']);
+        /* 10W TL Merge */ 
+            $objPHPExcel->getActiveSheet()->mergeCells('A13:A14');
+        
+        /* Amata */
+            $objPHPExcel->getActiveSheet()->setCellValue('A15','Amata');
             $objPHPExcel->getActiveSheet()->setCellValue('B15', $r2_9['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C15','10W');
+            $objPHPExcel->getActiveSheet()->setCellValue('C15','DAIKI');
             $objPHPExcel->getActiveSheet()->setCellValue('D15', $r2_9['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E15', $r2_9['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F15', $r2_9['TOTAL_LITER']);
@@ -1105,7 +1048,7 @@
             $objPHPExcel->getActiveSheet()->setCellValue('L15', $r2_9['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M15', $r2_9['TOTAL_DRIVER']);
             $objPHPExcel->getActiveSheet()->setCellValue('B16', $r2_10['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C16','10W (Hook)');
+            $objPHPExcel->getActiveSheet()->setCellValue('C16','STC 10W');
             $objPHPExcel->getActiveSheet()->setCellValue('D16', $r2_10['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E16', $r2_10['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F16', $r2_10['TOTAL_LITER']);
@@ -1117,7 +1060,7 @@
             $objPHPExcel->getActiveSheet()->setCellValue('L16', $r2_10['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M16', $r2_10['TOTAL_DRIVER']);
             $objPHPExcel->getActiveSheet()->setCellValue('B17', $r2_11['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C17','22W');
+            $objPHPExcel->getActiveSheet()->setCellValue('C17','STC-TL');
             $objPHPExcel->getActiveSheet()->setCellValue('D17', $r2_11['TOTAL_TRIPS']);
             $objPHPExcel->getActiveSheet()->setCellValue('E17', $r2_11['TOTAL_MILEAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('F17', $r2_11['TOTAL_LITER']);
@@ -1128,63 +1071,27 @@
             $objPHPExcel->getActiveSheet()->setCellValue('K17', $r2_11['TOTAL_NG']);
             $objPHPExcel->getActiveSheet()->setCellValue('L17', $r2_11['TOTAL_PERCENTAGE']);
             $objPHPExcel->getActiveSheet()->setCellValue('M17', $r2_11['TOTAL_DRIVER']);
-            $objPHPExcel->getActiveSheet()->setCellValue('B18', $r2_12['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C18','Semi');
-            $objPHPExcel->getActiveSheet()->setCellValue('D18', $r2_12['TOTAL_TRIPS']);
-            $objPHPExcel->getActiveSheet()->setCellValue('E18', $r2_12['TOTAL_MILEAGE']);
-            $objPHPExcel->getActiveSheet()->setCellValue('F18', $r2_12['TOTAL_LITER']);
-            $objPHPExcel->getActiveSheet()->setCellValue('G18', $r2_12['TOTAL_ACTUAL']);
-            $objPHPExcel->getActiveSheet()->setCellValue('H18', $r2_12['TOTAL_MIN']);
-            $objPHPExcel->getActiveSheet()->setCellValue('I18', $r2_12['TOTAL_MAX']);
-            $objPHPExcel->getActiveSheet()->setCellValue('J18', $r2_12['TOTAL_OK']);
-            $objPHPExcel->getActiveSheet()->setCellValue('K18', $r2_12['TOTAL_NG']);
-            $objPHPExcel->getActiveSheet()->setCellValue('L18', $r2_12['TOTAL_PERCENTAGE']);
-            $objPHPExcel->getActiveSheet()->setCellValue('M18', $r2_12['TOTAL_DRIVER']);
-            $objPHPExcel->getActiveSheet()->setCellValue('B19', $r2_13['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C19','TTAST');
-            $objPHPExcel->getActiveSheet()->setCellValue('D19', $r2_13['TOTAL_TRIPS']);
-            $objPHPExcel->getActiveSheet()->setCellValue('E19', $r2_13['TOTAL_MILEAGE']);
-            $objPHPExcel->getActiveSheet()->setCellValue('F19', $r2_13['TOTAL_LITER']);
-            $objPHPExcel->getActiveSheet()->setCellValue('G19', $r2_13['TOTAL_ACTUAL']);
-            $objPHPExcel->getActiveSheet()->setCellValue('H19', $r2_13['TOTAL_MIN']);
-            $objPHPExcel->getActiveSheet()->setCellValue('I19', $r2_13['TOTAL_MAX']);
-            $objPHPExcel->getActiveSheet()->setCellValue('J19', $r2_13['TOTAL_OK']);
-            $objPHPExcel->getActiveSheet()->setCellValue('K19', $r2_13['TOTAL_NG']);
-            $objPHPExcel->getActiveSheet()->setCellValue('L19', $r2_13['TOTAL_PERCENTAGE']);
-            $objPHPExcel->getActiveSheet()->setCellValue('M19', $r2_13['TOTAL_DRIVER']);
-            $objPHPExcel->getActiveSheet()->setCellValue('B20', $r2_14['TARGET']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C20','TTAST (260 cc)');
-            $objPHPExcel->getActiveSheet()->setCellValue('D20', $r2_14['TOTAL_TRIPS']);
-            $objPHPExcel->getActiveSheet()->setCellValue('E20', $r2_14['TOTAL_MILEAGE']);
-            $objPHPExcel->getActiveSheet()->setCellValue('F20', $r2_14['TOTAL_LITER']);
-            $objPHPExcel->getActiveSheet()->setCellValue('G20', $r2_14['TOTAL_ACTUAL']);
-            $objPHPExcel->getActiveSheet()->setCellValue('H20', $r2_14['TOTAL_MIN']);
-            $objPHPExcel->getActiveSheet()->setCellValue('I20', $r2_14['TOTAL_MAX']);
-            $objPHPExcel->getActiveSheet()->setCellValue('J20', $r2_14['TOTAL_OK']);
-            $objPHPExcel->getActiveSheet()->setCellValue('K20', $r2_14['TOTAL_NG']);
-            $objPHPExcel->getActiveSheet()->setCellValue('L20', $r2_14['TOTAL_PERCENTAGE']);
-            $objPHPExcel->getActiveSheet()->setCellValue('M20', $r2_14['TOTAL_DRIVER']);
-        /* RRC Merge */ 
-            $objPHPExcel->getActiveSheet()->mergeCells('A14:A20');
+        /* Amata Merge */ 
+            $objPHPExcel->getActiveSheet()->mergeCells('A15:A17');
         
         /* Total */
-            $objPHPExcel->getActiveSheet()->setCellValue('A21','Total All Type');
-            $objPHPExcel->getActiveSheet()->setCellValue('D21', number_format($TOTAL_TRIPS, 0));
-            $objPHPExcel->getActiveSheet()->setCellValue('E21', number_format($TOTAL_MILEAGE, 0));
-            $objPHPExcel->getActiveSheet()->setCellValue('F21', number_format($TOTAL_LITER, 0));
-            $objPHPExcel->getActiveSheet()->setCellValue('G21', number_format($TOTAL_ACTUAL, 0));
-            $objPHPExcel->getActiveSheet()->setCellValue('H21', round($TOTAL_MIN / 14, 2));
-            $objPHPExcel->getActiveSheet()->setCellValue('I21', round($TOTAL_MAX / 14, 2));
-            $objPHPExcel->getActiveSheet()->setCellValue('J21', $TOTAL_OK);
-            $objPHPExcel->getActiveSheet()->setCellValue('K21', $TOTAL_NG);
-            $objPHPExcel->getActiveSheet()->setCellValue('L21', number_format(round($TOTAL_PERCENTAGE / 14, 2), 0).'%');
-            $objPHPExcel->getActiveSheet()->setCellValue('M21', number_format($TOTAL_DRIVER, 2));
+            $objPHPExcel->getActiveSheet()->setCellValue('A18','Total All Type');
+            $objPHPExcel->getActiveSheet()->setCellValue('D18', number_format($TOTAL_TRIPS, 0));
+            $objPHPExcel->getActiveSheet()->setCellValue('E18', number_format($TOTAL_MILEAGE, 0));
+            $objPHPExcel->getActiveSheet()->setCellValue('F18', number_format($TOTAL_LITER, 0));
+            $objPHPExcel->getActiveSheet()->setCellValue('G18', number_format($TOTAL_ACTUAL, 0));
+            $objPHPExcel->getActiveSheet()->setCellValue('H18', round($TOTAL_MIN / 14, 2));
+            $objPHPExcel->getActiveSheet()->setCellValue('I18', round($TOTAL_MAX / 14, 2));
+            $objPHPExcel->getActiveSheet()->setCellValue('J18', $TOTAL_OK);
+            $objPHPExcel->getActiveSheet()->setCellValue('K18', $TOTAL_NG);
+            $objPHPExcel->getActiveSheet()->setCellValue('L18', number_format(round($TOTAL_PERCENTAGE / 14, 2), 0).'%');
+            $objPHPExcel->getActiveSheet()->setCellValue('M18', number_format($TOTAL_DRIVER, 2));
 
         /* Total Merge */ 
-            $objPHPExcel->getActiveSheet()->mergeCells('A21:C21');
+            $objPHPExcel->getActiveSheet()->mergeCells('A18:C18');
         /* Total Style */
-            $sheet->getStyle('A21:M21')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
-            $objPHPExcel->getActiveSheet()->getStyle('B21')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle('A18:M18')->applyFromArray(array('fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID,'color' => array('rgb' => 'D3D3D3')),'font' => array('bold' => true)));
+            $objPHPExcel->getActiveSheet()->getStyle('B18')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setVERTICAL(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
         /* Check SQL */
             // $objPHPExcel->getActiveSheet()->setCellValue('A28',$s2_1);
             // $objPHPExcel->getActiveSheet()->setCellValue('A29',$s2_2);

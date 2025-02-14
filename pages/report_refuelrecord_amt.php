@@ -114,7 +114,7 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                                         </style>
                                     </div>
                                     <form action="report_refuelrecord_amt_export.php" method="post" target="_blank">
-                                        <u><h3>ข้อมูลประจำวัน</h3></u><br>
+                                        <u><h3>ข้อมูลประจำวัน</h3></u>
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label>ช่วงวันที่เริ่มต้น</label>
@@ -178,7 +178,7 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                                     </form>
                                     <form action="report_refuelrecord_amt_export_month.php" method="post" target="_blank">
                                         <hr>
-                                        <u><h3>ข้อมูลประจำเดือน</h3></u><br>
+                                        <u><h3>ข้อมูลประจำเดือน</h3></u>
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label>ช่วงวันที่เริ่มต้น</label>
@@ -239,7 +239,7 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                                     </form> 
                                     <form action="report_refuelrecord_amt_export_vhct.php" method="post" target="_blank">
                                         <hr>
-                                        <u><h3>ข้อมูลแยกบริษัท</h3></u><br>
+                                        <u><h3>ข้อมูลแยกบริษัท</h3></u>
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label>วันที่เริ่มต้นแผนวิ่งงาน</label>
@@ -261,7 +261,7 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                                     </form>                                    
                                     <form action="report_refuelrecord_amt_export_outside.php" method="post" target="_blank">
                                         <hr>
-                                        <h3><u>ข้อมูลเติมน้ำมันปั๊มนอก</u> <small><font color="red">***ดึงข้อมูลตามวันที่เติมน้ำมัน</font></small></h3><br>
+                                        <h3><u>ข้อมูลเติมน้ำมันปั๊มนอก</u> <small><font color="red">***ดึงข้อมูลตามวันที่เติมน้ำมัน</font></small></h3>
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label>ช่วงวันที่เริ่มต้น</label>
@@ -299,9 +299,29 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                                             </div>
                                         <!-- </div> -->
                                     </form>
+                                    <form action="report_refuelrecord_amt_avgday.php" method="post" target="_blank">
+                                        <hr>
+                                        <h3><u>สรุปค่าเฉลี่ยน้ำมันรายวัน</u> <small><font color="red">***อัพเดทข้อมูลเวลา 23:00 น. ของทุกวัน</font></small></h3>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>ช่วงวันที่เริ่มต้น</label>
+                                                <input class="form-control dateen" style="background-color: #f080802e"  id="txt_datestaravarageforday" name="txt_datestaravarageforday" value="<?= $result_seSystime['SYSDATE'] ?>" onchange="datetodatehavarageforday();" placeholder="วันที่เริ่มต้น" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>ช่วงวันที่สิ้นสุด</label>
+                                                <input class="form-control dateen" style="background-color: #f080802e"  id="txt_dateendyavarageforday" name="txt_dateendyavarageforday" value="<?= $result_seSystime['SYSDATE'] ?>" placeholder="วันที่สิ้นสุด" autocomplete="off">
+                                            </div> 
+                                        </div>
+                                        <div class="form-group">                        
+                                            <label>&nbsp;</label><br>                                               
+                                            <button type="submit" class="btn btn-success btn-md" name="EXCELDAY" value="EXCELDAY"><li class="fa fa-file-excel-o"></li> <b>Excel</b></button>
+                                        </div> 
+                                    </form>  
                                     <form action="report_refuelrecord_amt_export_avgday.php" method="post" target="_blank">
                                         <hr>
-                                        <u><h3>สรุปค่าเฉลี่ยน้ำมันรายเดือน</h3></u><br>
+                                        <u><h3>สรุปค่าเฉลี่ยน้ำมันรายเดือน</h3></u>
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label>ช่วงวันที่เริ่มต้น</label>
@@ -425,6 +445,9 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
         }
         function datetodateoiloutside(){
             document.getElementById('txt_dateendoiloutside').value = document.getElementById('txt_datestartoiloutside').value;
+        }
+        function datetodatehavarageforday(){
+            document.getElementById('txt_dateendyavarageforday').value = document.getElementById('txt_datestaravarageforday').value;
         }
         $(document).ready(function () {
             $('#dataTables-oiltat').DataTable({
