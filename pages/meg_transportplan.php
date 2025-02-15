@@ -3246,7 +3246,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1rkrttaststc" name="txt_e1rkrttaststc">                               
                                         </div>        
                                         <div class="col-lg-2">
                                             <label>ค่าควบ</label>
@@ -3255,7 +3255,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crossworkrkrttaststc" name="txt_crossworkrkrttaststc">                               
                                         </div> 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
@@ -3398,7 +3398,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1rkrttastcs" name="txt_e1rkrttastcs">                               
                                         </div>        
                                         <div class="col-lg-2">
                                             <label>ค่าควบ</label>
@@ -3407,7 +3407,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crossworkrkrttastcs" name="txt_crossworkrkrttastcs">                               
                                         </div> 
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
@@ -4074,7 +4074,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1rkrttastotw" name="txt_e1rkrttastotw">                               
                                         </div>        
                                         <div class="col-lg-2">
                                             <br>
@@ -4084,7 +4084,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crossworkrkrttastotw" name="txt_crossworkrkrttastotw">                               
                                         </div>           
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTTCSTC') {
@@ -6120,7 +6120,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1rklttaststc" name="txt_e1rklttaststc">                               
                                         </div>        
                                         <div class="col-lg-2">
                                             <label>ค่าควบ</label>
@@ -6129,7 +6129,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crossworkrklttaststc" name="txt_crossworkrklttaststc">                               
                                         </div>             
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTASTCS') {
@@ -6272,7 +6272,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1rklttastcs" name="txt_e1rklttastcs">                               
                                         </div>        
                                         <div class="col-lg-2">
                                             <label>ค่าควบ</label>
@@ -6281,7 +6281,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crossworkrklttastcs" name="txt_crossworkrklttastcs">                               
                                         </div>
                                         <?php
                                     } else if ($_GET['customercode'] == 'TTPROSTC') {
@@ -6558,7 +6558,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1rklttastotw" name="txt_e1rklttastotw">                               
                                         </div>        
                                         <div class="col-lg-2">
                                             <label>ค่าควบ</label>
@@ -6567,7 +6567,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crossworkrklttastotw" name="txt_crossworkrklttastotw">                               
                                         </div>  
 
                                         <?php
@@ -6972,7 +6972,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1" name="txt_e1">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_e1rkltttcstc" name="txt_e1rkltttcstc">                               
                                         </div>        
                                         <div class="col-lg-2">
                                             <label>ค่าควบ</label>
@@ -6981,7 +6981,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                             this.value = '';
                                             } else {
                                                 
-                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crosswork" name="txt_crosswork">                               
+                                            }"  class="form-control" type="text" size="10"   value="" id="txt_crossworkrkltttcstc" name="txt_crossworkrkltttcstc">                               
                                         </div>
                                         <?php
                                     } else if ($_GET['customercode'] == 'PARAGON') {
@@ -14244,13 +14244,20 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                 var datepresent = document.getElementById("txt_copydiagramdatepresent").value;
 
                  // ค่าเที่ยว ค่าควบ TTAST STC
-               if ('<?= $_GET['companycode'] ?>' == 'RKL' || '<?= $_GET['companycode'] ?>' == 'RKR') {
-
+                 if ('<?= $_GET['companycode'] ?>' == 'RKL') {
+                    // alert('1');
                     if ('<?= $_GET['carrytype'] ?>' == 'weight') {
-                        
-                        if ('<?= $_GET['customercode'] ?>' == 'TTASTSTC' || '<?= $_GET['customercode'] ?>' == 'TTAST' || '<?= $_GET['customercode'] ?>' == 'TTASTCS') {
-                            e1 = document.getElementById("txt_e1").value;
-                            crosswork = document.getElementById("txt_crosswork").value;
+                        // alert('2');
+                        if ('<?= $_GET['customercode'] ?>' == 'TTASTSTC') {
+                            // alert('3');
+                            e1 = document.getElementById("txt_e1rklttaststc").value;
+                            crosswork = document.getElementById("txt_crossworkrklttaststc").value;
+                        }else if ('<?= $_GET['customercode'] ?>' == 'TTASTCS'){
+                            e1 = document.getElementById("txt_e1rklttastcs").value;
+                            crosswork = document.getElementById("txt_crossworkrklttastcs").value;
+                        }else if ('<?= $_GET['customercode'] ?>' == 'TTAST'){
+                            e1 = document.getElementById("txt_e1rklttastotw").value;
+                            crosswork = document.getElementById("txt_crossworkrklttastotw").value;
                         }else{
                             e1 = '';
                             crosswork = '';
@@ -14260,6 +14267,30 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                         e1 = '';
                         crosswork = '';
                     }
+                }else if('<?= $_GET['companycode'] ?>' == 'RKR'){
+                    
+                    if ('<?= $_GET['carrytype'] ?>' == 'weight') {
+                        // alert('2');
+                        if ('<?= $_GET['customercode'] ?>' == 'TTASTSTC') {
+                            // alert('3');
+                            e1 = document.getElementById("txt_e1rkrttaststc").value;
+                            crosswork = document.getElementById("txt_crossworkrkrttaststc").value;
+                        }else if ('<?= $_GET['customercode'] ?>' == 'TTASTCS'){
+                            e1 = document.getElementById("txt_e1rkrttastcs").value;
+                            crosswork = document.getElementById("txt_crossworkrkrttastcs").value;
+                        }else if ('<?= $_GET['customercode'] ?>' == 'TTAST'){
+                            e1 = document.getElementById("txt_e1rkrttastotw").value;
+                            crosswork = document.getElementById("txt_crossworkrkrttastotw").value;
+                        }else{
+                            e1 = '';
+                            crosswork = '';
+                        }
+
+                    }else{
+                        e1 = '';
+                        crosswork = '';
+                    }
+
                 }else{
                     e1 = '';
                     crosswork = '';

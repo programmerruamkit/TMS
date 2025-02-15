@@ -5888,7 +5888,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                         $Criteria1 = 'ทักทายอย่างมีชีวิตชีวา';
                                                                     }else if ($result_seAbnormalData1['REMARK'] == 'TENKOUNIFORMREMARK'){
                                                                         $Heading1  = 'ตรวจเซ็คยูนิฟอร์ม';
-                                                                        $Criteria1 = 'สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย';
+                                                                        $Criteria1 = 'สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้';
                                                                     }else if ($result_seAbnormalData1['REMARK'] == 'TENKOBODYREMARK'){
                                                                         $Heading1  = 'ตรวจสอบสภาพร่างกาย';
                                                                         $Criteria1 = 'สุขภาพร่างกายแข็งแรงดี';
@@ -6661,7 +6661,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     <td style="text-align: center">2</td>
                                                     <td>ตรวจเซ็คยูนิฟอร์ม</td>
                                                     <td style="text-align: center"><input type="checkbox" <?= $check12 ?> id="chk_12" name="chk_12"  style="transform: scale(2)"/></td>
-                                                    <td colspan="2">สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย</td>
+                                                    <td colspan="2">สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้</td>
                                                     <td style="text-align: center"><input type="checkbox" <?= $rs121 ?> style="transform: scale(2)" id="chk_rs121" name="chk_rs121" onchange="edit_rs121()"/></td>
                                                     <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs120 ?> style="transform: scale(2)" id="chk_rs120" name="chk_rs120" onchange="edit_rs120()"/></td>
                                                     <td colspan="4"  ><input type="text" id="txt_remark12" name="txt_remark12" class="form-control" value="<?= $result_seTenkobefore['TENKOUNIFORMREMARK'] ?>"></td>
@@ -11999,7 +11999,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                         $Criteria2 = 'ทักทายอย่างมีชีวิตชีวา';
                                                                     }else if ($result_seAbnormalData2['REMARK'] == 'TENKOUNIFORMREMARK'){
                                                                         $Heading2  = 'ตรวจเซ็คยูนิฟอร์ม';
-                                                                        $Criteria2 = 'สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย';
+                                                                        $Criteria2 = 'สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้';
                                                                     }else if ($result_seAbnormalData2['REMARK'] == 'TENKOBODYREMARK'){
                                                                         $Heading2  = 'ตรวจสอบสภาพร่างกาย';
                                                                         $Criteria2 = 'สุขภาพร่างกายแข็งแรงดี';
@@ -12737,7 +12737,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     <td style="text-align: center">2</td>
                                                     <td>ตรวจเซ็คยูนิฟอร์ม</td>
                                                     <td style="text-align: center"><input type="checkbox" <?= $check12 ?> id="chk_12" name="chk_12"  style="transform: scale(2)"/></td>
-                                                    <td colspan="2">สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย</td>
+                                                    <td colspan="2">สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้</td>
                                                     <td style="text-align: center"><input type="checkbox" <?= $rs121 ?> style="transform: scale(2)" id="chk_rs121" name="chk_rs121" onchange="edit_rs121()"/></td>
                                                     <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs120 ?> style="transform: scale(2)" id="chk_rs120" name="chk_rs120" onchange="edit_rs120()"/></td>
                                                     <td colspan="4"  ><input type="text" id="txt_remark12" name="txt_remark12" class="form-control" value="<?= $result_seTenkobefore['TENKOUNIFORMREMARK'] ?>"></td>

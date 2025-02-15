@@ -9142,7 +9142,2113 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                 }
                                                                                             });
                                                                                         }
+                                                                                        function select_emp1loadskb(ID, ID2){
+                                                                                            // <!-- รถสายงาน RKL SKB จะใช้ Column SELECT_4LOAD1 และ PAY_4LOAD1REMARK -->
+                                                                                            // ในกรณีพนักงานคนที่ 1 เป็นผู้โหลดงาน ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_compensation1').value != "") ? document.getElementById('txt_compensation1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_compensation2').value != "") ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_compensation3').value != "") ? document.getElementById('txt_compensation3').value : 0;
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_e1').value != "") ? document.getElementById('txt_e1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_e2').value != "") ? document.getElementById('txt_e2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_e3').value != "") ? document.getElementById('txt_e3').value : 0;
+                                                                                            
+                                                                                            var compensation    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1   = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                            // var compensation2   = (document.getElementById('txt_compensation2').value != "")  ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var othermoney      = (document.getElementById('txt_orthermoney').value != "")    ? document.getElementById('txt_orthermoney').value : 0;
+                                                                                            
+                                                                                            if (compensation == '' || compensation == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_emp1loadskb").checked = false;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_emp1loadskb").checked = false;
+                                                                                            }else{
+                                                                                                //chk4load1 ข้อที่1
+                                                                                                if(chk_emp1loadskb.checked == true){
+                                                                                                    var emp1loadskbtrip_chk = (document.getElementById('chk_emp1loadskb').value != "") ? document.getElementById('chk_emp1loadskb').value : 0;
+                                                                                                    var emp1loadskbtripedit_chk = 'กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว';
+                                                                                                    // document.getElementById('txt_compensation').value = parseInt(compensation)+100; 
+                                                                                                    // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                    document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)+150;
+                                                                                                    // document.getElementById('txt_orthermoney').value    = 0; 
+                                                                                                    
+                                                                                                    //อัพเดท ช่อง chk_trainer,chk_ojt,chk_multiskill = false;
+                                                                                                    // document.getElementById("chk_trainer").checked      = false;
+                                                                                                    // document.getElementById("chk_ojt").checked          = false;
+                                                                                                    // document.getElementById("chk_multiskill").checked   = false;
+                                                                                                    // alert("Trainner Check");
+                                                                                                    // alert(compensation);
+                                                                                                    
+                                                                                                
+                                                                                                    
+                                                                                                }else{
+                                                                                                    // alert('1');
+
+                                                                                                    var emp1loadskbtrip_chk = '';
+                                                                                                    var emp1loadsktripbdit_chk = '';
+                                                                                                
+                                                                                                    
+                                                                                                    //เช็คถ้า compensation (ช่องค่าเที่ยวรวมทั้งหมด) เท่ากับ 0 
+                                                                                                    if (compensation1 == '0') {
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)-150;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }else{
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)-150;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }
+                                                                                                
+                                                                                                    // alert("Trainner UnCheck");
+                                                                                                    // alert(compensation);
+                                                                                                }
+                                                                                                
+                                                                                                var emp1loadskbtripcost    = emp1loadskbtrip_chk;
+                                                                                                var emp1loadskbtripedit    = emp1loadskbtripedit_chk;
+                                                                                                
+                                                                                                
+                                                                                                
+                                                                                                //OTHER
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_orthermoney').value, ID: ID2, fieldname: 'OTHER'
+                                                                                                //     },
+                                                                                                //     success: function () {
+
+
+                                                                                                //     }
+                                                                                                // });
+
+                                                                                                //COMPENSATION1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation1skb').value, ID: ID2, fieldname: 'COMPENSATION1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+
+
+
+                                                                                                // SELECT_4LOAD1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: emp1loadskbtripcost, ID: ID2, fieldname: 'SELECT_4LOAD1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // PAY_4LOAD1REMARK
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: emp1loadskbtripedit, ID: ID2, fieldname: 'PAY_4LOAD1REMARK'
+                                                                                                    },
+                                                                                                    success: function () {
+                                                                                                        
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // COMPENSATION
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationskb').value, ID: ID2, fieldname: 'COMPENSATION'
+                                                                                                //     },
+                                                                                                //     success: function () {
+                                                                                                        
+
+                                                                                                //     }
+                                                                                                // });
+                                                                                            
+                                                                                                // TOTALCOMPEN
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationskb').value, ID: ID2, fieldname: 'TOTALCOMPEN'
+                                                                                                //     },
+                                                                                                //     success: function () {
+                                                                                                        
+
+                                                                                                //     }
+                                                                                                // });
+                                                                                            
+                                                                                            }
+                                                                                            
+
+                                                                                        }
+                                                                                        function select_emp2loadskb(ID, ID2){
+                                                                                            // <!-- รถสายงาน RKL SKB จะใช้ Column SELECT_4LOAD1 และ PAY_4LOAD1REMARK -->
+                                                                                            // ในกรณีพนักงานคนที่ 1 เป็นผู้โหลดงาน ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_compensation1').value != "") ? document.getElementById('txt_compensation1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_compensation2').value != "") ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_compensation3').value != "") ? document.getElementById('txt_compensation3').value : 0;
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_e1').value != "") ? document.getElementById('txt_e1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_e2').value != "") ? document.getElementById('txt_e2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_e3').value != "") ? document.getElementById('txt_e3').value : 0;
+                                                                                            
+                                                                                            var compensation    = (document.getElementById('txt_e2skb').value != "")   ? document.getElementById('txt_e2skb').value : 0;
+                                                                                            var compensation2   = (document.getElementById('txt_compensation2skb').value != "")  ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                            // var compensation2   = (document.getElementById('txt_compensation2').value != "")  ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var othermoney      = (document.getElementById('txt_orthermoney').value != "")    ? document.getElementById('txt_orthermoney').value : 0;
+                                                                                            
+                                                                                            if (compensation == '' || compensation == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_emp2loadskb").checked = false;
+                                                                                            }else if (compensation2 == '' || compensation2 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_emp2loadskb").checked = false;
+                                                                                            }else{
+                                                                                                //chk4load1 ข้อที่1
+                                                                                                if(chk_emp2loadskb.checked == true){
+                                                                                                    var emp2loadskbtrip_chk = (document.getElementById('chk_emp2loadskb').value != "") ? document.getElementById('chk_emp2loadskb').value : 0;
+                                                                                                    var emp2loadskbtripedit_chk = 'กรณีพนักงานคนที่ 2 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว';
+                                                                                                    // document.getElementById('txt_compensation').value = parseInt(compensation)+100; 
+                                                                                                    // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                    document.getElementById('txt_compensation2skb').value  = parseInt(compensation)+150;
+                                                                                                    // document.getElementById('txt_orthermoney').value    = 0; 
+                                                                                                    
+                                                                                                    //อัพเดท ช่อง chk_trainer,chk_ojt,chk_multiskill = false;
+                                                                                                    // document.getElementById("chk_trainer").checked      = false;
+                                                                                                    // document.getElementById("chk_ojt").checked          = false;
+                                                                                                    // document.getElementById("chk_multiskill").checked   = false;
+                                                                                                    // alert("Trainner Check");
+                                                                                                    // alert(compensation);
+                                                                                                    
+                                                                                                
+                                                                                                    
+                                                                                                }else{
+                                                                                                    // alert('1');
+
+                                                                                                    var emp2loadskbtrip_chk = '';
+                                                                                                    var emp2loadsktripbdit_chk = '';
+                                                                                                
+                                                                                                    
+                                                                                                    //เช็คถ้า compensation (ช่องค่าเที่ยวรวมทั้งหมด) เท่ากับ 0 
+                                                                                                    if (compensation2 == '0') {
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation2skb').value  = parseInt(compensation2)-150;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }else{
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation2skb').value  = parseInt(compensation2)-150;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }
+                                                                                                
+                                                                                                    // alert("Trainner UnCheck");
+                                                                                                    // alert(compensation);
+                                                                                                }
+                                                                                                
+                                                                                                var emp2loadskbtripcost    = emp2loadskbtrip_chk;
+                                                                                                var emp2loadskbtripedit    = emp2loadskbtripedit_chk;
+                                                                                                
+                                                                                                
+                                                                                                
+                                                                                                //OTHER
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_orthermoney').value, ID: ID2, fieldname: 'OTHER'
+                                                                                                //     },
+                                                                                                //     success: function () {
+
+
+                                                                                                //     }
+                                                                                                // });
+
+                                                                                                //COMPENSATION1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation2skb').value, ID: ID2, fieldname: 'COMPENSATION2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+
+
+
+                                                                                                // SELECT_4LOAD1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: emp2loadskbtripcost, ID: ID2, fieldname: 'SELECT_4LOAD2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // PAY_4LOAD1REMARK
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: emp2loadskbtripedit, ID: ID2, fieldname: 'PAY_4LOAD2REMARK'
+                                                                                                    },
+                                                                                                    success: function () {
+                                                                                                        
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // COMPENSATION
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationskb').value, ID: ID2, fieldname: 'COMPENSATION'
+                                                                                                //     },
+                                                                                                //     success: function () {
+                                                                                                        
+
+                                                                                                //     }
+                                                                                                // });
+                                                                                            
+                                                                                                // TOTALCOMPEN
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationskb').value, ID: ID2, fieldname: 'TOTALCOMPEN'
+                                                                                                //     },
+                                                                                                //     success: function () {
+                                                                                                        
+
+                                                                                                //     }
+                                                                                                // });
+                                                                                            
+                                                                                            }
+                                                                                            
+
+                                                                                        }
+                                                                                        function select_allemploadskb(ID, ID2){
+                                                                                            // <!-- รถสายงาน RKL SKB จะใช้ Column SELECT_4LOAD1 และ PAY_4LOAD1REMARK -->
+                                                                                            // ในกรณีพนักงานคนที่ 1 เป็นผู้โหลดงาน ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_compensation1').value != "") ? document.getElementById('txt_compensation1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_compensation2').value != "") ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_compensation3').value != "") ? document.getElementById('txt_compensation3').value : 0;
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_e1').value != "") ? document.getElementById('txt_e1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_e2').value != "") ? document.getElementById('txt_e2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_e3').value != "") ? document.getElementById('txt_e3').value : 0;
+                                                                                            
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1   = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            var compensatione2    = (document.getElementById('txt_e2skb').value != "")   ? document.getElementById('txt_e2skb').value : 0;
+                                                                                            var compensation2   = (document.getElementById('txt_compensation2skb').value != "")  ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                            // var compensation2   = (document.getElementById('txt_compensation2').value != "")  ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var othermoney      = (document.getElementById('txt_orthermoney').value != "")    ? document.getElementById('txt_orthermoney').value : 0;
+                                                                                            
+                                                                                            if (compensatione1 == '' || compensatione1 == '0' || compensatione2 == '' || compensatione2 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_allemploadskb").checked = false;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0' || compensation2 == '' || compensation2 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_allemploadskb").checked = false;
+                                                                                            }else{
+                                                                                                //chk4load1 ข้อที่1
+                                                                                                if(chk_allemploadskb.checked == true){
+                                                                                                    var allemploadskbtrip_chk = (document.getElementById('chk_allemploadskb').value != "") ? document.getElementById('chk_allemploadskb').value : 0;
+                                                                                                    var allemploadskbtripedit_chk = 'กรณีพนักงานโหลดงานทั้งคู่ ได้รับเพิ่ม 150 บาท/เที่ยว';
+                                                                                                    // document.getElementById('txt_compensation').value = parseInt(compensation)+100; 
+                                                                                                    // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                    document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)+150;
+                                                                                                    document.getElementById('txt_compensation2skb').value  = parseInt(compensation2)+150;
+                                                                                                    // document.getElementById('txt_orthermoney').value    = 0; 
+                                                                                                    
+                                                                                                    //อัพเดท ช่อง chk_trainer,chk_ojt,chk_multiskill = false;
+                                                                                                    // document.getElementById("chk_trainer").checked      = false;
+                                                                                                    // document.getElementById("chk_ojt").checked          = false;
+                                                                                                    // document.getElementById("chk_multiskill").checked   = false;
+                                                                                                    // alert("Trainner Check");
+                                                                                                    // alert(compensation);
+                                                                                                    
+                                                                                                
+                                                                                                    
+                                                                                                }else{
+                                                                                                    // alert('1');
+
+                                                                                                    var allemploadskbtrip_chk = '';
+                                                                                                    var allemploadskbtripedit_chk = '';
+                                                                                                
+                                                                                                    
+                                                                                                    //เช็คถ้า compensation (ช่องค่าเที่ยวรวมทั้งหมด) เท่ากับ 0 
+                                                                                                    if (compensation1 == '0' || compensation2 == '0') {
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)-150;
+                                                                                                        document.getElementById('txt_compensation2skb').value  = parseInt(compensation2)-150;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }else{
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)-150;
+                                                                                                        document.getElementById('txt_compensation2skb').value  = parseInt(compensation2)-150;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }
+                                                                                                
+                                                                                                    // alert("Trainner UnCheck");
+                                                                                                    // alert(compensation);
+                                                                                                }
+                                                                                                
+                                                                                                var allemploadskbtripcost    = allemploadskbtrip_chk;
+                                                                                                var allemploadskbtripedit    = allemploadskbtripedit_chk;
+                                                                                                
+                                                                                                
+                                                                                                
+                                                                                                //OTHER
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_orthermoney').value, ID: ID2, fieldname: 'OTHER'
+                                                                                                //     },
+                                                                                                //     success: function () {
+
+
+                                                                                                //     }
+                                                                                                // });
+
+                                                                                                //COMPENSATION1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation1skb').value, ID: ID2, fieldname: 'COMPENSATION1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                //COMPENSATION2
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation2skb').value, ID: ID2, fieldname: 'COMPENSATION2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+
+                                                                                                // SELECT_4LOAD1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: allemploadskbtripcost, ID: ID2, fieldname: 'SELECT_4LOAD3'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // PAY_4LOAD1REMARK
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: allemploadskbtripedit, ID: ID2, fieldname: 'PAY_4LOAD3REMARK'
+                                                                                                    },
+                                                                                                    success: function () {
+                                                                                                        
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // COMPENSATION
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationskb').value, ID: ID2, fieldname: 'COMPENSATION'
+                                                                                                //     },
+                                                                                                //     success: function () {
+                                                                                                        
+
+                                                                                                //     }
+                                                                                                // });
+                                                                                            
+                                                                                                // TOTALCOMPEN
+                                                                                                // $.ajax({
+                                                                                                //     url: 'meg_data.php',
+                                                                                                //     type: 'POST',
+                                                                                                //     data: {
+                                                                                                //         txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationskb').value, ID: ID2, fieldname: 'TOTALCOMPEN'
+                                                                                                //     },
+                                                                                                //     success: function () {
+                                                                                                        
+
+                                                                                                //     }
+                                                                                                // });
+                                                                                            
+                                                                                            }
+                                                                                            
+
+                                                                                        }
+                                                                                        function edit_vehicletransportplan_emp3skb(ID, ID2,COMPANYCODE,EMPCHK)
+                                                                                        {
+                                                                                            // alert(ID);
+                                                                                            // alert(ID2);
+                                                                                            // alert(COMPANYCODE);
+
+                                                                                            // alert(EMPCHK);
+                                                                                            // var e1 = (document.getElementById('txt_e1').value != "") ? document.getElementById('txt_e1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_e2').value != "") ? document.getElementById('txt_e2').value : 0;
+                                                                                            var e3 = (document.getElementById('txt_e3skb').value != "") ? document.getElementById('txt_e3skb').value : 0;
+                                                                                            
+                                                                                            //COMPENSATION3
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_e3skb').value, ID: ID2, fieldname: 'COMPENSATION3'
+                                                                                                },
+                                                                                                success: function () {
+
+
+                                                                                                }
+                                                                                            });
+                                                                                            
+                                                                                        }
+                                                                                        // function คำนวณค่าเที่ยว
+                                                                                        function edit_vehicletransportdocumentdriverconm_skb(ID, ID2,COMPANYCODE,CUSTOMERCODE,empchk,poschk) {
+
+                                                                                            // alert(COMPANYCODE);
+                                                                                            // alert(CUSTOMERCODE);
+                                                                                            // alert(empchk);
+                                                                                            // alert(poschk);
+                                                                                            if (empchk == '1') {
+                                                                                                swal.fire({
+                                                                                                    title: "Warning",
+                                                                                                    // text: "โหลดงานคนเดียวได้ค่าเที่ยว เท่ากับ 2 คน",
+                                                                                                    html: '<div style="text-align: center;">กรณีส่งงานคนเดียวจะได้ค่าเที่ยวเท่ากับ 2 คน<br>แต่จะมีการหักค่าเที่ยว 150 บาท<br>เพื่อให้กับผู้ช่วยโหลดงานขึ้น</div>',
+                                                                                                    icon: "warning",
+                                                                                                    showConfirmButton: true,
+                                                                                                    allowOutsideClick: false,
+                                                                                                });
+                                                                                            }else{
+
+                                                                                            }
+                                                                                            
+
+                                                                                            // รวมค่าเที่ยวคนที่ 1 
+                                                                                            //เช็คในการกด คำนวณรอบแรก กรณี compensation1 เป็น NULL ,ว่าง  หรือ 0 จะใช้ E1 แทน
+                                                                                            if (document.getElementById('txt_compensation1skb').value == "" || document.getElementById('txt_compensation1skb').value == 0) {
+                                                                                                // alert('1');
+                                                                                                var e1 = (document.getElementById('txt_e1skb').value != "") ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            }else{
+                                                                                                // alert('2');
+                                                                                                var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                            }
+
+                                                                                            //เช็คในการกด คำนวณรอบแรก กรณี compensation2 เป็น NULL ,ว่าง  หรือ 0  จะใช้ E2 แทน
+                                                                                            if (document.getElementById('txt_compensation2skb').value == "" || document.getElementById('txt_compensation2skb').value == 0) {
+                                                                                                // alert('1');
+                                                                                                var e2 = (document.getElementById('txt_e2skb').value != "") ? document.getElementById('txt_e2skb').value : 0;
+                                                                                            }else{
+                                                                                                // alert('2');
+                                                                                                var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                            }
+
+                                                                                            //เช็คในการกด คำนวณรอบแรก กรณี compensation2 เป็น NULL ,ว่าง  หรือ 0  จะใช้ E3 แทน
+                                                                                            if (document.getElementById('txt_compensation3skb').value == "" || document.getElementById('txt_compensation3skb').value == 0) {
+                                                                                                // alert('1');
+                                                                                                var e3 = (document.getElementById('txt_e3skb').value != "") ? document.getElementById('txt_e3skb').value : 0;
+                                                                                            }else{
+                                                                                                // alert('2');
+                                                                                                var e3 = (document.getElementById('txt_compensation3skb').value != "") ? document.getElementById('txt_compensation3skb').value : 0;
+                                                                                            }
+
+                                                                                            // var e2 = (document.getElementById('txt_compensation2').value != "") ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_compensation3').value != "") ? document.getElementById('txt_compensation3').value : 0;
+                                                                                            // var eempty1 = (document.getElementById('txt_compensation_empty1').value != "") ? document.getElementById('txt_compensation_empty1').value : 0;
+                                                                                            // var eempty2 = (document.getElementById('txt_compensation_empty2').value != "") ? document.getElementById('txt_compensation_empty2').value : 0;
+                                                                                            // var eempty3 = (document.getElementById('txt_compensation_empty3').value != "") ? document.getElementById('txt_compensation_empty3').value : 0;
+                                                                                            // var othermoney = (document.getElementById('txt_orthermoney').value != "") ? document.getElementById('txt_orthermoney').value : 0;
+                                                                                            
+                                                                                            // //กรณีเลือก รับงาน 2 โรง ได้รับเพิ่ม 50 บาท สำหรับสายงาน TGT
+                                                                                            // if(chk_50trip.checked == true){
+                                                                                            //     var tgt50trip = 50;
+
+                                                                                            // }else{
+                                                                                            //     var tgt50trip = 0;
+                                                                                            // }
+
+                                                                                            // //กรณีเลือก วิ่งงาน 2 Drop รับเพิ่ม 50 บาท THAITOHKEN
+                                                                                            // if(chk_2dropthaitohken.checked == true){
+                                                                                            //     var twodropthaitohken = 50;
+
+                                                                                            // }else{
+                                                                                            //     var twodropthaitohken = 0;
+                                                                                            // }
+
+                                                                                            // //กรณีเลือก วิ่งงาน 3 Drop รับเพิ่ม 100 บาท THAITOHKEN
+                                                                                            // if(chk_3dropthaitohken.checked == true){
+                                                                                                
+                                                                                            //     var threedropthaitohken = 100;
+                                                                                            // }else{
+                                                                                            //     var threedropthaitohken = 0;
+                                                                                            // }
+
+
+                                                                                            if (empchk == '2' && poschk == 'F') {
+                                                                                                // ถ้าพนักงานวิ่งงานเท่ากับ 2 คน 
+                                                                                                // แสดงค่าเที่ยวรวม
+                                                                                                document.getElementById('txt_compensationallskb').value = (parseInt(e1) + parseInt(e2) + parseInt(e3));
+                                                                                                // แสดงค่า พนักงาน 1
+                                                                                                document.getElementById('txt_compensation1skb').value = parseInt(e1);
+                                                                                                // แสดงค่า พนักงาน 2
+                                                                                                document.getElementById('txt_compensation2skb').value = parseInt(e2);
+                                                                                                // แสดงค่า พนักงาน 3
+                                                                                                document.getElementById('txt_compensation3skb').value = parseInt(e3);
+                                                                                            }else{
+                                                                                                // ถ้าพนักงานวิ่งงานเท่ากับ 1 คน 
+                                                                                                // แสดงค่าเที่ยวรวม
+                                                                                                document.getElementById('txt_compensationallskb').value = (parseInt(e1*2) + parseInt(e3));
+                                                                                                // แสดงค่า พนักงาน 1
+                                                                                                document.getElementById('txt_compensation1skb').value = parseInt(e1*2);
+                                                                                                // แสดงค่า พนักงาน 2
+                                                                                                document.getElementById('txt_compensation2skb').value = 0;
+                                                                                                // แสดงค่า พนักงาน 3
+                                                                                                document.getElementById('txt_compensation3skb').value = parseInt(e3);
+
+                                                                                            }
+                                                                                            
+                                                                                            
+                                                                                            
+                                                                                            // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                            // $.ajax({
+                                                                                            //     url: 'meg_data.php',
+                                                                                            //     type: 'POST',
+                                                                                            //     data: {
+                                                                                            //         txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1').value, ID: ID, fieldname: 'E1'
+                                                                                            //     },
+                                                                                            //     success: function () {
+
+
+                                                                                            //     }
+                                                                                            // });
+
+                                                                                            
+                                                                                            // TOTALCOMPEN ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationallskb').value, ID: ID2, fieldname: 'TOTALCOMPEN'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // TOTALNET ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationallskb').value, ID: ID2, fieldname: 'TOTALNET'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION = ผลรวม ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationallskb').value, ID: ID2, fieldname: 'COMPENSATION'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION1 ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation1skb').value, ID: ID2, fieldname: 'COMPENSATION1'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION2 ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation2skb').value, ID: ID2, fieldname: 'COMPENSATION2'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION3 ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation3skb').value, ID: ID2, fieldname: 'COMPENSATION3'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                 
+                                                                                                }
+                                                                                            });
+
+                                                                                        }
+                                                                                        function select_OT15SKB(){
+                                                                                            // alert('OT15');
+                                                                                            // alert(value);
+
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_OT15SKB").checked = false;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_OT15SKB").checked = false;
+                                                                                            }else{
+
+                                                                                                var e1 = (document.getElementById('txt_e1skb').value != "") ? document.getElementById('txt_e1skb').value : 0;
+                                                                                                // var returnprice = (document.getElementById('txt_returnprice1').value != "") ? document.getElementById('txt_returnprice1').value : 0;
+
+                                                                                                // alert(e1);
+                                                                                                //  alert(returnprice);
+                                                                                                if (chk_OT15SKB.checked == true) {
+                                                                                                    // alert('check');
+                                                                                                    var ot15  =  ((parseInt(e1))*1.5);
+                                                                                                    document.getElementById('txt_compensation1skb').value = parseInt(Math.ceil(ot15));
+                                                                                                    document.getElementById('txt_compensation2skb').value = parseInt(Math.ceil(ot15));
+                                                                                                    document.getElementById('txt_compensationOT15SKB').value = (parseInt(Math.ceil(ot15))-(parseInt(e1)));
+
+                                                                                                    // alert(Math.ceil(ot15));
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'OT15CHK', editableObj: document.getElementById('txt_compensationOT15SKB').value 
+                                                                                                        },
+                                                                                                        success: function () {
+                                                                                                            
+                                                                                                            
+                                                                                                        }
+                                                                                                    });
+                                                                                                    
+                                                                                                
+
+                                                                                                }else{
+                                                                                                    // alert('not check');
+                                                                                                    // alert(e1);
+                                                                                                    
+                                                                                                    document.getElementById('txt_compensation1skb').value = (parseInt(e1));
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e1));
+                                                                                                    // document.getElementById('txt_compensationall').value = (parseInt(e1));
+                                                                                                    document.getElementById('txt_compensationOT15SKB').value = '0';
+
+                                                                                                    var compensation = (parseInt(e1));
+                                                                                                    var ot15  = document.getElementById('txt_compensationOT15SKB').value = '';
+
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'OT15CHK', editableObj: ot15
+                                                                                                        },
+                                                                                                        success: function () {
+                                                                                                            
+                                                                                                            
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+                                                                                            }
+                                                                                            
+                                                                                        }
+                                                                                        function select_OT180SKB(customercode,empchk,poschk){
+                                                                                            // alert('OT180')
+                                                                                            //OT180CHK
+                                                                                            // alert(customercode);
+                                                                                            // alert(empchk);
+                                                                                            // alert(poschk);
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_OT15SKB").checked = false;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_OT15SKB").checked = false;
+                                                                                            }else{
+                                                                                                var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                                var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                                
+                                                                                                
+                                                                                                
+
+                                                                                                if (chk_OT180SKB.checked == true) {
+                                                                                                    // alert('check');
+                                                                                                    var ot180 = 180;
+                                                                                                    document.getElementById('text_OT180SKB').value = '180';
+                                                                                                    document.getElementById('text_OT180VALUESKB').value = '1';
+                                                                                                    
+                                                                                                    document.getElementById('txt_compensation1skb').value = (parseInt(e1)+180);
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e2)+180);
+
+                                                                                                }else{
+                                                                                                    // alert('not check');
+                                                                                                    var ot180 = 0;
+                                                                                                    document.getElementById('text_OT180SKB').value = '';
+                                                                                                    document.getElementById('text_OT180VALUESKB').value = '';
+                                                                                                    document.getElementById('txt_compensation1skb').value = (parseInt(e1)-180);
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e2)-180);
+                                                                                                }
+                                                                                                
+                                                                                                
+
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'OT180CHK', editableObj: ot180
+                                                                                                    },
+                                                                                                    success: function () {
+                                                                                                        
+                                                                                                        
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                           
+                                                                                        }
+                                                                                        function select_OT360SKB(value,customercode,empchk,poschk){
+                                                                                            // alert('OT360');
+                                                                                            // alert(value);
+
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_OT180SKB").checked = false;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_OT180SKB").checked = false;
+                                                                                            }else{
+                                                                                                var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                                var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                                var ot360val = (document.getElementById('text_OT360SKB').value != "") ? document.getElementById('text_OT360SKB').value : 0;
+                                                                                                
+                                                                                            
+                                                                                                //เช็คOT360
+                                                                                                var ot360 = (360*value);
+
+                                                                                                //เช็ค OT180 
+                                                                                                // if (OT180.checked == true) {
+                                                                                                //     // alert('check');
+                                                                                                //     // var ot180 = 180;
+                                                                                                    
+                                                                                                // }else{
+                                                                                                //     // alert('not check');
+                                                                                                //     // var ot180 = 0;
+                                                                                                // }
+
+                                                                                            
+
+                                                                                            //     // alert(all48load360);
+                                                                                            //     // alert(ot180);
+                                                                                                // alert(ot360);
+
+                                                                                                if (value == '1') {
+                                                                                                    document.getElementById('text_OT360SKB').value = '360';
+                                                                                                    document.getElementById('text_OT360VALUESKB').value = '1';
+                                                                                                    
+                                                                                                    document.getElementById('txt_compensation1skb').value = (parseInt(e1)+360);
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e2)+360);
+
+                                                                                                }else if (value == '2'){
+                                                                                                    document.getElementById('text_OT360SKB').value = '720';
+                                                                                                    document.getElementById('text_OT360VALUESKB').value = '2';
+
+                                                                                                    document.getElementById('txt_compensation1skb').value = (parseInt(e1)+720);
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e2)+720);
+                                                                                                }else if (value == '3'){
+                                                                                                    document.getElementById('text_OT360SKB').value = '1080'; 
+                                                                                                    document.getElementById('text_OT360VALUESKB').value = '3';   
+
+                                                                                                    document.getElementById('txt_compensation1skb').value = (parseInt(e1)+1080);
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e2)+1080);
+                                                                                                }else{
+                                                                                                    document.getElementById('text_OT360SKB').value = '';
+                                                                                                    document.getElementById('text_OT360VALUESKB').value = '';
+
+                                                                                                    document.getElementById('txt_compensation1skb').value = (parseInt(e1)-ot360val);
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e2)-ot360val);
+                                                                                                }
+
+                                                                                                // var sumall48load360 = parseInt(Math.ceil(all48load360))+parseInt(ot180)+parseInt(ot360)
+                                                                                                // document.getElementById('txt_compensationall').value = sumall48load360;
+                                                                                                // // alert(sumall48load360);
+                                                                                                
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'OT360CHK', editableObj: ot360
+                                                                                                    },
+                                                                                                    success: function () {
+                                                                                                        
+                                                                                                        
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                            
+                                                                                        }
+                                                                                        function select_RETURNSKB(value,empchk,poschk,documentdriverid){
+                                                                                            // alert('OT360');
+                                                                                            // alert(value);
+                                                                                            // alert(empchk);
+                                                                                            // alert(poschk);
+                                                                                            // alert(documentdriverid);
+
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_RETURN").selectedIndex = 0;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_RETURN").selectedIndex = 0;
+                                                                                            }else{
+                                                                                                // ค่าเที่ยวปกติ
+                                                                                                var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                                var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                                var pricereturnskb = (document.getElementById('txt_returnpriceskb').value != "") ? document.getElementById('txt_returnpriceskb').value : 0;
+                                                                                                
+                                                                                                // alert(pricereturnskb);
+                                                                                                // ค่างานรับกลับ
+                                                                                                // var return1 = (document.getElementById('txt_returnprice1').value != "") ? document.getElementById('txt_returnprice1').value : 0;
+                                                                                                // var return2 = (document.getElementById('txt_returnprice2').value != "") ? document.getElementById('txt_returnprice2').value : 0;
+                                                                                            
+                                                                                                
+                                                                                                //เช็คราคาของรถรับกลับ และ จำนวนคัน
+                                                                                                var returnprice_chk = (150*value);
+                                                                                                var returnamount = value;
+                                                                                                // alert(all48load360);
+                                                                                                // alert(ot180);
+                                                                                                // alert(returnprice_chk);
+
+                                                                                                // เช็คค่าเที่ยวกรณีงานรับกลับ 
+                                                                                                // วิ่งคู่หาร 2
+                                                                                                if (empchk == '2' && poschk == 'F') {
+                                                                                                    
+                                                                                                    // alert('return1');
+                                                                                                    document.getElementById('txt_returnpriceskb').value = (returnprice_chk/2);
+
+                                                                                                    var returnpriceskb  = (returnprice_chk/2);
+                                                                                                    var returnpriceskb1 = (returnprice_chk/2);
+                                                                                                    var returnpriceskb2 = (returnprice_chk/2);
+                                                                                                }else{
+                                                                                                    // alert('return2');
+                                                                                                    // document.getElementById('txt_returnprice1').value = (returnprice_chk);
+                                                                                                    document.getElementById('txt_returnpriceskb').value = (returnprice_chk);
+
+                                                                                                    var returnpriceskb  = returnprice_chk;
+                                                                                                    var returnpriceskb1 = (returnprice_chk);
+                                                                                                    var returnpriceskb2 = '';
+                                                                                                }
+
+                                                                                                if (value == '1') {
+                                                                                                    // alert('return val = 1');
+                                                                                                    
+                                                                                                    
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 1 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '75';
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '1';
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 1 emp != 2 poschk != f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '150';
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '1';
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                    
+                                                                                                }else if (value == '2'){
+                                                                                                    // alert('return val = 2');
+                                                                                                    
+
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 2 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '150';
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '2';
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 2 emp != 2 poschk != f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '300';
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '2';
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }else if (value == '3'){
+                                                                                                    // alert('return val = 3');
+                                                                                                    
+                                                                                                    
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 3 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '225'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '3'; 
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 3 emp != 2 poschk != f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '450'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '3'; 
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }else if (value == '4'){
+                                                                                                    // alert('return val = 4');
+                                                                                                    
+                                                                                                    
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 4 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '300'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '4';
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 4 emp != 2 poschk != f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '600'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '4';
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }else if (value == '5'){
+                                                                                                    // alert('return val = 5');
+                                                                                                    
+                                                                                                    
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 5 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '375'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '5'; 
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 5 emp != 2 poschk != f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '750'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '5'; 
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }else if (value == '6'){
+                                                                                                    // alert('return val = 6');
+                                                                                                    
+                                                                                                    
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 6 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '450'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '6';  
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 6 emp != 2 poschk != f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '900'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '6';  
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }else if (value == '7'){
+                                                                                                    // alert('return val = 7');
+                                                                                                    
+
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 7 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '1050'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '7';  
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 7 emp != 2 poschk != f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '525'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '7';  
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }else if (value == '8'){
+                                                                                                    // alert('return val = 8');
+                                                                                                    
+
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 8 emp = 2 poschk = f');
+                                                                                                        document.getElementById('text_RETURNSKB').value = '600'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '8';  
+
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
+                                                                                                    } else {
+                                                                                                        document.getElementById('text_RETURNSKB').value = '1200'; 
+                                                                                                        document.getElementById('text_RETURNVALUESKB').value = '8'; 
+                                                                                                        // alert('return val = 8 emp != 2 poschk != f');
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }else{
+                                                                                                    document.getElementById('text_RETURNSKB').value = '';
+                                                                                                    document.getElementById('text_RETURNVALUESKB').value = '';
+
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        // alert('return val = 8 emp = 2 poschk = f');
+                                                                                                        
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)-(parseInt(pricereturnskb)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = (parseInt(e2)-(parseInt(pricereturnskb)));
+                                                                                                    } else {
+                                                                                                        // alert('return val = 8 emp != 2 poschk != f');
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)-(parseInt(pricereturnskb)));
+                                                                                                        document.getElementById('txt_compensation2skb').value = '';
+                                                                                                    }
+                                                                                                }
+
+                                                                                                // var compensation = parseInt(e1)+parseInt(returnprice);
+                                                                                                // var sumall48load360 = parseInt(returnprice)+parseInt(all48load360)+parseInt(ot180)+parseInt(ot360);
+                                                                                            
+                                                                                                
+
+                                                                                                // insert ข้อมูล RETURNCHK ค่าขนส่งงานรับกลับ
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'RETURNCHK', editableObj: returnpriceskb
+                                                                                                    },
+                                                                                                    success: function (rs) {
+                                                                                                        // alert(rs);
+                                                                                                        
+                                                                                                    }
+                                                                                                });
+
+                                                                                                
+
+                                                                                                // insert ข้อมูล C2 จำนวนคันของงานรับกลับ
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'C2', editableObj: returnamount
+                                                                                                    },
+                                                                                                    success: function (rs) {
+                                                                                                        // alert(rs);
+                                                                                                        
+                                                                                                    }
+                                                                                                });
+                                                                                            
+                                                                                            
+                                                                                            }
+                                                                                            
                                                                                         
+                                                                                        }
+                                                                                        function select_empsleepskb(ID, ID2){
+                                                                                            // <!-- รถสายงาน RKL SKB จะใช้ Column SELECT_4LOAD1 และ PAY_4LOAD1REMARK -->
+                                                                                            // ในกรณีพนักงานคนที่ 1 เป็นผู้โหลดงาน ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_compensation1').value != "") ? document.getElementById('txt_compensation1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_compensation2').value != "") ? document.getElementById('txt_compensation2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_compensation3').value != "") ? document.getElementById('txt_compensation3').value : 0;
+                                                                                            
+                                                                                            // var e1 = (document.getElementById('txt_e1').value != "") ? document.getElementById('txt_e1').value : 0;
+                                                                                            // var e2 = (document.getElementById('txt_e2').value != "") ? document.getElementById('txt_e2').value : 0;
+                                                                                            // var e3 = (document.getElementById('txt_e3').value != "") ? document.getElementById('txt_e3').value : 0;
+                                                                                            
+                                                                                            var compensation    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1   = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                            var compensation2   = (document.getElementById('txt_compensation2skb').value != "")  ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                            // var othermoney      = (document.getElementById('txt_orthermoney').value != "")    ? document.getElementById('txt_orthermoney').value : 0;
+                                                                                            
+                                                                                            if (compensation == '' || compensation == '0') {
+                                                                                                //check ถ้า ช่อง e1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_empsleepskb").checked = false;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีนอนค้างคืนเพื่อรอลงงานได้รับเพิ่ม 300 บาท/คน/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("chk_empsleepskb").checked = false;
+                                                                                            }else{
+                                                                                                //chk4load1 ข้อที่1
+                                                                                                if(chk_empsleepskb.checked == true){
+                                                                                                    var empsleepskbtrip_chk = (document.getElementById('chk_empsleepskb').value != "") ? document.getElementById('chk_empsleepskb').value : 0;
+                                                                                                    var empsleepskbtripedit_chk = 'นอนค้างคืนเพื่อรอลงงานได้รับเพิ่ม 300 บาท/คน/เที่ยว';
+                                                                                                    // document.getElementById('txt_compensation').value = parseInt(compensation)+100; 
+                                                                                                    // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                    document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)+300;
+                                                                                                    document.getElementById('txt_compensation2skb').value  = parseInt(compensation2)+300;
+                                                                                                    // document.getElementById('txt_orthermoney').value    = 0; 
+                                                                                                    
+                                                                                                    //อัพเดท ช่อง chk_trainer,chk_ojt,chk_multiskill = false;
+                                                                                                    // document.getElementById("chk_trainer").checked      = false;
+                                                                                                    // document.getElementById("chk_ojt").checked          = false;
+                                                                                                    // document.getElementById("chk_multiskill").checked   = false;
+                                                                                                    // alert("Trainner Check");
+                                                                                                    // alert(compensation);
+                                                                                                    
+                                                                                                
+                                                                                                    
+                                                                                                }else{
+                                                                                                    // alert('1');
+
+                                                                                                    var empsleepskbtrip_chk = '';
+                                                                                                    var empsleepsktripbdit_chk = '';
+                                                                                                
+                                                                                                    
+                                                                                                    //เช็คถ้า compensation (ช่องค่าเที่ยวรวมทั้งหมด) เท่ากับ 0 
+                                                                                                    if (compensation1 == '0') {
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)-300;
+                                                                                                        document.getElementById('txt_compensation2skb').value  = parseInt(compensation1)-300;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }else{
+                                                                                                        // document.getElementById('txt_compensationskb').value   = 0;
+                                                                                                        document.getElementById('txt_compensation1skb').value  = parseInt(compensation1)-300;
+                                                                                                        document.getElementById('txt_compensation2skb').value  = parseInt(compensation1)-300;
+                                                                                                        // document.getElementById('txt_orthermoney').value    = 0;
+                                                                                                    }
+                                                                                                
+                                                                                                    // alert("Trainner UnCheck");
+                                                                                                    // alert(compensation);
+                                                                                                }
+                                                                                                
+                                                                                                var empsleepskbtripcost    = empsleepskbtrip_chk;
+                                                                                                var empsleepskbtripedit    = empsleepskbtripedit_chk;
+                                                                                             
+                                                                                                //COMPENSATION1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation1skb').value, ID: ID2, fieldname: 'COMPENSATION1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                //COMPENSATION2
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation2skb').value, ID: ID2, fieldname: 'COMPENSATION2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+
+                                                                                                // SELECT_4LOAD1
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: empsleepskbtripcost, ID: ID2, fieldname: 'SELECT_4LOAD4'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // PAY_4LOAD1REMARK
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentdriver", editableObj: empsleepskbtripedit, ID: ID2, fieldname: 'PAY_4LOAD4REMARK'
+                                                                                                    },
+                                                                                                    success: function () {
+                                                                                                        
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                
+                                                                                            }
+                                                                                            
+
+                                                                                        }
+                                                                                        function select_assembleskb(value,empchk,poschk,documentdriverid){
+                                                                                            // alert('OT360');
+                                                                                            // alert(value);
+                                                                                            // alert(empchk);
+                                                                                            // alert(poschk);
+                                                                                            // alert(documentdriverid);
+
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensatione1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_assembleskb").selectedIndex = 0;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_assembleskb").selectedIndex = 0;
+                                                                                            }else{
+                                                                                                    
+                                                                                                    // ค่าเที่ยวปกติ
+                                                                                                    var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                                    var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                                    var assemblepriceskb = (document.getElementById('txt_assemblepriceskb').value != "") ? document.getElementById('txt_assemblepriceskb').value : 0;
+                                                                                                    
+                                                                                                 
+                                                                                                    //เช็คราคาของรถรับกลับ และ จำนวนคัน
+                                                                                                    var assembleprice_chk = (100*value);
+                                                                                                    var assembleamount = value;
+                                                                                                    // alert(all48load360);
+                                                                                                    // alert(ot180);
+                                                                                                    // alert(returnprice_chk);
+
+                                                                                                    // เช็คค่าเที่ยวกรณีงานรับกลับ 
+                                                                                                    // วิ่งคู่หาร 2
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        
+                                                                                                        // alert('return1');
+                                                                                                        document.getElementById('txt_assemblepriceskb').value = (assembleprice_chk/2);
+
+                                                                                                        var assemblepricesave = (assembleprice_chk/2);
+                                                                                                        var assembleamountsave = assembleamount;
+                                                                                                        // var returnprice  = (returnprice_chk/2);
+                                                                                                        // var returnprice1 = (returnprice_chk/2);
+                                                                                                        // var returnprice2 = (returnprice_chk/2);
+                                                                                                    }else{
+                                                                                                        // alert('return2');
+                                                                                                        // document.getElementById('txt_returnprice1').value = (returnprice_chk);
+                                                                                                        document.getElementById('txt_assemblepriceskb').value = (assembleprice_chk);
+
+                                                                                                        var assemblepricesave = (assembleprice_chk);
+                                                                                                        var assembleamountsave = assembleamount;
+                                                                                                        // var returnprice  = returnprice_chk;
+                                                                                                        // var returnprice1 = (returnprice_chk);
+                                                                                                        // var returnprice2 = '';
+                                                                                                    }
+
+
+                                                                                                    if (value == '1') {
+                                                                                                        // alert('return val = 1');
+                                                                                                        
+                                                                                                        
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 1 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '50';
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '1';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            document.getElementById('text_assembleskb').value = '100';
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '1';
+                                                                                                            // alert('return val = 1 emp != 2 poschk != f');
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                        
+                                                                                                    }else if (value == '2'){
+                                                                                                        // alert('return val = 2');
+                                                                                                        
+
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 2 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '100';
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '2';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 2 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_assembleskb').value = '200';
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '2';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else if (value == '3'){
+                                                                                                        // alert('return val = 3');
+                                                                                                        
+                                                                                                        
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 3 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '150'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '3'; 
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 3 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_assembleskb').value = '300'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '3'; 
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else if (value == '4'){
+                                                                                                        // alert('return val = 4');
+                                                                                                        
+                                                                                                        
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 4 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '200'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '4';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 4 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_assembleskb').value = '400'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '4';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else if (value == '5'){
+                                                                                                        // alert('return val = 5');
+                                                                                                        
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 5 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '250'; 
+                                                                                                        document.getElementById('text_assemblevalueskb').value = '5';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 5 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_assembleskb').value = '500'; 
+                                                                                                        document.getElementById('text_assemblevalueskb').value = '5'; 
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else if (value == '6'){
+                                                                                                        // alert('return val = 6');
+                                                                                                        
+                                                                                                        
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 6 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '300'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '6';  
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 6 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_assembleskb').value = '600'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '6';  
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else if (value == '7'){
+                                                                                                        // alert('return val = 7');
+                                                                                                        
+
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 7 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '350'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '7'; 
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 7 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_assembleskb').value = '700'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '7'; 
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else if (value == '8'){
+                                                                                                        // alert('return val = 8');
+                                                                                                        
+
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 8 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_assembleskb').value = '400'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '8';  
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(assembleprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 8 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_assembleskb').value = '800'; 
+                                                                                                            document.getElementById('text_assemblevalueskb').value = '8';  
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(assembleprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else{
+                                                                                                        document.getElementById('text_assembleskb').value = '';
+                                                                                                        document.getElementById('text_assemblevalueskb').value = '';
+
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 8 emp = 2 poschk = f');
+                                                                                                            
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)-(parseInt(assemblepriceskb)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)-(parseInt(assemblepriceskb)));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 8 emp != 2 poschk != f');
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)-(parseInt(assemblepriceskb)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }
+
+
+                                                                                                    // insert ข้อมูล RETURNCHK แทนเงินค่าประกอบ
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'PAY_4LOAD5REMARK', editableObj: assemblepricesave
+                                                                                                        },
+                                                                                                        success: function (rs) {
+                                                                                                            // alert(rs);
+                                                                                                            
+                                                                                                        }
+                                                                                                    });
+
+                                                                                                    
+
+                                                                                                    // insert ข้อมูล SELECT_4LOAD5 แทนจำนวนการประกอบ
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'SELECT_4LOAD5', editableObj: assembleamount
+                                                                                                        },
+                                                                                                        success: function (rs) {
+                                                                                                            // alert(rs);
+                                                                                                            
+                                                                                                        }
+                                                                                                    });
+                                                                                            
+                                                                                            } 
+                                                                                        }
+                                                                                        function select_morethan2storeskb(value,empchk,poschk,documentdriverid){
+                                                                                            // alert('OT360');
+                                                                                            // alert(value);
+                                                                                            // alert(empchk);
+                                                                                            // alert(poschk);
+                                                                                            // alert(documentdriverid);
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensatione1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_morethan2storeskb").selectedIndex = 0;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_morethan2storeskb").selectedIndex = 0;
+                                                                                            }else{
+
+                                                                                                    // ค่าเที่ยวปกติ
+                                                                                                    var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                                    var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                                    var morethan2storepriceskb = (document.getElementById('txt_morethan2storepriceskb').value != "") ? document.getElementById('txt_morethan2storepriceskb').value : 0;
+                                                                                                    
+                                                                                                    // alert(morethan2storepriceskb);
+                                                                                                
+                                                                                                    //เช็คราคาของรถรับกลับ และ จำนวนคัน
+                                                                                                    if (value == '0') {
+                                                                                                        var morethan2storeprice_chk = (100*(value));
+                                                                                                    }else{
+                                                                                                        var morethan2storeprice_chk = (100*(value-2));
+                                                                                                    }
+                                                                                                    // var morethan2storeprice_chk = (100*(value-2));
+                                                                                                    var morethan2storeamount = value;
+                                                                                                    // alert(all48load360);
+                                                                                                    // alert(ot180);
+                                                                                                    // alert(returnprice_chk);
+
+                                                                                                    // เช็คค่าเที่ยวกรณีงานรับกลับ 
+                                                                                                    // วิ่งคู่หาร 2
+                                                                                                    if (empchk == '2' && poschk == 'F') {
+                                                                                                        
+                                                                                                        // alert('return1');
+                                                                                                        document.getElementById('txt_morethan2storepriceskb').value = (morethan2storeprice_chk/2);
+                                                                                                        var morethan2storepricesave = (morethan2storeprice_chk/2);
+                                                                                                        var morethan2storeamountsave = morethan2storeamount;
+                                                                                                        // var returnprice  = (returnprice_chk/2);
+                                                                                                        // var returnprice1 = (returnprice_chk/2);
+                                                                                                        // var returnprice2 = (returnprice_chk/2);
+                                                                                                    }else{
+                                                                                                        // alert('return2');
+                                                                                                        // document.getElementById('txt_returnprice1').value = (returnprice_chk);
+                                                                                                        document.getElementById('txt_morethan2storepriceskb').value = (morethan2storeprice_chk);
+                                                                                                        var morethan2storepricesave = (morethan2storeprice_chk);
+                                                                                                        var morethan2storeamountsave = morethan2storeamount;
+                                                                                                        // var returnprice  = returnprice_chk;
+                                                                                                        // var returnprice1 = (returnprice_chk);
+                                                                                                        // var returnprice2 = '';
+                                                                                                    }
+
+
+                                                                                                    if (value == '3') {
+                                                                                                        // alert('return val = 1');
+                                                                                                        
+                                                                                                        
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 1 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_morethan2storeskb').value = '50';
+                                                                                                            document.getElementById('text_morethan2storevalueskb').value = '3';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(morethan2storeprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(morethan2storeprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 1 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_morethan2storeskb').value = '100';
+                                                                                                            document.getElementById('text_morethan2storevalueskb').value = '3';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(morethan2storeprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                        
+                                                                                                    }else if (value == '4'){
+                                                                                                        // alert('return val = 2');
+                                                                                                        
+
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 2 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_morethan2storeskb').value = '100';
+                                                                                                            document.getElementById('text_morethan2storevalueskb').value = '4';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(morethan2storeprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(morethan2storeprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 2 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_morethan2storeskb').value = '200';
+                                                                                                            document.getElementById('text_morethan2storevalueskb').value = '4';
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(morethan2storeprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else if (value == '5'){
+                                                                                                        // alert('return val = 3');
+                                                                                                        
+                                                                                                        
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 3 emp = 2 poschk = f');
+                                                                                                            document.getElementById('text_morethan2storeskb').value = '150'; 
+                                                                                                            document.getElementById('text_morethan2storevalueskb').value = '5'; 
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(morethan2storeprice_chk)/2));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(morethan2storeprice_chk)/2));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 3 emp != 2 poschk != f');
+                                                                                                            document.getElementById('text_morethan2storeskb').value = '300'; 
+                                                                                                            document.getElementById('text_morethan2storevalueskb').value = '5'; 
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(morethan2storeprice_chk)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }else{
+                                                                                                        document.getElementById('text_morethan2storeskb').value = '';
+                                                                                                        document.getElementById('text_morethan2storevalueskb').value = '';
+                                                                                                        document.getElementById('txt_morethan2storepriceskb').value = '';
+
+                                                                                                        if (empchk == '2' && poschk == 'F') {
+                                                                                                            // alert('return val = 8 emp = 2 poschk = f');
+                                                                                                            
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)-(parseInt(morethan2storepriceskb)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = (parseInt(e2)-(parseInt(morethan2storepriceskb)));
+                                                                                                        } else {
+                                                                                                            // alert('return val = 8 emp != 2 poschk != f');
+                                                                                                            document.getElementById('txt_compensation1skb').value = (parseInt(e1)-(parseInt(morethan2storepriceskb)));
+                                                                                                            document.getElementById('txt_compensation2skb').value = '';
+                                                                                                        }
+                                                                                                    }
+
+
+                                                                                                    // insert ข้อมูล PAY_4LOAD6REMARK กรณีลงงานมากกว่า 2 ร้านค้าในหนึ่งเที่ยว
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'PAY_4LOAD6REMARK', editableObj: morethan2storeprice_chk
+                                                                                                        },
+                                                                                                        success: function (rs) {
+                                                                                                            // alert(rs);
+                                                                                                            
+                                                                                                        }
+                                                                                                    });
+
+                                                                                                    
+
+                                                                                                    // insert ข้อมูล SELECT_4LOAD6 กรณีลงงานมากกว่า 2 ร้านค้าในหนึ่งเที่ยว 
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'SELECT_4LOAD6', editableObj: morethan2storeamount
+                                                                                                        },
+                                                                                                        success: function (rs) {
+                                                                                                            // alert(rs);
+                                                                                                            
+                                                                                                        }
+                                                                                                    });
+                                                                                            }
+                                             
+                                                                                        }
+                                                                                        function select_trainnerskbemp1(value,empchk,poschk,documentdriverid){
+                                                                                            // alert('OT360');
+                                                                                            // alert(value);
+                                                                                            // alert(empchk);
+                                                                                            // alert(poschk);
+                                                                                            // alert(documentdriverid);
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensatione1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_trainnerskbemp1").selectedIndex = 0;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_trainnerskbemp1").selectedIndex = 0;
+                                                                                            }else{
+                                                                                                    // ค่าเที่ยวปกติ
+                                                                                                    var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                                    var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                                    var trainnerskbemp1 = (document.getElementById('text_trainnerskbemp1').value != "") ? document.getElementById('text_trainnerskbemp1').value : 0;
+                                                                                                    
+                                                                                                    // alert(morethan2storepriceskb);
+                                                                                                
+                                                                                                    //เช็คจำนวนเงินค่าเทรนเนอร์
+                                                                                                    
+                                                                                                    var trainnerskbemp1price_chk = (value);
+                                                                                                    
+                                                                                                    // var morethan2storeprice_chk = (100*(value-2));
+                                                                                                    var morethan2storeamount = value;
+                                                                                                    // alert(all48load360);
+                                                                                                    // alert(ot180);
+                                                                                                    // alert(returnprice_chk);
+
+                                                                                                    if (value == '0') {
+                                                                                                        // alert('return val = 8 emp = 2 poschk = f');
+                                                                                                        
+                                                                                                        document.getElementById('txt_compensation1skb').value = '0';
+                                                                                                        document.getElementById('text_trainnerskbemp1').value = parseInt(value);
+
+                                                                                                    } else {
+                                                                                                        // alert('return val = 8 emp != 2 poschk != f');
+                                                                                                        document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(trainnerskbemp1price_chk)));
+                                                                                                        document.getElementById('text_trainnerskbemp1').value = parseInt(value);
+                                                                                                    }
+
+                                                                                                    // document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(trainnerskbemp1price_chk)));
+                                                                                                    // document.getElementById('text_trainnerskbemp1').value = parseInt(value);
+                                                                                                    
+                                                                                                    
+                                                                                                    // SKB ใช้ SELECT_8LOAD1 เก็บข้อมูลค่าเทรนเนอร์ ของพนักงานคนที่ 1
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'SELECT_8LOAD1', editableObj: trainnerskbemp1price_chk
+                                                                                                        },
+                                                                                                        success: function (rs) {
+                                                                                                            // alert(rs);
+                                                                                                            
+                                                                                                        }
+                                                                                                    });
+                                                                                        
+                                                                                            }
+                                                                                        }
+                                                                                        
+                                                                                        function select_trainnerskbemp2(value,empchk,poschk,documentdriverid){
+                                                                                            // alert('OT360');
+                                                                                            // alert(value);
+                                                                                            // alert(empchk);
+                                                                                            // alert(poschk);
+                                                                                            // alert(documentdriverid);
+
+                                                                                            var compensatione1    = (document.getElementById('txt_e1skb').value != "")   ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            var compensation1     = (document.getElementById('txt_compensation1skb').value != "")  ? document.getElementById('txt_compensation1skb').value : 0;
+
+                                                                                            if (compensatione1 == '' || compensatione1 == '0') {
+                                                                                                //check ถ้า ช่อง compensatione1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "ไม่พบค่าเที่ยวในตารางข้อมูลราคา กรุณาติดต่อเจ้าหน้าที่!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_trainnerskbemp2").selectedIndex = 0;
+                                                                                            }else if (compensation1 == '' || compensation1 == '0') {
+                                                                                                //check ถ้า ช่อง compensation1 == '' กรณีพนักงานคนที่ 1 โหลดงาน SKB ได้รับเพิ่ม 150 บาท/เที่ยว
+                                                                                                    // alert("กรุณากดปุ่มคำนวณก่อนที่จะเลือกเงื่อนไขนี้ !!!")
+                                                                                                    swal.fire({
+                                                                                                            title: "Warning",
+                                                                                                            text: "กรุณากดปุ่มคำนวณค่าเที่ยวก่อนทุกครั้ง !!!",
+                                                                                                            icon: "error",
+                                                                                                            showConfirmButton: true,
+                                                                                                            allowOutsideClick: false,
+                                                                                                    });
+                                                                                                    document.getElementById("se_trainnerskbemp2").selectedIndex = 0;
+                                                                                            }else{
+                                                                                                // ค่าเที่ยวปกติ
+                                                                                                var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                                var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                                var trainnerskbemp2 = (document.getElementById('text_trainnerskbemp2').value != "") ? document.getElementById('text_trainnerskbemp2').value : 0;
+                                                                                                
+                                                                                                // alert(morethan2storepriceskb);
+                                                                                            
+                                                                                                //เช็คจำนวนเงินค่าเทรนเนอร์
+                                                                                                
+                                                                                                var trainnerskbemp2price_chk = (value);
+                                                                                                
+                                                                                                // var morethan2storeprice_chk = (100*(value-2));
+                                                                                                // var morethan2storeamount = value;
+                                                                                                // alert(all48load360);
+                                                                                                // alert(ot180);
+                                                                                                // alert(returnprice_chk);
+
+                                                                                                if (value == '0') {
+                                                                                                    // alert('return val = 8 emp = 2 poschk = f');
+                                                                                                    
+                                                                                                    document.getElementById('txt_compensation2skb').value = '0';
+                                                                                                    document.getElementById('text_trainnerskbemp2').value = parseInt(value);
+
+                                                                                                } else {
+                                                                                                    // alert('return val = 8 emp != 2 poschk != f');
+                                                                                                    document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(trainnerskbemp2price_chk)));
+                                                                                                    document.getElementById('text_trainnerskbemp2').value = parseInt(value);
+                                                                                                }
+                                                                                                
+                                                                                                
+                                                                                                
+                                                                                                
+                                                                                                // SKB ใช้ SELECT_8LOAD2 เก็บข้อมูลค่าเทรนเนอร์ ของพนักงานคนที่ 2
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportdocumentplan", ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'SELECT_8LOAD2', editableObj: trainnerskbemp2price_chk
+                                                                                                    },
+                                                                                                    success: function (rs) {
+                                                                                                        // alert(rs);
+                                                                                                        
+                                                                                                    }
+                                                                                                });
+                                                                                            
+                                                                                            }
+                                             
+                                                                                        }
+                                                                                        function chk_clearcompensation_skb(ID, ID2,COMPANYCODE,CUSTOMERCODE) {
+                                                                                            Swal.fire({
+                                                                                                title: 'ต้องการลงค่าเที่ยวใหม่?',
+                                                                                                text: "กรุณากด 'ตกลง' เพื่อยืนยัน!!!",
+                                                                                                icon: 'warning',
+                                                                                                showCancelButton: true,
+                                                                                                confirmButtonColor: '#3085d6',
+                                                                                                cancelButtonColor: '#d33',
+                                                                                                confirmButtonText: 'ตกลง',
+                                                                                                cancelButtonText: 'ยกเลิก'
+                                                                                            }).then((result) => {
+                                                                                                if (result.isConfirmed) {
+                                                                                                    Swal.fire(
+                                                                                                    'Clear!',
+                                                                                                    'ดำเนินการเรียบร้อย!!!',
+                                                                                                    'success'
+                                                                                                    )
+
+                                                                                                    
+                                                                                                    // ล้างค่าขอมูลค่าเที่ยว พขร.1,พขร.2,รายได้อื่นๆ และค่าเที่ยวรวม ให้เป็นค่า 0 
+                                                                                                    document.getElementById('txt_compensation1skb').value       = 0;
+                                                                                                    document.getElementById('txt_compensation2skb').value       = 0;
+                                                                                                    document.getElementById('txt_compensation3skb').value       = 0;
+                                                                                                    document.getElementById('txt_compensationallskb').value     = 0;
+                                                                                                    document.getElementById('txt_compensationOT15SKB').value    = 0;
+                                                                                                    document.getElementById('txt_returnpriceskb').value         = 0;
+                                                                                                    document.getElementById('txt_assemblepriceskb').value       = 0;
+                                                                                                    document.getElementById('txt_morethan2storepriceskb').value = 0;
+                                                                                                    
+                                                                                                    // document.getElementById('txt_orthermoney').value    = 0;
+
+                                                                                                    // ล้างข้อมูลการเลือกเช็คทั้งหมดให้เป็น false
+                                                                                                    document.getElementById("chk_OT15SKB").checked = false;
+                                                                                                    
+                                                                                                    // OT180
+                                                                                                    document.getElementById("chk_OT180SKB").checked                  = false;
+                                                                                                    document.getElementById('text_OT180VALUESKB').value              = 0;
+                                                                                                    document.getElementById('text_OT180SKB').value                   = 0;
+                                                                                                        
+                                                                                                    // OT360
+                                                                                                    document.getElementById("se_OT360SKB").selectedIndex             = 0;
+                                                                                                    document.getElementById('text_OT360VALUESKB').value              = 0;
+                                                                                                    document.getElementById('text_OT360SKB').value                   = 0;
+
+                                                                                                    // จำนวนรับกลับ
+                                                                                                    document.getElementById("se_RETURN").selectedIndex               = 0;
+                                                                                                    document.getElementById('text_RETURNVALUESKB').value             = 0;
+                                                                                                    document.getElementById('text_RETURNSKB').value                  = 0;                                                                                                 
+
+                                                                                                    // ค่าประกอบ
+                                                                                                    document.getElementById("se_assembleskb").selectedIndex          = 0;
+                                                                                                    document.getElementById('text_assemblevalueskb').value           = 0;
+                                                                                                    document.getElementById('text_assembleskb').value                = 0; 
+
+                                                                                                    // ลงงานมากกว่า 2 ร้านค้า
+                                                                                                    document.getElementById("se_morethan2storeskb").selectedIndex    = 0;
+                                                                                                    document.getElementById('text_morethan2storevalueskb').value     = 0;
+                                                                                                    document.getElementById('text_morethan2storeskb').value          = 0; 
+
+                                                                                                    // กรณีโหลดงาน ทั้ง 3 กรณีและ กรณีนอนค้างคืน
+                                                                                                    document.getElementById("chk_emp1loadskb").checked               = false;
+                                                                                                    document.getElementById("chk_emp2loadskb").checked               = false;
+                                                                                                    document.getElementById("chk_allemploadskb").checked             = false;
+                                                                                                    document.getElementById("chk_empsleepskb").checked               = false;
+                                                                                                    
+                                                                                                    // ค่าเทรนเนอร์ คนที่ 1 และ ค่าเทรนเนอร์ คนที่ 2
+                                                                                                    document.getElementById("se_trainnerskbemp1").selectedIndex      = 0;
+                                                                                                    document.getElementById("text_trainnerskbemp1").value            = 0;
+                                                                                                    document.getElementById("se_trainnerskbemp2").selectedIndex      = 0;
+                                                                                                    document.getElementById("text_trainnerskbemp2").value            = 0;
+
+
+                                                                                                    update_compendata_skb(ID, ID2,COMPANYCODE,CUSTOMERCODE);
+                                                                                                }else{
+                                                                                                    // window.location.reload();
+                                                                                                }
+                                                                                                
+                                                                                            })
+                                                                                            //    11111
+                                                                                        }
+                                                                                        function update_compendata_skb(planid, driverid,companycode,customercode) {
+                                                                                            // alert(planid);
+                                                                                            // alert(driverid);
+                                                                                            // alert(companycode);
+                                                                                            // alert(customercode);
+
+                                                                                            $.ajax({
+                                                                                                type: 'post',
+                                                                                                url: 'meg_data2.php',
+                                                                                                data: {
+                                                                                                    txt_flg: "update_compendata_skb", 
+                                                                                                    planid: planid, 
+                                                                                                    driverid: driverid, 
+                                                                                                    companycode: companycode, 
+                                                                                                    customercode: customercode
+                                                                                                },
+                                                                                                success: function () {
+
+                                                                                                    
+
+                                                                                                }
+                                                                                            });
+
+                                                                                        }
                                                                                         function save_mileage(mileageid, vehicleregisternumber1, jobno, editableObj, mileagetype)
                                                                                         {
 

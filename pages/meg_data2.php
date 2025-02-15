@@ -8459,6 +8459,45 @@ if ($_POST['txt_flg'] == "update_compendata") {
 
   <?php
 }
+if ($_POST['txt_flg'] == "update_compendata_skb") {
+  ?>
+
+  <?php
+
+    //อัพเดทค่าเที่ยวพนักงานคนที่ 1 และ 2 ในแผนเป็นค่า 0
+    $sql_updatePlandata = "UPDATE VEHICLETRANSPORTPLAN
+        SET E1 = NULL ,E2 = NULL,C2 = NULL,C4 = NULL,C5 = NULL
+        WHERE VEHICLETRANSPORTPLANID ='".$_POST['planid']."'";
+    $query_updatePlandata  = sqlsrv_query($conn, $sql_updatePlandata, $params_updatePlandata);
+    $result_updatePlandata = sqlsrv_fetch_array($query_updatePlandata, SQLSRV_FETCH_ASSOC);
+
+    //อัพเดทค่าเที่ยวพนักงานคนที่ 1 และ 2 ,ค่าใช้จ่ายอื่นๆ,ค่าเที่ยวรวม เป็นค่า ว่าง  และ ล้างข้อมูลการเลือกเช็คทั้งหมดให้เป็นค่า NULL
+    $sql_updateDriverdata = "UPDATE VEHICLETRANSPORTDOCUMENTDIRVER
+        SET 
+        COMPENSATION    = NULL,COMPENSATION1 = NULL,
+        COMPENSATION2   = NULL,COMPENSATION3 = NULL,
+        TOTALCOMPEN     = NULL,TOTALNET      = NULL,
+
+        SELECT_4LOAD1 = NULL,PAY_4LOAD1REMARK = NULL,
+        SELECT_4LOAD2 = NULL,PAY_4LOAD2REMARK = NULL,
+        SELECT_4LOAD3 = NULL,PAY_4LOAD3REMARK = NULL,
+        SELECT_4LOAD4 = NULL,PAY_4LOAD4REMARK = NULL,
+        SELECT_4LOAD5 = NULL,PAY_4LOAD5REMARK = NULL,
+        SELECT_4LOAD6 = NULL,PAY_4LOAD6REMARK = NULL,
+        SELECT_8LOAD1 = NULL,SELECT_8LOAD2    = NULL,
+
+        OT180CHK = NULL,OT360CHK  = NULL,   
+        OT15CHK  = NULL,RETURNCHK = NULL
+        
+        WHERE VEHICLETRANSPORTPLANID ='".$_POST['planid']."'";
+    $query_updateDriverdata  = sqlsrv_query($conn, $sql_updateDriverdata, $params_updateDriverdata);
+    $result_updateDriverdata = sqlsrv_fetch_array($query_updateDriverdata, SQLSRV_FETCH_ASSOC);
+  ?>
+
+
+
+  <?php
+}
 if ($_POST['txt_flg'] == "save_stdtenkodata") {
   ?>
 

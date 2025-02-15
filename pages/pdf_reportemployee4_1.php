@@ -770,7 +770,7 @@ $table_1DAY1 = '<table id="bg-table" width="100%" style="border-collapse: collap
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">2</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:left;">ตรวจเช็คยูนิฟอร์ม</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $TENKOUNIFORMCHECK . '</td>
-        <td colspan="2" style="border-right:1px solid #000;padding:4px;text-align:left;">สวมชุดที่สอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย</td>
+        <td colspan="2" style="border-right:1px solid #000;padding:4px;text-align:left;">สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $TENKOUNIFORMRESULT1 . '</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $TENKOUNIFORMRESULT0 . '</td>
         <td colspan="2" style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seTenkobefor['TENKOUNIFORMREMARK'] . '</td>
@@ -5719,7 +5719,7 @@ $table_3 = '<table id="bg-table" width="100%" style="border-collapse: collapse;f
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">2</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:left;">ตรวจเช็คยูนิฟอร์ม</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $TENKOUNIFORMCHECK1 . '</td>
-        <td style="border-right:1px solid #000;padding:4px;text-align:left;">สวมชุดที่สอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $TENKOUNIFORMRESULT11 . '</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">' . $TENKOUNIFORMRESULT00 . '</td>
         <td colspan="2" style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seTenkoafter['TENKOUNIFORMREMARK'] . '</td>

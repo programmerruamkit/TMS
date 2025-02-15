@@ -168,6 +168,14 @@ $query_seCountHealth = sqlsrv_query($conn, $sql_seCountHealth, $params_seCountHe
 $result_seCountHealth = sqlsrv_fetch_array($query_seCountHealth, SQLSRV_FETCH_ASSOC);
 
 
+$sql_seCountHealthLastYear = "SELECT  COUNT(ID) AS 'COUNTHEALTH_LASTYEAR'
+FROM [dbo].[HEALTHHISTORY]
+WHERE EMPLOYEECODE ='".$_GET['employeecode']."'
+AND CREATEYEAR ='".($currentyear-1)."'
+AND ACTIVESTATUS ='1'";
+$query_seCountHealthLastYear = sqlsrv_query($conn, $sql_seCountHealthLastYear, $params_seCountHealthLastYear);
+$result_seCountHealthLastYear = sqlsrv_fetch_array($query_seCountHealthLastYear, SQLSRV_FETCH_ASSOC);
+
 if ($result_seEmp['MaritalID'] = '1') {
     $status = 'โสด';
 }else if($result_seEmp['MaritalID'] = '2'){
@@ -310,6 +318,117 @@ $table1 = '<table id="bg-table" width="100%" style="border-collapse: collapse;fo
         <td style=" padding:4px;text-align:left;" colspan="6"></td>
     </tr>
 </tbody></table>';
+
+// ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ประวัติสุขภาพ ย้อนหลัง 1 ปี
+if ($result_seCountHealthLastYear['COUNTHEALTH_LASTYEAR'] > 0) {
+  $table_header2lastyear = '<table style="width: 100%;">
+    <thead>
+        <tr>
+            <td colspan="48" style="text-align:center;font-size:16px"><b>ข้อมูลประวัติสุขภาพปี&#160;'.($currentyear-1).'</b></td>
+        </tr>
+
+    </thead>
+</table>';
+}else {
+  $table_header2lastyear = '<table style="width: 100%;">
+    <thead>
+        <tr>
+            <td colspan="48" style="text-align:center;font-size:16px"><b>ยังไม่มีข้อมูลประวัติสุขภาพปี&#160;'.($currentyear-1).'</b></td>
+        </tr>
+
+    </thead>
+</table>';
+}
+
+
+$table_begin2lastyear = '<table id="bg-table" width="100%" style="border-collapse: collapse;margin-top:8px;">';
+$thead2lastyear = '<thead>
+      <tr  style="border:1px solid #000;padding:8px;background-color:#A69D9D">
+        <td colspan = "4"   style="border-right:1px solid #000;padding:8px;text-align:center;font-size:12px"><b>สายตาสั้น</b></td>
+        <td colspan = "4"   style="border-right:1px solid #000;padding:8px;text-align:center;font-size:12px"><b>สายตายาว</b></td>
+        <td colspan = "4"   style="border-right:1px solid #000;padding:8px;text-align:center;font-size:12px"><b>สายตาเอียง</b></td>
+      </tr>
+    </thead><tbody>';
+    $ihealthlastyear = 1;
+    
+    $sql_sedataHealthlastyear = "SELECT  TOP 1 ID,DIABETES,HIGHTBLOODPRESSURE,LOWBLOODPRESSURE,
+      HEARTDISEASE, EPILEPPSY, BRAINSURGERY, SHORTSIGHT,SHORTSIGHT_R,SHORTSIGHT_L,LONGSIGHT,LONGSIGHT_R,LONGSIGHT_L,
+      OBLIQUESIGHT,OBLIQUESIGHT_R,OBLIQUESIGHT_L,COLORBLIND_OK,COLORBLIND_NG,OTHERDISEASE1,OTHERDISEASE2,OTHERDISEASE3,
+      OTHERDISEASE4,OTHERDISEASE5,OTHERDISEASE6,CREATEDATE,CREATEYEAR
+      FROM [dbo].[HEALTHHISTORY]
+      WHERE EMPLOYEECODE ='".$_GET['employeecode']."'
+      AND CREATEYEAR ='".($currentyear-1)."'
+      AND ACTIVESTATUS ='1'
+      ORDER BY CREATEDATE DESC";
+    $params_sedataHealthlastyear = array();
+    $query_sedataHealthlastyear = sqlsrv_query($conn, $sql_sedataHealthlastyear, $params_sedataHealthlastyearlastyear);
+    while ($result_sedataHealthlastyear = sqlsrv_fetch_array($query_sedataHealthlastyear, SQLSRV_FETCH_ASSOC)) {
+        // echo $result_sedataHealth['DIABETES'] == '0' ? 'UNCHECK'  : 'CHECK';
+        $tbody2lastyear .= '
+        <tr style="border:1px solid #000;padding:10px;background-color:#A69D9D">
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">R(ข้างขวา)</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">L(ข้างซ้าย)</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">R(ข้างขวา)</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">L(ข้างซ้าย)</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">R(ข้างขวา)</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">L(ข้างซ้าย)</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;">
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">'.$result_sedataHealthlastyear['SHORTSIGHT_R'].'</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">'.$result_sedataHealthlastyear['SHORTSIGHT_L'].'</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">'.$result_sedataHealthlastyear['LONGSIGHT_R'].'</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">'.$result_sedataHealthlastyear['LONGSIGHT_L'].'</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">'.$result_sedataHealthlastyear['OBLIQUESIGHT_R'].'</td>
+          <td colspan = "2" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">'.$result_sedataHealthlastyear['OBLIQUESIGHT_L'].'</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;background-color:#A69D9D">
+          <td colspan = "8" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">5 โรคเสี่ยง</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:center;font-size:14px">โรคอื่นๆ</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;">
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">1.โรคเบาหวาน</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealthlastyear['DIABETES']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
+          // โรคอื่นๆ
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.$result_sedataHealthlastyear['OTHERDISEASE1'].'</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;">
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">2.โรคความดันโลหิตสูง</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealthlastyear['HIGHTBLOODPRESSURE']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
+          // โรคอื่นๆ
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.$result_sedataHealthlastyear['OTHERDISEASE2'].'</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;">
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">3.โรคความดันโลหิตต่ำ</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealthlastyear['LOWBLOODPRESSURE']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
+          // โรคอื่นๆ
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.$result_sedataHealthlastyear['OTHERDISEASE3'].'</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;">
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">4.โรคหัวใจ</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealth['HEARTDISEASE']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
+          // โรคอื่นๆ
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.$result_sedataHealthlastyear['OTHERDISEASE4'].'</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;">
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">5.โรคลมชัก/ลมบ้าหมู</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealthlastyear['EPILEPPSY']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
+          // โรคอื่นๆ
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.$result_sedataHealthlastyear['OTHERDISEASE5'].'</td>
+        </tr>
+        <tr style="border:1px solid #000;padding:10px;">
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">6.ผ่าตัดสมอง</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealthlastyear['BRAINSURGERY']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
+          // โรคอื่นๆ
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.$result_sedataHealthlastyear['OTHERDISEASE6'].'</td>
+        </tr>
+        ';
+      
+      $i++;
+    }
+
+$table_end2lastyear = '</table>';
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 // ประวัติสุขภาพ
@@ -537,6 +656,20 @@ $table_end3 = '</table>';
 $mpdf->WriteHTML($style);
 $mpdf->WriteHTML($table1);
 
+//  helthhistory Data Last Year
+if ($result_seCountHealthLastYear['COUNTHEALTH_LASTYEAR'] > 0) {
+  $mpdf->WriteHTML($table_header2lastyear);
+  $mpdf->WriteHTML($table_begin2lastyear);
+  $mpdf->WriteHTML($thead2lastyear);
+  $mpdf->WriteHTML($tbody2lastyear);
+  $mpdf->WriteHTML($table_end2lastyear);
+  // $mpdf->Output();
+}else {
+  $mpdf->WriteHTML($table_header2);
+  // $mpdf->Output();
+}
+
+$mpdf->AddPage();
 //  helthhistory Data
 if ($result_seCountHealth['COUNTHEALTH'] > 0) {
   $mpdf->WriteHTML($table_header2);
