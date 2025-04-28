@@ -9282,7 +9282,33 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     }
                                                                                                 });
 
-                                                                                                // COMPENSATION
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                 // COMPENSATION
                                                                                                 // $.ajax({
                                                                                                 //     url: 'meg_data.php',
                                                                                                 //     type: 'POST',
@@ -9448,6 +9474,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     },
                                                                                                     success: function () {
                                                                                                         
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
 
                                                                                                     }
                                                                                                 });
@@ -9639,6 +9691,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     }
                                                                                                 });
 
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
                                                                                                 // COMPENSATION
                                                                                                 // $.ajax({
                                                                                                 //     url: 'meg_data.php',
@@ -9695,17 +9773,26 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                             
                                                                                         }
                                                                                         // function คำนวณค่าเที่ยว
-                                                                                        function edit_vehicletransportdocumentdriverconm_skb(ID, ID2,COMPANYCODE,CUSTOMERCODE,empchk,poschk) {
+                                                                                        function edit_vehicletransportdocumentdriverconm_skb(ID, ID2,COMPANYCODE,CUSTOMERCODE,empchk,poschk,jobstart) {
 
                                                                                             // alert(COMPANYCODE);
                                                                                             // alert(CUSTOMERCODE);
                                                                                             // alert(empchk);
                                                                                             // alert(poschk);
-                                                                                            if (empchk == '1') {
+                                                                                            if (empchk == '1' && jobstart != 'Ruamkit') {
                                                                                                 swal.fire({
                                                                                                     title: "Warning",
                                                                                                     // text: "โหลดงานคนเดียวได้ค่าเที่ยว เท่ากับ 2 คน",
                                                                                                     html: '<div style="text-align: center;">กรณีส่งงานคนเดียวจะได้ค่าเที่ยวเท่ากับ 2 คน<br>แต่จะมีการหักค่าเที่ยว 150 บาท<br>เพื่อให้กับผู้ช่วยโหลดงานขึ้น</div>',
+                                                                                                    icon: "warning",
+                                                                                                    showConfirmButton: true,
+                                                                                                    allowOutsideClick: false,
+                                                                                                });
+                                                                                            }else if (empchk == '1' && jobstart == 'Ruamkit'){
+                                                                                                swal.fire({
+                                                                                                    title: "Warning",
+                                                                                                    // text: "โหลดงานคนเดียวได้ค่าเที่ยว เท่ากับ 2 คน",
+                                                                                                    html: '<div style="text-align: center;">กรณีโหลดงานแทนจะได้รับค่าเที่ยว 150 บาท</div>',
                                                                                                     icon: "warning",
                                                                                                     showConfirmButton: true,
                                                                                                     allowOutsideClick: false,
@@ -9785,6 +9872,17 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                 document.getElementById('txt_compensation2skb').value = parseInt(e2);
                                                                                                 // แสดงค่า พนักงาน 3
                                                                                                 document.getElementById('txt_compensation3skb').value = parseInt(e3);
+                                                                                            }else if(empchk == '1' && jobstart == 'Ruamkit'){
+                                                                                                // ถ้าพนักงานวิ่งงานเท่ากับ 1 คน 
+                                                                                                // แสดงค่าเที่ยวรวม
+                                                                                                document.getElementById('txt_compensationallskb').value = parseInt(e1);
+                                                                                                // แสดงค่า พนักงาน 1
+                                                                                                document.getElementById('txt_compensation1skb').value = parseInt(e1);
+                                                                                                // แสดงค่า พนักงาน 2
+                                                                                                document.getElementById('txt_compensation2skb').value = 0;
+                                                                                                // แสดงค่า พนักงาน 3
+                                                                                                document.getElementById('txt_compensation3skb').value = parseInt(e3);
+
                                                                                             }else{
                                                                                                 // ถ้าพนักงานวิ่งงานเท่ากับ 1 คน 
                                                                                                 // แสดงค่าเที่ยวรวม
@@ -9889,7 +9987,202 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                 }
                                                                                             });
 
+                                                                                            // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                },
+                                                                                                success: function () {
+
+
+                                                                                                }
+                                                                                            });
+                                                                                            
+                                                                                            // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                },
+                                                                                                success: function () {
+
+
+                                                                                                }
+                                                                                            });
+
                                                                                         }
+                                                                                        // function ยืนยันค่าเที่ยว
+                                                                                        function edit_vehicletransportdocumentdriverconm_skb2(ID, ID2,COMPANYCODE,CUSTOMERCODE,empchk,poschk,jobstart) {
+
+                                                                                            // รวมค่าเที่ยวคนที่ 1 
+                                                                                            //เช็คในการกด คำนวณรอบแรก กรณี compensation1 เป็น NULL ,ว่าง  หรือ 0 จะใช้ E1 แทน
+                                                                                            if (document.getElementById('txt_compensation1skb').value == "" || document.getElementById('txt_compensation1skb').value == 0) {
+                                                                                                // alert('1');
+                                                                                                var e1 = (document.getElementById('txt_e1skb').value != "") ? document.getElementById('txt_e1skb').value : 0;
+                                                                                            }else{
+                                                                                                // alert('2');
+                                                                                                var e1 = (document.getElementById('txt_compensation1skb').value != "") ? document.getElementById('txt_compensation1skb').value : 0;
+                                                                                            }
+
+                                                                                            //เช็คในการกด คำนวณรอบแรก กรณี compensation2 เป็น NULL ,ว่าง  หรือ 0  จะใช้ E2 แทน
+                                                                                            if (document.getElementById('txt_compensation2skb').value == "" || document.getElementById('txt_compensation2skb').value == 0) {
+                                                                                                // alert('1');
+                                                                                                var e2 = (document.getElementById('txt_e2skb').value != "") ? document.getElementById('txt_e2skb').value : 0;
+                                                                                            }else{
+                                                                                                // alert('2');
+                                                                                                var e2 = (document.getElementById('txt_compensation2skb').value != "") ? document.getElementById('txt_compensation2skb').value : 0;
+                                                                                            }
+
+                                                                                            //เช็คในการกด คำนวณรอบแรก กรณี compensation2 เป็น NULL ,ว่าง  หรือ 0  จะใช้ E3 แทน
+                                                                                            if (document.getElementById('txt_compensation3skb').value == "" || document.getElementById('txt_compensation3skb').value == 0) {
+                                                                                                // alert('1');
+                                                                                                var e3 = (document.getElementById('txt_e3skb').value != "") ? document.getElementById('txt_e3skb').value : 0;
+                                                                                            }else{
+                                                                                                // alert('2');
+                                                                                                var e3 = (document.getElementById('txt_compensation3skb').value != "") ? document.getElementById('txt_compensation3skb').value : 0;
+                                                                                            }
+
+
+
+                                                                                            if (empchk == '2' && poschk == 'F') {
+                                                                                                // ถ้าพนักงานวิ่งงานเท่ากับ 2 คน 
+                                                                                                // แสดงค่าเที่ยวรวม
+                                                                                                document.getElementById('txt_compensationallskb').value = (parseInt(e1) + parseInt(e2) + parseInt(e3));
+                                                                                                // แสดงค่า พนักงาน 1
+                                                                                                document.getElementById('txt_compensation1skb').value = parseInt(e1);
+                                                                                                // แสดงค่า พนักงาน 2
+                                                                                                document.getElementById('txt_compensation2skb').value = parseInt(e2);
+                                                                                                // แสดงค่า พนักงาน 3
+                                                                                                document.getElementById('txt_compensation3skb').value = parseInt(e3);
+                                                                                            }else if (empchk == '1' && jobstart == 'Ruamkit'){
+                                                                                                // ถ้าพนักงานวิ่งงานเท่ากับ 1 คน 
+                                                                                                // แสดงค่าเที่ยวรวม
+                                                                                                document.getElementById('txt_compensationallskb').value = parseInt(e1);
+                                                                                                // แสดงค่า พนักงาน 1
+                                                                                                document.getElementById('txt_compensation1skb').value = parseInt(e1);
+                                                                                                // แสดงค่า พนักงาน 2
+                                                                                                document.getElementById('txt_compensation2skb').value = 0;
+                                                                                                // แสดงค่า พนักงาน 3
+                                                                                                document.getElementById('txt_compensation3skb').value = parseInt(e3);
+
+                                                                                            }else{
+                                                                                                // ถ้าพนักงานวิ่งงานเท่ากับ 1 คน 
+                                                                                                // แสดงค่าเที่ยวรวม
+                                                                                                document.getElementById('txt_compensationallskb').value = (parseInt(e1*2) + parseInt(e3));
+                                                                                                // แสดงค่า พนักงาน 1
+                                                                                                document.getElementById('txt_compensation1skb').value = parseInt(e1*2);
+                                                                                                // แสดงค่า พนักงาน 2
+                                                                                                document.getElementById('txt_compensation2skb').value = 0;
+                                                                                                // แสดงค่า พนักงาน 3
+                                                                                                document.getElementById('txt_compensation3skb').value = parseInt(e3);
+
+                                                                                            }
+
+                                                                                            // TOTALCOMPEN ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationallskb').value, ID: ID2, fieldname: 'TOTALCOMPEN'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // TOTALNET ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationallskb').value, ID: ID2, fieldname: 'TOTALNET'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION = ผลรวม ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensationallskb').value, ID: ID2, fieldname: 'COMPENSATION'
+                                                                                                    
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION1 ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation1skb').value, ID: ID2, fieldname: 'COMPENSATION1'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION2 ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation2skb').value, ID: ID2, fieldname: 'COMPENSATION2'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                    
+                                                                                                }
+                                                                                            });
+
+                                                                                            // COMPENSATION3 ในตาราง DO
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportdocumentdriver", editableObj: document.getElementById('txt_compensation3skb').value, ID: ID2, fieldname: 'COMPENSATION3'
+                                                                                                },
+                                                                                                success: function () {
+                                                                                                
+                                                                                                }
+                                                                                            });
+
+                                                                                            // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                },
+                                                                                                success: function () {
+
+
+                                                                                                }
+                                                                                            });
+
+                                                                                            // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                            $.ajax({
+                                                                                                url: 'meg_data.php',
+                                                                                                type: 'POST',
+                                                                                                data: {
+                                                                                                    txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                },
+                                                                                                success: function () {
+
+
+                                                                                                }
+                                                                                            });
+
+                                                                                            }
                                                                                         function select_OT15SKB(){
                                                                                             // alert('OT15');
                                                                                             // alert(value);
@@ -9946,7 +10239,31 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                         }
                                                                                                     });
                                                                                                     
-                                                                                                
+                                                                                                    // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
+                                                                                                    
+                                                                                                    // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
 
                                                                                                 }else{
                                                                                                     // alert('not check');
@@ -10042,6 +10359,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     success: function () {
                                                                                                         
                                                                                                         
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
                                                                                                     }
                                                                                                 });
                                                                                             }
@@ -10143,6 +10486,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                         
                                                                                                     }
                                                                                                 });
+
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
                                                                                             }
                                                                                             
                                                                                         }
@@ -10191,7 +10560,7 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                             
                                                                                                 
                                                                                                 //เช็คราคาของรถรับกลับ และ จำนวนคัน
-                                                                                                var returnprice_chk = (150*value);
+                                                                                                var returnprice_chk = (100*value);
                                                                                                 var returnamount = value;
                                                                                                 // alert(all48load360);
                                                                                                 // alert(ot180);
@@ -10223,13 +10592,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 1 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '75';
+                                                                                                        document.getElementById('text_RETURNSKB').value = '50';
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '1';
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
                                                                                                         // alert('return val = 1 emp != 2 poschk != f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '150';
+                                                                                                        document.getElementById('text_RETURNSKB').value = '100';
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '1';
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
                                                                                                         document.getElementById('txt_compensation2skb').value = '';
@@ -10241,13 +10610,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 2 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '150';
+                                                                                                        document.getElementById('text_RETURNSKB').value = '100';
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '2';
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
                                                                                                         // alert('return val = 2 emp != 2 poschk != f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '300';
+                                                                                                        document.getElementById('text_RETURNSKB').value = '200';
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '2';
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
                                                                                                         document.getElementById('txt_compensation2skb').value = '';
@@ -10258,13 +10627,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 3 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '225'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '150'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '3'; 
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
                                                                                                         // alert('return val = 3 emp != 2 poschk != f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '450'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '300'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '3'; 
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
                                                                                                         document.getElementById('txt_compensation2skb').value = '';
@@ -10275,13 +10644,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 4 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '300'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '200'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '4';
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
                                                                                                         // alert('return val = 4 emp != 2 poschk != f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '600'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '400'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '4';
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
                                                                                                         document.getElementById('txt_compensation2skb').value = '';
@@ -10292,13 +10661,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 5 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '375'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '250'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '5'; 
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
                                                                                                         // alert('return val = 5 emp != 2 poschk != f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '750'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '500'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '5'; 
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
                                                                                                         document.getElementById('txt_compensation2skb').value = '';
@@ -10309,13 +10678,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 6 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '450'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '300'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '6';  
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
                                                                                                         // alert('return val = 6 emp != 2 poschk != f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '900'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '600'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '6';  
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
                                                                                                         document.getElementById('txt_compensation2skb').value = '';
@@ -10326,13 +10695,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 7 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '1050'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '350'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '7';  
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
                                                                                                         // alert('return val = 7 emp != 2 poschk != f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '525'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '700'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '7';  
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
                                                                                                         document.getElementById('txt_compensation2skb').value = '';
@@ -10343,13 +10712,13 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
                                                                                                     if (empchk == '2' && poschk == 'F') {
                                                                                                         // alert('return val = 8 emp = 2 poschk = f');
-                                                                                                        document.getElementById('text_RETURNSKB').value = '600'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '400'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '8';  
 
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)/2));
                                                                                                         document.getElementById('txt_compensation2skb').value = (parseInt(e2)+(parseInt(returnprice_chk)/2));
                                                                                                     } else {
-                                                                                                        document.getElementById('text_RETURNSKB').value = '1200'; 
+                                                                                                        document.getElementById('text_RETURNSKB').value = '800'; 
                                                                                                         document.getElementById('text_RETURNVALUESKB').value = '8'; 
                                                                                                         // alert('return val = 8 emp != 2 poschk != f');
                                                                                                         document.getElementById('txt_compensation1skb').value = (parseInt(e1)+(parseInt(returnprice_chk)));
@@ -10401,6 +10770,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     success: function (rs) {
                                                                                                         // alert(rs);
                                                                                                         
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
                                                                                                     }
                                                                                                 });
                                                                                             
@@ -10544,6 +10939,58 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     },
                                                                                                     success: function () {
                                                                                                         
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
 
                                                                                                     }
                                                                                                 });
@@ -10805,6 +11252,58 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                             
                                                                                                         }
                                                                                                     });
+
+                                                                                                    // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
+                                                                                                    
+                                                                                                    // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
+
+                                                                                                    // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
+                                                                                                    
+                                                                                                    // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
                                                                                             
                                                                                             } 
                                                                                         }
@@ -10980,6 +11479,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                             
                                                                                                         }
                                                                                                     });
+
+                                                                                                    // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
+                                                                                                    
+                                                                                                    // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
                                                                                             }
                                              
                                                                                         }
@@ -11058,6 +11583,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                         success: function (rs) {
                                                                                                             // alert(rs);
                                                                                                             
+                                                                                                        }
+                                                                                                    });
+
+                                                                                                    // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
+                                                                                                        }
+                                                                                                    });
+                                                                                                    
+                                                                                                    // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                    $.ajax({
+                                                                                                        url: 'meg_data.php',
+                                                                                                        type: 'POST',
+                                                                                                        data: {
+                                                                                                            txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                        },
+                                                                                                        success: function () {
+
+
                                                                                                         }
                                                                                                     });
                                                                                         
@@ -11139,6 +11690,32 @@ $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
                                                                                                     success: function (rs) {
                                                                                                         // alert(rs);
                                                                                                         
+                                                                                                    }
+                                                                                                });
+
+                                                                                                // E1 บันทึกค่าเที่ยวไปใน column E1 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation1skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E1'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
+                                                                                                    }
+                                                                                                });
+                                                                                                
+                                                                                                // E2 บันทึกค่าเที่ยวไปใน column E2 ในตารางแผนงาน VEHICLETRANSPORTPLAN
+                                                                                                $.ajax({
+                                                                                                    url: 'meg_data.php',
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        txt_flg: "edit_vehicletransportplan", editableObj: document.getElementById('txt_compensation2skb').value, ID: document.getElementById('txt_vehicletransportplainid').value, fieldname: 'E2'
+                                                                                                    },
+                                                                                                    success: function () {
+
+
                                                                                                     }
                                                                                                 });
                                                                                             

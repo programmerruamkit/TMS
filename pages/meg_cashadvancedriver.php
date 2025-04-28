@@ -319,10 +319,13 @@ $today = date("H:i");
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <label style="font-size:20px;color:red"><b>เงื่อนไขในการให้เบิก</b></label><br>
-                                                            <label style="font-size:14px">&nbsp;1.เบิก 1,000 บาทขึ่้นไป สำหรับพนักงานที่ผ่านโปรแล้วเท่านั้น</label><br>
+                                                            <!-- <label style="font-size:14px">&nbsp;1.เบิก 1,000 บาทขึ่้นไป สำหรับพนักงานที่ผ่านโปรแล้วเท่านั้น</label><br>
                                                             <label style="font-size:14px">&nbsp;2.เบิก 500 บาทสำหรับพนักงานที่ยังไม่ผ่านโปร</label><br>
                                                             <label style="font-size:14px">&nbsp;3.จะเบิกได้ตั้งแต่ จันทร์-พุธ ของแต่ละสัปดาห์ </label><br>
-                                                            <label style="font-size:14px">&nbsp;4.จะเบิกได้ 1 ครั้งต่อสัปดาห์ เท่านั้น</label><br>
+                                                            <label style="font-size:14px">&nbsp;4.จะเบิกได้ 1 ครั้งต่อสัปดาห์ เท่านั้น</label><br> -->
+                                                            <label style="font-size:14px">&nbsp;1.เบิก 1,000 บาทขึ่้นไป สำหรับพนักงานที่ผ่านโปรแล้วเท่านั้น</label><br>
+                                                            <label style="font-size:14px">&nbsp;2.จะเบิกได้ตั้งแต่ จันทร์-พุธ ของแต่ละสัปดาห์ </label><br>
+                                                            <label style="font-size:14px">&nbsp;3.จะเบิกได้ 1 ครั้งต่อสัปดาห์ เท่านั้น</label><br>
                                                         </div>
                                                     </div>
                                                         <!-- <div class="col-lg-3">
@@ -349,6 +352,20 @@ $today = date("H:i");
                                     </div>
                                     
                                     <!-- Class ในการแสดงข้อมูลการให้เบิกเงินล่วงหน้า วันจันทร์ - วันพุธ เท่านั้น -->
+									<!-- เงื่อนไขเบิกล่วงหน้า ใหม่ พี่สุเจ้มา (โทรมาแจ้ง)
+									 เปลี่ยนเงื่อนไขวันที่ 11/03/2568
+
+									AMT 
+									1.เบิก 1,000 บาท สำหรับพนักงานที่ผ่านโปรแล้วเท่านั้น
+									2.จะเบิกได้ตั้งแต่ จันทร์-พุธ ของแต่ละสัปดาห์
+									3.จะเบิกได้ 1 ครั้งต่อสัปดาห์ เท่านั้น
+									
+									
+									GW
+									1.เบิก 1,000 บาท และ 2000 บาท สำหรับพนักงานที่ผ่านโปรแล้วเท่านั้น
+									2.เจ้าหน้าที่ เบิกได้ 1000 บาทเท่านั้น
+									3.จะเบิกได้ตั้งแต่ จันทร์-พุธ ของแต่ละสัปดาห์
+									4.จะเบิกได้ 1 ครั้งต่อสัปดาห์ เท่านั้น -->
                                      <?php
                                     if ($dayname =='Mon' || $dayname =='Tue' || $dayname =='Wed') {
                                      ?>
@@ -375,7 +392,7 @@ $today = date("H:i");
                                                                     if ($empchk =='01' || $empchk =='02' || $empchk =='06' || $empchk =='07' ) {
                                                                     ?>
                                                                         <option value="1000">1,000 บาท</option>
-                                                                        <option value="500">500 บาท</option> 
+                                                                        <!-- <option value="500">500 บาท</option>  -->
                                                                     <?php
                                                                     }else {
                                                                     ?>
@@ -384,11 +401,12 @@ $today = date("H:i");
                                                                         if ($position == 'Driver' || $_SESSION["ROLENAME"] == 'ADMIN') {
                                                                         ?>
                                                                             <!-- <option value="4000">4,000 บาท</option> -->
-                                                                            <option value="2000">2,000 บาท</option>
                                                                             <option value="1000">1,000 บาท</option>
+                                                                            <option value="2000">2,000 บาท</option>
                                                                         <?php
                                                                         }else{
                                                                         ?>
+                                                                            <!-- เบิก 1,000 บาท สำหรับเจ้าหน้าที่สำนักงาน/ช่างซ่อมบำรุง ที่ผ่านโปรแล้วเท่านั้น -->
                                                                             <!-- <option value="4000">4,000 บาท</option> -->
                                                                             <option value="1000">1,000 บาท</option>
                                                                         <?php
@@ -402,7 +420,23 @@ $today = date("H:i");
                                                                 <?php
                                                             } else {
                                                                 ?>
+                                                                <!-- พนักงานที่ยังไม่ผ่านโปร หรือ OJT ฝั่ง AMT เบิกได้ 500 -->
+                                                                <?php
+                                                                if ($empchk =='01' || $empchk =='02' || $empchk =='06' || $empchk =='07' ) {
+                                                                ?>
                                                                 <option value="500">500 บาท</option>  
+                                                                <?php
+                                                                }else{
+                                                                ?>
+                                                                <!-- พนักงานที่ยังไม่ผ่านโปร หรือ OJT ฝั่ง GW เบิกได้ 500 -->
+                                                                <option value="500">500 บาท</option>  
+
+                                                                <!-- <option value="2000">2000 บาท</option>  
+                                                                <option value="1000">1000 บาท</option>   -->
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                                
                                                                 <?php
                                                             }
                                                             ?>

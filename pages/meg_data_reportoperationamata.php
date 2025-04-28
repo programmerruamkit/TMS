@@ -30,7 +30,7 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
         <div class="col-md-12" >
             <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 
-                <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example_tenkotransport" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                <table style="width: 100%;" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example_tenkotransport" role="grid" aria-describedby="dataTables-example_info" >
                     <thead>
                         <tr>
 
@@ -38,11 +38,12 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
 
 
 
-                            <th style="text-align: center;width:15%">เลขที่งาน</th>
+                            <th style="text-align: center;width:21%">เลขที่งาน</th>
                             <th style="text-align: center;width:10%">ทะเบียน/ชื่อรถ</th>
 
                             <th style="text-align: center;width:15%">พนักงาน(1)</th>
                             <th style="text-align: center;width:15%">พนักงาน(2)</th>
+                            <th style="text-align: center;width:15%">พนักงาน(3)</th>
 
                             <th style="text-align: center;width:10%">ต้นทาง</th>
                             <th style="text-align: center;width:10%">ปลายทาง</th>
@@ -114,7 +115,7 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
                                                     <!--<a tabindex="-1" href='#' onclick="save_tenkomaster('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '')" >รายงานตัวตรวจร่างกาย (เท็งโกะระหว่างทาง)</a>-->
                                                     <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps2['EMPLOYEECODE1'] ?>', '1')" ><?= $result_seOps2['EMPLOYEENAME1'] ?></a>
                                                     <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps2['EMPLOYEECODE2'] ?>', '2')" ><?= $result_seOps2['EMPLOYEENAME2'] ?></a>
-
+                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps2['EMPLOYEECODE3'] ?>', '3')" ><?= $result_seOps2['EMPLOYEENAME3'] ?></a>
                                                 </li>
                                                 <li class="divider"></li>
                                                 <li>
@@ -122,6 +123,7 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
                                                     <!--<a tabindex="-1" href='#' onclick="save_tenkomaster('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '')" >รายงานตัวตรวจร่างกาย (เท็งโกะเลิกงาน)</a>-->
                                                     <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps2['EMPLOYEECODE1'] ?>', '1')" ><?= $result_seOps2['EMPLOYEENAME1'] ?></a>
                                                     <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps2['EMPLOYEECODE2'] ?>', '2')" ><?= $result_seOps2['EMPLOYEENAME2'] ?></a>
+                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps2['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps2['EMPLOYEECODE2'] ?>', '3')" ><?= $result_seOps2['EMPLOYEENAME3'] ?></a>
 
                                                 </li>
 
@@ -150,8 +152,9 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
 
                                 <td ><?= $result_seOps2['JOBNO'] ?></td>
                                 <td ><?= $result_seOps2['THAINAME'] ?></td>
-                                <td ><?= ($result_seOps2['EMPLOYEENAME1']) ? $result_seOps2['EMPLOYEENAME1'] . '(' . $result_seOps2['EMPLOYEECODE1'] . ')' : '' ?> </td>
-                                <td ><?= ($result_seOps2['EMPLOYEENAME2']) ? $result_seOps2['EMPLOYEENAME2'] . '(' . $result_seOps2['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                <td ><?= ($result_seOps2['EMPLOYEENAME1']) ? $result_seOps2['EMPLOYEENAME1'] . '<br>(' . $result_seOps2['EMPLOYEECODE1'] . ')' : '' ?> </td>
+                                <td ><?= ($result_seOps2['EMPLOYEENAME2']) ? $result_seOps2['EMPLOYEENAME2'] . '<br>(' . $result_seOps2['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                <td ><?= ($result_seOps2['EMPLOYEENAME3']) ? $result_seOps2['EMPLOYEENAME3'] . '<br>(' . $result_seOps2['EMPLOYEECODE3'] . ')' : '' ?></td>
                                 <td><?= $result_seOps2['JOBSTART'] ?></td>
                                 <td><?= $result_seOps2['JOBEND'] ?></td>
                                 <td><?= $result_seOps2['DATEPRESENT'] ?></td>
@@ -210,15 +213,16 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
                     <thead>
                         <tr>
 
-                            <th style="text-align: center;width:5%" >จัดการ1</th>
+                            <th style="text-align: center;width:5%" >จัดการ12</th>
 
 
 
-                            <th style="text-align: center;width:15%">เลขที่งาน</th>
+                            <th style="text-align: center;width:21%">เลขที่งาน</th>
                             <th style="text-align: center;width:10%">ทะเบียน/ชื่อรถ</th>
 
                             <th style="text-align: center;width:15%">พนักงาน(1)</th>
                             <th style="text-align: center;width:15%">พนักงาน(2)</th>
+                            <th style="text-align: center;width:15%">พนักงาน(3)</th>
 
                             <th style="text-align: center;width:10%">ต้นทาง</th>
                             <th style="text-align: center;width:10%">ปลายทาง</th>
@@ -245,7 +249,7 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
 
                         $condOps31 = " AND a.COMPANYCODE IN ('RKR','RKL','RKS') ";
                         $condOps32 = " AND a.STATUSNUMBER IN ('T','X')";
-                        $condOps33 = " AND CONVERT(DATE,DATEVLIN) BETWEEN CONVERT(DATE,DATEADD(DAY,-5,GETDATE())) AND CONVERT(DATE,GETDATE())";
+                        $condOps33 = " AND CONVERT(DATE,a.DATEVLIN) BETWEEN CONVERT(DATE,DATEADD(DAY,-5,GETDATE())) AND CONVERT(DATE,GETDATE()) ";
                         $params_seOps3 = array(
                             array('select_tenkodatafortenkodocumentamata', SQLSRV_PARAM_IN),
                             array($condOps31, SQLSRV_PARAM_IN),
@@ -297,7 +301,10 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
                                                 <li>
                                                     <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps3['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps3['EMPLOYEECODE2'] ?>', '2')" ><?= $result_seOps3['EMPLOYEENAME2'] ?></a>
                                                 </li>
-
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps3['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps3['EMPLOYEECODE3'] ?>', '3')" ><?= $result_seOps3['EMPLOYEENAME3'] ?></a>
+                                                </li>
 
                                                 <?php
                                             } else {
@@ -307,25 +314,18 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
                                             }
                                             ?>
 
-
-
-
-
-
-
                                         </ul>
                                     </div>
 
                                 </td>
 
 
-
-
                                 <td ><?= $result_seOps3['JOBNO'] ?></td>
 
                                 <td ><?= $result_seOps3['THAINAME'] ?></td>
-                                <td ><?= ($result_seOps3['EMPLOYEENAME1']) ? $result_seOps3['EMPLOYEENAME1'] . '(' . $result_seOps3['EMPLOYEECODE1'] . ')' : '' ?> </td>
-                                <td ><?= ($result_seOps3['EMPLOYEENAME2']) ? $result_seOps3['EMPLOYEENAME2'] . '(' . $result_seOps3['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                <td ><?= ($result_seOps3['EMPLOYEENAME1']) ? $result_seOps3['EMPLOYEENAME1'] . '<br>(' . $result_seOps3['EMPLOYEECODE1'] . ')' : '' ?> </td>
+                                <td ><?= ($result_seOps3['EMPLOYEENAME2']) ? $result_seOps3['EMPLOYEENAME2'] . '<br>(' . $result_seOps3['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                <td ><?= ($result_seOps3['EMPLOYEENAME3']) ? $result_seOps3['EMPLOYEENAME3'] . '<br>(' . $result_seOps3['EMPLOYEECODE3'] . ')' : '' ?></td>
                                 <td><?= $result_seOps3['JOBSTART'] ?></td>
                                 <td><?= $result_seOps3['JOBEND'] ?></td>
                                 <td><?= $result_seOps3['DATEPRESENT'] ?></td>
@@ -389,6 +389,7 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
 
                                 <th style="text-align: center;width:15%">พนักงาน(1)</th>
                                 <th style="text-align: center;width:15%">พนักงาน(2)</th>
+                                <th style="text-align: center;width:15%">พนักงาน(3)</th>
 
                                 <th style="text-align: center;width:10%">ต้นทาง</th>
                                 <th style="text-align: center;width:10%">ปลายทาง</th>
@@ -415,7 +416,7 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
 
                             $condOps41 = " AND a.COMPANYCODE IN ('RKR','RKL','RKS') ";
                             $condOps42 = " AND a.STATUSNUMBER = '2'";
-                            $condOps43 = " AND CONVERT(DATE,a.DATEVLIN,103) BETWEEN CONVERT(DATE,DATEADD(DAY,-4,GETDATE()),103) AND CONVERT(DATE,DATEADD(DAY,4,GETDATE()),103)";
+                            $condOps43 = " AND CONVERT(DATE,a.DATEVLIN,103) BETWEEN CONVERT(DATE,DATEADD(DAY,-8,GETDATE()),103) AND CONVERT(DATE,DATEADD(DAY,8,GETDATE()),103)";
                             $params_seOps4 = array(
                                 array('select_tenkodatafortenkodocumentamata', SQLSRV_PARAM_IN),
                                 array($condOps41, SQLSRV_PARAM_IN),
@@ -463,7 +464,10 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
                                                     <li>
                                                         <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps4['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps4['EMPLOYEECODE2'] ?>', '2')" ><?= $result_seOps4['EMPLOYEENAME2'] ?></a>
                                                     </li>
-
+                                                    <li class="divider"></li>
+                                                    <li>
+                                                        <a tabindex="-1" href='#' onclick="save_tenkomaster2('<?= $result_seOps4['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps4['EMPLOYEECODE3'] ?>', '3')" ><?= $result_seOps4['EMPLOYEENAME3'] ?></a>
+                                                    </li>
 
                                                     <?php
                                                 } else {
@@ -490,8 +494,9 @@ if ($_POST['txt_flg'] == "select_tenkotransport") {
                                     <td ><?= $result_seOps4['JOBNO'] ?></td>
 
                                     <td ><?= $result_seOps4['THAINAME'] ?></td>
-                                    <td ><?= ($result_seOps4['EMPLOYEENAME1']) ? $result_seOps4['EMPLOYEENAME1'] . '(' . $result_seOps4['EMPLOYEECODE1'] . ')' : '' ?> </td>
-                                    <td ><?= ($result_seOps4['EMPLOYEENAME2']) ? $result_seOps4['EMPLOYEENAME2'] . '(' . $result_seOps4['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                    <td ><?= ($result_seOps4['EMPLOYEENAME1']) ? $result_seOps4['EMPLOYEENAME1'] . '<br>(' . $result_seOps4['EMPLOYEECODE1'] . ')' : '' ?></td>
+                                    <td ><?= ($result_seOps4['EMPLOYEENAME2']) ? $result_seOps4['EMPLOYEENAME2'] . '<br>(' . $result_seOps4['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                    <td ><?= ($result_seOps4['EMPLOYEENAME3']) ? $result_seOps4['EMPLOYEENAME3'] . '<br>(' . $result_seOps4['EMPLOYEECODE3'] . ')' : '' ?></td>
                                     <td><?= $result_seOps4['JOBSTART'] ?></td>
                                     <td><?= $result_seOps4['JOBEND'] ?></td>
                                     <td><?= $result_seOps4['DATEPRESENT'] ?></td>

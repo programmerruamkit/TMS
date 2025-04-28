@@ -616,11 +616,16 @@ $result_seCustomer = sqlsrv_fetch_array($query_seCustomer, SQLSRV_FETCH_ASSOC);
                                         $query_seMonthst = sqlsrv_query($conn, $sql_seMonthst, $params_seMonthst);
                                          * 
                                          */
+										 // เฉพาะปี 2024 ขี้นไป อัพเดทเงื่อนไขวันที่ 31/03/2025 
                                         $worktype = ($_GET['worktype'] == "")? "":" AND WORKTYPE = '".$_GET['worktype']."' ";
-                                         $sql_seMonthst="SELECT A.DATA1,A.DATA2 FROM (SELECT COMPANYCODE+'-'+CUSTOMERCODE+'/'+MONTHST+'-'+CONVERT(NVARCHAR(4),STARTDATE,111)  AS 'DATA1',CONVERT(NVARCHAR(4),STARTDATE,111)+','+MONTHST AS 'DATA2' FROM [dbo].[VEHICLETRANSPORTPRICE] 
+                                         $sql_seMonthst="SELECT A.DATA1,A.DATA2 FROM (
+                                        SELECT COMPANYCODE+'-'+CUSTOMERCODE+'/'+MONTHST+'-'+CONVERT(NVARCHAR(4),STARTDATE,111)  AS 'DATA1',CONVERT(NVARCHAR(4),STARTDATE,111)+','+MONTHST AS 'DATA2',
+                                        YEAR(STARTDATE) AS 'STARTDATE'
+                                        FROM [dbo].[VEHICLETRANSPORTPRICE] 
                                         WHERE COMPANYCODE = '" . $_GET['companycode'] . "'
                                         AND CUSTOMERCODE = '" . $_GET['customercode']."'".$worktype." AND CARRYTYPE = '".$_GET['carrytype']."'
-                                        ) AS A GROUP BY A.DATA1,A.DATA2 ORDER BY A.DATA2 ASC";
+                                        AND YEAR(STARTDATE) >='2024'
+                                        ) AS A GROUP BY A.DATA1,A.DATA2,A.STARTDATE ORDER BY A.DATA2 ASC";
                                         $params_seMonthst = array();
                                         $query_seMonthst = sqlsrv_query($conn, $sql_seMonthst, $params_seMonthst);
                                     }
@@ -1580,11 +1585,20 @@ $result_seCustomer = sqlsrv_fetch_array($query_seCustomer, SQLSRV_FETCH_ASSOC);
                                                     document.getElementById("datadef").innerHTML = "";
                                                 }
                                                 $(document).ready(function () {
-                                                    $('#dataTables-example').DataTable({
+                                                    if ('<?=$_GET['companycode']?>' == 'RKL' && '<?=$_GET['customercode']?>' == 'SKB') {
+                                                        
+                                                        $('#dataTables-example').DataTable({
+                                                            order: [[4, "asc"]],
+                                                            scrollX: true
+                                                        });  
+                                                          
+                                                    }else{
 
-                                                        order: [[0, "desc"]],
-                                                        scrollX: true
-                                                    });
+                                                        $('#dataTables-example').DataTable({
+                                                            order: [[0, "desc"]],
+                                                            scrollX: true
+                                                        }); 
+                                                    }
                                                 });
                                             }
                                         });

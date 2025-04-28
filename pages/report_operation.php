@@ -1178,7 +1178,7 @@ $result_seCompany = sqlsrv_fetch_array($query_seCompany, SQLSRV_FETCH_ASSOC);
                                                             },
                                                             success: function (rs) {
                                                                 // alert(rs);
-                                                                update_modalrks(ID);
+                                                                //update_modalrks(ID);
                                                             }
                                                         });
                                                     }

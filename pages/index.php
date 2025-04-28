@@ -5,7 +5,9 @@ date_default_timezone_set("Asia/Bangkok");
 require_once("../class/meg_function.php");
 $conn = connect("RTMS");
 if (!isset($_SESSION["USERNAME"]) || !isset($_SESSION["PASSWORD"])) {
-    header("location:../pages/meg_login.php?data=3");
+    // ถ้าเวฺ็บไม่สามาถเข้าใช้งานได้
+    // header("location:../pages/meg_login.php?data=3");
+   // header("location:../pages/index_mantenance.html?status=mantenance");
 }
 $sql_seSystime = "{call megGetdate_v2(?)}";
 $params_seSystime = array(
@@ -13,6 +15,7 @@ $params_seSystime = array(
 );
 $query_seSystime = sqlsrv_query($conn, $sql_seSystime, $params_seSystime);
 $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -272,7 +275,8 @@ $result_seSystime = sqlsrv_fetch_array($query_seSystime, SQLSRV_FETCH_ASSOC);
                     </a>
                 </div>
 				<?php
-                if ($_SESSION["USERNAME"] == '100007' || $_SESSION["USERNAME"] == '100006') {
+                if ($_SESSION["USERNAME"] == '100007' || $_SESSION["USERNAME"] == '100006' || $_SESSION["USERNAME"] == '100013' 
+				|| $_SESSION["USERNAME"] == '040728' || $_SESSION["USERNAME"] == '090343' || $_SESSION["USERNAME"] == '090015' || $_SESSION["USERNAME"] == '090338') {
                 ?>
                     <div class="col-lg-2" style="">
 						<a href="meg_drivingpattern_driver.php">

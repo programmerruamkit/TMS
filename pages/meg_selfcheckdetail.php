@@ -28,7 +28,7 @@ if ($_GET['type'] == "officercheck") {
 
 $checkArea = substr($_GET['employeecode'],0,2);
 
-if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea == '08' || $checkArea == '10') {
+if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea == '08' ) {
     $areashow = '(AMT)';
 
     $sql_seTenkoSTD = "SELECT STD_ID,MAXSYS,MINSYS,MAXDIA,MINDIA,MAXPULSE,MINPULSE,TEMP,OXYGEN,ALCOHOL,REMARK
@@ -646,7 +646,7 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
             }
 
             //เวลาการพักผ่อน 8 ชั่วโมง
-            if (($result_seSelfCheck['TIMESLEEPREST'] == '' || $result_seSelfCheck['TIMESLEEPREST'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') || ($result_seKeyDropTime['KEYDROPTIME'] == NULL || $result_seKeyDropTime['KEYDROPTIME'] == '') ) {
+            if (($result_seSelfCheck['TIMESLEEPREST'] == '' || $result_seSelfCheck['TIMESLEEPREST'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') && ($result_seKeyDropTime['KEYDROPTIME'] == NULL || $result_seKeyDropTime['KEYDROPTIME'] == '') ) {
                 $TIMESLEEPREST = '0';
             }else {
                 $TIMESLEEPREST = substr($result_seSelfCheck['TIMESLEEPREST'],0,2);
@@ -957,7 +957,8 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                             <div class = "row">
                                                                 <div class="">
                                                                         <div class="form-group">
-                                                                            <label >ช่วงเวลาการพักผ่อน(ระยะเวลาการพักผ่อน)</label><br><br>
+                                                                            <label >ช่วงเวลาการพักผ่อน(ระยะเวลาการพักผ่อน)</label><br>
+                                                                            <label style="color:red">ในกรณีไม่มีเวลาเลิกงานของวันที่แล้ว ระบบจะใช้เวลาที่เจ้าหน้าที่ลงข้อมูล</label><br>
                                                                             <div class="col-lg-6">
                                                                                 <?php
                                                                                 if ($checkClient == 'MB') { //สำหรับมือถือ
@@ -979,7 +980,7 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                                                     //ดึงข้อมูลเวลาวางกุญแจมาจาก การ TENKO ขากลับ
                                                                                     if ($result_seKeyDropTime['KEYDROPTIME'] == '') {
                                                                                         
-                                                                                        $DATERESTSTART1 = str_replace("T"," ",$result_seKeyDropTime['KEYDROPTIME']);
+                                                                                        $DATERESTSTART1 = str_replace("T"," ",$result_seSelfCheck['SLEEPRESTSTART']);
                                                                                         $DATERESTSTART = str_replace("-","/",$DATERESTSTART1);
                                                                                     }else {
                                                                                         $DATERESTSTART1 = str_replace("T"," ",$result_seKeyDropTime['KEYDROPTIME']);
@@ -1740,7 +1741,7 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                             </div>
                                         <!--END COLUNM5  --> 
                                         <!-- START COLUNM6 -->
-                                        <div class="col-lg-4" >
+                                            <div class="col-lg-4" >
                                                 <div class="panel panel-default">
                                                     <div class="panel-heading" style="background-color:#f0c402;">
                                                         <label><font style="font-size: 16px">อุณภูมิ(°C) / ความดัน (ข้อมูลการตรวจร่างกายโดยเจ้าหน้าที่เท็งโกะ)</font></label>
@@ -1834,7 +1835,7 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                                 </div>
                                                             </div>
                                                         </div>
-														<div class = "row">
+                                                        <div class = "row">
                                                             <label ></label>
                                                         </div>
                                                         <div class = "row">
@@ -1844,6 +1845,7 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                     <!-- .panel-body -->
                                                 </div>
                                                 <!-- /.panel -->
+                                                 
                                             </div>
                                         <!--END COLUNM6  -->
                                         <!-- START COLUNM7 -->
@@ -1866,7 +1868,7 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                                     if ($areashow == '(GW)') {
                                                                     ?>
                                                                         <?php
-                                                                        if ($result_seComEmpChk['COMCHK'] == 'RCC' || $result_seComEmpChk['COMCHK'] == 'RATC') {
+                                                                        if ($result_seComEmpChk['COMCHK'] == 'RCC' || $result_seComEmpChk['COMCHK'] == 'RATC' || $result_seComEmpChk['COMCHK'] == 'RIT') {
                                                                         ?>
                                                                             <div class="form-group" >
                                                                                 <label style="">การประเมินปัญหาสายตา TLEP: <u><?=$eyecheck  == '1' ? 'มีปัญหาสายตา' : 'ไม่มีปัญหาสายตา' ?></u></label>
@@ -2051,12 +2053,12 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                         </div>
                                                     </div>
                                                     <!-- .panel-body -->
-                                                   <!-- <div class = "row">
+                                                    <!-- <div class = "row">
                                                         <label ></label>
-                                                    </div>-->
-                                                    <!--<div class = "row">
+                                                    </div> -->
+                                                    <!-- <div class = "row">
                                                         <label ></label>
-                                                    </div>-->
+                                                    </div> -->
                                                     <!-- <div class = "row">
                                                         <label ></label>
                                                     </div> -->
@@ -2111,12 +2113,6 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                                         </div>
                                                                 </div>
                                                             </div>
-															 <div class = "row">
-																<label ></label>
-															</div>
-															 <div class = "row">
-																<label ></label>
-															</div>
                                                             <div class = "row">
                                                                 <label ></label>
                                                             </div>
@@ -2151,6 +2147,15 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                                                             <div class = "row">
                                                                 <label ></label>
                                                             </div> 
+                                                            <div class = "row">
+                                                                <label ></label>
+                                                            </div> 
+                                                            <div class = "row">
+                                                                <label ></label>
+                                                            </div> 
+                                                            <div class = "row">
+                                                                <label ></label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <!-- .panel-body -->
@@ -2966,8 +2971,8 @@ if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07' || $checkArea
                     var officerconfirm = document.getElementById('txt_officerconfirmhidden').value;
                     var selfcheckid = document.getElementById('txt_selfchkid').value;
 
-                    // alert(officerconfirm);
-                    // alert(selfcheckid);
+                    alert(officerconfirm);
+                    alert(selfcheckid);
                     
                     $.ajax({
                     type: 'post',

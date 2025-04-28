@@ -73,7 +73,7 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
         <link href="../dist/css/jquery.autocomplete.css" rel="stylesheet">
         <link href="../js/jquery.datetimepicker.css" rel="stylesheet">
         <link href="style/style.css" rel="stylesheet" type="text/css">
-
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
 
 
         <style>
@@ -86,7 +86,39 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
 
                 border-left: 1px solid #ffcb0b;
             }
-
+            .swal2-popup {
+                font-size: 16px !important;
+                padding: 17px;
+                border: 1px solid #F0E1A1;
+                display: block;
+                margin: 22px;
+                text-align: center;
+                color: #61534e;
+                
+            }
+            #loading {
+                display:none; 
+                opacity: 0.5;
+                /* border-radius: 50%; */
+                /* border-top: 12px ; */
+                width: 10px;
+                left: 100px;
+                right: 850px;
+                top: 260px;
+                bottom: 550px;
+                height: 10px;
+                /* animation: spin 1s linear infinite; */
+            }
+            .center {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                
+            }
+            
         </style>
 
         <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
@@ -225,7 +257,7 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                             <div class="col-md-2" >
                                 <label>บริษัท</label>
                                 <select class="form-control"  id="cb_company" name="cb_company" >
-                                    <option value = "">บริษัททั้งหมด</option>
+                                    <option value = "" disabled selected>เลือกบริษัท</option>
                                     <option value = "RKR">ร่วมกิจรุ่งเรือง (1993)</option>
                                     <option value = "RKL">ร่วมกิจรุ่งเรือง โลจิสติคส์</option>
                                     <option value = "RKS">ร่วมกิจรุ่งเรือง เซอร์วิส</option>
@@ -250,7 +282,6 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                                 <div class="form-group">
                                     <button class="btn btn-default"  onclick="select_operationamata();">ค้นหา <li class="fa fa-search"></li></button>
                                 </div>
-
                             </div>
 
 
@@ -317,19 +348,20 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                                                             <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 
 
-                                                                <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example1" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                                                <table style="width: 100%;" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example1" role="grid" aria-describedby="dataTables-example_info" >
                                                                     <thead>
                                                                         <tr>
 
-                                                                            <th style="text-align: center;width:5%" >จัดการ</th>
+                                                                            <th style="text-align: center;width:5%" >จัดการs</th>
 
 
 
-                                                                            <th style="text-align: center;width:15%">เลขที่งาน</th>
-                                                                            <th style="text-align: center;width:10%">ทะเบียน/ชื่อรถ</th>
+                                                                            <th style="text-align: center;width:25%">เลขที่งาน</th>
+                                                                            <th style="text-align: center;width:15%">ทะเบียน/ชื่อรถ</th>
 
                                                                             <th style="text-align: center;width:15%">พนักงาน(1)</th>
                                                                             <th style="text-align: center;width:15%">พนักงาน(2)</th>
+                                                                            <th style="text-align: center;width:15%">พนักงาน(3)</th>
 
                                                                             <th style="text-align: center;width:10%">ต้นทาง</th>
                                                                             <th style="text-align: center;width:10%">ปลายทาง</th>
@@ -337,7 +369,6 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                                                                             <th style="text-align: center;width:5%">รายงานตัว</th>
                                                                             <th style="text-align: center;width:5%">ทำงาน</th>
 
-                                                                            
                                                                             <th style="text-align: center;width:5%">เข้าวีแอล</th>
                                                                             <th style="text-align: center;width:5%">ออกวีแอล</th>
 
@@ -357,7 +388,7 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
 
                                                                         $condOps1 = " AND a.COMPANYCODE IN ('RKR','RKL','RKS')";
                                                                         $condOps2 = " AND (a.STATUSNUMBER = 'O' OR a.STATUSNUMBER = 'L' OR a.STATUSNUMBER = 'P')";
-                                                                        $condOps3 = " AND((CONVERT(DATE,a.DATEVLIN) = CONVERT(DATE,GETDATE(),103)) OR (CONVERT(DATE,a.DATEPRESENT) = CONVERT(DATE,GETDATE(),103)))";
+                                                                        $condOps3 = " AND((CONVERT(DATE,a.DATEVLIN) = CONVERT(DATE,GETDATE(),103)) OR (CONVERT(DATE,a.DATEPRESENT) = CONVERT(DATE,GETDATE(),103)) )  ";
                                                                         $params_seOps = array(
                                                                             array('select_tenkodatafortenkodocumentamata', SQLSRV_PARAM_IN),
                                                                             array($condOps1, SQLSRV_PARAM_IN),
@@ -445,7 +476,7 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                                                                                                 if ($result_seOps['EMPLOYEENAME1'] != '') {
                                                                                                 ?>   
                                                                                                 <li>
-                                                                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps['EMPLOYEECODE1'] ?>', '1')" ><?= $result_seOps['EMPLOYEENAME1'] ?></a>
+                                                                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', '<?= $result_seOps['STATUSNUMBER'] ?>', '<?= $result_seOps['EMPLOYEECODE1'] ?>', '1')" ><?= $result_seOps['EMPLOYEENAME1'] ?></a>
                                                                                                 </li>
                                                                                                 <li class="divider"></li>
                                                                                                 <?php
@@ -470,13 +501,13 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                                                                                                 }
                                                                                                 ?>
 
-                                                                                                
+                                                                                                <!-- CHK TENKODRIVER2 -->
                                                                                                 <li class="divider"></li>
                                                                                                 <?php 
                                                                                                 if ($result_seOps['EMPLOYEENAME2'] != '') {
                                                                                                 ?>
                                                                                                 <li>
-                                                                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps['EMPLOYEECODE2'] ?>', '2')" ><?= $result_seOps['EMPLOYEENAME2'] ?></a>
+                                                                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', '<?= $result_seOps['STATUSNUMBER'] ?>', '<?= $result_seOps['EMPLOYEECODE2'] ?>', '2')" ><?= $result_seOps['EMPLOYEENAME2'] ?></a>
                                                                                                 </li>
 
                                                                                                 <li class="divider"></li>
@@ -501,7 +532,40 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                                                                                                  <?php
                                                                                                 }
                                                                                                 ?>
-                                                                                                
+
+
+                                                                                                <!-- CHK TENKODRIVER3 -->
+                                                                                                <li class="divider"></li>
+                                                                                                <?php 
+                                                                                                if ($result_seOps['EMPLOYEENAME3'] != '') {
+                                                                                                ?>
+                                                                                                <li>
+                                                                                                    <a tabindex="-1" href='#' onclick="save_tenkomaster('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', '<?= $result_seOps['STATUSNUMBER'] ?>', '<?= $result_seOps['EMPLOYEECODE3'] ?>', '3')" ><?= $result_seOps['EMPLOYEENAME3'] ?></a>
+                                                                                                </li>
+
+                                                                                                <li class="divider"></li>
+                                                                                                <?php
+                                                                                                if ($result_seOps['TENKOMASTERID'] != '') {
+                                                                                                  ?>
+                                                                                                <!-- <li>
+                                                                                                    <a tabindex="-1" href='#' data-confirm ="กรุณากด 'ตกลง' เพื่อยืนยันการบันทึกข้อมูล?" onclick="save_tenkomasterhome('<?= $result_seOps['VEHICLETRANSPORTPLANID'] ?>', '', '<?= $result_seOps['EMPLOYEECODE2'] ?>', '2')" ><?= $result_seOps['EMPLOYEENAME2'] ?>(ตรวจร่างกายใหม่)</a>
+                                                                                                </li>  -->
+                                                                                                  <?php
+                                                                                                }else {
+                                                                                                   ?>
+                                                                                                    <!-- ELSE CHK TENKOMASTERID FOR EMPLOYEE2 -->
+                                                                                                   <?php     
+                                                                                                }
+                                                                                                ?>
+                                                                                                            
+                                                                                                <?php                                           
+                                                                                                }else {
+                                                                                                 ?>
+                                                                                                    <!-- ELSE CHK EMPLOYEENAME2 -->
+                                                                                                 <?php
+                                                                                                }
+                                                                                                ?>
+
                                                                                                 <?php
                                                                                                 //}
                                                                                             } else {
@@ -528,8 +592,9 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
 
                                                                                 <td ><?= $result_seOps['JOBNO'] ?></td>
                                                                                 <td ><?= $result_seOps['THAINAME'] ?></td>
-                                                                                <td ><?= ($result_seOps['EMPLOYEENAME1']) ? $result_seOps['EMPLOYEENAME1'] . '(' . $result_seOps['EMPLOYEECODE1'] . ')' : '' ?> </td>
-                                                                                <td ><?= ($result_seOps['EMPLOYEENAME2']) ? $result_seOps['EMPLOYEENAME2'] . '(' . $result_seOps['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                                                                <td ><?= ($result_seOps['EMPLOYEENAME1']) ? $result_seOps['EMPLOYEENAME1'] . '<br>(' . $result_seOps['EMPLOYEECODE1'] . ')' : '' ?> </td>
+                                                                                <td ><?= ($result_seOps['EMPLOYEENAME2']) ? $result_seOps['EMPLOYEENAME2'] . '<br>(' . $result_seOps['EMPLOYEECODE2'] . ')' : '' ?></td>
+                                                                                <td ><?= ($result_seOps['EMPLOYEENAME3']) ? $result_seOps['EMPLOYEENAME3'] . '<br>(' . $result_seOps['EMPLOYEECODE3'] . ')' : '' ?></td>
                                                                                 <td><?= $result_seOps['JOBSTART'] ?></td>
                                                                                 <td><?= $result_seOps['JOBEND'] ?></td>
                                                                                 <td><?= $result_seOps['DATEPRESENT'] ?></td>
@@ -553,7 +618,7 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
 
                                                             </div>
                                                         </div>
-
+                                                       
                                                         <!-- /.panel-body -->
                                                     </div>
                                                 </div>
@@ -582,7 +647,9 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
                 </div>
             </div>
 
-
+            <div  id="loading" class="center" >
+                <p><img style="" src="../images/Truckload5.gif" /></p>
+            </div>                                                          
 
 
 
@@ -601,514 +668,596 @@ $result_sePremissions = sqlsrv_fetch_array($query_sePremissions, SQLSRV_FETCH_AS
             <!-- <script src="../dist/js/buttons.print.min.js"></script> -->
             <!-- <script src="../dist/js/bootstrap-select.js"></script> -->
             <!-- <script src="../dist/js/jquery.autocomplete.js"></script>    -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+            <script type="text/javascript">     
+                                    // CHECK SESSION IF SESSION CLOSE THEN GO LOGIN AGAIN
+                                    if ('<?=$_SESSION['USERNAME'] == ''?>' ) {
+
+                                        swal.fire({
+                                            title: 'Warning!',
+                                            text: 'Session Close Please Login Again!!!',
+                                            icon: 'warning',
+                                            showConfirmButton: false,
+                                        });
+                                        setTimeout(() => {
+                                            // document.location.reload();
+                                            window.location.href = 'meg_login.php';
+                                        }, 1100);
+
+                                    }else{
+                                    // alert('SESSION OK');
+                                    }
+                                    function showLoading() {
+                                        $("#loading").show();
+                                    }
+
+                                    function hideLoading() {
+                                        $("#loading").hide();
+                                    }
+
+                                    function select_tenkotransport()
+                                    {
+                                            // alert("Tenko2");
+                                            $.ajax({
+                                                url: 'meg_data_reportoperationamata.php',
+                                                type: 'POST',
+                                                data: {
+                                                    txt_flg: "select_tenkotransport", '': ''
+                                                },
+                                                success: function (rs) {
+                                                    document.getElementById("data_tenkotransport").innerHTML = rs;
+
+                                                    
+
+                                                    $('#dataTables-example_tenkotransport').DataTable({
+                                                        responsive: true,
+                                                        order: [[8, "asc"]],
+                                                    });
+                                                }
+                                            });
+            
+                                    }
+                                    function select_tenkoafter()
+                                    {
+                                            // alert("Tenko2");
+                                            $.ajax({
+                                                url: 'meg_data_reportoperationamata.php',
+                                                type: 'POST',
+                                                data: {
+                                                    txt_flg: "select_tenkoafter", '': ''
+                                                },
+                                                success: function (rs) {
+                                                    document.getElementById("data_tenkoafter").innerHTML = rs;
+
+                                                    $('#dataTables-example_tenkoafter').DataTable({
+                                                        responsive: true,
+                                                        order: [[1, "desc"]]
+                                                    });
+                                                }
+                                            });
+            
+                                    }
+                                    function select_tenkoclosejob()
+                                    {
+                                            // alert("Tenko2");
+                                            $.ajax({
+                                                url: 'meg_data_reportoperationamata.php',
+                                                type: 'POST',
+                                                data: {
+                                                    txt_flg: "select_tenkoclosejob", '': ''
+                                                },
+                                                success: function (rs) {
+                                                    document.getElementById("data_tenkoclosejob").innerHTML = rs;
+
+                                                    
+
+                                                    $('#dataTables-example_tenkoclosejob').DataTable({
+                                                        responsive: true
+                                                    });
+                                                }
+                                            });
+            
+                                    }     
+                                    function update_tenkomaster(tenkomasterid, vehicletransportplanid, employeecode, statusemp)
+                                    {
+
+
+                                        save_tenkomaster(vehicletransportplanid, '', employeecode, statusemp);
+
+                                        $.ajax({
+                                            url: 'meg_data.php',
+                                            type: 'POST',
+                                            data: {
+                                                txt_flg: "update_tenkomaster", tenkomasterid: tenkomasterid, vehicletransportplanid: vehicletransportplanid
+                                            },
+                                            success: function () {
+
+
+
+                                            }
+
+                                        });
+
+
+
+                                    }
+                                    function datetodate()
+                                    {
+                                        document.getElementById('txt_dateend').value = document.getElementById('txt_datestart').value;
+
+                                    }
+                                    // function modal_selecttenko(employeecode, vehicletransportplanid, statusemp)
+                                    // {
 
-            <script type="text/javascript"> 
-                                                                                                function select_tenkotransport()
-                                                                                                {
-                                                                                                        // alert("Tenko2");
-                                                                                                        $.ajax({
-                                                                                                            url: 'meg_data_reportoperationamata.php',
-                                                                                                            type: 'POST',
-                                                                                                            data: {
-                                                                                                                txt_flg: "select_tenkotransport", '': ''
-                                                                                                            },
-                                                                                                            success: function (rs) {
-                                                                                                                document.getElementById("data_tenkotransport").innerHTML = rs;
-
-                                                                                                              
-
-                                                                                                                $('#dataTables-example_tenkotransport').DataTable({
-                                                                                                                    responsive: true,
-                                                                                                                    order: [[8, "asc"]],
-                                                                                                                });
-                                                                                                            }
-                                                                                                        });
-                                                                       
-                                                                                                }
-                                                                                                function select_tenkoafter()
-                                                                                                {
-                                                                                                        // alert("Tenko2");
-                                                                                                        $.ajax({
-                                                                                                            url: 'meg_data_reportoperationamata.php',
-                                                                                                            type: 'POST',
-                                                                                                            data: {
-                                                                                                                txt_flg: "select_tenkoafter", '': ''
-                                                                                                            },
-                                                                                                            success: function (rs) {
-                                                                                                                document.getElementById("data_tenkoafter").innerHTML = rs;
-
-                                                                                                            
-
-                                                                                                                $('#dataTables-example_tenkoafter').DataTable({
-                                                                                                                    responsive: true,
-                                                                                                                    order: [[1, "desc"]]
-                                                                                                                });
-                                                                                                            }
-                                                                                                        });
-                                                                       
-                                                                                                }
-                                                                                                function select_tenkoclosejob()
-                                                                                                {
-                                                                                                        // alert("Tenko2");
-                                                                                                        $.ajax({
-                                                                                                            url: 'meg_data_reportoperationamata.php',
-                                                                                                            type: 'POST',
-                                                                                                            data: {
-                                                                                                                txt_flg: "select_tenkoclosejob", '': ''
-                                                                                                            },
-                                                                                                            success: function (rs) {
-                                                                                                                document.getElementById("data_tenkoclosejob").innerHTML = rs;
-
-                                                                                                               
-
-                                                                                                                $('#dataTables-example_tenkoclosejob').DataTable({
-                                                                                                                    responsive: true
-                                                                                                                });
-                                                                                                            }
-                                                                                                        });
-                                                                       
-                                                                                                }     
-                                                                                                function update_tenkomaster(tenkomasterid, vehicletransportplanid, employeecode, statusemp)
-                                                                                                {
-
-
-                                                                                                    save_tenkomaster(vehicletransportplanid, '', employeecode, statusemp);
-
-                                                                                                    $.ajax({
-                                                                                                        url: 'meg_data.php',
-                                                                                                        type: 'POST',
-                                                                                                        data: {
-                                                                                                            txt_flg: "update_tenkomaster", tenkomasterid: tenkomasterid, vehicletransportplanid: vehicletransportplanid
-                                                                                                        },
-                                                                                                        success: function () {
-
-
-
-                                                                                                        }
-
-                                                                                                    });
-
-
-
-                                                                                                }
-                                                                                                function datetodate()
-                                                                                                {
-                                                                                                    document.getElementById('txt_dateend').value = document.getElementById('txt_datestart').value;
-
-                                                                                                }
-                                                                                                // function modal_selecttenko(employeecode, vehicletransportplanid, statusemp)
-                                                                                                // {
-
-
-                                                                                                //     $.ajax({
-                                                                                                //         url: 'meg_data.php',
-                                                                                                //         type: 'POST',
-                                                                                                //         data: {
-                                                                                                //             txt_flg: "select_selecttenko", employeecode: employeecode, vehicletransportplanid: vehicletransportplanid, statusemp: statusemp
-                                                                                                //         },
-                                                                                                //         success: function (rs) {
 
+                                    //     $.ajax({
+                                    //         url: 'meg_data.php',
+                                    //         type: 'POST',
+                                    //         data: {
+                                    //             txt_flg: "select_selecttenko", employeecode: employeecode, vehicletransportplanid: vehicletransportplanid, statusemp: statusemp
+                                    //         },
+                                    //         success: function (rs) {
+
+
+                                    //             document.getElementById("select_selecttenko").innerHTML = rs;
+                                    //             $('#dataTables-example').DataTable({
+                                    //                 responsive: true
+                                    //             });
+
+
+                                    //         }
+
+                                    //     });
+
+
+                                    // }
+                                    function save_logprocess(category, process, employeecode)
+                                    {
+                                        $.ajax({
+                                            url: 'meg_data.php',
+                                            type: 'POST',
+                                            data: {
+                                                txt_flg: "save_logprocess", category: category, process: process, employeecode: employeecode
+                                            },
+                                            success: function () {
+
+
+                                            }
+                                        });
+                                    }
+                                    function select_operationamata()
+                                    {
+                                        // alert("sss");
+                                        showLoading();
+                                        $.ajax({
+                                            url: 'meg_data.php',
+                                            type: 'POST',
+                                            data: {
+                                                txt_flg: "select_operationtenkoamata", companycode: document.getElementById("cb_company").value, datestart: document.getElementById('txt_datestart').value, dateend: document.getElementById('txt_dateend').value
+                                            },
+                                            success: function (rs) {
+                                                // alert(rs);
+                                                hideLoading();
+                                                document.getElementById("datadef").innerHTML = "";
+                                                document.getElementById("datasr").innerHTML = rs;
 
-                                                                                                //             document.getElementById("select_selecttenko").innerHTML = rs;
-                                                                                                //             $('#dataTables-example').DataTable({
-                                                                                                //                 responsive: true
-                                                                                                //             });
+                                                save_logprocess('Tenko', 'Select Company', '<?= $result_seLogin['PersonCode'] ?>');
+
+                                                swal.fire({
+                                                    title: "Good Job!",
+                                                    text: "โหลดข้อมูลเรียบร้อยแล้ว !!",
+                                                    icon: "success",
+                                                    showConfirmButton: true,
+                                                });
+
 
+                                                $('#dataTables-example1').DataTable({
+                                                    responsive: true,
+                                                    order: [[8, "desc"]],
+                                                });
+                                                $('#dataTables-example2').DataTable({
+                                                    responsive: true
+                                                });
+                                                $('#dataTables-example3').DataTable({
+                                                    responsive: true
+                                                });
+                                                $('#dataTables-example4').DataTable({
+                                                    responsive: true
+                                                });
 
-                                                                                                //         }
+                                                $(function () {
+                                                    $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
+                                                    // กรณีใช้แบบ input
+                                                    $(".dateen").datetimepicker({
+                                                        timepicker: false,
+                                                        format: 'd/m/Y', // กำหนดรูปแบบวันที่ ที่ใช้ เป็น 00-00-0000
+                                                        lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
+                                                        minDate: 0,
+
+                                                    });
+                                                });
+                                            }
+                                            
+                                        });
 
-                                                                                                //     });
-
+                                    }
 
-                                                                                                // }
-                                                                                                function save_logprocess(category, process, employeecode)
-                                                                                                {
-                                                                                                    $.ajax({
-                                                                                                        url: 'meg_data.php',
-                                                                                                        type: 'POST',
-                                                                                                        data: {
-                                                                                                            txt_flg: "save_logprocess", category: category, process: process, employeecode: employeecode
-                                                                                                        },
-                                                                                                        success: function () {
 
+                                    // function edit_chkvehicletransportjobendtemp(editableObj, fieldname, ID1, vehicletransportplanid)
+                                    // {
 
-                                                                                                        }
-                                                                                                    });
-                                                                                                }
-                                                                                                function select_operationamata()
-                                                                                                {
+                                    //     if (document.getElementById(ID1).checked == true) {
 
-                                                                                                    $.ajax({
-                                                                                                        url: 'meg_data.php',
-                                                                                                        type: 'POST',
-                                                                                                        data: {
-                                                                                                            txt_flg: "select_operationtenkoamata", companycode: document.getElementById("cb_company").value, datestart: document.getElementById('txt_datestart').value, dateend: document.getElementById('txt_dateend').value
-                                                                                                        },
-                                                                                                        success: function (rs) {
 
-                                                                                                            document.getElementById("datadef").innerHTML = "";
-                                                                                                            document.getElementById("datasr").innerHTML = rs;
+                                    //         $.ajax({
+                                    //             url: 'meg_data.php',
+                                    //             type: 'POST',
+                                    //             data: {
+                                    //                 txt_flg: "edit_vehicletransportjobendtemp", editableObj: '1', ID1: ID1, fieldname: fieldname
+                                    //             },
+                                    //             success: function (rs) {
 
-                                                                                                            save_logprocess('Tenko', 'Select Company', '<?= $result_seLogin['PersonCode'] ?>');
+                                    //                 //window.location.reload();
+                                    //             }
+                                    //         });
 
+                                    //     } else
+                                    //     {
+                                    //         $.ajax({
+                                    //             url: 'meg_data.php',
+                                    //             type: 'POST',
+                                    //             data: {
+                                    //                 txt_flg: "edit_vehicletransportjobendtemp", editableObj: '0', ID1: ID1, fieldname: fieldname
+                                    //             },
+                                    //             success: function () {
 
-                                                                                                            $('#dataTables-example1').DataTable({
-                                                                                                                responsive: true
-                                                                                                            });
-                                                                                                            $('#dataTables-example2').DataTable({
-                                                                                                                responsive: true
-                                                                                                            });
-                                                                                                            $('#dataTables-example3').DataTable({
-                                                                                                                responsive: true
-                                                                                                            });
-                                                                                                            $('#dataTables-example4').DataTable({
-                                                                                                                responsive: true
-                                                                                                            });
+                                    //                 //window.location.reload();
+                                    //             }
+                                    //         });
+                                    //     }
 
-                                                                                                            $(function () {
-                                                                                                                $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                                                                                                                // กรณีใช้แบบ input
-                                                                                                                $(".dateen").datetimepicker({
-                                                                                                                    timepicker: false,
-                                                                                                                    format: 'd/m/Y', // กำหนดรูปแบบวันที่ ที่ใช้ เป็น 00-00-0000
-                                                                                                                    lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                                                                                                                    minDate: 0,
+                                    //     alert(vehicletransportplanid);
+                                    //     $.ajax({
+                                    //         url: 'meg_data.php',
+                                    //         type: 'POST',
+                                    //         data: {
+                                    //             txt_flg: "edit_vehicletransportplantemp", vehicletransportplanid: vehicletransportplanid
+                                    //         },
+                                    //         success: function () {
 
-                                                                                                                });
-                                                                                                            });
-                                                                                                        }
 
-                                                                                                    });
 
+                                    //         }
+                                    //     });
 
 
 
-                                                                                                }
+                                    // }
+                                    // function edit_vehicletransportjobendtempinner(editableObj, fieldname, ID1)
+                                    // {
 
 
-                                                                                                // function edit_chkvehicletransportjobendtemp(editableObj, fieldname, ID1, vehicletransportplanid)
-                                                                                                // {
+                                    //     $.ajax({
+                                    //         url: 'meg_data.php',
+                                    //         type: 'POST',
+                                    //         data: {
+                                    //             txt_flg: "edit_vehicletransportjobendtemp", editableObj: editableObj.innerHTML, ID1: ID1, fieldname: fieldname
+                                    //         },
+                                    //         success: function () {
 
-                                                                                                //     if (document.getElementById(ID1).checked == true) {
+                                    //             //window.location.reload();
+                                    //         }
+                                    //     });
 
 
-                                                                                                //         $.ajax({
-                                                                                                //             url: 'meg_data.php',
-                                                                                                //             type: 'POST',
-                                                                                                //             data: {
-                                                                                                //                 txt_flg: "edit_vehicletransportjobendtemp", editableObj: '1', ID1: ID1, fieldname: fieldname
-                                                                                                //             },
-                                                                                                //             success: function (rs) {
 
-                                                                                                //                 //window.location.reload();
-                                                                                                //             }
-                                                                                                //         });
+                                    // }
+                                    // function select_compensationcluster(cluster, num, tempjobendid)
+                                    // {
 
-                                                                                                //     } else
-                                                                                                //     {
-                                                                                                //         $.ajax({
-                                                                                                //             url: 'meg_data.php',
-                                                                                                //             type: 'POST',
-                                                                                                //             data: {
-                                                                                                //                 txt_flg: "edit_vehicletransportjobendtemp", editableObj: '0', ID1: ID1, fieldname: fieldname
-                                                                                                //             },
-                                                                                                //             success: function () {
+                                    //     $.ajax({
+                                    //         url: 'meg_data.php',
+                                    //         type: 'POST',
+                                    //         data: {
+                                    //             txt_flg: "select_compensationcluster", cluster: cluster, tempjobendid: tempjobendid
+                                    //         },
+                                    //         success: function (rs) {
 
-                                                                                                //                 //window.location.reload();
-                                                                                                //             }
-                                                                                                //         });
-                                                                                                //     }
+                                    //             document.getElementById("def_jobend" + num).innerHTML = "";
+                                    //             document.getElementById("sr_jobend" + num).innerHTML = rs;
+                                    //             update_compensationcluster(cluster);
+                                    //         }
+                                    //     });
 
-                                                                                                //     alert(vehicletransportplanid);
-                                                                                                //     $.ajax({
-                                                                                                //         url: 'meg_data.php',
-                                                                                                //         type: 'POST',
-                                                                                                //         data: {
-                                                                                                //             txt_flg: "edit_vehicletransportplantemp", vehicletransportplanid: vehicletransportplanid
-                                                                                                //         },
-                                                                                                //         success: function () {
+                                    // }
+                                    // function update_compensationcluster(editableObj)
+                                    // {
 
 
+                                    //     update_vehicletransportplan(editableObj, 'CLUSTER', '<?= $_GET['vehicletransportplanid'] ?>');
 
-                                                                                                //         }
-                                                                                                //     });
 
+                                    // }
+                                    // function update_compensationjobend(jobend)
+                                    // {
 
 
-                                                                                                // }
-                                                                                                // function edit_vehicletransportjobendtempinner(editableObj, fieldname, ID1)
-                                                                                                // {
+                                    //     edit_vehicletransportjobendtemp(jobend, 'JOBEND', document.getElementById("tempjobendid").value);
 
 
-                                                                                                //     $.ajax({
-                                                                                                //         url: 'meg_data.php',
-                                                                                                //         type: 'POST',
-                                                                                                //         data: {
-                                                                                                //             txt_flg: "edit_vehicletransportjobendtemp", editableObj: editableObj.innerHTML, ID1: ID1, fieldname: fieldname
-                                                                                                //         },
-                                                                                                //         success: function () {
+
+                                    // }
+                                    // function edit_vehicletransportjobendtemp(editableObj, fieldname, ID1)
+                                    // {
+
 
-                                                                                                //             //window.location.reload();
-                                                                                                //         }
-                                                                                                //     });
+                                    //     $.ajax({
+                                    //         url: 'meg_data.php',
+                                    //         type: 'POST',
+                                    //         data: {
+                                    //             txt_flg: "edit_vehicletransportjobendtemp", editableObj: editableObj, ID1: ID1, fieldname: fieldname
+                                    //         },
+                                    //         success: function () {
+                                    //             // alert(rs);
+                                    //             //window.location.reload();
+                                    //         }
+                                    //     });
 
 
 
-                                                                                                // }
-                                                                                                // function select_compensationcluster(cluster, num, tempjobendid)
-                                                                                                // {
+                                    // }
+                                    // function show_confrimdriving(vehicletransportplanid)
+                                    // {
 
-                                                                                                //     $.ajax({
-                                                                                                //         url: 'meg_data.php',
-                                                                                                //         type: 'POST',
-                                                                                                //         data: {
-                                                                                                //             txt_flg: "select_compensationcluster", cluster: cluster, tempjobendid: tempjobendid
-                                                                                                //         },
-                                                                                                //         success: function (rs) {
+                                    //     $.ajax({
+                                    //         type: 'post',
+                                    //         url: 'meg_data.php',
+                                    //         data: {
+                                    //             txt_flg: "show_confrimdriving", vehicletransportplanid: vehicletransportplanid
 
-                                                                                                //             document.getElementById("def_jobend" + num).innerHTML = "";
-                                                                                                //             document.getElementById("sr_jobend" + num).innerHTML = rs;
-                                                                                                //             update_compensationcluster(cluster);
-                                                                                                //         }
-                                                                                                //     });
+                                    //         },
+                                    //         success: function (rs) {
 
-                                                                                                // }
-                                                                                                // function update_compensationcluster(editableObj)
-                                                                                                // {
+                                    //             document.getElementById("data_confrimdriving").innerHTML = rs;
+                                    //         }
+                                    //     });
 
+                                    // }
+                                    function save_tenkomaster2(vehicletransportplanid, tenkostatus, employeecode, statusemp)
+                                    {
 
-                                                                                                //     update_vehicletransportplan(editableObj, 'CLUSTER', '<?= $_GET['vehicletransportplanid'] ?>');
+                                        if (statusemp == '1')
+                                        {
+                                            window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
+                                        } else if(statusemp == '2')
+                                        {
+                                            window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
+                                        } else
+                                        {
+                                            window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode3=' + employeecode, '_blank');
+                                        }
 
+                                        window.location.reload();
+                                    }
+                                    function save_tenkomaster(vehicletransportplanid, tenkostatus, employeecode, statusemp)
+                                    {
+                                        // alert(statusemp);
 
-                                                                                                // }
-                                                                                                // function update_compensationjobend(jobend)
-                                                                                                // {
+                                        if (tenkostatus == 'T')
+                                        {
+                                                // alert(employeecode);
 
 
-                                                                                                //     edit_vehicletransportjobendtemp(jobend, 'JOBEND', document.getElementById("tempjobendid").value);
+                                                $.ajax({
+                                                    type: 'post',
+                                                    url: 'meg_data.php',
+                                                    data: {
+                                                        txt_flg: "save_tenkomaster", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
+                                                        remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
 
+                                                    },
+                                                    success: function () {
+                                                        if (statusemp == '1')
+                                                        {
+                                                            window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
+                                                        }else if (statusemp == '2'){
+                                                            window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
+                                                        }else{
+                                                            window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode3=' + employeecode, '_blank');
+                                                        }
 
+                                                        window.location.reload();
+                                                    }
+                                                });
 
-                                                                                                // }
-                                                                                                // function edit_vehicletransportjobendtemp(editableObj, fieldname, ID1)
-                                                                                                // {
 
+                                        } else if(tenkostatus == 'P')
+                                        {
+                                            // alert('else if');
+                                            // alert(statusemp);
+                                            // alert(tenkostatus);
+                                            // alert(employeecode);
 
-                                                                                                //     $.ajax({
-                                                                                                //         url: 'meg_data.php',
-                                                                                                //         type: 'POST',
-                                                                                                //         data: {
-                                                                                                //             txt_flg: "edit_vehicletransportjobendtemp", editableObj: editableObj, ID1: ID1, fieldname: fieldname
-                                                                                                //         },
-                                                                                                //         success: function () {
-                                                                                                //             // alert(rs);
-                                                                                                //             //window.location.reload();
-                                                                                                //         }
-                                                                                                //     });
+                                            // P คือ ตรวจร่างกายเรียบร้อย
 
-
-
-                                                                                                // }
-                                                                                                // function show_confrimdriving(vehicletransportplanid)
-                                                                                                // {
-
-                                                                                                //     $.ajax({
-                                                                                                //         type: 'post',
-                                                                                                //         url: 'meg_data.php',
-                                                                                                //         data: {
-                                                                                                //             txt_flg: "show_confrimdriving", vehicletransportplanid: vehicletransportplanid
-
-                                                                                                //         },
-                                                                                                //         success: function (rs) {
-
-                                                                                                //             document.getElementById("data_confrimdriving").innerHTML = rs;
-                                                                                                //         }
-                                                                                                //     });
-
-                                                                                                // }
-                                                                                                function save_tenkomaster2(vehicletransportplanid, tenkostatus, employeecode, statusemp)
-                                                                                                {
-
-                                                                                                    if (statusemp == '1')
-                                                                                                    {
-                                                                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
-                                                                                                    } else
-                                                                                                    {
-                                                                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
-                                                                                                    }
-
-                                                                                                    window.location.reload();
-                                                                                                }
-                                                                                                function save_tenkomaster(vehicletransportplanid, tenkostatus, employeecode, statusemp)
-                                                                                                {
-                                                                                                    // alert(tenkostatus);
-
-                                                                                                    if (tenkostatus == 'T')
-                                                                                                    {
-
-                                                                                                        $.ajax({
-                                                                                                            type: 'post',
-                                                                                                            url: 'meg_data.php',
-                                                                                                            data: {
-                                                                                                                txt_flg: "save_tenkomaster", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
-                                                                                                                remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
-
-                                                                                                            },
-                                                                                                            success: function () {
-                                                                                                                if (statusemp == '1')
-                                                                                                                {
-                                                                                                                    window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
-                                                                                                                } else
-                                                                                                                {
-                                                                                                                    window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
-                                                                                                                }
-
-                                                                                                                window.location.reload();
-                                                                                                            }
-                                                                                                        });
-                                                                                                    } else
-                                                                                                    {
-                                                                                                        // alert('else');
-                                                                                                        // alert(statusemp);
-                                                                                                        $.ajax({
-                                                                                                            type: 'post',
-                                                                                                            url: 'meg_data.php',
-                                                                                                            data: {
-                                                                                                                txt_flg: "save_tenkomaster", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
-                                                                                                                remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
-
-                                                                                                            },
-                                                                                                            success: function () {
-
-                                                                                                                if (statusemp == '1')
-                                                                                                                {
-
-                                                                                                                    window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
-                                                                                                                } else
-                                                                                                                {
-
-                                                                                                                    window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
-                                                                                                                }
-
-                                                                                                                window.location.reload();
-                                                                                                            }
-                                                                                                        });
-                                                                                                    }
-
-
-                                                                                                }
-                                                                                                // ตรวจร่างกายใหม่
-                                                                                                // function save_tenkomasterhome(vehicletransportplanid, tenkostatus, employeecode, statusemp)
-                                                                                                // {
-                                                                                                //     $(document).on('click', ':not(form)[data-confirm]', function(e){
-                                                                                                //     if(confirm($(this).data('confirm'))){
-                                                                                                //     e.stopImmediatePropagation();
-                                                                                                //     e.preventDefault();
-                                                                                                    
-                                                                                                //     // alert('ต้องการจะตรวจร่างกายใหม่');
-                                                                                                //     $.ajax({
-                                                                                                //             type: 'post',
-                                                                                                //             url: 'meg_data.php',
-                                                                                                //             data: {
-                                                                                                //                 txt_flg: "save_tenkomasterhome", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
-                                                                                                //                 remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
-
-                                                                                                //             },
-                                                                                                //             success: function () {
-
-                                                                                                //                 if (statusemp == '1')
-                                                                                                //                 {
-
-                                                                                                //                     window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
-                                                                                                //                 } else
-                                                                                                //                 {
-
-                                                                                                //                     window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
-                                                                                                //                 }
-
-                                                                                                //                 window.location.reload();
-                                                                                                //             }
-                                                                                                //         });
-                                                                                                //     }else{
-                                                                                                //     alert('ยกเลิก');
-                                                                                                //         // window.location.reload();
-                                                                                                //     }
-
-                                                                                                    
-                                                                                                // });
-                                                                                                    
-                                                                                                //     // $.ajax({
-                                                                                                //     //         type: 'post',
-                                                                                                //     //         url: 'meg_data.php',
-                                                                                                //     //         data: {
-                                                                                                //     //             txt_flg: "save_tenkomasterhome", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
-                                                                                                //     //             remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
-
-                                                                                                //     //         },
-                                                                                                //     //         success: function () {
-
-                                                                                                //     //             if (statusemp == '1')
-                                                                                                //     //             {
-
-                                                                                                //     //                 window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
-                                                                                                //     //             } else
-                                                                                                //     //             {
-
-                                                                                                //     //                 window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
-                                                                                                //     //             }
-
-                                                                                                //     //             window.location.reload();
-                                                                                                //     //         }
-                                                                                                //     //     });
-                                                                                                // }
-                                                                                                // function update_vehicletransportplanjob(rootno, statusnumber)
-                                                                                                // {
-
-                                                                                                //     $.ajax({
-                                                                                                //         type: 'post',
-                                                                                                //         url: 'meg_data.php',
-                                                                                                //         data: {
-                                                                                                //             txt_flg: "edit_vehicletransportplanjob", rootno: rootno, statusnumber: statusnumber
-                                                                                                //         },
-                                                                                                //         success: function () {
-
-                                                                                                //             window.location.reload();
-                                                                                                //         }
-                                                                                                //     });
-                                                                                                // }
-
-                                                                                                $(function () {
-                                                                                                    $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                                                                                                    // กรณีใช้แบบ input
-                                                                                                    $(".dateen").datetimepicker({
-                                                                                                        timepicker: false,
-                                                                                                        format: 'd/m/Y', // กำหนดรูปแบบวันที่ ที่ใช้ เป็น 00-00-0000
-                                                                                                        lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
-                                                                                                        minDate: 0,
-
-                                                                                                    });
-                                                                                                });
-
-
-
-                                                                                        </script>
-                                                                                        <script>
-                                                                                            $(document).ready(function () {
-                                                                                                $('#dataTables-example1').DataTable({
-                                                                                                    responsive: true,
-                                                                                                    order: [[8, "asc"]],
-                                                                                                });
-                                                                                                $('#dataTables-example2').DataTable({
-                                                                                                    responsive: true
-                                                                                                });
-                                                                                                $('#dataTables-example3').DataTable({
-                                                                                                    responsive: true
-                                                                                                });
-                                                                                                $('#dataTables-example4').DataTable({
-                                                                                                    responsive: true
-                                                                                                });
-                                                                                            });
-                                                                                        </script>
+                                            // $.ajax({
+                                            //     type: 'post',
+                                            //     url: 'meg_data.php',
+                                            //     data: {
+                                            //         txt_flg: "save_tenkomaster", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
+                                            //         remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
+
+                                            //     },
+                                            //     success: function () {
+
+                                                    if (statusemp == '1')
+                                                    {
+
+                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
+                                                    }else if(statusemp == '2'){
+
+                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
+                                                    }else{
+
+                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode3=' + employeecode, '_blank');
+                                                    }
+
+                                            //         window.location.reload();
+                                            //     }
+                                            // });
+
+
+                                        } else
+                                        {
+                                            // alert('else');
+                                            // alert(statusemp);
+                                            // alert(tenkostatus);
+                                            // alert(employeecode);
+
+
+                                            $.ajax({
+                                                type: 'post',
+                                                url: 'meg_data.php',
+                                                data: {
+                                                    txt_flg: "save_tenkomaster", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
+                                                    remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
+
+                                                },
+                                                success: function () {
+
+                                                    if (statusemp == '1')
+                                                    {
+
+                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
+                                                    }else if(statusemp == '2'){
+
+                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
+                                                    }else{
+
+                                                        window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode3=' + employeecode, '_blank');
+                                                    }
+
+                                                    window.location.reload();
+                                                }
+                                            });
+
+
+                                        }
+
+
+                                    }
+                                    // ตรวจร่างกายใหม่
+                                    // function save_tenkomasterhome(vehicletransportplanid, tenkostatus, employeecode, statusemp)
+                                    // {
+                                    //     $(document).on('click', ':not(form)[data-confirm]', function(e){
+                                    //     if(confirm($(this).data('confirm'))){
+                                    //     e.stopImmediatePropagation();
+                                    //     e.preventDefault();
+                                        
+                                    //     // alert('ต้องการจะตรวจร่างกายใหม่');
+                                    //     $.ajax({
+                                    //             type: 'post',
+                                    //             url: 'meg_data.php',
+                                    //             data: {
+                                    //                 txt_flg: "save_tenkomasterhome", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
+                                    //                 remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
+
+                                    //             },
+                                    //             success: function () {
+
+                                    //                 if (statusemp == '1')
+                                    //                 {
+
+                                    //                     window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
+                                    //                 } else
+                                    //                 {
+
+                                    //                     window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
+                                    //                 }
+
+                                    //                 window.location.reload();
+                                    //             }
+                                    //         });
+                                    //     }else{
+                                    //     alert('ยกเลิก');
+                                    //         // window.location.reload();
+                                    //     }
+
+                                        
+                                    // });
+                                        
+                                    //     // $.ajax({
+                                    //     //         type: 'post',
+                                    //     //         url: 'meg_data.php',
+                                    //     //         data: {
+                                    //     //             txt_flg: "save_tenkomasterhome", tenkomasterid: '', vehicletransportplanid: vehicletransportplanid, changeka: '',
+                                    //     //             remark1: '', remark2: '', status: tenkostatus, officer: '<?= $result_seEmployee["nameT"] ?>', statusemp: statusemp
+
+                                    //     //         },
+                                    //     //         success: function () {
+
+                                    //     //             if (statusemp == '1')
+                                    //     //             {
+
+                                    //     //                 window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode, '_blank');
+                                    //     //             } else
+                                    //     //             {
+
+                                    //     //                 window.open('meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode, '_blank');
+                                    //     //             }
+
+                                    //     //             window.location.reload();
+                                    //     //         }
+                                    //     //     });
+                                    // }
+                                    // function update_vehicletransportplanjob(rootno, statusnumber)
+                                    // {
+
+                                    //     $.ajax({
+                                    //         type: 'post',
+                                    //         url: 'meg_data.php',
+                                    //         data: {
+                                    //             txt_flg: "edit_vehicletransportplanjob", rootno: rootno, statusnumber: statusnumber
+                                    //         },
+                                    //         success: function () {
+
+                                    //             window.location.reload();
+                                    //         }
+                                    //     });
+                                    // }
+
+                                    $(function () {
+                                        $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
+                                        // กรณีใช้แบบ input
+                                        $(".dateen").datetimepicker({
+                                            timepicker: false,
+                                            format: 'd/m/Y', // กำหนดรูปแบบวันที่ ที่ใช้ เป็น 00-00-0000
+                                            lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
+                                            minDate: 0,
+
+                                        });
+                                    });
+
+
+
+                            </script>
+                            <script>
+                                $(document).ready(function () {
+                                    $('#dataTables-example1').DataTable({
+                                        responsive: true,
+                                        order: [[8, "asc"]],
+                                    });
+                                    $('#dataTables-example2').DataTable({
+                                        responsive: true
+                                    });
+                                    $('#dataTables-example3').DataTable({
+                                        responsive: true
+                                    });
+                                    $('#dataTables-example4').DataTable({
+                                        responsive: true
+                                    });
+                                });
+                            </script>
 
     </body>
 

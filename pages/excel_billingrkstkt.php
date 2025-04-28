@@ -8,6 +8,7 @@ if ($_GET['invoicecode'] == "" || $_GET['invoicecode'] == "") {
   $strExcelFileName = "RKSTKT_Billing" . $_GET['invoicecode'] . ".xls";
 }
 // $strExcelFileName="Member-All.xls";
+
 header("Content-Type: application/x-msexcel; name=\"$strExcelFileName\"");
 header("Content-Disposition: inline; filename=\"$strExcelFileName\"");
 header("Pragma:no-cache");
@@ -89,7 +90,7 @@ $result_seInvoice = sqlsrv_fetch_array($query_seInvoice, SQLSRV_FETCH_ASSOC);
         </tr>
         <tr>
           <td colspan="5"style="width: 50%;">เลขประจำตัวผู้เสียภาษี 0105548105689</td>
-          <td colspan="4"style="width: 50%;text-align:right">วันที่ครบกำหนด -</td>
+          <td colspan="4"style="width: 50%;text-align:right"></td>
         </tr>
       </tbody>
     </table>
@@ -99,12 +100,13 @@ $result_seInvoice = sqlsrv_fetch_array($query_seInvoice, SQLSRV_FETCH_ASSOC);
 
         <tr style="border:1px solid #000;padding:4px;">
 
-          <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>ลำดับที่</b></td>
+          <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ลำดับที่</b></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>วันที่</b></td>
-          <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>หมายเลข DO</b></td>
+          <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 20%;"><b>หมายเลข DO</b></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ทะเบียนรถ</b></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 15%;"><b>พนักงาน</b></td>
-          <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>เส้นทาง</b></td>
+          <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>ต้นทาง</b></td>
+          <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>ปลายทาง</b></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>QT.</b></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ราคา</b></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>จำนวนเงิน(บาท)</b></td>
@@ -126,7 +128,7 @@ $result_seInvoice = sqlsrv_fetch_array($query_seInvoice, SQLSRV_FETCH_ASSOC);
           $condEmployeeehr1 = " AND (a.FnameT+' '+a.LnameT) = '" . $result_seBilling['EMPLOYEENAME1'] . "' ";
           $sql_seEmployeeehr = "{call megEmployeeEHR_v2(?,?)}";
           $params_seEmployeeehr = array(
-            array('select_employee', SQLSRV_PARAM_IN),
+            array('select_employeeehr2', SQLSRV_PARAM_IN),
             array($condEmployeeehr1, SQLSRV_PARAM_IN)
           );
           $query_seEmployeeehr = sqlsrv_query($conn, $sql_seEmployeeehr, $params_seEmployeeehr);
@@ -143,6 +145,7 @@ $result_seInvoice = sqlsrv_fetch_array($query_seInvoice, SQLSRV_FETCH_ASSOC);
             <td style="border-right:1px solid #000;padding:4px;text-align:left;"><?=$result_seBilling['THAINAME'] ?></td>
             <td style="border-right:1px solid #000;padding:4px;text-align:left;"><?=$result_seBilling['EMPLOYEENAME1'] ?></td>
             <td style="border-right:1px solid #000;padding:4px;text-align:left;"><?=$result_seBilling['JOBSTART'] ?></td>
+            <td style="border-right:1px solid #000;padding:4px;text-align:left;"><?=$result_seBilling['JOBEND'] ?></td>
             <td style="border-right:1px solid #000;padding:4px;text-align:right;">1.00</td>
             <td style="border-right:1px solid #000;padding:4px;text-align:right;"><?=number_format($result_seBilling['ACTUALPRICE'], 2) ?></td>
             <td style="border-right:1px solid #000;padding:4px;text-align:right;"><?=number_format($result_seBilling['ACTUALPRICE'], 2) ?></td>
@@ -157,8 +160,10 @@ $result_seInvoice = sqlsrv_fetch_array($query_seInvoice, SQLSRV_FETCH_ASSOC);
 
       </tbody><tfoot>
         <tr style="border:1px solid #000;">
-          <td colspan="7" style="border-right:1px solid #000;padding:4px;text-align:center;"><?=convert($sumtotal) ?></td>
+          
+          <td style="border-right:1px solid #000;padding:4px;text-align:center;"></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:center;">รวมสุทธิ</td>
+          <td colspan="7" style="border-right:1px solid #000;padding:4px;text-align:center;"><?=convert($sumtotal) ?></td>
           <td style="border-right:1px solid #000;padding:4px;text-align:right;"><?=number_format($sumtotal, 2) ?></td>
 
         </tr>

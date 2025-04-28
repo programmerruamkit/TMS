@@ -48,15 +48,17 @@ if ($_POST['txt_flg'] == "select_tenko2emp1") {
     $query_seTenkomaster = sqlsrv_query($conn, $sql_seTenkomaster, $params_seTenkomaster);
     $result_seTenkomaster = sqlsrv_fetch_array($query_seTenkomaster, SQLSRV_FETCH_ASSOC);
 
-    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEENAME1']."'";
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE1']."'";
     $params_checkSexT = array();
     $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
     $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
 
     if ($result_checkSexT['SexT'] == 'หญิง') {
         $sex = 'นางสาว';
-    }else{
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
         $sex = 'นาย';
+    }else{
+        $sex = '';
     }
 
     
@@ -1875,113 +1877,6 @@ if ($_POST['txt_flg'] == "check_gpspointemp1") {
         
     <?php
 }
-if ($_POST['txt_flg'] == "check_gpspointemp2") {
-    ?>
-
-            <div style="text-align: center;">
-                <?php
-                    $sql_CheckPoint = "SELECT TENKOGPSSPEEDOVERAMOUNT,TENKOGPSBRAKEAMOUNT,TENKOGPSSPEEDMACHINEAMOUNT,
-                    TENKOGPSOUTLINEAMOUNT,TENKOGPSCONTINUOUSAMOUNT,GRADEDRIVER,POINTDRIVER
-                    FROM TENKOGPS WHERE TENKOMASTERID ='".$_POST['tenkomasterid']."'
-                    AND TENKOMASTERDIRVERCODE ='".$_POST['employeecode']."'";
-                    $params_CheckPoint = array();
-                    $query_CheckPoint = sqlsrv_query($conn, $sql_CheckPoint, $params_CheckPoint);
-                    $result_CheckPoint = sqlsrv_fetch_array($query_CheckPoint, SQLSRV_FETCH_ASSOC);
-
-            
-
-                    //	ความเร็วเกินกำหนด
-                    if ($result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '' || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
-                        $speedoverpoint = '100';
-                    }else {
-                        $speedoverpoint = $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'];
-                    }
-                    
-                    // 	เบรคกระทันหัน
-                    if ($result_CheckPoint['TENKOGPSBRAKEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSBRAKEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
-                        $gpsbrakepoint = '100';
-                    }else {
-                        $gpsbrakepoint = $result_CheckPoint['TENKOGPSBRAKEAMOUNT'];
-                    }
-                    
-                    // รอบเครื่องเกินกำหนด
-                    if ($result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
-                        $speedmechinepoint = '100';
-                    }else {
-                        $speedmechinepoint = $result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'];
-                    }
-                    
-                    //	วิ่งนอกเส้นทาง
-                    if ($result_CheckPoint['TENKOGPSOUTLINEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSOUTLINEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
-                        $outlinepoint = '100';
-                    }else {
-                        $outlinepoint = $result_CheckPoint['TENKOGPSOUTLINEAMOUNT'];
-                    }
-                    
-                    //	ขับรถต่อเนื่อง 4 ชม.
-                    if ($result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'] == '' || $result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
-                        $continuepoint = '100';
-                    }else {
-                        $continuepoint = $result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'];
-                    }
-                    
-
-                    // ถ้าทำผิดหัก ครั้งละ 2 คะแนน
-                    $maxpoint = 100;
-                    $sumpoint = ($speedoverpoint+$gpsbrakepoint+$speedmechinepoint+$outlinepoint+$continuepoint)*2;
-
-                    if($sumpoint == '1000'){
-                        $allpoint = 'ไม่มีผลคะแนน';
-                    }else {
-                        $allpoint = ($maxpoint)-($sumpoint);
-                    }
-
-                    
-
-                    if ($allpoint == '100') {
-                        $grade = 'A';
-                    }else if(($allpoint >= '80') && ($allpoint <= '99')){
-                        $grade = 'B';
-                    }else if(($allpoint >= '60') && ($allpoint <= '79')){
-                        $grade = 'C';
-                    }else if(($allpoint >= '40') && ($allpoint <= '59')){
-                        $grade = 'D';
-                    }else if(($allpoint >= '0') && ($allpoint <= '39')){
-                        $grade = 'E';
-                    }else {
-                        $grade = 'ไม่มีผลการประเมิน';
-                    }
-                ?>
-                <tr>
-                    <input type="text" name="txt_gradeemp2" id="txt_gradeemp2" value="<?= $grade ?>" style="display:none">
-                    <input type="text" name="txt_pointemp2" id="txt_pointemp2" value="<?= $allpoint ?>" style="display:none">
-                    <!-- <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px"><?=$grade?></td>
-                    <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px"><?=$allpoint?></td> -->
-                </tr>
-            </div>
-        
-    <?php
-}
-if ($_POST['txt_flg'] == "update_tenkogpsGradePoint") {
-  ?>
-
-  <?php
-
-  $sql_updateGradePoint = "{call megEdittenkogps_v2(?,?,?,?,?)}";
-  $params_updateGradePoint = array(
-  array('update_tenkogpsGradePoint', SQLSRV_PARAM_IN),
-  array($_POST['grade'], SQLSRV_PARAM_IN),
-  array($_POST['point'], SQLSRV_PARAM_IN),
-  array($_POST['tenkomasterid'], SQLSRV_PARAM_IN),
-  array($_POST['tenkomasterdrivercode'], SQLSRV_PARAM_IN)
-  );
-
-  $query_updateGradePoint = sqlsrv_query($conn, $sql_updateGradePoint, $params_updateGradePoint);
-  $result_updateGradePoint = sqlsrv_fetch_array($query_updateGradePoint, SQLSRV_FETCH_ASSOC);
-  ?>
-
-  <?php
-}
 // select_tenko2emp2 ย้ายไป meg_data_tenkotransport
 if ($_POST['txt_flg'] == "select_tenko2emp2") {
     $condition1 = "  AND a.PersonID = '" . $_SESSION["EMPLOYEEID"] . "'";
@@ -2003,15 +1898,17 @@ if ($_POST['txt_flg'] == "select_tenko2emp2") {
     $result_sePlain = sqlsrv_fetch_array($query_sePlain, SQLSRV_FETCH_ASSOC);
 
 
-    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEENAME2']."'";
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE2']."'";
     $params_checkSexT = array();
     $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
     $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
 
     if ($result_checkSexT['SexT'] == 'หญิง') {
         $sex = 'นางสาว';
-    }else{
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
         $sex = 'นาย';
+    }else{
+        $sex = '';
     }
 
     $conditionTenkomaster_temp = " AND VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
@@ -3764,7 +3661,2060 @@ if ($_POST['txt_flg'] == "select_tenko6emp2") {
     </table>
 
     <?php
-}if ($_POST['txt_flg'] == "save_healthfortenko") {
+}
+if ($_POST['txt_flg'] == "check_gpspointemp2") {
+    ?>
+
+            <div style="text-align: center;">
+                <?php
+                    $sql_CheckPoint = "SELECT TENKOGPSSPEEDOVERAMOUNT,TENKOGPSBRAKEAMOUNT,TENKOGPSSPEEDMACHINEAMOUNT,
+                    TENKOGPSOUTLINEAMOUNT,TENKOGPSCONTINUOUSAMOUNT,GRADEDRIVER,POINTDRIVER
+                    FROM TENKOGPS WHERE TENKOMASTERID ='".$_POST['tenkomasterid']."'
+                    AND TENKOMASTERDIRVERCODE ='".$_POST['employeecode']."'";
+                    $params_CheckPoint = array();
+                    $query_CheckPoint = sqlsrv_query($conn, $sql_CheckPoint, $params_CheckPoint);
+                    $result_CheckPoint = sqlsrv_fetch_array($query_CheckPoint, SQLSRV_FETCH_ASSOC);
+
+            
+
+                    //	ความเร็วเกินกำหนด
+                    if ($result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '' || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                        $speedoverpoint = '100';
+                    }else {
+                        $speedoverpoint = $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'];
+                    }
+                    
+                    // 	เบรคกระทันหัน
+                    if ($result_CheckPoint['TENKOGPSBRAKEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSBRAKEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                        $gpsbrakepoint = '100';
+                    }else {
+                        $gpsbrakepoint = $result_CheckPoint['TENKOGPSBRAKEAMOUNT'];
+                    }
+                    
+                    // รอบเครื่องเกินกำหนด
+                    if ($result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                        $speedmechinepoint = '100';
+                    }else {
+                        $speedmechinepoint = $result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'];
+                    }
+                    
+                    //	วิ่งนอกเส้นทาง
+                    if ($result_CheckPoint['TENKOGPSOUTLINEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSOUTLINEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                        $outlinepoint = '100';
+                    }else {
+                        $outlinepoint = $result_CheckPoint['TENKOGPSOUTLINEAMOUNT'];
+                    }
+                    
+                    //	ขับรถต่อเนื่อง 4 ชม.
+                    if ($result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'] == '' || $result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                        $continuepoint = '100';
+                    }else {
+                        $continuepoint = $result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'];
+                    }
+                    
+
+                    // ถ้าทำผิดหัก ครั้งละ 2 คะแนน
+                    $maxpoint = 100;
+                    $sumpoint = ($speedoverpoint+$gpsbrakepoint+$speedmechinepoint+$outlinepoint+$continuepoint)*2;
+
+                    if($sumpoint == '1000'){
+                        $allpoint = 'ไม่มีผลคะแนน';
+                    }else {
+                        $allpoint = ($maxpoint)-($sumpoint);
+                    }
+
+                    
+
+                    if ($allpoint == '100') {
+                        $grade = 'A';
+                    }else if(($allpoint >= '80') && ($allpoint <= '99')){
+                        $grade = 'B';
+                    }else if(($allpoint >= '60') && ($allpoint <= '79')){
+                        $grade = 'C';
+                    }else if(($allpoint >= '40') && ($allpoint <= '59')){
+                        $grade = 'D';
+                    }else if(($allpoint >= '0') && ($allpoint <= '39')){
+                        $grade = 'E';
+                    }else {
+                        $grade = 'ไม่มีผลการประเมิน';
+                    }
+                ?>
+                <tr>
+                    <input type="text" name="txt_gradeemp2" id="txt_gradeemp2" value="<?= $grade ?>" style="display:none">
+                    <input type="text" name="txt_pointemp2" id="txt_pointemp2" value="<?= $allpoint ?>" style="display:none">
+                    <!-- <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px"><?=$grade?></td>
+                    <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px"><?=$allpoint?></td> -->
+                </tr>
+            </div>
+        
+    <?php
+}
+// select_tenko2emp3 ย้ายไป meg_data_tenkotransport
+//tenko 2 = ระหว่างทาง พขร.3
+if ($_POST['txt_flg'] == "select_tenko2emp3") {
+    $condition1 = "  AND a.PersonID = '" . $_SESSION["EMPLOYEEID"] . "'";
+    $sql_seEmployee = "{call megEmployeeEHR_v2(?,?)}";
+    $params_seEmployee = array(
+        array('select_employeeehr2', SQLSRV_PARAM_IN),
+        array($condition1, SQLSRV_PARAM_IN)
+    );
+    $query_seEmployee = sqlsrv_query($conn, $sql_seEmployee, $params_seEmployee);
+    $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
+    
+    $conditionPlain = " AND a.VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_sePlain = "{call megVehicletransportplan_v2(?,?)}";
+    $params_sePlain = array(
+        array('select_vehicletransportplan', SQLSRV_PARAM_IN),
+        array($conditionPlain, SQLSRV_PARAM_IN)
+    );
+    $query_sePlain = sqlsrv_query($conn, $sql_sePlain, $params_sePlain);
+    $result_sePlain = sqlsrv_fetch_array($query_sePlain, SQLSRV_FETCH_ASSOC);
+
+
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE3']."'";
+    $params_checkSexT = array();
+    $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
+    $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
+
+    if ($result_checkSexT['SexT'] == 'หญิง') {
+        $sex = 'นางสาว';
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
+        $sex = 'นาย';
+    }else{
+        $sex = '';
+    }
+
+    $conditionTenkomaster_temp = " AND VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_seTenkomaster_temp = "{call megVehicletransportplan_v2(?,?,?,?)}";
+    $params_seTenkomaster_temp = array(
+        array('select_vehicletransporttenko', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster_temp, SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster_temp = sqlsrv_query($conn, $sql_seTenkomaster_temp, $params_seTenkomaster_temp);
+    $result_seTenkomaster_temp = sqlsrv_fetch_array($query_seTenkomaster_temp, SQLSRV_FETCH_ASSOC);
+
+    $conditionTenkomaster = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "'";
+    $sql_seTenkomaster = "{call megEdittenkomaster_v2(?,?)}";
+    $params_seTenkomaster = array(
+        array('select_tenkomaster', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster, SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster = sqlsrv_query($conn, $sql_seTenkomaster, $params_seTenkomaster);
+    $result_seTenkomaster = sqlsrv_fetch_array($query_seTenkomaster, SQLSRV_FETCH_ASSOC);
+    ?>
+
+        <div class="panel-body">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#day1" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F1'] ?></a></li>
+                <?php
+                // บริษัท RRC tenko ระหว่างทางสูงสุดได้ 4 วัน
+                if ($result_sePlain['COMPANYCODE'] == 'RRC') {
+                ?>  
+                    <li><a href="#day2" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F2'] ?></a></li>
+                    <li><a href="#day3" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F3'] ?></a></li>
+                    <li><a href="#day4" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F4'] ?></a></li>
+                </li>
+                    <?php
+                } else {
+                    if ($result_sePlain['CUSTOMERCODE'] == 'SKB' || $result_sePlain['CUSTOMERCODE'] == 'TTT' 
+                    || $result_sePlain['CUSTOMERCODE'] == 'GMT' || $result_sePlain['CUSTOMERCODE'] == 'TTAST' 
+                    || $result_sePlain['CUSTOMERCODE'] == 'TTASTCS' || $result_sePlain['CUSTOMERCODE'] == 'TTTCSTC') {
+                    ?>
+                    <li><a href="#day2" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F2'] ?></a></li>
+                    <li><a href="#day3" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F3'] ?></a></li>
+                    <li><a href="#day4" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F4'] ?></a></li>
+                    <li><a href="#day5" data-toggle="tab"><?= $result_seTenkomaster['DATEINPUT_F5'] ?></a></li>
+                    <?php
+                    }
+                }
+                ?>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="day1">
+                    <?php
+                    $conditionTenkotransport11 = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "' ";
+                    $conditionTenkotransport12 = " AND CONVERT(DATE,TENKOTRANSPORTDATE) = CONVERT(DATE,'" . $result_seTenkomaster['DATEINPUT_F1'] . "',103)";
+                    $sql_seTenkotransport1 = "{call megEdittenkotransport_v2(?,?,?)}";
+                    $params_seTenkotransport1 = array(
+                        array('select_tenkotransport', SQLSRV_PARAM_IN),
+                        array($conditionTenkotransport11, SQLSRV_PARAM_IN),
+                        array($conditionTenkotransport12, SQLSRV_PARAM_IN)
+                    );
+                    $query_seTenkotransport1 = sqlsrv_query($conn, $sql_seTenkotransport1, $params_seTenkotransport1);
+                    $result_seTenkotransport1 = sqlsrv_fetch_array($query_seTenkotransport1, SQLSRV_FETCH_ASSOC);
+
+
+                    $rs1d1 = ($result_seTenkotransport1['TENKOLOADRESTCHECK'] == '1') ? "checked" : "";
+                    $rs2d1 = ($result_seTenkotransport1['TENKOBODYSLEEPYCHECK'] == '1') ? "checked" : "";
+                    $rs3d1 = ($result_seTenkotransport1['TENKOCARNEWCHECK'] == '1') ? "checked" : "";
+                    $rs4d1 = ($result_seTenkotransport1['TENKOTRAILERCHECK'] == '1') ? "checked" : "";
+                    $rs5d1 = ($result_seTenkotransport1['TENKOROADCHECK'] == '1') ? "checked" : "";
+                    $rs6d1 = ($result_seTenkotransport1['TENKOAIRCHECK'] == '1') ? "checked" : "";
+                    $rs7d1 = ($result_seTenkotransport1['TENKOSLEEPYCHECK'] == '1') ? "checked" : "";
+                    ?>
+                    <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                        <thead>
+                            <tr>
+
+                               
+                                <!-- Commit_Emp3Day1 -->
+                                <th colspan="6" ><input type="button" onclick="commit_2('<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>','<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>', '<?= $result_seEmployee['nameT'] ?>')"   class="btn btn-success" value="Commit3_Day1"> <font style="color: green">พนักงานขับรถ : <?= $sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+
+                                <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะก่อนเริ่มงาน</th>
+                                <th style="text-align: center;"><?= $result_seTenkotransport1["CREATEBY"] ?></th>
+                                <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะปฎิบัติงาน</th>
+                                <th style="text-align: center;"><?= $result_seEmployee["nameT"] ?></th>
+                            </tr>
+                            <tr>
+
+                                <th colspan="12">เจ้าหน้าที่โทรไปไม่พบสิ่งผิดปกติ : <font style="color: red">0</font>  | พนักงานขับรถโทรมาไม่พบสิ่งผิดปกติ : <font style="color: red">1</font> | พบสิ่งผิดปกติ : <font style="color: red">x</font></th>
+                            </tr>
+                            <tr>
+
+                                <th rowspan="4" style="text-align: center;">ข้อ</th>
+                                <th rowspan="4" style="text-align: center;">หัวข้อ</th>
+                                <th rowspan="4" style="text-align: center;">ช่องตรวจ</th>
+                                <th rowspan="4" style="text-align: center;">เกณฑ์การตัดสิน</th>
+                                <th rowspan="2" style="text-align: center;"><p>โทรช่วง </p>
+                                    <p>00:01 - 23:59</p></th>
+                                <th colspan="6" style="text-align: center">Night Call Check</th>
+                                <th rowspan="4"style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">รายละเอียดการแนะนำของเจ้าหน้าที่</th>
+                            </tr>
+                            <tr>
+
+                                <th style="text-align: center;">ครั้งที่ 1</th>
+                                <th style="text-align: center;">ครั้งที่ 2</th>
+                                <th style="text-align: center;">ครั้งที่ 3</th>
+                                <th style="text-align: center;">ครั้งที่ 4</th>
+                                <th style="text-align: center;">ครั้งที่ 5</th>
+                                <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ครั้งที่ 6</th>
+                            </tr>
+                            <tr>
+
+                                <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control timeen" id="txt_time0" name="txt_time0" value="<?= $result_seTenkotransport1['TENKOTIME0'] ?>"></th>
+                                <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control timeen" id="txt_time1" name="txt_time1" value="<?= $result_seTenkotransport1['TENKOTIME1'] ?>"></th>
+                                <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control timeen" id="txt_time2" name="txt_time2" value="<?= $result_seTenkotransport1['TENKOTIME2'] ?>"></th>
+                                <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control timeen" id="txt_time3" name="txt_time3" value="<?= $result_seTenkotransport1['TENKOTIME3'] ?>"></th>
+                                <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control timeen" id="txt_time4" name="txt_time4" value="<?= $result_seTenkotransport1['TENKOTIME4'] ?>"></th>
+                                <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control timeen" id="txt_time5" name="txt_time5" value="<?= $result_seTenkotransport1['TENKOTIME5'] ?>"></th>
+                                <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control timeen" id="txt_time6" name="txt_time6" value="<?= $result_seTenkotransport1['TENKOTIME6'] ?>"></th>
+                            </tr>
+                            <tr>
+
+                                <th style="text-align: center;">ผล</th>
+                                <th style="text-align: center;">ผล</th>
+                                <th style="text-align: center;">ผล</th>
+                                <th style="text-align: center;">ผล</th>
+                                <th style="text-align: center;">ผล</th>
+                                <th style="text-align: center;">ผล</th>
+                                <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ผล</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: center">1</td>
+                                <td>เส้นทางที่กำหนด - จุดพัก</td>
+                                <td style="text-align: center"><input type="checkbox" <?= $rs1d1 ?> onchange="edit_check1d1('TENKOLOADRESTCHECK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" style="transform: scale(2)" id="chk_1d1" name="chk_1d1" /></td>
+                                <td>เส้นทาง จุดพักที่กำหนด</td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT0" name="TXT_TENKOLOADRESTRESULT0" value="<?= $result_seTenkotransport1['TENKOLOADRESTRESULT0'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT0" name="TXT_TENKOBODYSLEEPYRESULT0" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYRESULT0'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT0" name="TXT_TENKOCARNEWRESULT0" value="<?= $result_seTenkotransport1['TENKOCARNEWRESULT0'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT0" name="TXT_TENKOTRAILERRESULT0" value="<?= $result_seTenkotransport1['TENKOTRAILERRESULT0'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOROADRESULT0" name="TXT_TENKOROADRESULT0" value="<?= $result_seTenkotransport1['TENKOROADRESULT0'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT0" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport1['TENKOAIRRESULT0'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT0', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT0" name="TXT_TENKOSLEEPYRESULT0" value="<?= $result_seTenkotransport1['TENKOSLEEPYRESULT0'] ?>"></td>
+                                <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"  class="form-control" value="<?= $result_seTenkotransport1['TENKOLOADRESTREMARK'] ?>"></td>
+                                <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"><?= $result_seTenkotransport1['TENKOLOADRESTREMARK'] ?></td> -->
+                            </tr>
+                            <tr>
+                                <td style="text-align: center">2</td>
+                                <td>ตรวจร่างกาย - อาการง่วง</td>
+                                <td style="text-align: center"><input type="checkbox" <?= $rs2d1 ?> onchange="edit_check2d1('TENKOBODYSLEEPYCHECK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" style="transform: scale(2)"  id="chk_2d1" name="chk_2d1"/></td>
+                                <td>วิธีการพูดคุยต้องร่าเริง</td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT1" name="TXT_TENKOLOADRESTRESULT1" value="<?= $result_seTenkotransport1['TENKOLOADRESTRESULT1'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT1" name="TXT_TENKOBODYSLEEPYRESULT1" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYRESULT1'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT1" name="TXT_TENKOCARNEWRESULT1" value="<?= $result_seTenkotransport1['TENKOCARNEWRESULT1'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT1" name="TXT_TENKOTRAILERRESULT1" value="<?= $result_seTenkotransport1['TENKOTRAILERRESULT1'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOROADRESULT1" name="TXT_TENKOROADRESULT1" value="<?= $result_seTenkotransport1['TENKOROADRESULT1'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT1" name="TXT_TENKOAIRRESULT1" value="<?= $result_seTenkotransport1['TENKOAIRRESULT1'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT1', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT1" name="TXT_TENKOSLEEPYRESULT1" value="<?= $result_seTenkotransport1['TENKOSLEEPYRESULT1'] ?>"></td>
+                                <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"  class="form-control" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"><?= $result_seTenkotransport1['TENKOBODYSLEEPYREMARK'] ?></td> -->
+                            </tr>
+                            <tr>
+                                <td style="text-align: center">3</td>
+                                <td>ตรวจรถใหม่ (เฉพาะหยุดรถ)</td>
+                                <td style="text-align: center"><input type="checkbox" <?= $rs3d1 ?> onchange="edit_check3d1('TENKOCARNEWCHECK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" style="transform: scale(2)"  id="chk_3d1" name="chk_3d1"/></td>
+                                <td>มีการรายงานเกี่ยวกับรถใหม่ว่ามีสิ่งผิดปกติหรือไม่</td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT2" name="TXT_TENKOLOADRESTRESULT2" value="<?= $result_seTenkotransport1['TENKOLOADRESTRESULT2'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT2" name="TXT_TENKOBODYSLEEPYRESULT2" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYRESULT2'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT2" name="TXT_TENKOCARNEWRESULT2" value="<?= $result_seTenkotransport1['TENKOCARNEWRESULT2'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT2" name="TXT_TENKOTRAILERRESULT2" value="<?= $result_seTenkotransport1['TENKOTRAILERRESULT2'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOROADRESULT2" name="TXT_TENKOROADRESULT2" value="<?= $result_seTenkotransport1['TENKOROADRESULT2'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT2" name="TXT_TENKOAIRRESULT2" value="<?= $result_seTenkotransport1['TENKOAIRRESULT2'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT2', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT2" name="TXT_TENKOSLEEPYRESULT2" value="<?= $result_seTenkotransport1['TENKOSLEEPYRESULT2'] ?>"></td>
+                                <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"  class="form-control" value="<?= $result_seTenkotransport1['TENKOCARNEWREMARK'] ?>"></td>
+                                <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"><?= $result_seTenkotransport1['TENKOCARNEWREMARK'] ?></td> -->
+                            </tr>
+                            <tr>
+                                <td style="text-align: center">4</td>
+                                <td>ตรวจเทรลเลอร์</td>
+                                <td style="text-align: center"><input type="checkbox" <?= $rs4d1 ?> onchange="edit_check4d1('TENKOTRAILERCHECK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" style="transform: scale(2)"  id="chk_4d1" name="chk_4d1"/></td>
+                                <td>ระหว่างวิ่งงานไม่มีสิ่งผิดปกติ</td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT3" name="TXT_TENKOLOADRESTRESULT3" value="<?= $result_seTenkotransport1['TENKOLOADRESTRESULT3'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT3" name="TXT_TENKOBODYSLEEPYRESULT3" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYRESULT3'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT3" name="TXT_TENKOCARNEWRESULT3" value="<?= $result_seTenkotransport1['TENKOCARNEWRESULT3'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT3" name="TXT_TENKOTRAILERRESULT3" value="<?= $result_seTenkotransport1['TENKOTRAILERRESULT3'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOROADRESULT3" name="TXT_TENKOROADRESULT3" value="<?= $result_seTenkotransport1['TENKOROADRESULT3'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT3" name="TXT_TENKOAIRRESULT3" value="<?= $result_seTenkotransport1['TENKOAIRRESULT3'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT3', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT3" name="TXT_TENKOSLEEPYRESULT3" value="<?= $result_seTenkotransport1['TENKOSLEEPYRESULT3'] ?>"></td>
+                                <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"  class="form-control" value="<?= $result_seTenkotransport1['TENKOTRAILERREMARK'] ?>"></td>
+                                <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"><?= $result_seTenkotransport1['TENKOTRAILERREMARK'] ?></td> -->
+                            </tr>
+                            <tr>
+                                <td style="text-align: center">5</td>
+                                <td>ตรวจสภาพถนน</td>
+                                <td style="text-align: center"><input type="checkbox" <?= $rs5d1 ?> onchange="edit_check5d1('TENKOROADCHECK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" style="transform: scale(2)"  id="chk_5d1" name="chk_5d1"/></td>
+                                <td>รายงานสภาพถนน</td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT4" name="TXT_TENKOLOADRESTRESULT4" value="<?= $result_seTenkotransport1['TENKOLOADRESTRESULT4'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT4" name="TXT_TENKOBODYSLEEPYRESULT4" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYRESULT4'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT4" name="TXT_TENKOCARNEWRESULT4" value="<?= $result_seTenkotransport1['TENKOCARNEWRESULT4'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT4" name="TXT_TENKOTRAILERRESULT4" value="<?= $result_seTenkotransport1['TENKOTRAILERRESULT4'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOROADRESULT4" name="TXT_TENKOROADRESULT4" value="<?= $result_seTenkotransport1['TENKOROADRESULT4'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT4" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport1['TENKOAIRRESULT4'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT4', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT4" name="TXT_TENKOSLEEPYRESULT4" value="<?= $result_seTenkotransport1['TENKOSLEEPYRESULT4'] ?>"></td>
+                                <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOROADREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"  class="form-control" value="<?= $result_seTenkotransport1['TENKOROADREMARK'] ?>"></td>
+                                <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOROADREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"><?= $result_seTenkotransport1['TENKOROADREMARK'] ?></td> -->
+                            </tr>
+                            <tr>
+                                <td style="text-align: center">6</td>
+                                <td>ตรวจสภาพอากาศ (ใช้ที่ปัดน้ำฝนระดับ 3 ให้หยุดรถ)</td>
+                                <td style="text-align: center"><input type="checkbox" <?= $rs6d1 ?> onchange="edit_check6d1('TENKOAIRCHECK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" style="transform: scale(2)"  id="chk_6d1" name="chk_6d1"/></td>
+                                <td>รายงานสภาพอากาศ1</td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT5" name="TXT_TENKOLOADRESTRESULT5" value="<?= $result_seTenkotransport1['TENKOLOADRESTRESULT5'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT5" name="TXT_TENKOBODYSLEEPYRESULT5" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYRESULT5'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT5" name="TXT_TENKOCARNEWRESULT5" value="<?= $result_seTenkotransport1['TENKOCARNEWRESULT5'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT5" name="TXT_TENKOTRAILERRESULT5" value="<?= $result_seTenkotransport1['TENKOTRAILERRESULT5'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOROADRESULT5" name="TXT_TENKOROADRESULT5" value="<?= $result_seTenkotransport1['TENKOROADRESULT5'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT5" name="TXT_TENKOAIRRESULT5" value="<?= $result_seTenkotransport1['TENKOAIRRESULT5'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT5', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT5" name="TXT_TENKOSLEEPYRESULT5" value="<?= $result_seTenkotransport1['TENKOSLEEPYRESULT5'] ?>"></td>
+                                <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOAIRREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"  class="form-control" value="<?= $result_seTenkotransport1['TENKOAIRREMARK'] ?>"></td>
+                                <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOAIRREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"><?= $result_seTenkotransport1['TENKOAIRREMARK'] ?></td> -->
+                            </tr>
+                            <tr>
+                                <td style="text-align: center">7</td>
+                                <td>ตรวจสอบอาการง่วงและย้ำให้ระมัดระวัง</td>
+                                <td style="text-align: center"><input type="checkbox" <?= $rs7d1 ?> onchange="edit_check7d1('TENKOSLEEPYCHECK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" style="transform: scale(2)" id="chk_7d1" name="chk_7d1" /></td>
+                                <td>สภาพที่สามารถวิ่งงานต่อได้</td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT6" name="TXT_TENKOLOADRESTRESULT6" value="<?= $result_seTenkotransport1['TENKOLOADRESTRESULT6'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT6" name="TXT_TENKOBODYSLEEPYRESULT6" value="<?= $result_seTenkotransport1['TENKOBODYSLEEPYRESULT6'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT6" name="TXT_TENKOCARNEWRESULT6" value="<?= $result_seTenkotransport1['TENKOCARNEWRESULT6'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT6" name="TXT_TENKOTRAILERRESULT6" value="<?= $result_seTenkotransport1['TENKOTRAILERRESULT6'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOROADRESULT6" name="TXT_TENKOROADRESULT6" value="<?= $result_seTenkotransport1['TENKOROADRESULT6'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT6" name="TXT_TENKOAIRRESULT6" value="<?= $result_seTenkotransport1['TENKOAIRRESULT6'] ?>"></td>
+                                <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT6', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT6" name="TXT_TENKOSLEEPYRESULT6" value="<?= $result_seTenkotransport1['TENKOSLEEPYRESULT6'] ?>"></td>
+                                <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"  class="form-control" value="<?= $result_seTenkotransport1['TENKOSLEEPYREMARK'] ?>"></td>
+                                <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport1['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F1'] ?>')"><?= $result_seTenkotransport1['TENKOSLEEPYREMARK'] ?></td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                    <div class="tab-pane" id="day2">
+                        <?php
+                        $conditionTenkotransport21 = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "' ";
+                        $conditionTenkotransport22 = " AND CONVERT(DATE,TENKOTRANSPORTDATE) = CONVERT(DATE,'" . $result_seTenkomaster['DATEINPUT_F2'] . "',103)";
+                        $sql_seTenkotransport2 = "{call megEdittenkotransport_v2(?,?,?)}";
+                        $params_seTenkotransport2 = array(
+                            array('select_tenkotransport', SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport21, SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport22, SQLSRV_PARAM_IN)
+                        );
+                        $query_seTenkotransport2 = sqlsrv_query($conn, $sql_seTenkotransport2, $params_seTenkotransport2);
+                        $result_seTenkotransport2 = sqlsrv_fetch_array($query_seTenkotransport2, SQLSRV_FETCH_ASSOC);
+
+                        $rs1d2 = ($result_seTenkotransport2['TENKOLOADRESTCHECK'] == '1') ? "checked" : "";
+                        $rs2d2 = ($result_seTenkotransport2['TENKOBODYSLEEPYCHECK'] == '1') ? "checked" : "";
+                        $rs3d2 = ($result_seTenkotransport2['TENKOCARNEWCHECK'] == '1') ? "checked" : "";
+                        $rs4d2 = ($result_seTenkotransport2['TENKOTRAILERCHECK'] == '1') ? "checked" : "";
+                        $rs5d2 = ($result_seTenkotransport2['TENKOROADCHECK'] == '1') ? "checked" : "";
+                        $rs6d2 = ($result_seTenkotransport2['TENKOAIRCHECK'] == '1') ? "checked" : "";
+                        $rs7d2 = ($result_seTenkotransport2['TENKOSLEEPYCHECK'] == '1') ? "checked" : "";
+                        ?>
+                        <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                            <thead>
+                                <tr>
+
+                                    
+                                    <!-- Commit_Emp3Day2 -->
+                                    <th colspan="6" ><input type="button" onclick="commit_2('<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>','<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>', '<?= $result_seEmployee['nameT'] ?>')"   class="btn btn-success" value="Commit3_Day2"> <font style="color: green">พนักงานขับรถ : <?= $sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะก่อนเริ่มงาน</th>
+                                    <th style="text-align: center;"><?= $result_seTenkotransport1["CREATEBY"] ?></th>
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะปฎิบัติงาน</th>
+                                    <th style="text-align: center;"><?= $result_seEmployee["nameT"] ?></th>
+                                </tr>
+                                <tr>
+
+                                    <th colspan="12">เจ้าหน้าที่โทรไปไม่พบสิ่งผิดปกติ : <font style="color: red">0</font>  | พนักงานขับรถโทรมาไม่พบสิ่งผิดปกติ : <font style="color: red">1</font> | พบสิ่งผิดปกติ : <font style="color: red">x</font></th>
+                                </tr>
+                                <tr>
+
+                                    <th rowspan="4" style="text-align: center;">ข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">หัวข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">ช่องตรวจ</th>
+                                    <th rowspan="4" style="text-align: center;">เกณฑ์การตัดสิน</th>
+                                    <th rowspan="2" style="text-align: center;"><p>โทรช่วง </p>
+                                        <p>00:01 - 23:59</p></th>
+                                    <th colspan="6" style="text-align: center">Night Call Check</th>
+                                    <th rowspan="4"style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">รายละเอียดการแนะนำของเจ้าหน้าที่</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ครั้งที่ 1</th>
+                                    <th style="text-align: center;">ครั้งที่ 2</th>
+                                    <th style="text-align: center;">ครั้งที่ 3</th>
+                                    <th style="text-align: center;">ครั้งที่ 4</th>
+                                    <th style="text-align: center;">ครั้งที่ 5</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ครั้งที่ 6</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control timeen" id="txt_time0" name="txt_time0" value="<?= $result_seTenkotransport2['TENKOTIME0'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control timeen" id="txt_time1" name="txt_time1" value="<?= $result_seTenkotransport2['TENKOTIME1'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control timeen" id="txt_time2" name="txt_time2" value="<?= $result_seTenkotransport2['TENKOTIME2'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control timeen" id="txt_time3" name="txt_time3" value="<?= $result_seTenkotransport2['TENKOTIME3'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control timeen" id="txt_time4" name="txt_time4" value="<?= $result_seTenkotransport2['TENKOTIME4'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control timeen" id="txt_time5" name="txt_time5" value="<?= $result_seTenkotransport2['TENKOTIME5'] ?>"></th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control timeen" id="txt_time6" name="txt_time6" value="<?= $result_seTenkotransport2['TENKOTIME6'] ?>"></th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ผล</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center">1</td>
+                                    <td>เส้นทางที่กำหนด - จุดพัก</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs1d2 ?> onchange="edit_check1d2('TENKOLOADRESTCHECK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" style="transform: scale(2)" id="chk_1d2" name="chk_1d2" /></td>
+                                    <td>เส้นทาง จุดพักที่กำหนด</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT0" name="TXT_TENKOLOADRESTRESULT0" value="<?= $result_seTenkotransport2['TENKOLOADRESTRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT0" name="TXT_TENKOBODYSLEEPYRESULT0" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT0" name="TXT_TENKOCARNEWRESULT0" value="<?= $result_seTenkotransport2['TENKOCARNEWRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT0" name="TXT_TENKOTRAILERRESULT0" value="<?= $result_seTenkotransport2['TENKOTRAILERRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOROADRESULT0" name="TXT_TENKOROADRESULT0" value="<?= $result_seTenkotransport2['TENKOROADRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT0" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport2['TENKOAIRRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT0', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT0" name="TXT_TENKOSLEEPYRESULT0" value="<?= $result_seTenkotransport2['TENKOSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"  class="form-control" value="<?= $result_seTenkotransport2['TENKOLOADRESTREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"><?= $result_seTenkotransport2['TENKOLOADRESTREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">2</td>
+                                    <td>ตรวจร่างกาย - อาการง่วง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs2d2 ?> onchange="edit_check2d2('TENKOBODYSLEEPYCHECK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" style="transform: scale(2)"  id="chk_2d2" name="chk_2d2"/></td>
+                                    <td>วิธีการพูดคุยต้องร่าเริง</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT1" name="TXT_TENKOLOADRESTRESULT1" value="<?= $result_seTenkotransport2['TENKOLOADRESTRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT1" name="TXT_TENKOBODYSLEEPYRESULT1" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT1" name="TXT_TENKOCARNEWRESULT1" value="<?= $result_seTenkotransport2['TENKOCARNEWRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT1" name="TXT_TENKOTRAILERRESULT1" value="<?= $result_seTenkotransport2['TENKOTRAILERRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOROADRESULT1" name="TXT_TENKOROADRESULT1" value="<?= $result_seTenkotransport2['TENKOROADRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT1" name="TXT_TENKOAIRRESULT1" value="<?= $result_seTenkotransport2['TENKOAIRRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT1', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT1" name="TXT_TENKOSLEEPYRESULT1" value="<?= $result_seTenkotransport2['TENKOSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"  class="form-control" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"><?= $result_seTenkotransport2['TENKOBODYSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">3</td>
+                                    <td>ตรวจรถใหม่ (เฉพาะหยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs3d2 ?> onchange="edit_check3d2('TENKOCARNEWCHECK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" style="transform: scale(2)"  id="chk_3d2" name="chk_3d2"/></td>
+                                    <td>มีการรายงานเกี่ยวกับรถใหม่ว่ามีสิ่งผิดปกติหรือไม่</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT2" name="TXT_TENKOLOADRESTRESULT2" value="<?= $result_seTenkotransport2['TENKOLOADRESTRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT2" name="TXT_TENKOBODYSLEEPYRESULT2" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT2" name="TXT_TENKOCARNEWRESULT2" value="<?= $result_seTenkotransport2['TENKOCARNEWRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT2" name="TXT_TENKOTRAILERRESULT2" value="<?= $result_seTenkotransport2['TENKOTRAILERRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOROADRESULT2" name="TXT_TENKOROADRESULT2" value="<?= $result_seTenkotransport2['TENKOROADRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT2" name="TXT_TENKOAIRRESULT2" value="<?= $result_seTenkotransport2['TENKOAIRRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT2', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT2" name="TXT_TENKOSLEEPYRESULT2" value="<?= $result_seTenkotransport2['TENKOSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"  class="form-control" value="<?= $result_seTenkotransport2['TENKOCARNEWREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"><?= $result_seTenkotransport2['TENKOCARNEWREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">4</td>
+                                    <td>ตรวจเทรลเลอร์</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs4d2 ?> onchange="edit_check4d2('TENKOTRAILERCHECK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" style="transform: scale(2)"  id="chk_4d2" name="chk_4d2"/></td>
+                                    <td>ระหว่างวิ่งงานไม่มีสิ่งผิดปกติ</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT3" name="TXT_TENKOLOADRESTRESULT3" value="<?= $result_seTenkotransport2['TENKOLOADRESTRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT3" name="TXT_TENKOBODYSLEEPYRESULT3" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT3" name="TXT_TENKOCARNEWRESULT3" value="<?= $result_seTenkotransport2['TENKOCARNEWRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT3" name="TXT_TENKOTRAILERRESULT3" value="<?= $result_seTenkotransport2['TENKOTRAILERRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOROADRESULT3" name="TXT_TENKOROADRESULT3" value="<?= $result_seTenkotransport2['TENKOROADRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT3" name="TXT_TENKOAIRRESULT3" value="<?= $result_seTenkotransport2['TENKOAIRRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT3', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT3" name="TXT_TENKOSLEEPYRESULT3" value="<?= $result_seTenkotransport2['TENKOSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"  class="form-control" value="<?= $result_seTenkotransport2['TENKOTRAILERREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"><?= $result_seTenkotransport2['TENKOTRAILERREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">5</td>
+                                    <td>ตรวจสภาพถนน</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs5d2 ?> onchange="edit_check5d2('TENKOROADCHECK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" style="transform: scale(2)"  id="chk_5d2" name="chk_5d2"/></td>
+                                    <td>รายงานสภาพถนน</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT4" name="TXT_TENKOLOADRESTRESULT4" value="<?= $result_seTenkotransport2['TENKOLOADRESTRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT4" name="TXT_TENKOBODYSLEEPYRESULT4" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT4" name="TXT_TENKOCARNEWRESULT4" value="<?= $result_seTenkotransport2['TENKOCARNEWRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT4" name="TXT_TENKOTRAILERRESULT4" value="<?= $result_seTenkotransport2['TENKOTRAILERRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOROADRESULT4" name="TXT_TENKOROADRESULT4" value="<?= $result_seTenkotransport2['TENKOROADRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT4" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport2['TENKOAIRRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT4', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT4" name="TXT_TENKOSLEEPYRESULT4" value="<?= $result_seTenkotransport2['TENKOSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOROADREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"  class="form-control" value="<?= $result_seTenkotransport2['TENKOROADREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOROADREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"><?= $result_seTenkotransport2['TENKOROADREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">6</td>
+                                    <td>ตรวจสภาพอากาศ (ใช้ที่ปัดน้ำฝนระดับ 3 ให้หยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs6d2 ?> onchange="edit_check6d2('TENKOAIRCHECK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" style="transform: scale(2)"  id="chk_6d2" name="chk_6d2"/></td>
+                                    <td>รายงานสภาพอากาศ2</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT5" name="TXT_TENKOLOADRESTRESULT5" value="<?= $result_seTenkotransport2['TENKOLOADRESTRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT5" name="TXT_TENKOBODYSLEEPYRESULT5" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT5" name="TXT_TENKOCARNEWRESULT5" value="<?= $result_seTenkotransport2['TENKOCARNEWRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT5" name="TXT_TENKOTRAILERRESULT5" value="<?= $result_seTenkotransport2['TENKOTRAILERRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOROADRESULT5" name="TXT_TENKOROADRESULT5" value="<?= $result_seTenkotransport2['TENKOROADRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT5" name="TXT_TENKOAIRRESULT5" value="<?= $result_seTenkotransport2['TENKOAIRRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT5', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT5" name="TXT_TENKOSLEEPYRESULT5" value="<?= $result_seTenkotransport2['TENKOSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOAIRREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"  class="form-control" value="<?= $result_seTenkotransport2['TENKOAIRREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOAIRREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"><?= $result_seTenkotransport2['TENKOAIRREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">7</td>
+                                    <td>ตรวจสอบอาการง่วงและย้ำให้ระมัดระวัง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs7d2 ?> onchange="edit_check7d2('TENKOSLEEPYCHECK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" style="transform: scale(2)" id="chk_7d2" name="chk_7d2" /></td>
+                                    <td>สภาพที่สามารถวิ่งงานต่อได้</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT6" name="TXT_TENKOLOADRESTRESULT6" value="<?= $result_seTenkotransport2['TENKOLOADRESTRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT6" name="TXT_TENKOBODYSLEEPYRESULT6" value="<?= $result_seTenkotransport2['TENKOBODYSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT6" name="TXT_TENKOCARNEWRESULT6" value="<?= $result_seTenkotransport2['TENKOCARNEWRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT6" name="TXT_TENKOTRAILERRESULT6" value="<?= $result_seTenkotransport2['TENKOTRAILERRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOROADRESULT6" name="TXT_TENKOROADRESULT6" value="<?= $result_seTenkotransport2['TENKOROADRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT6" name="TXT_TENKOAIRRESULT6" value="<?= $result_seTenkotransport2['TENKOAIRRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT6', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT6" name="TXT_TENKOSLEEPYRESULT6" value="<?= $result_seTenkotransport2['TENKOSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"  class="form-control" value="<?= $result_seTenkotransport2['TENKOSLEEPYREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport2['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F2'] ?>')"><?= $result_seTenkotransport2['TENKOSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="tab-pane" id="day3">
+                        <?php
+                        $conditionTenkotransport31 = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "' ";
+                        $conditionTenkotransport32 = " AND CONVERT(DATE,TENKOTRANSPORTDATE) = CONVERT(DATE,'" . $result_seTenkomaster['DATEINPUT_F3'] . "',103)";
+                        $sql_seTenkotransport3 = "{call megEdittenkotransport_v2(?,?,?)}";
+                        $params_seTenkotransport3 = array(
+                            array('select_tenkotransport', SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport31, SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport32, SQLSRV_PARAM_IN)
+                        );
+                        $query_seTenkotransport3 = sqlsrv_query($conn, $sql_seTenkotransport3, $params_seTenkotransport3);
+                        $result_seTenkotransport3 = sqlsrv_fetch_array($query_seTenkotransport3, SQLSRV_FETCH_ASSOC);
+
+                        $rs1d3 = ($result_seTenkotransport3['TENKOLOADRESTCHECK'] == '1') ? "checked" : "";
+                        $rs2d3 = ($result_seTenkotransport3['TENKOBODYSLEEPYCHECK'] == '1') ? "checked" : "";
+                        $rs3d3 = ($result_seTenkotransport3['TENKOCARNEWCHECK'] == '1') ? "checked" : "";
+                        $rs4d3 = ($result_seTenkotransport3['TENKOTRAILERCHECK'] == '1') ? "checked" : "";
+                        $rs5d3 = ($result_seTenkotransport3['TENKOROADCHECK'] == '1') ? "checked" : "";
+                        $rs6d3 = ($result_seTenkotransport3['TENKOAIRCHECK'] == '1') ? "checked" : "";
+                        $rs7d3 = ($result_seTenkotransport3['TENKOSLEEPYCHECK'] == '1') ? "checked" : "";
+                        ?>
+                        <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                            <thead>
+                                <tr>
+
+                                    
+                                    <!-- Commit_Emp3Day3 -->
+                                    <th colspan="6" ><input type="button" onclick="commit_2('<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>','<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>', '<?= $result_seEmployee['nameT'] ?>')"   class="btn btn-success" value="Commit3_Day3"> <font style="color: green">พนักงานขับรถ : <?= $sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะก่อนเริ่มงาน</th>
+                                    <th style="text-align: center;"><?= $result_seTenkotransport1["CREATEBY"] ?></th>
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะปฎิบัติงาน</th>
+                                    <th style="text-align: center;"><?= $result_seEmployee["nameT"] ?></th>
+                                </tr>
+                                <tr>
+
+                                    <th colspan="12">เจ้าหน้าที่โทรไปไม่พบสิ่งผิดปกติ : <font style="color: red">0</font>  | พนักงานขับรถโทรมาไม่พบสิ่งผิดปกติ : <font style="color: red">1</font> | พบสิ่งผิดปกติ : <font style="color: red">x</font></th>
+                                </tr>
+                                <tr>
+
+                                    <th rowspan="4" style="text-align: center;">ข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">หัวข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">ช่องตรวจ</th>
+                                    <th rowspan="4" style="text-align: center;">เกณฑ์การตัดสิน</th>
+                                    <th rowspan="2" style="text-align: center;"><p>โทรช่วง </p>
+                                        <p>00:01 - 23:59</p></th>
+                                    <th colspan="6" style="text-align: center">Night Call Check</th>
+                                    <th rowspan="4"style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">รายละเอียดการแนะนำของเจ้าหน้าที่</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ครั้งที่ 1</th>
+                                    <th style="text-align: center;">ครั้งที่ 2</th>
+                                    <th style="text-align: center;">ครั้งที่ 3</th>
+                                    <th style="text-align: center;">ครั้งที่ 4</th>
+                                    <th style="text-align: center;">ครั้งที่ 5</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ครั้งที่ 6</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control timeen" id="txt_time0" name="txt_time0" value="<?= $result_seTenkotransport3['TENKOTIME0'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control timeen" id="txt_time1" name="txt_time1" value="<?= $result_seTenkotransport3['TENKOTIME1'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control timeen" id="txt_time2" name="txt_time2" value="<?= $result_seTenkotransport3['TENKOTIME2'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control timeen" id="txt_time3" name="txt_time3" value="<?= $result_seTenkotransport3['TENKOTIME3'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control timeen" id="txt_time4" name="txt_time4" value="<?= $result_seTenkotransport3['TENKOTIME4'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control timeen" id="txt_time5" name="txt_time5" value="<?= $result_seTenkotransport3['TENKOTIME5'] ?>"></th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control timeen" id="txt_time6" name="txt_time6" value="<?= $result_seTenkotransport3['TENKOTIME6'] ?>"></th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ผล</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center">1</td>
+                                    <td>เส้นทางที่กำหนด - จุดพัก</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs1d3 ?> onchange="edit_check1d3('TENKOLOADRESTCHECK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" style="transform: scale(2)" id="chk_1d3" name="chk_1d3" /></td>
+                                    <td>เส้นทาง จุดพักที่กำหนด</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT0" name="TXT_TENKOLOADRESTRESULT0" value="<?= $result_seTenkotransport3['TENKOLOADRESTRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT0" name="TXT_TENKOBODYSLEEPYRESULT0" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT0" name="TXT_TENKOCARNEWRESULT0" value="<?= $result_seTenkotransport3['TENKOCARNEWRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT0" name="TXT_TENKOTRAILERRESULT0" value="<?= $result_seTenkotransport3['TENKOTRAILERRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOROADRESULT0" name="TXT_TENKOROADRESULT0" value="<?= $result_seTenkotransport3['TENKOROADRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT0" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport3['TENKOAIRRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT0', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT0" name="TXT_TENKOSLEEPYRESULT0" value="<?= $result_seTenkotransport3['TENKOSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport3['TENKOLOADRESTREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"><?= $result_seTenkotransport3['TENKOLOADRESTREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">2</td>
+                                    <td>ตรวจร่างกาย - อาการง่วง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs2d3 ?> onchange="edit_check2d3('TENKOBODYSLEEPYCHECK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" style="transform: scale(2)"  id="chk_2d3" name="chk_2d3"/></td>
+                                    <td>วิธีการพูดคุยต้องร่าเริง</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT1" name="TXT_TENKOLOADRESTRESULT1" value="<?= $result_seTenkotransport3['TENKOLOADRESTRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT1" name="TXT_TENKOBODYSLEEPYRESULT1" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT1" name="TXT_TENKOCARNEWRESULT1" value="<?= $result_seTenkotransport3['TENKOCARNEWRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT1" name="TXT_TENKOTRAILERRESULT1" value="<?= $result_seTenkotransport3['TENKOTRAILERRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOROADRESULT1" name="TXT_TENKOROADRESULT1" value="<?= $result_seTenkotransport3['TENKOROADRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT1" name="TXT_TENKOAIRRESULT1" value="<?= $result_seTenkotransport3['TENKOAIRRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT1', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT1" name="TXT_TENKOSLEEPYRESULT1" value="<?= $result_seTenkotransport3['TENKOSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"><?= $result_seTenkotransport3['TENKOBODYSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">3</td>
+                                    <td>ตรวจรถใหม่ (เฉพาะหยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs3d3 ?> onchange="edit_check3d3('TENKOCARNEWCHECK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" style="transform: scale(2)"  id="chk_3d3" name="chk_3d3"/></td>
+                                    <td>มีการรายงานเกี่ยวกับรถใหม่ว่ามีสิ่งผิดปกติหรือไม่</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT2" name="TXT_TENKOLOADRESTRESULT2" value="<?= $result_seTenkotransport3['TENKOLOADRESTRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT2" name="TXT_TENKOBODYSLEEPYRESULT2" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT2" name="TXT_TENKOCARNEWRESULT2" value="<?= $result_seTenkotransport3['TENKOCARNEWRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT2" name="TXT_TENKOTRAILERRESULT2" value="<?= $result_seTenkotransport3['TENKOTRAILERRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOROADRESULT2" name="TXT_TENKOROADRESULT2" value="<?= $result_seTenkotransport3['TENKOROADRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT2" name="TXT_TENKOAIRRESULT2" value="<?= $result_seTenkotransport3['TENKOAIRRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT2', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT2" name="TXT_TENKOSLEEPYRESULT2" value="<?= $result_seTenkotransport3['TENKOSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"><?= $result_seTenkotransport3['TENKOCARNEWREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">4</td>
+                                    <td>ตรวจเทรลเลอร์</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs4d3 ?> onchange="edit_check4d3('TENKOTRAILERCHECK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" style="transform: scale(2)"  id="chk_4d3" name="chk_4d3"/></td>
+                                    <td>ระหว่างวิ่งงานไม่มีสิ่งผิดปกติ</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT3" name="TXT_TENKOLOADRESTRESULT3" value="<?= $result_seTenkotransport3['TENKOLOADRESTRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT3" name="TXT_TENKOBODYSLEEPYRESULT3" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT3" name="TXT_TENKOCARNEWRESULT3" value="<?= $result_seTenkotransport3['TENKOCARNEWRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT3" name="TXT_TENKOTRAILERRESULT3" value="<?= $result_seTenkotransport3['TENKOTRAILERRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOROADRESULT3" name="TXT_TENKOROADRESULT3" value="<?= $result_seTenkotransport3['TENKOROADRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT3" name="TXT_TENKOAIRRESULT3" value="<?= $result_seTenkotransport3['TENKOAIRRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT3', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT3" name="TXT_TENKOSLEEPYRESULT3" value="<?= $result_seTenkotransport3['TENKOSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"><?= $result_seTenkotransport3['TENKOTRAILERREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">5</td>
+                                    <td>ตรวจสภาพถนน</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs5d3 ?> onchange="edit_check5d3('TENKOROADCHECK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" style="transform: scale(2)"  id="chk_5d3" name="chk_5d3"/></td>
+                                    <td>รายงานสภาพถนน</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT4" name="TXT_TENKOLOADRESTRESULT4" value="<?= $result_seTenkotransport3['TENKOLOADRESTRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT4" name="TXT_TENKOBODYSLEEPYRESULT4" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT4" name="TXT_TENKOCARNEWRESULT4" value="<?= $result_seTenkotransport3['TENKOCARNEWRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT4" name="TXT_TENKOTRAILERRESULT4" value="<?= $result_seTenkotransport3['TENKOTRAILERRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOROADRESULT4" name="TXT_TENKOROADRESULT4" value="<?= $result_seTenkotransport3['TENKOROADRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT4" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport3['TENKOAIRRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT4', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT4" name="TXT_TENKOSLEEPYRESULT4" value="<?= $result_seTenkotransport3['TENKOSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOROADREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"><?= $result_seTenkotransport3['TENKOROADREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">6</td>
+                                    <td>ตรวจสภาพอากาศ (ใช้ที่ปัดน้ำฝนระดับ 3 ให้หยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs6d3 ?> onchange="edit_check6d3('TENKOAIRCHECK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" style="transform: scale(2)"  id="chk_6d3" name="chk_6d3"/></td>
+                                    <td>รายงานสภาพอากาศ3</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT5" name="TXT_TENKOLOADRESTRESULT5" value="<?= $result_seTenkotransport3['TENKOLOADRESTRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT5" name="TXT_TENKOBODYSLEEPYRESULT5" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT5" name="TXT_TENKOCARNEWRESULT5" value="<?= $result_seTenkotransport3['TENKOCARNEWRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT5" name="TXT_TENKOTRAILERRESULT5" value="<?= $result_seTenkotransport3['TENKOTRAILERRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOROADRESULT5" name="TXT_TENKOROADRESULT5" value="<?= $result_seTenkotransport3['TENKOROADRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT5" name="TXT_TENKOAIRRESULT5" value="<?= $result_seTenkotransport3['TENKOAIRRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT5', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT5" name="TXT_TENKOSLEEPYRESULT5" value="<?= $result_seTenkotransport3['TENKOSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOAIRREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport3['TENKOAIRREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOAIRREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"><?= $result_seTenkotransport3['TENKOAIRREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">7</td>
+                                    <td>ตรวจสอบอาการง่วงและย้ำให้ระมัดระวัง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs7d3 ?> onchange="edit_check7d3('TENKOSLEEPYCHECK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" style="transform: scale(2)" id="chk_7d3" name="chk_7d3" /></td>
+                                    <td>สภาพที่สามารถวิ่งงานต่อได้</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT6" name="TXT_TENKOLOADRESTRESULT6" value="<?= $result_seTenkotransport3['TENKOLOADRESTRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT6" name="TXT_TENKOBODYSLEEPYRESULT6" value="<?= $result_seTenkotransport3['TENKOBODYSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT6" name="TXT_TENKOCARNEWRESULT6" value="<?= $result_seTenkotransport3['TENKOCARNEWRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT6" name="TXT_TENKOTRAILERRESULT6" value="<?= $result_seTenkotransport3['TENKOTRAILERRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOROADRESULT6" name="TXT_TENKOROADRESULT6" value="<?= $result_seTenkotransport3['TENKOROADRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT6" name="TXT_TENKOAIRRESULT6" value="<?= $result_seTenkotransport3['TENKOAIRRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT6', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT6" name="TXT_TENKOSLEEPYRESULT6" value="<?= $result_seTenkotransport3['TENKOSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport3['TENKOSLEEPYREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport3['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"><?= $result_seTenkotransport3['TENKOSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="tab-pane" id="day4">
+                        <?php
+                        $conditionTenkotransport41 = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "' ";
+                        $conditionTenkotransport42 = " AND CONVERT(DATE,TENKOTRANSPORTDATE) = CONVERT(DATE,'" . $result_seTenkomaster['DATEINPUT_F4'] . "',103)";
+                        $sql_seTenkotransport4 = "{call megEdittenkotransport_v2(?,?,?)}";
+                        $params_seTenkotransport4 = array(
+                            array('select_tenkotransport', SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport41, SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport42, SQLSRV_PARAM_IN)
+                        );
+                        $query_seTenkotransport4 = sqlsrv_query($conn, $sql_seTenkotransport4, $params_seTenkotransport4);
+                        $result_seTenkotransport4 = sqlsrv_fetch_array($query_seTenkotransport4, SQLSRV_FETCH_ASSOC);
+
+                        $rs1d4 = ($result_seTenkotransport4['TENKOLOADRESTCHECK'] == '1') ? "checked" : "";
+                        $rs2d4 = ($result_seTenkotransport4['TENKOBODYSLEEPYCHECK'] == '1') ? "checked" : "";
+                        $rs3d4 = ($result_seTenkotransport4['TENKOCARNEWCHECK'] == '1') ? "checked" : "";
+                        $rs4d4 = ($result_seTenkotransport4['TENKOTRAILERCHECK'] == '1') ? "checked" : "";
+                        $rs5d4 = ($result_seTenkotransport4['TENKOROADCHECK'] == '1') ? "checked" : "";
+                        $rs6d4 = ($result_seTenkotransport4['TENKOAIRCHECK'] == '1') ? "checked" : "";
+                        $rs7d4 = ($result_seTenkotransport4['TENKOSLEEPYCHECK'] == '1') ? "checked" : "";
+                        ?>
+                        <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                            <thead>
+                                <tr>
+
+                                    
+                                    <!-- Commit_Emp2Day4 -->
+                                    <th colspan="6" ><input type="button" onclick="commit_2('<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>','<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>', '<?= $result_seEmployee['nameT'] ?>')"   class="btn btn-success" value="Commit3_Day4"> <font style="color: green">พนักงานขับรถ : <?= $sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะก่อนเริ่มงาน</th>
+                                    <th style="text-align: center;"><?= $result_seTenkotransport1["CREATEBY"] ?></th>
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะปฎิบัติงาน</th>
+                                    <th style="text-align: center;"><?= $result_seEmployee["nameT"] ?></th>
+                                </tr>
+                                <tr>
+
+                                    <th colspan="12">เจ้าหน้าที่โทรไปไม่พบสิ่งผิดปกติ : <font style="color: red">0</font>  | พนักงานขับรถโทรมาไม่พบสิ่งผิดปกติ : <font style="color: red">1</font> | พบสิ่งผิดปกติ : <font style="color: red">x</font></th>
+                                </tr>
+                                <tr>
+
+                                    <th rowspan="4" style="text-align: center;">ข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">หัวข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">ช่องตรวจ</th>
+                                    <th rowspan="4" style="text-align: center;">เกณฑ์การตัดสิน</th>
+                                    <th rowspan="2" style="text-align: center;"><p>โทรช่วง </p>
+                                        <p>00:01 - 23:59</p></th>
+                                    <th colspan="6" style="text-align: center">Night Call Check</th>
+                                    <th rowspan="4"style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">รายละเอียดการแนะนำของเจ้าหน้าที่</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ครั้งที่ 1</th>
+                                    <th style="text-align: center;">ครั้งที่ 2</th>
+                                    <th style="text-align: center;">ครั้งที่ 3</th>
+                                    <th style="text-align: center;">ครั้งที่ 4</th>
+                                    <th style="text-align: center;">ครั้งที่ 5</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ครั้งที่ 6</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control timeen" id="txt_time0" name="txt_time0" value="<?= $result_seTenkotransport4['TENKOTIME0'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control timeen" id="txt_time1" name="txt_time1" value="<?= $result_seTenkotransport4['TENKOTIME1'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control timeen" id="txt_time2" name="txt_time2" value="<?= $result_seTenkotransport4['TENKOTIME2'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control timeen" id="txt_time3" name="txt_time3" value="<?= $result_seTenkotransport4['TENKOTIME3'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control timeen" id="txt_time4" name="txt_time4" value="<?= $result_seTenkotransport4['TENKOTIME4'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control timeen" id="txt_time5" name="txt_time5" value="<?= $result_seTenkotransport4['TENKOTIME5'] ?>"></th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control timeen" id="txt_time6" name="txt_time6" value="<?= $result_seTenkotransport4['TENKOTIME6'] ?>"></th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ผล</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center">1</td>
+                                    <td>เส้นทางที่กำหนด - จุดพัก</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs1d4 ?> onchange="edit_check1d4('TENKOLOADRESTCHECK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" style="transform: scale(2)" id="chk_1d4" name="chk_1d4" /></td>
+                                    <td>เส้นทาง จุดพักที่กำหนด</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT0" name="TXT_TENKOLOADRESTRESULT0" value="<?= $result_seTenkotransport4['TENKOLOADRESTRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT0" name="TXT_TENKOBODYSLEEPYRESULT0" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT0" name="TXT_TENKOCARNEWRESULT0" value="<?= $result_seTenkotransport4['TENKOCARNEWRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT0" name="TXT_TENKOTRAILERRESULT0" value="<?= $result_seTenkotransport4['TENKOTRAILERRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOROADRESULT0" name="TXT_TENKOROADRESULT0" value="<?= $result_seTenkotransport4['TENKOROADRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT0" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport4['TENKOAIRRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT0', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT0" name="TXT_TENKOSLEEPYRESULT0" value="<?= $result_seTenkotransport4['TENKOSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"  class="form-control" value="<?= $result_seTenkotransport4['TENKOLOADRESTREMARK'] ?>"></td>
+                                    
+
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"><?= $result_seTenkotransport4['TENKOLOADRESTREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">2</td>
+                                    <td>ตรวจร่างกาย - อาการง่วง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs2d4 ?> onchange="edit_check2d4('TENKOBODYSLEEPYCHECK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" style="transform: scale(2)"  id="chk_2d4" name="chk_2d4"/></td>
+                                    <td>วิธีการพูดคุยต้องร่าเริง</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT1" name="TXT_TENKOLOADRESTRESULT1" value="<?= $result_seTenkotransport4['TENKOLOADRESTRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT1" name="TXT_TENKOBODYSLEEPYRESULT1" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT1" name="TXT_TENKOCARNEWRESULT1" value="<?= $result_seTenkotransport4['TENKOCARNEWRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT1" name="TXT_TENKOTRAILERRESULT1" value="<?= $result_seTenkotransport4['TENKOTRAILERRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOROADRESULT1" name="TXT_TENKOROADRESULT1" value="<?= $result_seTenkotransport4['TENKOROADRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT1" name="TXT_TENKOAIRRESULT1" value="<?= $result_seTenkotransport4['TENKOAIRRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT1', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT1" name="TXT_TENKOSLEEPYRESULT1" value="<?= $result_seTenkotransport4['TENKOSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"  class="form-control" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"><?= $result_seTenkotransport4['TENKOBODYSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">3</td>
+                                    <td>ตรวจรถใหม่ (เฉพาะหยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs3d4 ?> onchange="edit_check3d4('TENKOCARNEWCHECK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" style="transform: scale(2)"  id="chk_3d4" name="chk_3d4"/></td>
+                                    <td>มีการรายงานเกี่ยวกับรถใหม่ว่ามีสิ่งผิดปกติหรือไม่</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT2" name="TXT_TENKOLOADRESTRESULT2" value="<?= $result_seTenkotransport4['TENKOLOADRESTRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT2" name="TXT_TENKOBODYSLEEPYRESULT2" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT2" name="TXT_TENKOCARNEWRESULT2" value="<?= $result_seTenkotransport4['TENKOCARNEWRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT2" name="TXT_TENKOTRAILERRESULT2" value="<?= $result_seTenkotransport4['TENKOTRAILERRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOROADRESULT2" name="TXT_TENKOROADRESULT2" value="<?= $result_seTenkotransport4['TENKOROADRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT2" name="TXT_TENKOAIRRESULT2" value="<?= $result_seTenkotransport4['TENKOAIRRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT2', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT2" name="TXT_TENKOSLEEPYRESULT2" value="<?= $result_seTenkotransport4['TENKOSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F3'] ?>')"  class="form-control" value="<?= $result_seTenkotransport4['TENKOCARNEWREMARK'] ?>"></td>
+                                    
+
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"><?= $result_seTenkotransport4['TENKOCARNEWREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">4</td>
+                                    <td>ตรวจเทรลเลอร์</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs4d4 ?> onchange="edit_check4d4('TENKOTRAILERCHECK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" style="transform: scale(2)"  id="chk_4d4" name="chk_4d4"/></td>
+                                    <td>ระหว่างวิ่งงานไม่มีสิ่งผิดปกติ</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT3" name="TXT_TENKOLOADRESTRESULT3" value="<?= $result_seTenkotransport4['TENKOLOADRESTRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT3" name="TXT_TENKOBODYSLEEPYRESULT3" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT3" name="TXT_TENKOCARNEWRESULT3" value="<?= $result_seTenkotransport4['TENKOCARNEWRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT3" name="TXT_TENKOTRAILERRESULT3" value="<?= $result_seTenkotransport4['TENKOTRAILERRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOROADRESULT3" name="TXT_TENKOROADRESULT3" value="<?= $result_seTenkotransport4['TENKOROADRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT3" name="TXT_TENKOAIRRESULT3" value="<?= $result_seTenkotransport4['TENKOAIRRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT3', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT3" name="TXT_TENKOSLEEPYRESULT3" value="<?= $result_seTenkotransport4['TENKOSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"  class="form-control" value="<?= $result_seTenkotransport4['TENKOTRAILERREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"><?= $result_seTenkotransport4['TENKOTRAILERREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">5</td>
+                                    <td>ตรวจสภาพถนน</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs5d4 ?> onchange="edit_check5d4('TENKOROADCHECK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" style="transform: scale(2)"  id="chk_5d4" name="chk_5d4"/></td>
+                                    <td>รายงานสภาพถนน</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT4" name="TXT_TENKOLOADRESTRESULT4" value="<?= $result_seTenkotransport4['TENKOLOADRESTRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT4" name="TXT_TENKOBODYSLEEPYRESULT4" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT4" name="TXT_TENKOCARNEWRESULT4" value="<?= $result_seTenkotransport4['TENKOCARNEWRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT4" name="TXT_TENKOTRAILERRESULT4" value="<?= $result_seTenkotransport4['TENKOTRAILERRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOROADRESULT4" name="TXT_TENKOROADRESULT4" value="<?= $result_seTenkotransport4['TENKOROADRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT4" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport4['TENKOAIRRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT4', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT4" name="TXT_TENKOSLEEPYRESULT4" value="<?= $result_seTenkotransport4['TENKOSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOROADREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"  class="form-control" value="<?= $result_seTenkotransport4['TENKOROADREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOROADREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"><?= $result_seTenkotransport4['TENKOROADREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">6</td>
+                                    <td>ตรวจสภาพอากาศ (ใช้ที่ปัดน้ำฝนระดับ 3 ให้หยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs6d4 ?> onchange="edit_check6d4('TENKOAIRCHECK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" style="transform: scale(2)"  id="chk_6d4" name="chk_6d4"/></td>
+                                    <td>รายงานสภาพอากาศ4</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT5" name="TXT_TENKOLOADRESTRESULT5" value="<?= $result_seTenkotransport4['TENKOLOADRESTRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT5" name="TXT_TENKOBODYSLEEPYRESULT5" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT5" name="TXT_TENKOCARNEWRESULT5" value="<?= $result_seTenkotransport4['TENKOCARNEWRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT5" name="TXT_TENKOTRAILERRESULT5" value="<?= $result_seTenkotransport4['TENKOTRAILERRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOROADRESULT5" name="TXT_TENKOROADRESULT5" value="<?= $result_seTenkotransport4['TENKOROADRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT5" name="TXT_TENKOAIRRESULT5" value="<?= $result_seTenkotransport4['TENKOAIRRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT5', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT5" name="TXT_TENKOSLEEPYRESULT5" value="<?= $result_seTenkotransport4['TENKOSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOAIRREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"  class="form-control" value="<?= $result_seTenkotransport4['TENKOAIRREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOAIRREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"><?= $result_seTenkotransport4['TENKOAIRREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">7</td>
+                                    <td>ตรวจสอบอาการง่วงและย้ำให้ระมัดระวัง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs7d4 ?> onchange="edit_check7d4('TENKOSLEEPYCHECK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" style="transform: scale(2)" id="chk_7d4" name="chk_7d4" /></td>
+                                    <td>สภาพที่สามารถวิ่งงานต่อได้</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT6" name="TXT_TENKOLOADRESTRESULT6" value="<?= $result_seTenkotransport4['TENKOLOADRESTRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT6" name="TXT_TENKOBODYSLEEPYRESULT6" value="<?= $result_seTenkotransport4['TENKOBODYSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT6" name="TXT_TENKOCARNEWRESULT6" value="<?= $result_seTenkotransport4['TENKOCARNEWRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT6" name="TXT_TENKOTRAILERRESULT6" value="<?= $result_seTenkotransport4['TENKOTRAILERRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOROADRESULT6" name="TXT_TENKOROADRESULT6" value="<?= $result_seTenkotransport4['TENKOROADRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT6" name="TXT_TENKOAIRRESULT6" value="<?= $result_seTenkotransport4['TENKOAIRRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT6', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT6" name="TXT_TENKOSLEEPYRESULT6" value="<?= $result_seTenkotransport4['TENKOSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"  class="form-control" value="<?= $result_seTenkotransport4['TENKOSLEEPYREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport4['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F4'] ?>')"><?= $result_seTenkotransport4['TENKOSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="tab-pane" id="day5">
+                        <?php
+                        $conditionTenkotransport51 = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "' ";
+                        $conditionTenkotransport52 = " AND CONVERT(DATE,TENKOTRANSPORTDATE) = CONVERT(DATE,'" . $result_seTenkomaster['DATEINPUT_F5'] . "',103)";
+                        $sql_seTenkotransport5 = "{call megEdittenkotransport_v2(?,?,?)}";
+                        $params_seTenkotransport5 = array(
+                            array('select_tenkotransport', SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport51, SQLSRV_PARAM_IN),
+                            array($conditionTenkotransport52, SQLSRV_PARAM_IN)
+                        );
+                        $query_seTenkotransport5 = sqlsrv_query($conn, $sql_seTenkotransport5, $params_seTenkotransport5);
+                        $result_seTenkotransport5 = sqlsrv_fetch_array($query_seTenkotransport5, SQLSRV_FETCH_ASSOC);
+
+                        $rs1d5 = ($result_seTenkotransport5['TENKOLOADRESTCHECK'] == '1') ? "checked" : "";
+                        $rs2d5 = ($result_seTenkotransport5['TENKOBODYSLEEPYCHECK'] == '1') ? "checked" : "";
+                        $rs3d5 = ($result_seTenkotransport5['TENKOCARNEWCHECK'] == '1') ? "checked" : "";
+                        $rs4d5 = ($result_seTenkotransport5['TENKOTRAILERCHECK'] == '1') ? "checked" : "";
+                        $rs5d5 = ($result_seTenkotransport5['TENKOROADCHECK'] == '1') ? "checked" : "";
+                        $rs6d5 = ($result_seTenkotransport5['TENKOAIRCHECK'] == '1') ? "checked" : "";
+                        $rs7d5 = ($result_seTenkotransport5['TENKOSLEEPYCHECK'] == '1') ? "checked" : "";
+                        ?>
+                        <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                            <thead>
+                                <tr>
+
+                                    
+                                    <!-- Commit_Emp2Day5 -->
+                                    <th colspan="6" ><input type="button" onclick="commit_2('<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>','<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>', '<?= $result_seEmployee['nameT'] ?>')"   class="btn btn-success" value="Commit3_Day5"> <font style="color: green">พนักงานขับรถ : <?= $sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะก่อนเริ่มงาน</th>
+                                    <th style="text-align: center;"><?= $result_seTenkotransport1["CREATEBY"] ?></th>
+                                    <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะปฎิบัติงาน</th>
+                                    <th style="text-align: center;"><?= $result_seEmployee["nameT"] ?></th>
+                                </tr>
+                                <tr>
+
+                                    <th colspan="12">เจ้าหน้าที่โทรไปไม่พบสิ่งผิดปกติ : <font style="color: red">0</font>  | พนักงานขับรถโทรมาไม่พบสิ่งผิดปกติ : <font style="color: red">1</font> | พบสิ่งผิดปกติ : <font style="color: red">x</font></th>
+                                </tr>
+                                <tr>
+
+                                    <th rowspan="4" style="text-align: center;">ข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">หัวข้อ</th>
+                                    <th rowspan="4" style="text-align: center;">ช่องตรวจ</th>
+                                    <th rowspan="4" style="text-align: center;">เกณฑ์การตัดสิน</th>
+                                    <th rowspan="2" style="text-align: center;"><p>โทรช่วง </p>
+                                        <p>00:01 - 23:59</p></th>
+                                    <th colspan="6" style="text-align: center">Night Call Check</th>
+                                    <th rowspan="4"style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">รายละเอียดการแนะนำของเจ้าหน้าที่</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ครั้งที่ 1</th>
+                                    <th style="text-align: center;">ครั้งที่ 2</th>
+                                    <th style="text-align: center;">ครั้งที่ 3</th>
+                                    <th style="text-align: center;">ครั้งที่ 4</th>
+                                    <th style="text-align: center;">ครั้งที่ 5</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ครั้งที่ 6</th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control timeen" id="txt_time0" name="txt_time0" value="<?= $result_seTenkotransport5['TENKOTIME0'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control timeen" id="txt_time1" name="txt_time1" value="<?= $result_seTenkotransport5['TENKOTIME1'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control timeen" id="txt_time2" name="txt_time2" value="<?= $result_seTenkotransport5['TENKOTIME2'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control timeen" id="txt_time3" name="txt_time3" value="<?= $result_seTenkotransport5['TENKOTIME3'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control timeen" id="txt_time4" name="txt_time4" value="<?= $result_seTenkotransport5['TENKOTIME4'] ?>"></th>
+                                    <th style="text-align: center"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control timeen" id="txt_time5" name="txt_time5" value="<?= $result_seTenkotransport5['TENKOTIME5'] ?>"></th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;"><input type="text" onchange="edit_tenkotransporttime(this.value, 'TENKOTIME6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control timeen" id="txt_time6" name="txt_time6" value="<?= $result_seTenkotransport5['TENKOTIME6'] ?>"></th>
+                                </tr>
+                                <tr>
+
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;">ผล</th>
+                                    <th style="text-align: center;border: solid;border-color: #E5E5E5;border-width: thin;">ผล</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center">1</td>
+                                    <td>เส้นทางที่กำหนด - จุดพัก</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs1d5 ?> onchange="edit_check1d5('TENKOLOADRESTCHECK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" style="transform: scale(2)" id="chk_1d5" name="chk_1d5" /></td>
+                                    <td>เส้นทาง จุดพักที่กำหนด</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT0" name="TXT_TENKOLOADRESTRESULT0" value="<?= $result_seTenkotransport5['TENKOLOADRESTRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT0" name="TXT_TENKOBODYSLEEPYRESULT0" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT0" name="TXT_TENKOCARNEWRESULT0" value="<?= $result_seTenkotransport5['TENKOCARNEWRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT0" name="TXT_TENKOTRAILERRESULT0" value="<?= $result_seTenkotransport5['TENKOTRAILERRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOROADRESULT0" name="TXT_TENKOROADRESULT0" value="<?= $result_seTenkotransport5['TENKOROADRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT0" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport5['TENKOAIRRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT0', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT0" name="TXT_TENKOSLEEPYRESULT0" value="<?= $result_seTenkotransport5['TENKOSLEEPYRESULT0'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"  class="form-control" value="<?= $result_seTenkotransport5['TENKOLOADRESTREMARK'] ?>"></td>
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOLOADRESTREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"><?= $result_seTenkotransport5['TENKOLOADRESTREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">2</td>
+                                    <td>ตรวจร่างกาย - อาการง่วง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs2d5 ?> onchange="edit_check2d5('TENKOBODYSLEEPYCHECK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" style="transform: scale(2)"  id="chk_2d5" name="chk_2d5"/></td>
+                                    <td>วิธีการพูดคุยต้องร่าเริง</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT1" name="TXT_TENKOLOADRESTRESULT1" value="<?= $result_seTenkotransport5['TENKOLOADRESTRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT1" name="TXT_TENKOBODYSLEEPYRESULT1" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT1" name="TXT_TENKOCARNEWRESULT1" value="<?= $result_seTenkotransport5['TENKOCARNEWRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT1" name="TXT_TENKOTRAILERRESULT1" value="<?= $result_seTenkotransport5['TENKOTRAILERRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOROADRESULT1" name="TXT_TENKOROADRESULT1" value="<?= $result_seTenkotransport5['TENKOROADRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT1" name="TXT_TENKOAIRRESULT1" value="<?= $result_seTenkotransport5['TENKOAIRRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT1', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT1" name="TXT_TENKOSLEEPYRESULT1" value="<?= $result_seTenkotransport5['TENKOSLEEPYRESULT1'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"  class="form-control" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOBODYSLEEPYREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"><?= $result_seTenkotransport5['TENKOBODYSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">3</td>
+                                    <td>ตรวจรถใหม่ (เฉพาะหยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs3d5 ?> onchange="edit_check3d5('TENKOCARNEWCHECK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" style="transform: scale(2)"  id="chk_3d5" name="chk_3d5"/></td>
+                                    <td>มีการรายงานเกี่ยวกับรถใหม่ว่ามีสิ่งผิดปกติหรือไม่</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT2" name="TXT_TENKOLOADRESTRESULT2" value="<?= $result_seTenkotransport5['TENKOLOADRESTRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT2" name="TXT_TENKOBODYSLEEPYRESULT2" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT2" name="TXT_TENKOCARNEWRESULT2" value="<?= $result_seTenkotransport5['TENKOCARNEWRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT2" name="TXT_TENKOTRAILERRESULT2" value="<?= $result_seTenkotransport5['TENKOTRAILERRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOROADRESULT2" name="TXT_TENKOROADRESULT2" value="<?= $result_seTenkotransport5['TENKOROADRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT2" name="TXT_TENKOAIRRESULT2" value="<?= $result_seTenkotransport5['TENKOAIRRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT2', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT2" name="TXT_TENKOSLEEPYRESULT2" value="<?= $result_seTenkotransport5['TENKOSLEEPYRESULT2'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"  class="form-control" value="<?= $result_seTenkotransport5['TENKOCARNEWREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOCARNEWREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"><?= $result_seTenkotransport5['TENKOCARNEWREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">4</td>
+                                    <td>ตรวจเทรลเลอร์</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs4d5 ?> onchange="edit_check4d5('TENKOTRAILERCHECK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" style="transform: scale(2)"  id="chk_4d5" name="chk_4d5"/></td>
+                                    <td>ระหว่างวิ่งงานไม่มีสิ่งผิดปกติ</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT3" name="TXT_TENKOLOADRESTRESULT3" value="<?= $result_seTenkotransport5['TENKOLOADRESTRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT3" name="TXT_TENKOBODYSLEEPYRESULT3" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT3" name="TXT_TENKOCARNEWRESULT3" value="<?= $result_seTenkotransport5['TENKOCARNEWRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT3" name="TXT_TENKOTRAILERRESULT3" value="<?= $result_seTenkotransport5['TENKOTRAILERRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOROADRESULT3" name="TXT_TENKOROADRESULT3" value="<?= $result_seTenkotransport5['TENKOROADRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT3" name="TXT_TENKOAIRRESULT3" value="<?= $result_seTenkotransport5['TENKOAIRRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT3', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT3" name="TXT_TENKOSLEEPYRESULT3" value="<?= $result_seTenkotransport5['TENKOSLEEPYRESULT3'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"  class="form-control" value="<?= $result_seTenkotransport5['TENKOTRAILERREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOTRAILERREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"><?= $result_seTenkotransport5['TENKOTRAILERREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">5</td>
+                                    <td>ตรวจสภาพถนน</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs5d5 ?> onchange="edit_check5d5('TENKOROADCHECK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" style="transform: scale(2)"  id="chk_5d5" name="chk_5d5"/></td>
+                                    <td>รายงานสภาพถนน</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT4" name="TXT_TENKOLOADRESTRESULT4" value="<?= $result_seTenkotransport5['TENKOLOADRESTRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT4" name="TXT_TENKOBODYSLEEPYRESULT4" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT4" name="TXT_TENKOCARNEWRESULT4" value="<?= $result_seTenkotransport5['TENKOCARNEWRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT4" name="TXT_TENKOTRAILERRESULT4" value="<?= $result_seTenkotransport5['TENKOTRAILERRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOROADRESULT4" name="TXT_TENKOROADRESULT4" value="<?= $result_seTenkotransport5['TENKOROADRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT4" name="TXT_TENKOAIRRESULT0" value="<?= $result_seTenkotransport5['TENKOAIRRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT4', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT4" name="TXT_TENKOSLEEPYRESULT4" value="<?= $result_seTenkotransport5['TENKOSLEEPYRESULT4'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOROADREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"  class="form-control" value="<?= $result_seTenkotransport5['TENKOROADREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOROADREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"><?= $result_seTenkotransport5['TENKOROADREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">6</td>
+                                    <td>ตรวจสภาพอากาศ (ใช้ที่ปัดน้ำฝนระดับ 3 ให้หยุดรถ)</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs6d5 ?> onchange="edit_check6d5('TENKOAIRCHECK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" style="transform: scale(2)"  id="chk_6d5" name="chk_6d5"/></td>
+                                    <td>รายงานสภาพอากาศ5</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT5" name="TXT_TENKOLOADRESTRESULT5" value="<?= $result_seTenkotransport5['TENKOLOADRESTRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT5" name="TXT_TENKOBODYSLEEPYRESULT5" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT5" name="TXT_TENKOCARNEWRESULT5" value="<?= $result_seTenkotransport5['TENKOCARNEWRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT5" name="TXT_TENKOTRAILERRESULT5" value="<?= $result_seTenkotransport5['TENKOTRAILERRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOROADRESULT5" name="TXT_TENKOROADRESULT5" value="<?= $result_seTenkotransport5['TENKOROADRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT5" name="TXT_TENKOAIRRESULT5" value="<?= $result_seTenkotransport5['TENKOAIRRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT5', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT5" name="TXT_TENKOSLEEPYRESULT5" value="<?= $result_seTenkotransport5['TENKOSLEEPYRESULT5'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOAIRREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"  class="form-control" value="<?= $result_seTenkotransport5['TENKOAIRREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOAIRREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"><?= $result_seTenkotransport5['TENKOAIRREMARK'] ?></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">7</td>
+                                    <td>ตรวจสอบอาการง่วงและย้ำให้ระมัดระวัง</td>
+                                    <td style="text-align: center"><input type="checkbox" <?= $rs7d5 ?> onchange="edit_check7d5('TENKOSLEEPYCHECK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" style="transform: scale(2)" id="chk_7d5" name="chk_7d5" /></td>
+                                    <td>สภาพที่สามารถวิ่งงานต่อได้</td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOLOADRESTRESULT6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOLOADRESTRESULT6" name="TXT_TENKOLOADRESTRESULT6" value="<?= $result_seTenkotransport5['TENKOLOADRESTRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOBODYSLEEPYRESULT6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOBODYSLEEPYRESULT6" name="TXT_TENKOBODYSLEEPYRESULT6" value="<?= $result_seTenkotransport5['TENKOBODYSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOCARNEWRESULT6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOCARNEWRESULT6" name="TXT_TENKOCARNEWRESULT6" value="<?= $result_seTenkotransport5['TENKOCARNEWRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOTRAILERRESULT6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOTRAILERRESULT6" name="TXT_TENKOTRAILERRESULT6" value="<?= $result_seTenkotransport5['TENKOTRAILERRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOROADRESULT6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOROADRESULT6" name="TXT_TENKOROADRESULT6" value="<?= $result_seTenkotransport5['TENKOROADRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOAIRRESULT6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOAIRRESULT6" name="TXT_TENKOAIRRESULT6" value="<?= $result_seTenkotransport5['TENKOAIRRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="editvalue_tenkotransport(this.value, 'TENKOSLEEPYRESULT6', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')" class="form-control" id="TXT_TENKOSLEEPYRESULT6" name="TXT_TENKOSLEEPYRESULT6" value="<?= $result_seTenkotransport5['TENKOSLEEPYRESULT6'] ?>"></td>
+                                    <td><input type="text" onchange="edit_tenkotransport(this.value, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"  class="form-control" value="<?= $result_seTenkotransport5['TENKOSLEEPYREMARK'] ?>"></td>
+                                    
+                                    
+                                    <!-- <td contenteditable="true" onkeyup="edit_tenkotransport(this, 'TENKOSLEEPYREMARK', '<?= $result_seTenkotransport5['TENKOTRANSPORTID'] ?>', '<?= $result_seTenkomaster['DATEINPUT_F5'] ?>')"><?= $result_seTenkotransport5['TENKOSLEEPYREMARK'] ?></td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                  
+            </div>
+        </div>
+   
+    <?php
+}
+//tenko 3 = เลิกงาน พขร.3
+if ($_POST['txt_flg'] == "select_tenko3emp3") {
+    $condition1 = "  AND a.PersonID = '" . $_SESSION["EMPLOYEEID"] . "'";
+    $sql_seEmployee = "{call megEmployeeEHR_v2(?,?)}";
+    $params_seEmployee = array(
+        array('select_employeeehr2', SQLSRV_PARAM_IN),
+        array($condition1, SQLSRV_PARAM_IN)
+    );
+    $query_seEmployee = sqlsrv_query($conn, $sql_seEmployee, $params_seEmployee);
+    $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
+    
+    $conditionPlain = " AND a.VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_sePlain = "{call megVehicletransportplan_v2(?,?)}";
+    $params_sePlain = array(
+        array('select_vehicletransportplan', SQLSRV_PARAM_IN),
+        array($conditionPlain, SQLSRV_PARAM_IN)
+    );
+    $query_sePlain = sqlsrv_query($conn, $sql_sePlain, $params_sePlain);
+    $result_sePlain = sqlsrv_fetch_array($query_sePlain, SQLSRV_FETCH_ASSOC);
+
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE3']."'";
+    $params_checkSexT = array();
+    $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
+    $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
+
+    if ($result_checkSexT['SexT'] == 'หญิง') {
+        $sex = 'นางสาว';
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
+        $sex = 'นาย';
+    }else{
+        $sex = '';
+    }
+
+    $conditionTenkomaster_temp = " AND VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_seTenkomaster_temp = "{call megVehicletransportplan_v2(?,?,?,?)}";
+    $params_seTenkomaster_temp = array(
+        array('select_vehicletransporttenko', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster_temp, SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster_temp = sqlsrv_query($conn, $sql_seTenkomaster_temp, $params_seTenkomaster_temp);
+    $result_seTenkomaster_temp = sqlsrv_fetch_array($query_seTenkomaster_temp, SQLSRV_FETCH_ASSOC);
+
+    $conditionTenkomaster = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "'";
+    $sql_seTenkomaster = "{call megEdittenkomaster_v2(?,?)}";
+    $params_seTenkomaster = array(
+        array('select_tenkomaster', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster, SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster = sqlsrv_query($conn, $sql_seTenkomaster, $params_seTenkomaster);
+    $result_seTenkomaster = sqlsrv_fetch_array($query_seTenkomaster, SQLSRV_FETCH_ASSOC);
+
+    $conditionTenkoafter = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "'";
+    $sql_seTenkoafter = "{call megEdittenkoafter_v2(?,?,?)}";
+    $params_seTenkoafter = array(
+        array('select_tenkoafter', SQLSRV_PARAM_IN),
+        array($conditionTenkoafter, SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN)
+    );
+    $query_seTenkoafter = sqlsrv_query($conn, $sql_seTenkoafter, $params_seTenkoafter);
+    $result_seTenkoafter = sqlsrv_fetch_array($query_seTenkoafter, SQLSRV_FETCH_ASSOC);
+
+    $chk31 = ($result_seTenkoafter['TENKOBEFOREGREETCHECK'] == '1') ? "checked" : "";
+    $chk32 = ($result_seTenkoafter['TENKOUNIFORMCHECK'] == '1') ? "checked" : "";
+    $chk33 = ($result_seTenkoafter['TENKOBODYCHECK'] == '1') ? "checked" : "";
+    $chk34 = ($result_seTenkoafter['TENKOALCOHOLCHECK'] == '1') ? "checked" : "";
+    $chk35 = ($result_seTenkoafter['TENKOCARNEWCHECK'] == '1') ? "checked" : "";
+    $chk36 = ($result_seTenkoafter['TENKOTRAILERCHECK'] == '1') ? "checked" : "";
+    $chk37 = ($result_seTenkoafter['TENKORISKYCHECK'] == '1') ? "checked" : "";
+    $chk38 = ($result_seTenkoafter['TENKOAIRCHECK'] == '1') ? "checked" : "";
+    $chk39 = ($result_seTenkoafter['TENKOPATTERNDRIVERCHECK'] == '1') ? "checked" : "";
+    $chk310 = ($result_seTenkoafter['TENKODAILYDRIVERCHECK'] == '1') ? "checked" : "";
+    $chk311 = ($result_seTenkoafter['TENKOHIYARIHATTOCHECK'] == '1') ? "checked" : "";
+    $chk312 = ($result_seTenkoafter['TENKOYOKOTENCHECK'] == '1') ? "checked" : "";
+    $chk313 = ($result_seTenkoafter['TENKOAFTERGREETCHECK'] == '1') ? "checked" : "";
+
+    $rs311 = ($result_seTenkoafter['TENKOBEFOREGREETRESULT'] == '1') ? "checked" : "";
+    $rs321 = ($result_seTenkoafter['TENKOUNIFORMRESULT'] == '1') ? "checked" : "";
+    $rs331 = ($result_seTenkoafter['TENKOBODYRESULT'] == '1') ? "checked" : "";
+    $rs341 = ($result_seTenkoafter['TENKOALCOHOLRESULT'] == '1') ? "checked" : "";
+    $rs351 = ($result_seTenkoafter['TENKOCARNEWRESULT'] == '1') ? "checked" : "";
+    $rs361 = ($result_seTenkoafter['TENKOTRAILERRESULT'] == '1') ? "checked" : "";
+    $rs371 = ($result_seTenkoafter['TENKORISKYRESULT'] == '1') ? "checked" : "";
+    $rs381 = ($result_seTenkoafter['TENKOAIRRESULT'] == '1') ? "checked" : "";
+    $rs391 = ($result_seTenkoafter['TENKOPATTERNDRIVERRESULT'] == '1') ? "checked" : "";
+    $rs3101 = ($result_seTenkoafter['TENKODAILYDRIVERRESULT'] == '1') ? "checked" : "";
+    $rs3111 = ($result_seTenkoafter['TENKOHIYARIHATTORESULT'] == '1') ? "checked" : "";
+    $rs3121 = ($result_seTenkoafter['TENKOYOKOTENRESULT'] == '1') ? "checked" : "";
+    $rs3131 = ($result_seTenkoafter['TENKOAFTERGREETRESULT'] == '1') ? "checked" : "";
+
+    $rs310 = ($result_seTenkoafter['TENKOBEFOREGREETRESULT'] == '0') ? "checked" : "";
+    $rs320 = ($result_seTenkoafter['TENKOUNIFORMRESULT'] == '0') ? "checked" : "";
+    $rs330 = ($result_seTenkoafter['TENKOBODYRESULT'] == '0') ? "checked" : "";
+    $rs340 = ($result_seTenkoafter['TENKOALCOHOLRESULT'] == '0') ? "checked" : "";
+    $rs350 = ($result_seTenkoafter['TENKOCARNEWRESULT'] == '0') ? "checked" : "";
+    $rs360 = ($result_seTenkoafter['TENKOTRAILERRESULT'] == '0') ? "checked" : "";
+    $rs370 = ($result_seTenkoafter['TENKORISKYRESULT'] == '0') ? "checked" : "";
+    $rs380 = ($result_seTenkoafter['TENKOAIRRESULT'] == '0') ? "checked" : "";
+    $rs390 = ($result_seTenkoafter['TENKOPATTERNDRIVERRESULT'] == '0') ? "checked" : "";
+    $rs3100 = ($result_seTenkoafter['TENKODAILYDRIVERRESULT'] == '0') ? "checked" : "";
+    $rs3110 = ($result_seTenkoafter['TENKOHIYARIHATTORESULT'] == '0') ? "checked" : "";
+    $rs3120 = ($result_seTenkoafter['TENKOYOKOTENRESULT'] == '0') ? "checked" : "";
+    $rs3130 = ($result_seTenkoafter['TENKOAFTERGREETRESULT'] == '0') ? "checked" : "";
+    ?>
+
+    <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+        <thead>
+            <tr>
+
+                <th colspan="6" ><input type="button" onclick="commit_3('<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>','<?= $result_seTenkoafter['TENKOAFTERID'] ?>','<?= $result_seEmployee['nameT'] ?>')" class="btn btn-success" value="Commit3_After"> <font style="color: green">พนักงานขับรถ : <?=$sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+                <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะก่อนเริ่มงาน</th>
+                <th style="text-align: center;"><?= $result_seTenkoafter["CREATEBY"] ?></th>
+                <th colspan="2" style="text-align: center;">เจ้าหน้าที่เท็งโกะปฎิบัติงาน</th>
+                <th style="text-align: center;"><?= $result_seEmployee["nameT"] ?></th>
+            </tr>
+            <tr>
+                <th rowspan="2" style="text-align: center;">ข้อ พขร3</th>
+                <th rowspan="2" style="text-align: center;">หัวข้อ</th>
+                <th rowspan="2" style="text-align: center;">ช่องตรวจสอบ</th>
+                <th rowspan="2" style="text-align: center;">เกณฑ์การตัดสิน</th>
+                <th colspan="2" style="text-align: center;">ผล</th>
+                <th colspan="4" rowspan="2" style="text-align: center;">รายละเอียดและการแนะนำ</th>
+            </tr>
+            <tr>
+                <th style="text-align: center;">ปกติ</th>
+                <th style="text-align: center;">ไม่ปกติ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align: center">1</td>
+                <td>การทักทายก่อนเริ่มเท็งโกะ</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk31 ?> onchange="edit_check31('TENKOBEFOREGREETCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_31" name="chk_31"/></td>
+                <td>ทักทายอย่างมีชีวิตชีวา</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs311 ?> style="transform: scale(2)" id="chk_rs311" name="chk_rs311" onchange="edit_rs311('TENKOBEFOREGREETRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs310 ?> style="transform: scale(2)" id="chk_rs310" name="chk_rs310" onchange="edit_rs310('TENKOBEFOREGREETRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOBEFOREGREETREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOBEFOREGREETREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">2</td>
+                <td>ตรวจเช็คยูนิฟอร์ม</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk32 ?> onchange="edit_check32('TENKOUNIFORMCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_32" name="chk_32"/></td>
+                <td>ไม่มีคราบสกปรก</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs321 ?> style="transform: scale(2)" id="chk_rs321" name="chk_rs321" onchange="edit_rs321('TENKOUNIFORMRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs320 ?> style="transform: scale(2)" id="chk_rs320" name="chk_rs320" onchange="edit_rs320('TENKOUNIFORMRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOUNIFORMREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOUNIFORMREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">3</td>
+                <td>ตรวจสภาพร่างกาย</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk33 ?> onchange="edit_check33('TENKOBODYCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_33" name="chk_33"/></td>
+                <td>สภาพร่างกายแข็งแรงดี</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs331 ?> style="transform: scale(2)" id="chk_rs331" name="chk_rs331" onchange="edit_rs331('TENKOBODYRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs330 ?> style="transform: scale(2)" id="chk_rs330" name="chk_rs330" onchange="edit_rs330('TENKOBODYRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOBODYREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOBODYREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">4</td>
+                <td>ตรวจเช็คแอลกอฮอล์</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk34 ?> onchange="edit_check34('TENKOALCOHOLCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_34" name="chk_34"/></td>
+                <td>[0]</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs341 ?> style="transform: scale(2)" id="chk_rs341" name="chk_rs341" onchange="edit_rs341('TENKOALCOHOLRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox"  <?= $rs340 ?> style="transform: scale(2)" id="chk_rs340" name="chk_rs340" onchange="edit_rs340('TENKOALCOHOLRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOALCOHOLREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOALCOHOLREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">5</td>
+                <td>มีความผิดปกติกับรถใหม่หรือไม่</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk35 ?> onchange="edit_check35('TENKOCARNEWCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_35" name="chk_35"/></td>
+                <td>รายงานสิ่งผิดปกติของรถใหม่ว่ามีหรือไม่</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs351 ?> style="transform: scale(2)" id="chk_rs351" name="chk_rs351" onchange="edit_rs351('TENKOCARNEWRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs350 ?> style="transform: scale(2)" id="chk_rs350" name="chk_rs350" onchange="edit_rs350('TENKOCARNEWRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOCARNEWREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOCARNEWREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">6</td>
+                <td>ความผิดปกติของรถเทรลเลอร์</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk36 ?> onchange="edit_check36('TENKOTRAILERCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_36" name="chk_36"/></td>
+                <td>รายงานสิ่งผิดปกติของเทรลเลอร์ว่ามีหรือไม่</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs361 ?> style="transform: scale(2)" id="chk_rs361" name="chk_rs361" onchange="edit_rs361('TENKOTRAILERRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs360 ?> style="transform: scale(2)" id="chk_rs360" name="chk_rs360" onchange="edit_rs360('TENKOTRAILERRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOTRAILERREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOTRAILERREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">7</td>
+                <td>จุดเสี่ยงระหว่างเส้นทางการขนส่ง(ล่าง)</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk37 ?> onchange="edit_check37('TENKORISKYCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_37" name="chk_37"/></td>
+                <td>รายงานว่ามีจุดเปลี่ยนแปลงที่ผิดปกติหรือไม่</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs371 ?> style="transform: scale(2)" id="chk_rs371" name="chk_rs371" onchange="edit_rs371('TENKORISKYRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs370 ?> style="transform: scale(2)" id="chk_rs370" name="chk_rs370" onchange="edit_rs370('TENKORISKYRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKORISKYREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKORISKYREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">8</td>
+                <td>ตรวจสอบสภาพอากาศ</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk38 ?> onchange="edit_check38('TENKOAIRCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_38" name="chk_38"/></td>
+                <td>รายงานสภาพอากาศ6</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs381 ?> style="transform: scale(2)" id="chk_rs381" name="chk_rs381" onchange="edit_rs381('TENKOAIRRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs380 ?> style="transform: scale(2)" id="chk_rs380" name="chk_rs380" onchange="edit_rs380('TENKOAIRRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOAIRREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOAIRREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">9</td>
+                <td>ตรวจสอบรูปแบบการขับขี่</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk39 ?> onchange="edit_check39('TENKOPATTERNDRIVERCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_39" name="chk_39"/></td>
+                <td>รายงานรูปแบบการขับขี่</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs391 ?> style="transform: scale(2)" id="chk_rs391" name="chk_rs391" onchange="edit_rs391('TENKOPATTERNDRIVERRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs390 ?> style="transform: scale(2)" id="chk_rs390" name="chk_rs390" onchange="edit_rs390('TENKOPATTERNDRIVERRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOPATTERNDRIVERREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOPATTERNDRIVERREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">10</td>
+                <td>ตรวจสอบข้อมูลการขับขี่ประจำวันจาก GPS เรคคอร์ด(ล่าง)</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk310 ?> onchange="edit_check310('TENKODAILYDRIVERCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"  id="chk_310" name="chk_310"/></td>
+                <td>หัวข้อฝ่าฝืนเป็น [0]</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3101 ?> style="transform: scale(2)" id="chk_rs3101" name="chk_rs3101" onchange="edit_rs3101('TENKODAILYDRIVERRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3100 ?> style="transform: scale(2)" id="chk_rs3100" name="chk_rs3100" onchange="edit_rs3100('TENKODAILYDRIVERRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKODAILYDRIVERREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKODAILYDRIVERREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">11</td>
+                <td>ฮิยาริฮัตโตะนอกเหนือจากข้อ 7.</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk311 ?> onchange="edit_check311('TENKOHIYARIHATTOCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_311" name="chk_311"/></td>
+                <td>เหตุการณ์ที่ตกใจและเกือบเกิดอุบัติเหตุ</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3111 ?> style="transform: scale(2)" id="chk_rs3111" name="chk_rs3111" onchange="edit_rs3111('TENKOHIYARIHATTORESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3110 ?> style="transform: scale(2)" id="chk_rs3110" name="chk_rs3110" onchange="edit_rs3110('TENKOHIYARIHATTORESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOHIYARIHATTOREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOHIYARIHATTOREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">12</td>
+                <td>แจ้งเรื่องโยโกะเต็น/แนะนำวิธีการจัดสรรชั่วโมงนอนหลับ</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk312 ?> onchange="edit_check312('TENKOYOKOTENCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_312" name="chk_312"/></td>
+                <td>เข้าใจเนื้อหาและวิธีการต่างๆที่แจ้งไป</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3121 ?> style="transform: scale(2)" id="chk_rs3121" name="chk_rs3121" onchange="edit_rs3121('TENKOYOKOTENRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3120 ?> style="transform: scale(2)" id="chk_rs3120" name="chk_rs3120" onchange="edit_rs3120('TENKOYOKOTENRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOYOKOTENREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOYOKOTENREMARK'] ?></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">13</td>
+                <td>การทักทายหลังทำเท็งโกะเสร็จ</td>
+                <td style="text-align:center"><input type="checkbox" style="transform: scale(2)" <?= $chk313 ?> onchange="edit_check313('TENKOAFTERGREETCHECK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')" id="chk_313" name="chk_313"/></td>
+                <td>ทักทายอย่างมีชีวิตชีวา</td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3131 ?> style="transform: scale(2)" id="chk_rs3131" name="chk_rs3131" onchange="edit_rs3131('TENKOAFTERGREETRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td style="text-align:center"><input type="checkbox" <?= $rs3130 ?> style="transform: scale(2)" id="chk_rs3130" name="chk_rs3130" onchange="edit_rs3130('TENKOAFTERGREETRESULT', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"/></td>
+                <td colspan="4" contenteditable="true" onkeyup="edit_tenkoafter(this, 'TENKOAFTERGREETREMARK', '<?= $result_seTenkoafter['TENKOAFTERID'] ?>')"><?= $result_seTenkoafter['TENKOAFTERGREETREMARK'] ?></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <?php
+}
+//tenko 4 = จุดเสี่ยงระหว่างทาง 3-1 = GW พขร.3
+if ($_POST['txt_flg'] == "select_tenko4emp3-1") {
+    $conditionPlain = " AND a.VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_sePlain = "{call megVehicletransportplan_v2(?,?)}";
+    $params_sePlain = array(
+        array('select_vehicletransportplan', SQLSRV_PARAM_IN),
+        array($conditionPlain, SQLSRV_PARAM_IN)
+    );
+    $query_sePlain = sqlsrv_query($conn, $sql_sePlain, $params_sePlain);
+    $result_sePlain = sqlsrv_fetch_array($query_sePlain, SQLSRV_FETCH_ASSOC);
+
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE3']."'";
+    $params_checkSexT = array();
+    $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
+    $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
+
+    if ($result_checkSexT['SexT'] == 'หญิง') {
+        $sex = 'นางสาว';
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
+        $sex = 'นาย';
+    }else{
+        $sex = '';
+    }
+
+    $conditionTenkomaster_temp = " AND VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_seTenkomaster_temp = "{call megVehicletransportplan_v2(?,?,?,?)}";
+    $params_seTenkomaster_temp = array(
+        array('select_vehicletransporttenko', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster_temp, SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster_temp = sqlsrv_query($conn, $sql_seTenkomaster_temp, $params_seTenkomaster_temp);
+    $result_seTenkomaster_temp = sqlsrv_fetch_array($query_seTenkomaster_temp, SQLSRV_FETCH_ASSOC);
+
+    $conditionTenkomaster = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "'";
+    $sql_seTenkomaster = "{call megEdittenkomaster_v2(?,?)}";
+    $params_seTenkomaster = array(
+        array('select_tenkomaster', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster, SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster = sqlsrv_query($conn, $sql_seTenkomaster, $params_seTenkomaster);
+    $result_seTenkomaster = sqlsrv_fetch_array($query_seTenkomaster, SQLSRV_FETCH_ASSOC);
+
+    if ($result_sePlain['COMPANYCODE'] == 'RRC' || $result_sePlain['COMPANYCODE'] == 'RCC' || $result_sePlain['COMPANYCODE'] == 'RATC') {
+        $conditionTenkorisky = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode2'] . "'";
+        $sql_seTenkorisky = "{call megEdittenkorisky_v2(?,?,?)}";
+        $params_seTenkorisky = array(
+            array('select_tenkorisky', SQLSRV_PARAM_IN),
+            array($conditionTenkorisky, SQLSRV_PARAM_IN),
+            array('', SQLSRV_PARAM_IN)
+        );
+        $query_seTenkorisky = sqlsrv_query($conn, $sql_seTenkorisky, $params_seTenkorisky);
+        $result_seTenkorisky = sqlsrv_fetch_array($query_seTenkorisky, SQLSRV_FETCH_ASSOC);
+
+        $rs411 = ($result_seTenkorisky['TENKORISKYBPRESULT'] == '1') ? "checked" : "";
+        $rs421 = ($result_seTenkorisky['TENKORISKYSRRESULT'] == '1') ? "checked" : "";
+        $rs431 = ($result_seTenkorisky['TENKORISKYGWRESULT'] == '1') ? "checked" : "";
+        $rs441 = ($result_seTenkorisky['TENKORISKYOTH1RESULT'] == '1') ? "checked" : "";
+        $rs451 = ($result_seTenkorisky['TENKORISKYBRANCHRESULT'] == '1') ? "checked" : "";
+        $rs461 = ($result_seTenkorisky['TENKOWIRERESULT'] == '1') ? "checked" : "";
+        $rs471 = ($result_seTenkorisky['TENKOLOADRESULT'] == '1') ? "checked" : "";
+        $rs481 = ($result_seTenkorisky['TENKOTRAILERPARKINGRESULT'] == '1') ? "checked" : "";
+        $rs491 = ($result_seTenkorisky['TENKOCARNEWPARKINGRESULT'] == '1') ? "checked" : "";
+        $rs4101 = ($result_seTenkorisky['TENKORISKYOTH2RESULT'] == '1') ? "checked" : "";
+
+
+        $rs410 = ($result_seTenkorisky['TENKORISKYBPRESULT'] == '0') ? "checked" : "";
+        $rs420 = ($result_seTenkorisky['TENKORISKYSRRESULT'] == '0') ? "checked" : "";
+        $rs430 = ($result_seTenkorisky['TENKORISKYGWRESULT'] == '0') ? "checked" : "";
+        $rs440 = ($result_seTenkorisky['TENKORISKYOTH1RESULT'] == '0') ? "checked" : "";
+        $rs450 = ($result_seTenkorisky['TENKORISKYBRANCHRESULT'] == '0') ? "checked" : "";
+        $rs460 = ($result_seTenkorisky['TENKOWIRERESULT'] == '0') ? "checked" : "";
+        $rs470 = ($result_seTenkorisky['TENKOLOADRESULT'] == '0') ? "checked" : "";
+        $rs480 = ($result_seTenkorisky['TENKOTRAILERPARKINGRESULT'] == '0') ? "checked" : "";
+        $rs490 = ($result_seTenkorisky['TENKOCARNEWPARKINGRESULT'] == '0') ? "checked" : "";
+        $rs4100 = ($result_seTenkorisky['TENKORISKYOTH2RESULT'] == '0') ? "checked" : "";
+        ?>
+
+        <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+            <thead>
+                <tr>
+
+                    <th colspan="6" ><font style="color: green">พนักงานขับรถ : <?=$sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+                </tr>
+                <tr>
+                    <th style="text-align: center">ข้อ</th>
+                    <th style="text-align: center" colspan="2">หัวข้อ</th>
+                    <th colspan="2" style="text-align: center">สิ่งผิดปกติ</th>
+                    <th style="text-align: center">รายละเอียดสิ่งผิดปกติ</th>
+                </tr>
+                <tr>
+                    <th style="text-align: center">&nbsp;</th>
+                    <th style="text-align: center" colspan="2">&nbsp;</th>
+                    <th style="text-align: center">มี</th>
+                    <th style="text-align: center">ไม่มี</th>
+                    <th style="text-align: center">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td rowspan="4" style="text-align: center">1</td>
+                    <td rowspan="4">ในยาร์ด</td>
+                    <td>บ้านโพธิ์</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs411 ?> onchange="edit_rs411('TENKORISKYBPRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"  style="transform: scale(2)" id="chk_rs411" name="chk_rs411" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs410 ?> onchange="edit_rs410('TENKORISKYBPRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs410" name="chk_rs410" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKORISKYBPREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKORISKYBPREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td>สำโรง</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs421 ?> onchange="edit_rs421('TENKORISKYSRRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs421" name="chk_rs421" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs420 ?>  onchange="edit_rs420('TENKORISKYSRRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs420" name="chk_rs420" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKORISKYSRREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKORISKYSRREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td>เกตุเวย์</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs431 ?> onchange="edit_rs431('TENKORISKYGWRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs431" name="chk_rs431" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs430 ?> onchange="edit_rs430('TENKORISKYGWRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs430" name="chk_rs430" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKORISKYGWREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKORISKYGWREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td>อื่นๆ</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs441 ?> onchange="edit_rs441('TENKORISKYOTH1RESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" style="transform: scale(2)" id="chk_rs441" name="chk_rs441" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs440 ?> onchange="edit_rs440('TENKORISKYOTH1RESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" style="transform: scale(2)" id="chk_rs440" name="chk_rs440" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKORISKYOTH1REMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKORISKYOTH1REMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td rowspan="3" style="text-align: center">2</td>
+                    <td rowspan="3">บนถนน</td>
+                    <td>กิ่งไม้</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs451 ?> onchange="edit_rs451('TENKORISKYBRANCHRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs451" name="chk_rs451" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs450 ?> onchange="edit_rs450('TENKORISKYBRANCHRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs450" name="chk_rs450" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKORISKYBRANCHREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKORISKYBRANCHREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td>สายไฟ</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs461 ?> onchange="edit_rs461('TENKOWIRERESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs461" name="chk_rs461" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs460 ?> onchange="edit_rs460('TENKOWIRERESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs460" name="chk_rs460" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKOWIREREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKOWIREREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td>สภาพถนน,ก่อสร้าง</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs471 ?> onchange="edit_rs471('TENKOLOADRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs471" name="chk_rs471" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs470 ?> onchange="edit_rs470('TENKOLOADRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs470" name="chk_rs470" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKOLOADREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKOLOADREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td rowspan="3" style="text-align: center">3</td>
+                    <td rowspan="3">ตัวแทนจำหน่ย</td>
+                    <td>จุดจอดเทรลเลอร์</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs481 ?> onchange="edit_rs481('TENKOTRAILERPARKINGRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs481" name="chk_rs481" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs480 ?> onchange="edit_rs480('TENKOTRAILERPARKINGRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs480" name="chk_rs480" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKOTRAILERPARKINGREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKOTRAILERPARKINGREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td>พื้นที่รับรถใหม่</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs491 ?> onchange="edit_rs491('TENKOCARNEWPARKINGRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs491" name="chk_rs491" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs490 ?> onchange="edit_rs490('TENKOCARNEWPARKINGRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs490" name="chk_rs490" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKOCARNEWPARKINGREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKOCARNEWPARKINGREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td>อื่นๆ</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs4101 ?> onchange="edit_rs4101('TENKORISKYOTH2RESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs4101" name="chk_rs4101" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs4100 ?> onchange="edit_rs4100('TENKORISKYOTH2RESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs4100" name="chk_rs4100" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKORISKYOTH2REMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKORISKYOTH2REMARK'] ?></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <?php
+    }
+}
+//tenko 4 = จุดเสี่ยงระหว่างทาง 3-2 = AMT พขร.3
+if ($_POST['txt_flg'] == "select_tenko4emp3-2") {
+    $condition1 = "  AND a.PersonID = '" . $_SESSION["EMPLOYEEID"] . "'";
+    $sql_seEmployee = "{call megEmployeeEHR_v2(?,?)}";
+    $params_seEmployee = array(
+        array('select_employeeehr2', SQLSRV_PARAM_IN),
+        array($condition1, SQLSRV_PARAM_IN)
+    );
+    $query_seEmployee = sqlsrv_query($conn, $sql_seEmployee, $params_seEmployee);
+    $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
+    
+    $conditionPlain = " AND a.VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_sePlain = "{call megVehicletransportplan_v2(?,?)}";
+    $params_sePlain = array(
+        array('select_vehicletransportplan', SQLSRV_PARAM_IN),
+        array($conditionPlain, SQLSRV_PARAM_IN)
+    );
+    $query_sePlain = sqlsrv_query($conn, $sql_sePlain, $params_sePlain);
+    $result_sePlain = sqlsrv_fetch_array($query_sePlain, SQLSRV_FETCH_ASSOC);
+
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE3']."'";
+    $params_checkSexT = array();
+    $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
+    $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
+
+    if ($result_checkSexT['SexT'] == 'หญิง') {
+        $sex = 'นางสาว';
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
+        $sex = 'นาย';
+    }else{
+        $sex = '';
+    }
+
+    $conditionTenkomaster_temp = " AND VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_seTenkomaster_temp = "{call megVehicletransportplan_v2(?,?,?,?)}";
+    $params_seTenkomaster_temp = array(
+        array('select_vehicletransporttenko', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster_temp, SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster_temp = sqlsrv_query($conn, $sql_seTenkomaster_temp, $params_seTenkomaster_temp);
+    $result_seTenkomaster_temp = sqlsrv_fetch_array($query_seTenkomaster_temp, SQLSRV_FETCH_ASSOC);
+
+    $conditionTenkomaster = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "'";
+    $sql_seTenkomaster = "{call megEdittenkomaster_v2(?,?)}";
+    $params_seTenkomaster = array(
+        array('select_tenkomaster', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster, SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster = sqlsrv_query($conn, $sql_seTenkomaster, $params_seTenkomaster);
+    $result_seTenkomaster = sqlsrv_fetch_array($query_seTenkomaster, SQLSRV_FETCH_ASSOC);
+
+    if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+        $conditionTenkorisky = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "'";
+        $sql_seTenkorisky = "{call megEdittenkorisky_v2(?,?,?)}";
+        $params_seTenkorisky = array(
+            array('select_tenkorisky', SQLSRV_PARAM_IN),
+            array($conditionTenkorisky, SQLSRV_PARAM_IN),
+            array('', SQLSRV_PARAM_IN)
+        );
+        $query_seTenkorisky = sqlsrv_query($conn, $sql_seTenkorisky, $params_seTenkorisky);
+        $result_seTenkorisky = sqlsrv_fetch_array($query_seTenkorisky, SQLSRV_FETCH_ASSOC);
+
+        $rs451 = ($result_seTenkorisky['TENKORISKYBRANCHRESULT'] == '1') ? "checked" : "";
+        $rs461 = ($result_seTenkorisky['TENKOWIRERESULT'] == '1') ? "checked" : "";
+        $rs471 = ($result_seTenkorisky['TENKOLOADRESULT'] == '1') ? "checked" : "";
+        $rs451_h = ($result_seTenkorisky['TENKORISKYBRANCHRESULT_H'] == '1') ? "checked" : "";
+        $rs461_h = ($result_seTenkorisky['TENKOWIRERESULT_H'] == '1') ? "checked" : "";
+        $rs471_h = ($result_seTenkorisky['TENKOLOADRESULT_H'] == '1') ? "checked" : "";
+
+
+
+        $rs450 = ($result_seTenkorisky['TENKORISKYBRANCHRESULT'] == '0') ? "checked" : "";
+        $rs460 = ($result_seTenkorisky['TENKOWIRERESULT'] == '0') ? "checked" : "";
+        $rs470 = ($result_seTenkorisky['TENKOLOADRESULT'] == '0') ? "checked" : "";
+        $rs450_h = ($result_seTenkorisky['TENKORISKYBRANCHRESULT_H'] == '0') ? "checked" : "";
+        $rs460_h = ($result_seTenkorisky['TENKOWIRERESULT_H'] == '0') ? "checked" : "";
+        $rs470_h = ($result_seTenkorisky['TENKOLOADRESULT_H'] == '0') ? "checked" : "";
+        ?>
+
+        <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+            <thead>
+                <tr>
+
+                    <th colspan="7" ><font style="color: green">พนักงานขับรถคนที่ : <?=$sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+                </tr>
+                <tr>
+                    <th style="text-align: center">ข้อ</th>
+                    <th style="text-align: center">หัวข้อ</th>
+                    <th colspan="2" style="text-align: center">สิ่งผิดปกติ</th>
+                    <th colspan="2" style="text-align: center">ฮิยาริฮัตโตะ</th>
+                    <th style="text-align: center">รายละเอียดสิ่งผิดปกติ</th>
+                </tr>
+                <tr>
+                    <th style="text-align: center">&nbsp;</th>
+                    <th style="text-align: center">&nbsp;</th>
+                    <th style="text-align: center">มี</th>
+                    <th style="text-align: center">ไม่มี</th>
+                    <th style="text-align: center">มี</th>
+                    <th style="text-align: center">ไม่มี</th>
+                    <th style="text-align: center">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+
+
+                <tr>
+                    <td style="text-align: center">1</td>
+
+                    <td>กิ่งไม้</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs451 ?> onchange="edit_rs451('TENKORISKYBRANCHRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs451" name="chk_rs451" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs450 ?> onchange="edit_rs450('TENKORISKYBRANCHRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs450" name="chk_rs450" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs451_h ?> onchange="edit_rs451_h('TENKORISKYBRANCHRESULT_H', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"  style="transform: scale(2)" id="chk_rs451_h" name="chk_rs451_h" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs450_h ?> onchange="edit_rs450_h('TENKORISKYBRANCHRESULT_H', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs450_h" name="chk_rs450_h" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKORISKYBRANCHREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKORISKYBRANCHREMARK'] ?></td>
+
+                </tr>
+                <tr>
+                    <td style="text-align: center">2</td>
+                    <td>สายไฟ</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs461 ?> onchange="edit_rs461('TENKOWIRERESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs461" name="chk_rs461" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs460 ?> onchange="edit_rs460('TENKOWIRERESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs460" name="chk_rs460" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs461_h ?> onchange="edit_rs461_h('TENKOWIRERESULT_H', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"  style="transform: scale(2)" id="chk_rs461_h" name="chk_rs461_h" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs460_h ?> onchange="edit_rs460_h('TENKOWIRERESULT_H', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs460_h" name="chk_rs460_h" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKOWIREREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKOWIREREMARK'] ?></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">3</td>
+                    <td>สภาพถนน,ก่อสร้าง</td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs471 ?> onchange="edit_rs471('TENKOLOADRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs471" name="chk_rs471" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs470 ?> onchange="edit_rs470('TENKOLOADRESULT', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs470" name="chk_rs470" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs471_h ?> onchange="edit_rs471_h('TENKOLOADRESULT_H', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"  style="transform: scale(2)" id="chk_rs471_h" name="chk_rs471_h" /></td>
+                    <td style="text-align: center"><input type="checkbox" <?= $rs470_h ?> onchange="edit_rs470_h('TENKOLOADRESULT_H', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')" style="transform: scale(2)" id="chk_rs470_h" name="chk_rs470_h" /></td>
+                    <td contenteditable="true" onkeyup="edit_tenkorisky(this, 'TENKOLOADREMARK', '<?= $result_seTenkorisky['TENKORISKYID'] ?>')"><?= $result_seTenkorisky['TENKOLOADREMARK'] ?></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <?php
+    }
+}
+//tenko 5 = แผนที่ พขร.3
+if ($_POST['txt_flg'] == "select_tenko5emp3") {
+    $conditionPlain = " AND a.VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_sePlain = "{call megVehicletransportplan_v2(?,?)}";
+    $params_sePlain = array(
+        array('select_vehicletransportplan', SQLSRV_PARAM_IN),
+        array($conditionPlain, SQLSRV_PARAM_IN)
+    );
+    $query_sePlain = sqlsrv_query($conn, $sql_sePlain, $params_sePlain);
+    $result_sePlain = sqlsrv_fetch_array($query_sePlain, SQLSRV_FETCH_ASSOC);
+
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE3']."'";
+    $params_checkSexT = array();
+    $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
+    $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
+
+    if ($result_checkSexT['SexT'] == 'หญิง') {
+        $sex = 'นางสาว';
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
+        $sex = 'นาย';
+    }else{
+        $sex = '';
+    }
+
+    ?>
+
+
+
+    <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+        <thead>
+
+            <tr>
+
+                <th colspan="6" ><font style="color: green">พนักงานขับรถ : <?=$sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+
+            </tr>
+
+        </thead>
+        <tbody>
+
+            <tr>
+                <td style="text-align: center">
+                    &nbsp;
+                </td>
+                <td style="text-align: center" >
+                    <img src="../images/noimage.jpg" width="200"/>
+                </td>
+                <td style="text-align: center">
+                    <img src="../images/noimage.jpg" width="200"/>
+                </td>
+                <td style="text-align: center">
+                    <img src="../images/noimage.jpg" width="200"/>
+                </td>
+                <td style="text-align: center">
+                    <img src="../images/noimage.jpg" width="200"/>
+                </td>
+                <td style="text-align: center">
+                    <img src="../images/noimage.jpg" width="200"/>
+                </td>
+                <!--<td width="20%" style="text-align:center">
+                    <img src="../upload_imagemap/<?//= $_POST['vehicletransportplanid'] . $_POST['employeecode2'] ?>1.jpg" width="200"/>
+
+                </td>
+                <td width="20%" style="text-align:center">
+                    <img src="../upload_imagemap/<?//= $_POST['vehicletransportplanid'] . $_POST['employeecode2'] ?>2.jpg" width="200"/>
+
+                </td>
+                <td width="20%" style="text-align:center">
+                    <img src="../upload_imagemap/<?//= $_POST['vehicletransportplanid'] . $_POST['employeecode2'] ?>3.jpg" width="200"/>
+
+                </td>
+                <td width="20%" style="text-align:center">
+                    <img src="../upload_imagemap/<?//= $_POST['vehicletransportplanid'] . $_POST['employeecode2'] ?>4.jpg" width="200"/>
+
+                </td>
+                <td width="20%" style="text-align:center">
+                    <img src="../upload_imagemap/<?//= $_POST['vehicletransportplanid'] . $_POST['employeecode2'] ?>5.jpg" width="200"/>
+
+                </td>
+                -->
+            </tr>
+        </tbody>
+    </table>
+    <!--</form>-->
+
+    <?php
+}
+//tenko 6 ตรวจสอบการฝ่าฝืนระบบ GPS พขร.3
+if ($_POST['txt_flg'] == "select_tenko6emp3") {
+    $condition1 = "  AND a.PersonID = '" . $_SESSION["EMPLOYEEID"] . "'";
+    $sql_seEmployee = "{call megEmployeeEHR_v2(?,?)}";
+    $params_seEmployee = array(
+        array('select_employeeehr2', SQLSRV_PARAM_IN),
+        array($condition1, SQLSRV_PARAM_IN)
+    );
+    $query_seEmployee = sqlsrv_query($conn, $sql_seEmployee, $params_seEmployee);
+    $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
+    
+    $conditionPlain = " AND a.VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_sePlain = "{call megVehicletransportplan_v2(?,?)}";
+    $params_sePlain = array(
+        array('select_vehicletransportplan', SQLSRV_PARAM_IN),
+        array($conditionPlain, SQLSRV_PARAM_IN)
+    );
+    $query_sePlain = sqlsrv_query($conn, $sql_sePlain, $params_sePlain);
+    $result_sePlain = sqlsrv_fetch_array($query_sePlain, SQLSRV_FETCH_ASSOC);
+
+    $sql_checkSexT = "SELECT SexT AS 'SexT' FROM EMPLOYEEEHR2 WHERE PersonCode ='".$result_sePlain['EMPLOYEECODE3']."'";
+    $params_checkSexT = array();
+    $query_checkSexT = sqlsrv_query($conn, $sql_checkSexT, $params_checkSexT);
+    $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
+
+    if ($result_checkSexT['SexT'] == 'หญิง') {
+        $sex = 'นางสาว';
+    }else if($result_checkSexT['SexT'] == 'ชาย'){
+        $sex = 'นาย';
+    }else{
+        $sex = '';
+    }
+
+    $conditionTenkomaster_temp = " AND VEHICLETRANSPORTPLANID = '" . $_POST['vehicletransportplanid'] . "'";
+    $sql_seTenkomaster_temp = "{call megVehicletransportplan_v2(?,?,?,?)}";
+    $params_seTenkomaster_temp = array(
+        array('select_vehicletransporttenko', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster_temp, SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster_temp = sqlsrv_query($conn, $sql_seTenkomaster_temp, $params_seTenkomaster_temp);
+    $result_seTenkomaster_temp = sqlsrv_fetch_array($query_seTenkomaster_temp, SQLSRV_FETCH_ASSOC);
+
+    $conditionTenkomaster = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "'";
+    $sql_seTenkomaster = "{call megEdittenkomaster_v2(?,?)}";
+    $params_seTenkomaster = array(
+        array('select_tenkomaster', SQLSRV_PARAM_IN),
+        array($conditionTenkomaster, SQLSRV_PARAM_IN)
+    );
+    $query_seTenkomaster = sqlsrv_query($conn, $sql_seTenkomaster, $params_seTenkomaster);
+    $result_seTenkomaster = sqlsrv_fetch_array($query_seTenkomaster, SQLSRV_FETCH_ASSOC);
+
+    $conditionTenkogps = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_POST['employeecode3'] . "'";
+    $sql_seTenkogps = "{call megEdittenkogps_v2(?,?,?)}";
+    $params_seTenkogps = array(
+        array('select_tenkogps', SQLSRV_PARAM_IN),
+        array($conditionTenkogps, SQLSRV_PARAM_IN),
+        array('', SQLSRV_PARAM_IN)
+    );
+    $query_seTenkogps = sqlsrv_query($conn, $sql_seTenkogps, $params_seTenkogps);
+    $result_seTenkogps = sqlsrv_fetch_array($query_seTenkogps, SQLSRV_FETCH_ASSOC);
+    ?>
+
+    <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+        <thead>
+
+            <tr>
+
+                <th colspan="5" ><font style="color: green">พนักงานขับรถ : <?=$sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?></font></th>
+            </tr>
+            <tr>
+                <th style="text-align: center;">ข้อ</th>
+                <th style="text-align: center;height: 35px; width:200px;">หัวข้อ</th>
+                <th style="text-align: center;height: 35px; width:180px;">จำนวน</th>
+                <th style="text-align: center;">รายละเอียดการชี้แนะ</th>
+                <th style="text-align: center;">ลายเซ็น พขร.</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+                <td style="text-align: center;height: 35px; width:100px;">1</td>
+                <td>ความเร็วเกินกำหนด</td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSSPEEDOVERAMOUNT', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:150px;" class="form-control"  type="text" name="txt_speedoveramountemp1" id="txt_speedoveramountemp1" value="<?= $result_seTenkogps['TENKOGPSSPEEDOVERAMOUNT'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSSPEEDOVERREMARK', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:500px;" class="form-control"  type="text" name="txt_speedoverremarkemp1" id="txt_speedoverremarkemp1" value="<?= $result_seTenkogps['TENKOGPSSPEEDOVERREMARK'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSSPEEDOVERDIRVER', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:180px;" class="form-control"  type="text" name="txt_speedoverdriveremp1" id="txt_speedoverdriveremp1" value="<?= $result_seTenkogps['TENKOGPSSPEEDOVERDIRVER'] ?>"></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;height: 35px; width:100px;">2</td>
+                <td>เบรคกระทันหัน</td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSBRAKEAMOUNT', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:150px;" class="form-control"  type="text" name="txt_brakeamountemp1" id="txt_brakeamountemp1" value="<?= $result_seTenkogps['TENKOGPSBRAKEAMOUNT'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSBRAKEREMARK', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:500px;" class="form-control"  type="text" name="txt_brakeremarkemp1" id="txt_brakeremarkemp1" value="<?= $result_seTenkogps['TENKOGPSBRAKEREMARK'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSBRAKEDIRVER', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:180px;" class="form-control"  type="text" name="txt_brakedriveremp1" id="txt_brakedriveremp1" value="<?= $result_seTenkogps['TENKOGPSBRAKEDIRVER'] ?>"></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;height: 35px; width:100px;">3</td>
+                <td>รอบเครื่องเกินกำหนด</td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSSPEEDMACHINEAMOUNT', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:150px;" class="form-control"  type="text" name="txt_gpsspeedmechineamountemp1" id="txt_gpsspeedmechineamountemp1" value="<?= $result_seTenkogps['TENKOGPSSPEEDMACHINEAMOUNT'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSSPEEDMACHINEREMARK', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:500px;" class="form-control"  type="text" name="txt_gpsspeedmechineremarkemp1" id="txt_gpsspeedmechineremarkemp1" value="<?= $result_seTenkogps['TENKOGPSSPEEDMACHINEREMARK'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSSPEEDMACHINEDIRVER', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:180px;" class="form-control"  type="text" name="txt_gpsspeedmechinedriveremp1" id="txt_gpsspeedmechinedriveremp1" value="<?= $result_seTenkogps['TENKOGPSSPEEDMACHINEDIRVER'] ?>"></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;height: 35px; width:100px;">4</td>
+                <td>วิ่งนอกเส้นทาง</td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSOUTLINEAMOUNT', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:150px;" class="form-control"  type="text" name="txt_outlineamountemp1" id="txt_outlineamountemp1" value="<?= $result_seTenkogps['TENKOGPSOUTLINEAMOUNT'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSOUTLINEREMARK', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:500px;" class="form-control"  type="text" name="txt_outlineremarkemp1" id="txt_outlineremarkemp1" value="<?= $result_seTenkogps['TENKOGPSOUTLINEREMARK'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSOUTLINEDIRVER', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:180px;" class="form-control"  type="text" name="txt_outlinedriveremp1" id="txt_outlinedriveremp1" value="<?= $result_seTenkogps['TENKOGPSOUTLINEDIRVER'] ?>"></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;height: 35px; width:100px;">5</td>
+                <td>ขับรถต่อเนื่อง 4 ชม.</td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSCONTINUOUSAMOUNT', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:150px;" class="form-control"  type="text" name="txt_continuousamountemp1" id="txt_continuousamountemp1" value="<?= $result_seTenkogps['TENKOGPSCONTINUOUSAMOUNT'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSCONTINUOUSREMARK', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:500px;" class="form-control"  type="text" name="txt_continuousremarkemp1" id="txt_continuousremarkemp1" value="<?= $result_seTenkogps['TENKOGPSCONTINUOUSREMARK'] ?>"></td>
+                <td contenteditable="true" ><input autocomplete="off" onchange="edit_tenkogps(this.value, 'TENKOGPSCONTINUOUSDIRVER', '<?= $result_seTenkogps['TENKOGPSID'] ?>')"  style="height: 35px; width:180px;" class="form-control"  type="text" name="txt_continuousdriveremp1" id="txt_continuousdriveremp1" value="<?= $result_seTenkogps['TENKOGPSCONTINUOUSDIRVER'] ?>"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <?php
+}
+//tenko คำนวณคะแนนการขับขี่ พขร.3
+if ($_POST['txt_flg'] == "check_gpspointemp3") {
+    ?>
+
+        <div style="text-align: center;">
+            <?php
+                $sql_CheckPoint = "SELECT TENKOGPSSPEEDOVERAMOUNT,TENKOGPSBRAKEAMOUNT,TENKOGPSSPEEDMACHINEAMOUNT,
+                TENKOGPSOUTLINEAMOUNT,TENKOGPSCONTINUOUSAMOUNT,GRADEDRIVER,POINTDRIVER
+                FROM TENKOGPS WHERE TENKOMASTERID ='".$_POST['tenkomasterid']."'
+                AND TENKOMASTERDIRVERCODE ='".$_POST['employeecode']."'";
+                $params_CheckPoint = array();
+                $query_CheckPoint = sqlsrv_query($conn, $sql_CheckPoint, $params_CheckPoint);
+                $result_CheckPoint = sqlsrv_fetch_array($query_CheckPoint, SQLSRV_FETCH_ASSOC);
+
+        
+
+                //	ความเร็วเกินกำหนด
+                if ($result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '' || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                    $speedoverpoint = '100';
+                }else {
+                    $speedoverpoint = $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'];
+                }
+                
+                // 	เบรคกระทันหัน
+                if ($result_CheckPoint['TENKOGPSBRAKEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSBRAKEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                    $gpsbrakepoint = '100';
+                }else {
+                    $gpsbrakepoint = $result_CheckPoint['TENKOGPSBRAKEAMOUNT'];
+                }
+                
+                // รอบเครื่องเกินกำหนด
+                if ($result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                    $speedmechinepoint = '100';
+                }else {
+                    $speedmechinepoint = $result_CheckPoint['TENKOGPSSPEEDMACHINEAMOUNT'];
+                }
+                
+                //	วิ่งนอกเส้นทาง
+                if ($result_CheckPoint['TENKOGPSOUTLINEAMOUNT'] == '' || $result_CheckPoint['TENKOGPSOUTLINEAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                    $outlinepoint = '100';
+                }else {
+                    $outlinepoint = $result_CheckPoint['TENKOGPSOUTLINEAMOUNT'];
+                }
+                
+                //	ขับรถต่อเนื่อง 4 ชม.
+                if ($result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'] == '' || $result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'] == NULL || $result_CheckPoint['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                    $continuepoint = '100';
+                }else {
+                    $continuepoint = $result_CheckPoint['TENKOGPSCONTINUOUSAMOUNT'];
+                }
+                
+
+                // ถ้าทำผิดหัก ครั้งละ 2 คะแนน
+                $maxpoint = 100;
+                $sumpoint = ($speedoverpoint+$gpsbrakepoint+$speedmechinepoint+$outlinepoint+$continuepoint)*2;
+
+                if($sumpoint == '1000'){
+                    $allpoint = 'ไม่มีผลคะแนน';
+                }else {
+                    $allpoint = ($maxpoint)-($sumpoint);
+                }
+
+                
+
+                if ($allpoint == '100') {
+                    $grade = 'A';
+                }else if(($allpoint >= '80') && ($allpoint <= '99')){
+                    $grade = 'B';
+                }else if(($allpoint >= '60') && ($allpoint <= '79')){
+                    $grade = 'C';
+                }else if(($allpoint >= '40') && ($allpoint <= '59')){
+                    $grade = 'D';
+                }else if(($allpoint >= '0') && ($allpoint <= '39')){
+                    $grade = 'E';
+                }else {
+                    $grade = 'ไม่มีผลการประเมิน';
+                }
+            ?>
+            <tr>
+                <input type="text" name="txt_gradeemp3" id="txt_gradeemp3" value="<?= $grade ?>" style="display:none">
+                <input type="text" name="txt_pointemp3" id="txt_pointemp3" value="<?= $allpoint ?>" style="display:none">
+                <!-- <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px"><?=$grade?></td>
+                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px"><?=$allpoint?></td> -->
+            </tr>
+        </div>
+        
+    <?php
+}
+if ($_POST['txt_flg'] == "update_tenkogpsGradePoint") {
+    ?>
+  
+    <?php
+  
+    $sql_updateGradePoint = "{call megEdittenkogps_v2(?,?,?,?,?)}";
+    $params_updateGradePoint = array(
+    array('update_tenkogpsGradePoint', SQLSRV_PARAM_IN),
+    array($_POST['grade'], SQLSRV_PARAM_IN),
+    array($_POST['point'], SQLSRV_PARAM_IN),
+    array($_POST['tenkomasterid'], SQLSRV_PARAM_IN),
+    array($_POST['tenkomasterdrivercode'], SQLSRV_PARAM_IN)
+    );
+  
+    $query_updateGradePoint = sqlsrv_query($conn, $sql_updateGradePoint, $params_updateGradePoint);
+    $result_updateGradePoint = sqlsrv_fetch_array($query_updateGradePoint, SQLSRV_FETCH_ASSOC);
+    ?>
+  
+    <?php
+}
+if ($_POST['txt_flg'] == "save_healthfortenko") {
     ?>
 
     <?php
@@ -3815,11 +5765,11 @@ if ($_POST['txt_flg'] == "select_tenko6emp2") {
 
 
     <?php
-  }
-  if ($_POST['txt_flg'] == "select_reportdatetimetenkocheck") {
+}
+if ($_POST['txt_flg'] == "select_reportdatetimetenkocheck") {
     ?>
 
-<table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example1" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+ <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example1" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
       <thead>
       <tr>
         <th>NO11</th>
@@ -3932,8 +5882,8 @@ if ($_POST['txt_flg'] == "select_tenko6emp2") {
             
         </div>
     <?php
-    }
-    if ($_POST['txt_flg'] == "select_dateworkinggrater14hour") {
+}
+if ($_POST['txt_flg'] == "select_dateworkinggrater14hour") {
    ?>
    
        <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example2" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
@@ -6475,6 +8425,39 @@ if ($_POST['txt_flg'] == "recheck_driver2") {
     $result_Recheck_Dri2 = sqlsrv_fetch_array($query_Recheck_Dri2, SQLSRV_FETCH_ASSOC);
 
 }
+if ($_POST['txt_flg'] == "recheck_driver3") {
+  
+    // $sql = "UPDATE DRIVERSELFCHECK 
+    // SET TEMPERATURE ='".$_POST['temperature'] ."',SYSVALUE1 ='".$_POST['sysvalue'] ."',
+    //     DIAVALUE1 ='".$_POST['diavalue'] ."',PULSEVALUE1 ='".$_POST['pulsevalue'] ."',
+    //     OXYGENVALUE ='".$_POST['oxygenvalue'] ."',ALCOHOLVOLUME ='".$_POST['alcoholvalue'] ."'
+    // WHERE SELFCHECKID ='".$_POST['selfcheckid'] ."'";
+    // $query = sqlsrv_query($conn, $sql, $params);
+    // $result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+    
+    // echo $result['TIMEREST'];
+    
+    $sql_Recheck_Dri3 = "{call megEditDriverSelfcheck(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    $params_Recheck_Dri3 = array(
+    array('recheck_driver3', SQLSRV_PARAM_IN),
+    array($_POST['selfcheckid'], SQLSRV_PARAM_IN),
+    array($_POST['temperature'], SQLSRV_PARAM_IN),
+    array($_POST['sysvalue'], SQLSRV_PARAM_IN),
+    array('', SQLSRV_PARAM_IN),
+    array('', SQLSRV_PARAM_IN),
+    array($_POST['diavalue'], SQLSRV_PARAM_IN),
+    array('', SQLSRV_PARAM_IN),
+    array('', SQLSRV_PARAM_IN),
+    array($_POST['pulsevalue'], SQLSRV_PARAM_IN),
+    array('', SQLSRV_PARAM_IN),
+    array('', SQLSRV_PARAM_IN),
+    array($_POST['oxygenvalue'], SQLSRV_PARAM_IN),
+    array($_POST['alcoholvalue'], SQLSRV_PARAM_IN)
+    );
+    $query_Recheck_Dri3 = sqlsrv_query($conn, $sql_Recheck_Dri3, $params_Recheck_Dri3);
+    $result_Recheck_Dri3 = sqlsrv_fetch_array($query_Recheck_Dri3, SQLSRV_FETCH_ASSOC);
+
+}
 if ($_POST['txt_flg'] == "confirm_driverdetail") {
   
     $sql = "UPDATE TENKOBEFORE 
@@ -8560,23 +10543,54 @@ if ($_POST['txt_flg'] == "update_stdtenkodata") {
 }
 if ($_POST['txt_flg'] == "edit_documentdriver_returncase") {
 
+    $RETURNPRICE1_CHK = $_POST['RETURNPRICE1'];
+    $RETURNPRICE2_CHK = $_POST['RETURNPRICE2'];
+
+    if($RETURNPRICE1_CHK == ''){
+        $sql_updatedata = "UPDATE VEHICLETRANSPORTDOCUMENTDIRVER 
+            SET RETURNPRICE1 = NULL ,RETURNPRICE2 ='".$_POST['RETURNPRICE2']."'
+            WHERE VEHICLETRANSPORTPLANID ='".$_POST['PLAN_ID']."'
+            AND VEHICLETRANSPORTDOCUMENTDRIVERID ='".$_POST['DOCUMENTDRIVER_ID']."'";
+        $query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+        $result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);
+    }else if ($RETURNPRICE2_CHK == ''){
+        $sql_updatedata = "UPDATE VEHICLETRANSPORTDOCUMENTDIRVER 
+            SET RETURNPRICE1 ='".$_POST['RETURNPRICE1']."',RETURNPRICE2 = NULL
+            WHERE VEHICLETRANSPORTPLANID ='".$_POST['PLAN_ID']."'
+            AND VEHICLETRANSPORTDOCUMENTDRIVERID ='".$_POST['DOCUMENTDRIVER_ID']."'";
+        $query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+        $result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);
+    }else{
+        $sql_updatedata = "UPDATE VEHICLETRANSPORTDOCUMENTDIRVER 
+            SET RETURNPRICE1 ='".$_POST['RETURNPRICE1']."',RETURNPRICE2 = '".$_POST['RETURNPRICE2']."'
+            WHERE VEHICLETRANSPORTPLANID ='".$_POST['PLAN_ID']."'
+            AND VEHICLETRANSPORTDOCUMENTDRIVERID ='".$_POST['DOCUMENTDRIVER_ID']."'";
+        $query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+        $result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);
+    }
+
     if ($_POST['COMPENSATION2'] == '0') {
         $sql_updatedata = "UPDATE VEHICLETRANSPORTDOCUMENTDIRVER 
-            SET COMPENSATION ='".$_POST['COMPENSATION']."',COMPENSATION1 ='".$_POST['COMPENSATION1']."',COMPENSATION2 = NULL,
-            RETURNPRICE1 ='".$_POST['RETURNPRICE1']."',RETURNPRICE2 ='".$_POST['RETURNPRICE2']."'
+            SET COMPENSATION ='".$_POST['COMPENSATION']."',COMPENSATION1 ='".$_POST['COMPENSATION1']."',COMPENSATION2 = ''
             WHERE VEHICLETRANSPORTPLANID ='".$_POST['PLAN_ID']."'
             AND VEHICLETRANSPORTDOCUMENTDRIVERID ='".$_POST['DOCUMENTDRIVER_ID']."'";
         $query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
         $result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);   
-    }else {
+    }else if($_POST['COMPENSATION1'] == '0'){
         $sql_updatedata = "UPDATE VEHICLETRANSPORTDOCUMENTDIRVER 
-            SET COMPENSATION ='".$_POST['COMPENSATION']."',COMPENSATION1 ='".$_POST['COMPENSATION1']."',COMPENSATION2 ='".$_POST['COMPENSATION2']."',
-            RETURNPRICE1 ='".$_POST['RETURNPRICE1']."',RETURNPRICE2 ='".$_POST['RETURNPRICE2']."'
+            SET COMPENSATION ='".$_POST['COMPENSATION']."',COMPENSATION1 ='',COMPENSATION2 ='".$_POST['COMPENSATION2']."'
             WHERE VEHICLETRANSPORTPLANID ='".$_POST['PLAN_ID']."'
             AND VEHICLETRANSPORTDOCUMENTDRIVERID ='".$_POST['DOCUMENTDRIVER_ID']."'";
         $query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
         $result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);  
-    }  
+    } else {
+        $sql_updatedata = "UPDATE VEHICLETRANSPORTDOCUMENTDIRVER 
+            SET COMPENSATION ='".$_POST['COMPENSATION']."',COMPENSATION1 ='".$_POST['COMPENSATION1']."',COMPENSATION2 ='".$_POST['COMPENSATION2']."'
+            WHERE VEHICLETRANSPORTPLANID ='".$_POST['PLAN_ID']."'
+            AND VEHICLETRANSPORTDOCUMENTDRIVERID ='".$_POST['DOCUMENTDRIVER_ID']."'";
+        $query_updatedata  = sqlsrv_query($conn, $sql_updatedata, $params_updatedata);
+        $result_updatedata = sqlsrv_fetch_array($query_updatedata, SQLSRV_FETCH_ASSOC);  
+    }    
 
 }
 if ($_POST['txt_flg'] == "update_dateworking_bydriver") {

@@ -568,35 +568,7 @@ $i = 1;
 
       $query_seComp = sqlsrv_query($conn, $sql_seComp, $params_seComp);
       while ($result_seComp = sqlsrv_fetch_array($query_seComp, SQLSRV_FETCH_ASSOC)) {
-
-      if ($result_seComp['THAINAME'] =='61-4454' || $result_seComp['THAINAME'] =='61-4456' || $result_seComp['THAINAME'] =='61-3440' ||
-         $result_seComp['THAINAME'] =='61-3441' || $result_seComp['THAINAME'] =='61-4453' || $result_seComp['THAINAME'] =='61-4457' ||
-         $result_seComp['THAINAME'] =='61-4912' || $result_seComp['THAINAME'] =='61-4913' || $result_seComp['THAINAME'] =='61-4546' ||
-         $result_seComp['THAINAME'] =='61-4547' || $result_seComp['THAINAME'] =='64-3452' || $result_seComp['THAINAME'] =='61-3445' ||
-         $result_seComp['THAINAME'] =='61-3439' || $result_seComp['THAINAME'] =='61-3443' || $result_seComp['THAINAME'] =='61-3834' ||
-         $result_seComp['THAINAME'] =='61-3835' || $result_seComp['THAINAME'] =='61-3438' || $result_seComp['THAINAME'] =='61-3437' || 
-         $result_seComp['THAINAME'] =='62-9288' || $result_seComp['THAINAME'] =='61-3836' || $result_seComp['THAINAME'] =='61-4458' || 
-         $result_seComp['THAINAME'] =='61-3444' || $result_seComp['THAINAME'] =='60-3868' || $result_seComp['THAINAME'] =='60-3870' ||
-         $result_seComp['THAINAME'] =='61-3437' || $result_seComp['THAINAME'] =='61-3452') {
-
-         $OILAVERAGE = '4.00';
-
-      }else if($result_seComp['THAINAME'] =='60-3871' || $result_seComp['THAINAME'] =='61-3442' || $result_seComp['THAINAME'] =='60-2391' ||
-         $result_seComp['THAINAME'] =='61-3444' || $result_seComp['THAINAME'] =='76-8919' || $result_seComp['THAINAME'] =='61-4458' ||
-         $result_seComp['THAINAME'] =='79-2521' || $result_seComp['THAINAME'] =='79-2522' || $result_seComp['THAINAME'] =='79-2525' || 
-         $result_seComp['THAINAME'] =='74-5653' || $result_seComp['THAINAME'] =='74-5684' || $result_seComp['THAINAME'] =='74-5684' || $result_seComp['THAINAME'] =='74-5654'  
-      ) {
-         $OILAVERAGE = '3.50';
-      }else {
-         // code...
-
-         $OILAVERAGE = $result_seComp['OILAVERAGE'];
-      }
-
-
-
-
-      
+		  
       if($result_seComp['DOCUMENTCODE'] != '' || $result_seComp['STATUSNUMBER'] == 'X'){
       
          //จำนวนพาเลท
@@ -673,12 +645,61 @@ $i = 1;
             # code...
          }
 
+         if ($result_seComp['THAINAME'] =='61-4456' || $result_seComp['THAINAME'] =='61-3441' || $result_seComp['THAINAME'] =='61-4457' ||
+            $result_seComp['THAINAME'] =='61-4913' || $result_seComp['THAINAME'] =='61-4547' || $result_seComp['THAINAME'] =='64-3452' || 
+            $result_seComp['THAINAME'] =='61-3445' || $result_seComp['THAINAME'] =='61-3443' || $result_seComp['THAINAME'] =='62-9288' || 
+            $result_seComp['THAINAME'] =='61-3836' || $result_seComp['THAINAME'] =='61-4458' )
+         {
+            $OILAVERAGE = 4.0;    
+         }else if($result_seComp['THAINAME'] =='61-3442' || $result_seComp['THAINAME'] =='61-3444' || $result_seComp['THAINAME'] =='76-8919' || 
+                  $result_seComp['THAINAME'] =='61-4458' || $result_seComp['THAINAME'] =='79-2521' || $result_seComp['THAINAME'] =='79-2522' || 
+                  $result_seComp['THAINAME'] =='79-2525' || $result_seComp['THAINAME'] =='74-5654') 
+         {
+            $OILAVERAGE = 3.5;                    
+         }else if($result_seComp['THAINAME'] =='61-3440' || $result_seComp['THAINAME'] =='60-3868' || $result_seComp['THAINAME'] =='61-3439' ||
+               $result_seComp['THAINAME'] =='61-4546' || $result_seComp['THAINAME'] =='60-3870' || $result_seComp['THAINAME'] =='61-4912' ||
+               $result_seComp['THAINAME'] =='61-3452' || $result_seComp['THAINAME'] =='61-3835' || $result_seComp['THAINAME'] =='61-4454' ||
+               $result_seComp['THAINAME'] =='61-3437' || $result_seComp['THAINAME'] =='61-3438' || $result_seComp['THAINAME'] =='61-3834' ||
+               $result_seComp['THAINAME'] =='61-4453' ||
+               $result_seComp['THAINAME'] =='74-5610' || $result_seComp['THAINAME'] =='74-5611' || $result_seComp['THAINAME'] =='74-5612' ||
+               $result_seComp['THAINAME'] =='74-5613' || $result_seComp['THAINAME'] =='74-5658' || $result_seComp['THAINAME'] =='74-5660' ||
+               $result_seComp['THAINAME'] =='74-5675' || $result_seComp['THAINAME'] =='74-5676' || $result_seComp['THAINAME'] =='74-5677' ||
+               $result_seComp['THAINAME'] =='74-5678' || $result_seComp['THAINAME'] =='74-5679' || $result_seComp['THAINAME'] =='74-5688' ||
+               $result_seComp['THAINAME'] =='74-5690' ) 
+         {
+            if($JOBEND=='คลังโคราช'){
+               $OILAVERAGE = 3.75; // คลังโคราช ประเภทรถ 6W ใช้เรท 3.75
+            }else{
+               $OILAVERAGE = 4.25; // งานขายทั่วประเทศ ประเภทรถ 6W ใช้เรท 4.25
+            }
+         }else if($result_seComp['THAINAME'] =='60-3871' || $result_seComp['THAINAME'] =='60-2391' ||
+                  $result_seComp['THAINAME'] =='74-5653' || $result_seComp['THAINAME'] =='74-5684' ) 
+         {
+            if($JOBEND=='คลังโคราช'){
+               $OILAVERAGE = 3.00; // คลังโคราช ประเภทรถ 10W ใช้เรท 3.00 มีทะเบียน 74-5653 และ 74-5684
+            }else{
+               $OILAVERAGE = 3.75; // งานขายทั่วประเทศ ประเภทรถ 10W ใช้เรท 3.75 มีทะเบียน 74-5653 และ 74-5684
+            }
+         }else{
+            if($JOBEND=='BJKC + INGY' || $JOBEND=='INGY' || 
+                $JOBEND=='INGY (Rayong)' || $JOBEND=='INGY+BJKC (Rayong)' ){
+                    $OILAVERAGE = 6.50;
+            }else{
+               $OILAVERAGE = $result_seComp['OILAVERAGE'];
+            }
+         }
+
          if(($CUSTOMERCODE=='SKB')){
             if($JOBEND=='คลังโคราช'){
-               $C3PLUS='0.00';
-               $C3MINUS='0.00';
-               $CALC3='0.00';
-               $plus = '0.00';
+               // แก้ไข วันที่ 05.03.68 ให้แสดงยอดเงิน
+                  // $C3PLUS='0.00';
+                  // $C3MINUS='0.00';
+                  // $CALC3='0.00';
+                  // $plus = '0.00';
+               $C3PLUS=number_format($result_seComp['C3PLUS'] / ($result_seComp['COUNTEMP']), 2);
+               $C3MINUS=number_format($result_seComp['C3MINUS'] / ($result_seComp['COUNTEMP']), 2);
+               $CALC3=number_format(($result_seComp['C3PLUS'] / $result_seComp['COUNTEMP']) - (($result_seComp['C3MINUS'] / $result_seComp['COUNTEMP']) * -1));
+               $plus = $result_seComp['C3PLUS'] / $result_seComp['COUNTEMP'];
                $plus_format = number_format($plus);
                $plus_re = str_replace(",","",$plus_format);   
                $minus = '0.00';
@@ -1234,4 +1255,3 @@ $mpdf->Output();
 
 sqlsrv_close($conn);
 ?>
-

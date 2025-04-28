@@ -45,6 +45,9 @@ $conn = connect("RTMS");
         <link href="../dist/css/jquery.autocomplete.css" rel="stylesheet">
         <!-- <link href="../dist/css/bootstrap-select.css" rel="stylesheet"> -->
 
+        <!-- Swal Alert2 -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+
     </head>
 <style>
    .button {
@@ -58,6 +61,16 @@ $conn = connect("RTMS");
         font-size: 16px;
         margin: 4px 2px;
         cursor: pointer;
+    }
+    .swal2-popup {
+        font-size: 16px !important;
+        padding: 17px;
+        border: 1px solid #F0E1A1;
+        display: block;
+        margin: 22px;
+        text-align: center;
+        color: #61534e;
+        width:600px;
     }
 </style>
     <body>
@@ -207,7 +220,7 @@ $conn = connect("RTMS");
                                                             <tr>
 
                                                                 <td style="text-align: center">
-                                                                    <button style="text-align: center" onclick="delete_vehicleinfo(<?= $result_infolist['VEHICLEINFOID'] ?>);" title="ลบข้อมูล" type="button" class="list-group-item"><span class="glyphicon glyphicon-remove"></span></button>
+                                                                    <button style="text-align: center" onclick="delete_vehicleinfochk('<?= $result_infolist['VEHICLEINFOID'] ?>','<?= $result_infolist['VEHICLEREGISNUMBER'] ?>');" title="ลบข้อมูล" type="button" class="list-group-item"><span class="glyphicon glyphicon-remove"></span></button>
                                                                 </td>
                                                                 <td style="text-align: center">
                                                                     <a href='meg_vehicleinfoamata.php?vehicleinfoid=<?= $result_infolist['VEHICLEINFOID'] ?>&meg=edit' target="_bank" class='list-group-item'><span class="glyphicon glyphicon-wrench"></span></a>
@@ -293,6 +306,9 @@ $conn = connect("RTMS");
             <script src="../dist/js/jquery.autocomplete.js"></script>
             <script src="../dist/js/bootstrap-select.js"></script>
 
+            <!-- Sweet Alert -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+
 
     </body>
     <script>
@@ -306,23 +322,70 @@ $conn = connect("RTMS");
                                             });
                                         });
 
+                                        function delete_vehicleinfochk(vehicleinfoid,vehicleregisnumber){
+                                            
+                                            // alert(vehicleregisnumber);
+                                            var vehicleinfoid_chk = vehicleinfoid;
+                                            var vehicleregisnumber_chk = vehicleregisnumber;
+                                            // var nameshow = employeename;
+                                            // var checkindateshow = checkindate;
+                                            // var tenkoestdateshow = tenkoestdate;
+
+                                            Swal.fire({
+                                                title: 'ต้องการลบข้อมูลใช่หรือไม่ ?',
+                                                html: '<div style="text-align: left;"><b>รหัสไอดี</b>&nbsp;:  '+vehicleinfoid_chk+'<br><b>ทะเบียนรถ</b>&nbsp;: '+vehicleregisnumber_chk+'<br></div>',
+                                                text: "กรุณากด 'ตกลง' เพื่อยืนยัน!!!",
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#3085d6',
+                                                cancelButtonColor: '#d33',
+                                                confirmButtonText: 'ตกลง',
+                                                cancelButtonText: 'ยกเลิก',
+                                                allowOutsideClick: false,
+                                                position: 'top'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    // Swal.fire(
+                                                    // 'Deleted!',
+                                                    // 'Your file has been deleted.',
+                                                    // 'success'
+                                                    // )
+                                                    // alert('Y');
+                                                    delete_vehicleinfo(vehicleinfoid);   
+                                                }else{
+                                                    // window.location.reload();
+                                                    // alert('N');
+                                                }
+                                            })
+
+                                        }
                                         function delete_vehicleinfo(vehicleinfoid)
                                         {
-                                            var confirmation = confirm("ต้องการลบข้อมูล ?");
-
-                                            if (confirmation) {
-                                                $.ajax({
-                                                    type: 'post',
-                                                    url: 'meg_data.php',
-                                                    data: {
-                                                        txt_flg: "delete_vehicleinfo", vehicleinfoid: vehicleinfoid
-                                                    },
-                                                    success: function () {
-                                                        alert('ลบข้อมูลเรียบร้อยแล้ว');
+                                            $.ajax({
+                                                type: 'post',
+                                                url: 'meg_data.php',
+                                                data: {
+                                                    txt_flg: "delete_vehicleinfo", vehicleinfoid: vehicleinfoid
+                                                },
+                                                success: function () {
+                                                    // alert('ลบข้อมูลเรียบร้อยแล้ว');
+                                                    // window.location.reload();
+                                                    swal.fire({
+                                                        title: "Good Job!",
+                                                        text: "ลบข้อมูลเรียบร้อยแล้ว",
+                                                        icon: "success",
+                                                        showConfirmButton: true,
+                                                        allowOutsideClick: false,
+                                                    });
+                                                    setTimeout(() => {
+                                                        //         // document.location.reload();
                                                         window.location.reload();
-                                                    }
-                                                });
-                                            }
+                                                    }, 1500);
+                                                        // window.location.reload();
+                                                        
+                                                }
+                                            });
+                                            
                                         }
 
                                         function add_vehicleinfo()

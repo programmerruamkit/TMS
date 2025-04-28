@@ -98,7 +98,7 @@
             $QUERYWHERE1="EHR.PositionNameT LIKE '%CS%' AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";
             $SHOW='CS';
         }else if($LINEOFWORK == 'TTKN'){
-            $QUERYWHERE1="EHR.PositionNameT LIKE '%T-Tohken%' AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";
+            $QUERYWHERE1="EHR.PositionNameT LIKE '%Tohken%' AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";
             $SHOW='T.TOHKEN';
         }else if($LINEOFWORK == 'STM'){
             $QUERYWHERE1="EHR.PositionNameT LIKE '%STM%' AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";
@@ -113,7 +113,7 @@
             $QUERYWHERE1="EHR.PositionNameT LIKE '%พนักงานขับรถ%' AND EHR.Company_Code = 'RKR' AND NOT EHR.PositionNameT IN ('พนักงานขับรถ/CS','พนักงานขับรถ/RKL-STC') AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";
             $SHOW='STC 10 W';
         }else if($LINEOFWORK == 'SCCL'){
-            $QUERYWHERE1="EHR.PositionNameT LIKE '%พนักงานขับรถ/RKL-STC%' AND EHR.Company_Code = 'RKL' AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";
+            $QUERYWHERE1="(EHR.PositionNameT LIKE '%พนักงานขับรถ/RKL-STC%' OR EHR.PositionNameT LIKE '%พนักงานขับรถ/Other RKL%') AND EHR.Company_Code = 'RKL' AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";
             $SHOW='STC TL';
         }else if($LINEOFWORK == 'OTHER'){
             $QUERYWHERE1="NOT ( 
@@ -123,7 +123,9 @@
                 EHR.PositionNameT LIKE '%TGT%' OR 
                 EHR.PositionNameT LIKE '%STM%' OR 
                 EHR.PositionNameT LIKE '%T-Tohken%' OR 
+                EHR.PositionNameT LIKE '%T.Tohken%' OR 
                 EHR.PositionNameT LIKE '%RKL-STC%' OR 
+                EHR.PositionNameT LIKE '%Other RKL' OR 
                 EHR.PositionNameT LIKE '%KUBOTA%' OR 
                 EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR 
                 EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')";

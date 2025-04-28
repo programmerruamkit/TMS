@@ -109,11 +109,17 @@ if ($_POST['txt_flg'] == "select_vehicletransportprice") {
               <thead >
                 <tr>
                   <th title="ID" style="text-align: center;width: 100px">ID</th>
+                  <th title="VEHICLETYPE" style="text-align: center;width: 200px">VEHICLETYPE</th>
+                  <th title="BILLING1" style="text-align: center;width: 200px">BILLING1</th>
+                  <th title="BILLING2" style="text-align: center;width: 200px">BILLING2</th>
+                  <th title="ZONE" style="text-align: center;width: 200px">ZONE</th>
+                  <th title="LOCATION" style="text-align: center;width: 200px">LOCATION</th>
+                  <th title="E1" style="text-align: center;width: 200px">E1</th>
+                  <th title="E2" style="text-align: center;width: 200px">E2</th>
+                  <th title="MONTHST" style="text-align: center;width: 200px">ไตรมาส</th>
+                  <th title="STARTDATE" style="text-align: center;width: 200px">STARTDATE</th>
+                  <th title="ENDDATE" style="text-align: center;width: 200px">ENDDATE</th>
                   <th title="จัดการ" style="text-align: center;width: 100px">จัดการ</th>
-                  <th title="VEHICLEDESCCODE" style="text-align: center;width: 200px">ONEWAY_KM</th>
-                  <th title="COMPANYCODE" style="text-align: center;width: 200px">AllDISTANCE_KM</th>
-                  <th title="CUSTOMERCODE" style="text-align: center;width: 200px">PRICE</th>
-                  <th title="CUSTOMERCODE" style="text-align: center;width: 200px">VEHICLETYPE</th>
                 </tr>
               </thead>
               <?php
@@ -389,12 +395,18 @@ if ($_POST['txt_flg'] == "select_vehicletransportprice") {
           <tbody>
             <?php
             if ($_POST['companycode'] == 'RKL' && $_POST['customercode'] == 'SKB') {
-              $condVehicletransportprice1 = " AND ACTIVESTATUS = '1'";
+              $data = explode(",",$_POST['monthst']);
+              // echo $data[0];
+              // echo $data[1];
+              $condVehicletransportprice1 = " AND COMPANYCODE ='RKL' AND CUSTOMERCODE ='SKB' 
+                AND MONTHST ='" . $data[1] . "' AND CARRYTYPE = '" . $_POST['carrytype'] . "'
+                AND CONVERT(NVARCHAR(4),STARTDATE,111) = '".$data[0]."'
+                ORDER BY [ZONE],[LOCATION],[VEHICLETYPE] ASC";
               $condVehicletransportprice2 = "";
               $condVehicletransportprice3 = "";
               $sql_seVehicletransportprice = "{call megVehicletransportpriceavgkm_v2(?,?,?,?)}";
               $params_seVehicletransportprice = array(
-              array('select_vehicletransportpriceavgkm', SQLSRV_PARAM_IN),
+              array('select_vehicletransportpriceskb', SQLSRV_PARAM_IN),
               array($condVehicletransportprice1, SQLSRV_PARAM_IN),
               array($condVehicletransportprice2, SQLSRV_PARAM_IN),
               array($condVehicletransportprice3, SQLSRV_PARAM_IN)
@@ -405,22 +417,40 @@ if ($_POST['txt_flg'] == "select_vehicletransportprice") {
                 ?>
                 <tr >
                   <td style="text-align: center;">
-                    <?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEAVGKMID'] ?>
-                  </td>
-                  <td style="text-align: center;">
-                    <button onclick="delete_vehicletransportpriceavgkm('<?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEAVGKMID'] ?>');" title="ลบข้อมูล" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-remove"></span></button>
-                  </td>
-                  <td>
-                    <input type="text" class="form-control" value="<?= $result_seVehicletransportprice['ONEWAY_KM'] ?>" onchange="edit_vehicletransportpriceavgkm(this.value, 'ONEWAY_KM', '<?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEAVGKMID'] ?>', '<?= $result_seVehicletransportprice['VEHICLETYPE'] ?>')">
-                  </td>
-                  <td>
-                    <input type="text" class="form-control" value="<?= $result_seVehicletransportprice['AllDISTANCE_KM'] ?>" onchange="edit_vehicletransportpriceavgkm(this.value, 'AllDISTANCE_KM', '<?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEAVGKMID'] ?>', '<?= $result_seVehicletransportprice['VEHICLETYPE'] ?>')">
-                  </td>
-                  <td>
-                    <input type="text" class="form-control" value="<?= $result_seVehicletransportprice['PRICE'] ?>" onchange="edit_vehicletransportpriceavgkm(this.value, 'PRICE', '<?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEAVGKMID'] ?>', '<?= $result_seVehicletransportprice['VEHICLETYPE'] ?>')">
+                    <?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEID'] ?>
                   </td>
                   <td>
                     <?= $result_seVehicletransportprice['VEHICLETYPE'] ?>
+                  </td>
+                  <td>
+                    <?= $result_seVehicletransportprice['BILLING1'] ?>
+                  </td>
+                  <td>
+                    <?= $result_seVehicletransportprice['BILLING2'] ?>
+                  </td>
+                  <td>
+                    <?= $result_seVehicletransportprice['ZONE'] ?>
+                  </td>
+                  <td>
+                    <?= $result_seVehicletransportprice['LOCATION'] ?>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" value="<?= $result_seVehicletransportprice['E1'] ?>" onchange="edit_vehicletransportpriceavgkm(this.value, 'E1', '<?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEID'] ?>', '<?= $result_seVehicletransportprice['VEHICLETYPE'] ?>')">
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" value="<?= $result_seVehicletransportprice['E2'] ?>" onchange="edit_vehicletransportpriceavgkm(this.value, 'E2', '<?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEID'] ?>', '<?= $result_seVehicletransportprice['VEHICLETYPE'] ?>')">
+                  </td>
+                  <td style="text-align: center;">
+                    <?= $result_seVehicletransportprice['MONTHST'] ?>
+                  </td>
+                  <td style="text-align: center;">
+                    <?= $result_seVehicletransportprice['STARTDATE'] ?>
+                  </td>
+                  <td style="text-align: center;">
+                    <?= $result_seVehicletransportprice['ENDDATE'] ?>
+                  </td>
+                  <td style="text-align: center;">
+                    <button onclick="delete_vehicletransportpriceavgkm('<?= $result_seVehicletransportprice['VEHICLETRANSPORTPRICEID'] ?>');" title="ลบข้อมูล" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-remove"></span></button>
                   </td>
                 </tr>
                 <?php

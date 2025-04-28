@@ -76,6 +76,20 @@ if ($_GET['vehicleinfoid'] != "") {
     // echo $result_CalculateTruck['RS'];
 }
 
+// การลงข้อมูล ถ้าเป็น Add ต้องแสดงการลงข้อมูลทั้งหมด
+if ($_GET['meg'] == 'add') {
+    $chk_control1 = "";
+}else {
+    $chk_control1 = "display:none";
+}
+
+// ตารางค้นหาข้อมูลการซ่อมจาก EMS Phase1 ,EMS Phase2
+if ($_GET['meg'] == 'add') {
+    $chk_control2 = "display:none";
+}else {
+    $chk_control2 = "";
+}
+
     // Request URL  จาก SERVER 
     // if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')   
     //      $url = "https://";   
@@ -344,7 +358,7 @@ if ($_GET['vehicleinfoid'] != "") {
                                                 <input class="form-control"  id="txt_carnameth" name="txt_carnameth" value="<?= $result_info['THAINAME'] ?>">
                                             </div>
                                         </div>
-                                        <div class="col-lg-3" style="display:none">
+                                        <div class="col-lg-3" style="<?=$chk_control1?>">
                                             <div class="form-group">
                                                 <label>ชื่อรถ (อังกฤษ)</label>
                                                 <input class="form-control"  id="txt_carnameen" name="txt_carnameen" value="<?= $result_info['ENGNAME'] ?>">
@@ -444,7 +458,7 @@ if ($_GET['vehicleinfoid'] != "") {
                                         </div>
                                         <div class="col-lg-3 ">
                                             <div class="form-group">
-                                                <label>น้ำหนักรวมทั้งหมด(กิโลกรัม)</label>
+                                                <label>น้ำหนักรวมทั้งหมด (กิโลกรัม)</label>
                                                 <input class="form-control"  id="txt_totalweight" name="txt_totalweight" onkeyup="checknumber(this.value,'totalweight')" value="<?= $result_info['TOTALWEIGHT'] ?>">
                                             </div>
                                         </div> 
@@ -490,69 +504,59 @@ if ($_GET['vehicleinfoid'] != "") {
                                                 <input class="form-control" autocomplete="off"  id="txt_inforemark" name="txt_inforemark" value="<?= $result_info['REMARK'] ?>"></input>
                                             </div>
                                         </div>
-                                    </div>   
-                                    <div class="col-lg-2" style="display:none">
-                                        <div class="form-group">
-                                            <label>กลุ่มรถ</label>
-                                            <select  class="form-control" id="cb_cargroup" name="cb_cargroup">
-                                                <option value="">เลือกกลุ่มรถ</option>
-                                                <?php
-                                                $sql_seCargroup = "{call megVehiclegroup_v2(?)}";
-                                                $params_seCargroup = array(
-                                                    array('select_vehiclegroup', SQLSRV_PARAM_IN)
-                                                );
-                                                $query_seCargroup = sqlsrv_query($conn, $sql_seCargroup, $params_seCargroup);
-                                                while ($result_seCargroup = sqlsrv_fetch_array($query_seCargroup, SQLSRV_FETCH_ASSOC)) {
-                                                    $selected1 = "";
-                                                    if ($result_info['VEHICLEGROUPCODE'] == $result_seCargroup['VEHICLEGROUPCODE']) {
-                                                        $selected1 = "selected";
+                                        <div class="col-lg-3" style="<?=$chk_control1?>">
+                                            <div class="form-group">
+                                                <label>กลุ่มรถ</label>
+                                                <select  class="form-control" id="cb_cargroup" name="cb_cargroup">
+                                                    <option value="">เลือกกลุ่มรถ</option>
+                                                    <?php
+                                                    $sql_seCargroup = "{call megVehiclegroup_v2(?)}";
+                                                    $params_seCargroup = array(
+                                                        array('select_vehiclegroup', SQLSRV_PARAM_IN)
+                                                    );
+                                                    $query_seCargroup = sqlsrv_query($conn, $sql_seCargroup, $params_seCargroup);
+                                                    while ($result_seCargroup = sqlsrv_fetch_array($query_seCargroup, SQLSRV_FETCH_ASSOC)) {
+                                                        $selected1 = "";
+                                                        if ($result_info['VEHICLEGROUPCODE'] == $result_seCargroup['VEHICLEGROUPCODE']) {
+                                                            $selected1 = "selected";
+                                                        }
+                                                        ?>
+                                                        <option value="<?= $result_seCargroup['VEHICLEGROUPCODE'] ?>" <?= $selected1 ?>><?= $result_seCargroup['VEHICLEGROUPDESC'] ?></option>
+                                                        <?php
                                                     }
                                                     ?>
-                                                    <option value="<?= $result_seCargroup['VEHICLEGROUPCODE'] ?>" <?= $selected1 ?>><?= $result_seCargroup['VEHICLEGROUPDESC'] ?></option>
-                                                    <?php
-                                                }
-                                                ?>
 
 
-                                            </select>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>  
-                                    <div class="col-lg-3">
-                                            <div class="form-group" style="display:none">
+                                        <div class="col-lg-3">
+                                            <div class="form-group" style="<?=$chk_control1?>">
                                                 <label>เลขตัวถัง</label>
                                                 <input class="form-control"  id="txt_chassisnumber" name="txt_chassisnumber" value="<?= $result_info['CHASSISNUMBER'] ?>">
                                             </div>
                                         </div>
-                                    <div class="col-lg-3" style="display:none">
+                                        <div class="col-lg-3" style="<?=$chk_control1?>">
                                             <div class="form-group">
                                                 <label>น้ำหนักรถ (กิโลกรัม)</label>
                                                 <input class="form-control"  id="txt_weight" name="txt_weight" onkeyup="checknumber(this.value,'truckweight')" value="<?= $result_info['WEIGHT'] ?>">
                                             </div>
-                                        </div>
-                                    <div class="col-lg-2" style="display:none">
-                                        <div class="form-group">
-                                            <label>วันที่จดทะเบียน</label>
-                                            <input class="form-control datevehicleregister"  id="txt_vehicleregisterdate" name="txt_vehicleregisterdate"  value="<?= $result_info['VEHICLEREGISTERDATE'] ?>">
-                                        </div>
-                                    </div> 
-                                        
-                                    
-                                    <!-- END ROW1 -->
-                             
-                                    <!-- START ROW2 -->
-                                    <!-- <div class="row" >
-                                        <br>   
-                                    </div> -->
-                                    <!-- END ROW2 -->
-                                    <!-- START ROW3 -->
-                                    <div class="row" style="display:none">
-                                        <div class="col-lg-2">
+                                        </div>   
+                                    </div>   
+                                    <div class ="row">         
+                                        <div class="col-lg-3" style="<?=$chk_control1?>">
+                                            <div class="form-group">
+                                                <label>วันที่จดทะเบียน</label>
+                                                <input class="form-control datevehicleregister"  id="txt_vehicleregisterdate" name="txt_vehicleregisterdate"  value="<?= $result_info['VEHICLEREGISTERDATE'] ?>">
+                                            </div>
+                                        </div>               
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>เลขเครื่องยนต์</label>
                                                 <input class="form-control"  id="txt_machine" name="txt_machine" value="<?= $result_info['MACHINENUMBER'] ?>">
                                             </div>
-                                        </div> 
-                                        <div class="col-lg-2">
+                                        </div>             
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ประเภทเกียร์รถ</label>
                                                 <select  class="form-control" id="cb_geartype" name="cb_geartype">
@@ -577,7 +581,7 @@ if ($_GET['vehicleinfoid'] != "") {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ประเภทพลังงาน</label>
                                                 <select  class="form-control" id="cb_energy" name="cb_energy">
@@ -609,33 +613,43 @@ if ($_GET['vehicleinfoid'] != "") {
                                                     ?>
                                                 </select>
                                             </div>
-                                        </div>
+                                        </div>    
                                     </div>
-                                    <!-- END ROW3  -->
-                                    <!-- START ROW4 -->
-                                    <div class="row" style="display:none">
-                                        <div class="col-lg-2">
+                                      
+                                    
+                                    
+                                        
+                                    
+                                    <!-- END ROW1 -->
+                             
+                                    <!-- START ROW2 -->
+                                    <!-- <div class="row" >
+                                        <br>   
+                                    </div> -->
+                                    <!-- END ROW2 -->
+                                    <!-- START ROW3 -->
+                                    <div class="row" style="<?=$chk_control1?>">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>น้ำหนักบรรทุกสูงสุด (กิโลกรัม)</label>
                                                 <input class="form-control"  id="txt_maxload" name="txt_maxload" onkeyup="checknumber(this.value,'maximunload')" value="<?= $result_info['MAXIMUMLOAD'] ?>">
                                             </div>
                                         </div>
-                                            <div class="col-lg-2">
+                                            <div class="col-lg-3">
                                                 <div class="form-group">
                                                     <label>น้ำหนักรวม</label>
                                                     <input class="form-control"  id="txt_totalweight" name="txt_totalweight" onkeyup="checknumber(this.value,'totalweight')" value="<?= $result_info['TOTALWEIGHT'] ?>">
                                                 </div>
                                             </div> 
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>แรงม้า</label>
                                                 <input class="form-control"  id="txt_horse" name="txt_horse" onkeyup="checknumber(this.value,'horsepower')" value="<?= $result_info['HORSEPOWER'] ?>">
                                             </div>
-                                        </div>
-                                        <div class="col-lg-2">
+                                        </div>           
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ประเภทเพลา</label>
-
                                                 <select  class="form-control" id="cb_axle" name="cb_axle">
                                                     <option value="" >เลือกประเภทเพลา</option>
 
@@ -811,18 +825,18 @@ if ($_GET['vehicleinfoid'] != "") {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+
+                                    </div>
+                                    <!-- END ROW3  -->
+                                    <!-- START ROW4 -->
+                                    <div class="row" style="<?=$chk_control1?>">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>CC</label>
                                                 <input class="form-control"  id="txt_cc" name="txt_cc" onkeyup="checknumber(this.value,'cc')" value="<?= $result_info['CC'] ?>">
                                             </div>
                                         </div> 
-                                    </div>
-                                    <!-- END ROW4 -->
-                                    
-                                   <!-- START ROW6 -->
-                                    <div class="row" style="display:none"> 
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>การใช้งาน (ปี)</label>
                                                 <select  class="form-control" id="cb_used" name="cb_used">
@@ -1361,8 +1375,8 @@ if ($_GET['vehicleinfoid'] != "") {
                                                     ?>
                                                 </select>
                                             </div>
-                                        </div> 
-                                        <div class="col-lg-2">
+                                        </div>             
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ลูกสูบ</label>
                                                 <select  class="form-control" id="cb_piston" name="cb_piston">
@@ -1539,13 +1553,18 @@ if ($_GET['vehicleinfoid'] != "") {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>อุปกรณ์เฉพาะ</label>
                                                 <input class="form-control" autocomplete="off"  id="txt_vehiclespecial" name="txt_vehiclespecial" value="<?= $result_info['VEHICLESPECIAL'] ?>"></input>
                                             </div>
-                                        </div> 
-                                        <div class="col-lg-2">
+                                        </div>   
+                                    </div>
+                                    <!-- END ROW4 -->
+                                    
+                                   <!-- START ROW6 -->
+                                    <div class="row" style="<?=$chk_control1?>"> 
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>สีรถ</label>
                                                 <select  class="form-control" id="cb_carcolor" name="cb_carcolor">
@@ -1570,29 +1589,29 @@ if ($_GET['vehicleinfoid'] != "") {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ซื้อรถที่ไหน</label>
                                                 <input class="form-control"  id="txt_vehiclebuywhere" name="txt_vehiclebuywhere"  value="<?= $result_info['VEHICLEBUYWHERE'] ?>">
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>วันที่ซื้อ</label>
                                                 <input class="form-control datebuy"    id="txt_vehiclebuydate" name="txt_vehiclebuydate"  value="<?= $result_info['VEHICLEBUYDATE'] ?>">
                                             </div>
                                         </div>
-                                    </div>                
-                                    <!-- END ROW7 -->
-                                    <!-- START ROW8 -->
-                                    <div class="row" style="display:none">
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ราคารถ</label>
                                                 <input class="form-control" onkeyup="checknumber(this.value,'vehiclebuyprice')" id="txt_vehiclebuyprice" name="txt_vehiclebuyprice"  value="<?= $result_info['VEHICLEBUYPRICE'] ?>">
                                             </div>
-                                        </div>    
-                                        <div class="col-lg-2">
+                                        </div> 
+                                    </div>                
+                                    <!-- END ROW7 -->
+                                    <!-- START ROW8 -->
+                                    <div class="row" style="<?=$chk_control1?>">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>เงื่อนไขการซื้อ</label>
                                                 <select  class="form-control" id="cb_vehiclebuyconditon" name="cb_vehiclebuyconditon">
@@ -1627,66 +1646,68 @@ if ($_GET['vehicleinfoid'] != "") {
                                                 </select>
                                             </div>
                                         </div> 
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ต่อโครงสร้างที่ใหน</label>
                                                 <input class="form-control"  id="txt_vehiclestructurewhere" name="txt_vehiclestructurewhere"  value="<?= $result_info['VEHICLESTRUCTUREWHERE'] ?>">
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>วันที่ต่อโครงสร้าง</label>
                                                 <input class="form-control datevehiclestructure"   id="txt_vehiclestructuredate" name="txt_vehiclestructuredate"  value="<?= $result_info['VEHICLESTRUCTUREDATE'] ?>">
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ราคาการต่อโครงสร้าง</label>
                                                 <input class="form-control" onkeyup="checknumber(this.value,'vehiclestructuredprice')" id="txt_vehiclestructuredprice" name="txt_vehiclestructuredprice"  value="<?= $result_info['VEHICLESTRUCTUREPRICE'] ?>">
                                             </div>
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label>บริษัทสังกัด</label>
-                                                <input class="form-control" autocomplete="off"  id="txt_affcompany" name="txt_affcompany" value="<?= $result_info['AFFCOMPANY'] ?>"></input>
-                                            </div>
-                                        </div>       
+                                        </div>      
                                     </div>
                                     <!-- END ROW6 -->
                                     
                                     <!-- START ROW9 -->
-                                    <div class="row" style="display:none">
-                                        <div class="col-lg-2">
+                                    <div class="row" style="<?=$chk_control1?>">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>บริษัทสังกัด</label>
+                                                <input class="form-control" autocomplete="off"  id="txt_affcompany" name="txt_affcompany" value="<?= $result_info['AFFCOMPANY'] ?>"></input>
+                                            </div>
+                                        </div> 
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ขนาดของรถบรรทุก (กว้างXยาวXสูง)</label>
                                                 <input class="form-control"  id="txt_truckdimension" name="txt_truckdimension" value="<?= $result_info['TRUCKDIMENSION'] ?>">
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ขนาดของตู้สินค้า (กว้างXยาวXสูง)</label>
                                                 <input class="form-control"  id="txt_cargodimension" name="txt_cargodimension" value="<?= $result_info['CARGODIMENSION'] ?>">
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ความจุของถังน้ำมัน (ลิตร)</label>
                                                 <input class="form-control"  id="txt_fueltankcap" name="txt_fueltankcap" value="<?= $result_info['FUELTANKCAP'] ?>">
                                             </div>
                                         </div> 
-                                        <div class="col-lg-2">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>ลิมิตความเร็วที่กำหนด (km/hr)</label>
                                                 <input class="form-control"  id="txt_speedlimit" name="txt_speedlimit" value="<?= $result_info['SPEEDLIMIT'] ?>">
                                             </div>
                                         </div> 
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>หมายเหตุ</label>
                                                 <input class="form-control" autocomplete="off"  id="txt_inforemark" name="txt_inforemark" value="<?= $result_info['REMARK'] ?>"></input>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>สถานะ</label>
                                                 <select  class="form-control" id="cb_carstatus" name="cb_carstatus">
@@ -1721,16 +1742,16 @@ if ($_GET['vehicleinfoid'] != "") {
                                                     ?>
                                                 </select>
                                             </div>
-                                        </div>
+                                        </div>           
                                     </div>
-                                   
+                                    <div style="height:40px"></div>
                                     <!-- END ROW9 -->  
                                     <!-- <br>-->
                                     <div class="col-lg-12" style="text-align: center;">
                                         <?php
                                         $buttonname = ($_GET['meg'] == 'add') ? "บันทึกข้อมูล" : "แก้ไขข้อมูล";
                                         ?>
-                                        <input style="background-color: #3CBC8D;width:200px;height:40px;color:#ffffff;font-size: 20px;" type="button" onclick="confirm_data('<?= $_GET['vehicleinfoid'] ?>');" name="btnSend" id="btnSend" value="<?= $buttonname ?>" class="btn btn-success">
+                                        <input style="background-color: #3CBC8D;width:250px;height:100px;color:#ffffff;font-size: 45px;" type="button" onclick="confirm_data('<?= $_GET['vehicleinfoid'] ?>');" name="btnSend" id="btnSend" value="<?= $buttonname ?>" class="btn btn-success">
                                         <!-- <input style="background-color: #3CBC8D;width:200px;height:40px;color:#ffffff;font-size: 20px;" type="button" onclick="print_data('<?= $_GET['vehicleinfoid'] ?>');" name="btnSend" id="btnSend" value="พิมพ์ข้อมูลรถ" class="btn btn-success"> -->
                                         <!-- <button style="background-color: #1372d1;width:200px;height:40px;color:#ffffff;font-size: 20px;" onclick="pdf_printvehicleinfo('<?= $_GET['vehicleinfoid'] ?>')" title="พิมพ์" type="button" class="btn btn-default btn-circle"><span class="glyphicon glyphicon-print"></span>พิมพ์ข้อมูล</button> -->
                                     </div>  
@@ -1751,8 +1772,9 @@ if ($_GET['vehicleinfoid'] != "") {
                     </div>
                 </div>
 
+                
                 <!-- TAP ตารางแสดงข้อมูล EMS Phase1-->
-                <div class="panel-body" >
+                <div class="panel-body" style="<?=$chk_control2?>">
                     <ul class="nav nav-pills" id="emsnav">
                         <li class="active" ><a style="border-style: solid;border-radius: 10px;border-color: #0a4b85;display: inline-block;" href="#truckrepair_emsp1" data-toggle="tab" aria-expanded="true" >ข้อมูลการซ่อมจาก EMS Phase1</a>
                         </li>
@@ -1763,7 +1785,7 @@ if ($_GET['vehicleinfoid'] != "") {
                         <div class="col-md-12" >&nbsp;</div>
                     </div> 
                 </div>
-                <div class="tab-content">
+                <div class="tab-content" style="<?=$chk_control2?>">
                     <div class="row">
                         <div class="col-md-12">&nbsp;</div>
                     </div>
@@ -1784,29 +1806,7 @@ if ($_GET['vehicleinfoid'] != "") {
                                         <input type="text" class="form-control dateen_emsp1"  readonly=""  style="background-color: #f080802e" id="txt_dateend_emsp1" name="txt_dateend_emsp1" placeholder="วันที่สิ้นสุด" value="<?= $result_getDate['SYSDATE']; ?>">
                                     </div>
                                 </div>
-                                <!--                             
-                                <div class="col-lg-2">
-                                    <label>เลือกรถ:</label>
-                                    <div class="dropdown bootstrap-select show-tick form-control">
-                                        <select   id="txt_drivercode" name="txt_drivercode" class="selectpicker form-control" data-container="body" data-live-search="true" title="เลือก พนักงาน..." data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false" tabindex="-98" >
-                                            <?php
-                                            // $condiLocation1 = " AND COMPANYCODE = 'RKR' AND CUSTOMERCODE = 'TTASTSTC'";
-                                            $sql_seName = "{call megEmployeeEHR_v2(?,?)}";
-                                            $params_seName = array(
-                                                array('select_employeeehr2', SQLSRV_PARAM_IN),
-                                                array('', SQLSRV_PARAM_IN)
-                                            );
-                                            $query_seName = sqlsrv_query($conn, $sql_seName, $params_seName);
-                                            while ($result_seName = sqlsrv_fetch_array($query_seName, SQLSRV_FETCH_ASSOC)) {
-                                                ?>
-                                                <option value="<?= $result_seName['PersonCode'] ?>"><?= $result_seName['nameT'] ?> (<?= $result_seName['PersonCode'] ?>)</option>
-                                                <?php
-                                            }
-                                            ?>
-                                        </select>
-                                        <input class="form-control" style="display: none"   id="txt_copydiagramzone" name="txt_copydiagramzone" maxlength="500" value="" >
-                                    </div>
-                                </div> -->
+                                
                                 
                                 <div class="col-lg-12" style="text-align:left;">
                                     <label>&nbsp;</label>

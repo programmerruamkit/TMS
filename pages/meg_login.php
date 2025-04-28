@@ -17,7 +17,11 @@ else {
    $checkClient = 'DT';
    $TitleShow = '';
 }
+// ถ้าเวฺ็บไม่สามาถเข้าใช้งานได้
+    // header("location:../pages/meg_login.php?data=3");
+    //header("location:../pages/index_mantenance.html?status=mantenance");
 ?>
+
 <html lang="en">
     <head>
         <link rel="shortcut icon" href="../images/logo.ico" />

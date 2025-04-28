@@ -324,9 +324,9 @@ if ($EXCELMONTH != "") {
                             // $CUSTOMERCODE="AND VHCTPP.VEHICLETYPE LIKE '10W%' AND NOT VHCTPP.VEHICLETYPE LIKE '%10W(AMT)%'";
                         }else if($selcustomer2 == 'STC TL'){
                             $objPHPExcel->getActiveSheet()->setCellValue('I7', 'TL OTHER')->setCellValue('X7', 'TL AMATA');
-                            $QUERYWHERE1="EHR.PositionNameT LIKE '%พนักงานขับรถ/RKL-STC%' AND EHR.Company_Code = 'RKL' ";
+                            $QUERYWHERE1="(EHR.PositionNameT LIKE '%พนักงานขับรถ/RKL-STC%' OR EHR.PositionNameT LIKE '%พนักงานขับรถ/Other RKL%') AND EHR.Company_Code = 'RKL' ";
                             // $QUERYWHERE2="NOT VHCTPP.CUSTOMERCODE = 'SKB' AND NOT EHR.Company_Code IN('RKR','RCC','RATC','RRC')  AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')  AND CONVERT (VARCHAR (10),VHCTPP.DATEWORKING,20) = '$start_yen-$startif-$chkday' ORDER BY EHR.PositionNameT DESC";
-                            $QUERYWHERE2="VHCTPP.CUSTOMERCODE IN('TTASTSTC','CH-AUTO','GMT','TTAT') AND VHCTPP.VEHICLETYPE LIKE '%Trailer%' AND NOT EHR.Company_Code IN ('RKR','RCC','RRC','RATC') AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')  AND CONVERT (VARCHAR (10),VHCTPP.DATEWORKING,20) = '$start_yen-$startif-$chkday' ORDER BY EHR.PositionNameT DESC";
+                            $QUERYWHERE2="VHCTPP.CUSTOMERCODE IN('TTASTSTC','CH-AUTO','GMT','TKT','TTAT') AND VHCTPP.VEHICLETYPE LIKE '%Trailer%' AND NOT EHR.Company_Code IN ('RKR','RCC','RRC','RATC') AND NOT (EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเขียว' OR EHR.PositionNameT LIKE 'พนักงานขับรถ/ปลอกเหลือง')  AND CONVERT (VARCHAR (10),VHCTPP.DATEWORKING,20) = '$start_yen-$startif-$chkday' ORDER BY EHR.PositionNameT DESC";
                             $QUERYIFELSE1="OTSN.OIL_BILLNUMBER IS NOT NULL AND CONVERT (VARCHAR (10),VHCTPP.DATEWORKING,20) = '$start_yen-$startif-$chkday' AND NOT VHCTPP.VEHICLETYPE LIKE '%Trailer(AMT)%'";
                             $QUERYIFELSE2="OTSN.OIL_BILLNUMBER IS NOT NULL AND CONVERT (VARCHAR (10),VHCTPP.DATEWORKING,20) = '$start_yen-$startif-$chkday' AND VHCTPP.VEHICLETYPE = 'Trailer(AMT)'";
                             $CUSTOMERCODE="AND NOT VHCTPP.CUSTOMERCODE IN('SKB')";
@@ -538,12 +538,48 @@ if ($EXCELMONTH != "") {
                                     $objPHPExcel->getActiveSheet()->setCellValue('O' . $i, '=(L'.$i.'+M'.$i.')-N'.$i); // แก้แล้ว;                                              
                                     $SQLOAVG_LEFT="SELECT DISTINCT OILAVERAGE.OILAVERAGE OAVR FROM OILAVERAGE WHERE OILAVERAGE.COMPANYCODE = '$COM_LEFT' AND OILAVERAGE.CUSTOMERCODE = '$CUS_LEFT' AND OILAVERAGE.VEHICLETYPE = '$VHCTPLAN_LEFT'";
                                         $QUERYOAVG_LEFT = sqlsrv_query($conn, $SQLOAVG_LEFT ); while($RSOAVG_LEFT = sqlsrv_fetch_array($QUERYOAVG_LEFT)) {                                         
-                                            if ($VHCRGNB_LEFT =='61-4454'||$VHCRGNB_LEFT =='61-4456'||$VHCRGNB_LEFT =='61-3440'||$VHCRGNB_LEFT =='61-3441'||$VHCRGNB_LEFT =='61-4453'||$VHCRGNB_LEFT =='61-4457'||$VHCRGNB_LEFT =='61-4912'||$VHCRGNB_LEFT =='61-4913'||$VHCRGNB_LEFT =='61-4546'||$VHCRGNB_LEFT =='61-4547'||$VHCRGNB_LEFT =='64-3452'||$VHCRGNB_LEFT =='61-3445'||$VHCRGNB_LEFT =='61-3439'||$VHCRGNB_LEFT =='61-3443'||$VHCRGNB_LEFT =='61-3834'||$VHCRGNB_LEFT =='61-3835'||$VHCRGNB_LEFT =='61-3438'||$VHCRGNB_LEFT =='61-3437'||$VHCRGNB_LEFT =='62-9288'||$VHCRGNB_LEFT =='61-3836'||$VHCRGNB_LEFT =='61-4458'||$VHCRGNB_LEFT =='61-3444'||$VHCRGNB_LEFT =='60-3868'||$VHCRGNB_LEFT =='60-3870'||$VHCRGNB_LEFT =='61-3437'||$VHCRGNB_LEFT =='61-3452') {
-                                                $OAVR_LEFT = 4.0;    
-                                            }else if($VHCRGNB_LEFT =='60-3871'||$VHCRGNB_LEFT =='61-3442'||$VHCRGNB_LEFT =='60-2391'||$VHCRGNB_LEFT =='61-3444'||$VHCRGNB_LEFT =='76-8919'||$VHCRGNB_LEFT =='61-4458'||$VHCRGNB_LEFT =='79-2521'||$VHCRGNB_LEFT =='79-2522'||$VHCRGNB_LEFT =='79-2525'||$VHCRGNB_LEFT =='74-5653'||$VHCRGNB_LEFT =='74-5684'||$VHCRGNB_LEFT =='74-5684'||$VHCRGNB_LEFT =='74-5654') {
+                                            if ($VHCRGNB_LEFT =='61-4456' || $VHCRGNB_LEFT =='61-3441' || $VHCRGNB_LEFT =='61-4457' ||
+                                                $VHCRGNB_LEFT =='61-4913' || $VHCRGNB_LEFT =='61-4547' || $VHCRGNB_LEFT =='64-3452' || 
+                                                $VHCRGNB_LEFT =='61-3445' || $VHCRGNB_LEFT =='61-3443' || $VHCRGNB_LEFT =='62-9288' || 
+                                                $VHCRGNB_LEFT =='61-3836' || $VHCRGNB_LEFT =='61-4458' )
+                                            {
+                                                $OAVR_LEFT = 4.0;
+                                            }else if($VHCRGNB_LEFT =='61-3442' || $VHCRGNB_LEFT =='61-3444' || $VHCRGNB_LEFT =='76-8919' || 
+                                                    $VHCRGNB_LEFT =='61-4458' || $VHCRGNB_LEFT =='79-2521' || $VHCRGNB_LEFT =='79-2522' || 
+                                                    $VHCRGNB_LEFT =='79-2525' || $VHCRGNB_LEFT =='74-5654') 
+                                            {
                                                 $OAVR_LEFT = 3.5;  
+                                            }else if($VHCRGNB_LEFT =='61-3440' || $VHCRGNB_LEFT =='60-3868' || $VHCRGNB_LEFT =='61-3439' ||
+                                                    $VHCRGNB_LEFT =='61-4546' || $VHCRGNB_LEFT =='60-3870' || $VHCRGNB_LEFT =='61-4912' ||
+                                                    $VHCRGNB_LEFT =='61-3452' || $VHCRGNB_LEFT =='61-3835' || $VHCRGNB_LEFT =='61-4454' ||
+                                                    $VHCRGNB_LEFT =='61-3437' || $VHCRGNB_LEFT =='61-3438' || $VHCRGNB_LEFT =='61-3834' ||
+                                                    $VHCRGNB_LEFT =='61-4453' ||
+                                                    $VHCRGNB_LEFT =='74-5610' || $VHCRGNB_LEFT =='74-5611' || $VHCRGNB_LEFT =='74-5612' ||
+                                                    $VHCRGNB_LEFT =='74-5613' || $VHCRGNB_LEFT =='74-5658' || $VHCRGNB_LEFT =='74-5660' ||
+                                                    $VHCRGNB_LEFT =='74-5675' || $VHCRGNB_LEFT =='74-5676' || $VHCRGNB_LEFT =='74-5677' ||
+                                                    $VHCRGNB_LEFT =='74-5678' || $VHCRGNB_LEFT =='74-5679' || $VHCRGNB_LEFT =='74-5688' ||
+                                                    $VHCRGNB_LEFT =='74-5690' ) 
+                                            {
+                                                if($JOBEND_LEFT=='คลังโคราช'){
+                                                    $OAVR_LEFT = 3.75; // คลังโคราช ประเภทรถ 6W ใช้เรท 3.75
+                                                }else{
+                                                    $OAVR_LEFT = 4.25; // งานขายทั่วประเทศ ประเภทรถ 6W ใช้เรท 4.25
+                                                }
+                                            }else if($VHCRGNB_LEFT =='60-3871' || $VHCRGNB_LEFT =='60-2391' ||
+                                                    $VHCRGNB_LEFT =='74-5653' || $VHCRGNB_LEFT =='74-5684' ) 
+                                            {
+                                                if($JOBEND_LEFT=='คลังโคราช'){
+                                                    $OAVR_LEFT = 3.00; // คลังโคราช ประเภทรถ 10W ใช้เรท 3.00 มีทะเบียน 74-5653 และ 74-5684
+                                                }else{
+                                                    $OAVR_LEFT = 3.75; // งานขายทั่วประเทศ ประเภทรถ 10W ใช้เรท 3.75 มีทะเบียน 74-5653 และ 74-5684
+                                                }
                                             }else{
-                                                $OAVR_LEFT=$RSOAVG_LEFT["OAVR"]; 
+                                                if($JOBEND_LEFT=='BJKC + INGY' || $JOBEND_LEFT=='INGY' || 
+                                                    $JOBEND_LEFT=='INGY (Rayong)' || $JOBEND_LEFT=='INGY+BJKC (Rayong)' ){
+                                                        $OAVR_LEFT = 6.50;
+                                                }else{
+                                                    $OAVR_LEFT = $RSOAVG_LEFT["OAVR"]; 
+                                                }
                                             }
 
                                             $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $OAVR_LEFT); // แก้แล้ว;
@@ -674,12 +710,48 @@ if ($EXCELMONTH != "") {
                                     $objPHPExcel->getActiveSheet()->setCellValue('AD' . $i, '=(AA'.$i.'+AB'.$i.')-AC'.$i); // แก้แล้ว;                                           
                                     $SQLOAVG_RIGHT="SELECT DISTINCT OILAVERAGE.OILAVERAGE OAVR FROM OILAVERAGE WHERE OILAVERAGE.COMPANYCODE = '$COM_RIGHT' AND OILAVERAGE.CUSTOMERCODE = '$CUS_RIGHT' AND OILAVERAGE.VEHICLETYPE = '$VHCTPLAN_RIGHT'";
                                     $QUERYOAVG_RIGHT = sqlsrv_query($conn, $SQLOAVG_RIGHT ); while($RSOAVG_RIGHT = sqlsrv_fetch_array($QUERYOAVG_RIGHT)) {                                         
-                                        if ($VHCRGNB_RIGHT =='61-4454'||$VHCRGNB_RIGHT =='61-4456'||$VHCRGNB_RIGHT =='61-3440'||$VHCRGNB_RIGHT =='61-3441'||$VHCRGNB_RIGHT =='61-4453'||$VHCRGNB_RIGHT =='61-4457'||$VHCRGNB_RIGHT =='61-4912'||$VHCRGNB_RIGHT =='61-4913'||$VHCRGNB_RIGHT =='61-4546'||$VHCRGNB_RIGHT =='61-4547'||$VHCRGNB_RIGHT =='64-3452'||$VHCRGNB_RIGHT =='61-3445'||$VHCRGNB_RIGHT =='61-3439'||$VHCRGNB_RIGHT =='61-3443'||$VHCRGNB_RIGHT =='61-3834'||$VHCRGNB_RIGHT =='61-3835'||$VHCRGNB_RIGHT =='61-3438'||$VHCRGNB_RIGHT =='61-3437'||$VHCRGNB_RIGHT =='62-9288'||$VHCRGNB_RIGHT =='61-3836'||$VHCRGNB_RIGHT =='61-4458'||$VHCRGNB_RIGHT =='61-3444'||$VHCRGNB_RIGHT =='60-3868'||$VHCRGNB_RIGHT =='60-3870'||$VHCRGNB_RIGHT =='61-3437'||$VHCRGNB_RIGHT =='61-3452') {
-                                            $OAVR_RIGHT = 4.0;    
-                                        }else if($VHCRGNB_RIGHT =='60-3871'||$VHCRGNB_RIGHT =='61-3442'||$VHCRGNB_RIGHT =='60-2391'||$VHCRGNB_RIGHT =='61-3444'||$VHCRGNB_RIGHT =='76-8919'||$VHCRGNB_RIGHT =='61-4458'||$VHCRGNB_RIGHT =='79-2521'||$VHCRGNB_RIGHT =='79-2522'||$VHCRGNB_RIGHT =='79-2525'||$VHCRGNB_RIGHT =='74-5653'||$VHCRGNB_RIGHT =='74-5684'||$VHCRGNB_RIGHT =='74-5684'||$VHCRGNB_RIGHT =='74-5654') {
-                                            $OAVR_RIGHT = 3.5;  
+                                        if ($VHCRGNB_RIGHT =='61-4456' || $VHCRGNB_RIGHT =='61-3441' || $VHCRGNB_RIGHT =='61-4457' ||
+                                            $VHCRGNB_RIGHT =='61-4913' || $VHCRGNB_RIGHT =='61-4547' || $VHCRGNB_RIGHT =='64-3452' || 
+                                            $VHCRGNB_RIGHT =='61-3445' || $VHCRGNB_RIGHT =='61-3443' || $VHCRGNB_RIGHT =='62-9288' || 
+                                            $VHCRGNB_RIGHT =='61-3836' || $VHCRGNB_RIGHT =='61-4458' )
+                                        {
+                                        $OAVR_RIGHT = 4.0;
+                                        }else if($VHCRGNB_RIGHT =='61-3442' || $VHCRGNB_RIGHT =='61-3444' || $VHCRGNB_RIGHT =='76-8919' || 
+                                                $VHCRGNB_RIGHT =='61-4458' || $VHCRGNB_RIGHT =='79-2521' || $VHCRGNB_RIGHT =='79-2522' || 
+                                                $VHCRGNB_RIGHT =='79-2525' || $VHCRGNB_RIGHT =='74-5654') 
+                                        {
+                                        $OAVR_RIGHT = 3.5;  
+                                        }else if($VHCRGNB_RIGHT =='61-3440' || $VHCRGNB_RIGHT =='60-3868' || $VHCRGNB_RIGHT =='61-3439' ||
+                                                $VHCRGNB_RIGHT =='61-4546' || $VHCRGNB_RIGHT =='60-3870' || $VHCRGNB_RIGHT =='61-4912' ||
+                                                $VHCRGNB_RIGHT =='61-3452' || $VHCRGNB_RIGHT =='61-3835' || $VHCRGNB_RIGHT =='61-4454' ||
+                                                $VHCRGNB_RIGHT =='61-3437' || $VHCRGNB_RIGHT =='61-3438' || $VHCRGNB_RIGHT =='61-3834' ||
+                                                $VHCRGNB_RIGHT =='61-4453' ||
+                                                $VHCRGNB_RIGHT =='74-5610' || $VHCRGNB_RIGHT =='74-5611' || $VHCRGNB_RIGHT =='74-5612' ||
+                                                $VHCRGNB_RIGHT =='74-5613' || $VHCRGNB_RIGHT =='74-5658' || $VHCRGNB_RIGHT =='74-5660' ||
+                                                $VHCRGNB_RIGHT =='74-5675' || $VHCRGNB_RIGHT =='74-5676' || $VHCRGNB_RIGHT =='74-5677' ||
+                                                $VHCRGNB_RIGHT =='74-5678' || $VHCRGNB_RIGHT =='74-5679' || $VHCRGNB_RIGHT =='74-5688' ||
+                                                $VHCRGNB_RIGHT =='74-5690' ) 
+                                        {
+                                            if($JOBEND_RIGHT=='คลังโคราช'){
+                                                $OAVR_RIGHT = 3.75; // คลังโคราช ประเภทรถ 6W ใช้เรท 3.75
+                                            }else{
+                                                $OAVR_RIGHT = 4.25; // งานขายทั่วประเทศ ประเภทรถ 6W ใช้เรท 4.25
+                                            }
+                                        }else if($VHCRGNB_RIGHT =='60-3871' || $VHCRGNB_RIGHT =='60-2391' ||
+                                        $VHCRGNB_RIGHT =='74-5653' || $VHCRGNB_RIGHT =='74-5684' ) 
+                                        {
+                                            if($JOBEND_RIGHT=='คลังโคราช'){
+                                                $OAVR_RIGHT = 3.00; // คลังโคราช ประเภทรถ 10W ใช้เรท 3.00 มีทะเบียน 74-5653 และ 74-5684
+                                            }else{
+                                                $OAVR_RIGHT = 3.75; // งานขายทั่วประเทศ ประเภทรถ 10W ใช้เรท 3.75 มีทะเบียน 74-5653 และ 74-5684
+                                            }
                                         }else{
-                                            $OAVR_RIGHT=$RSOAVG_RIGHT["OAVR"];
+                                            if($JOBEND_RIGHT=='BJKC + INGY' || $JOBEND_RIGHT=='INGY' || 
+                                                $JOBEND_RIGHT=='INGY (Rayong)' || $JOBEND_RIGHT=='INGY+BJKC (Rayong)' ){
+                                                    $OAVR_RIGHT = 6.50;
+                                            }else{
+                                                $OAVR_RIGHT = $RSOAVG_RIGHT["OAVR"]; 
+                                            }
                                         }
                                         
                                         $objPHPExcel->getActiveSheet()->setCellValue('AE' . $i, $OAVR_RIGHT); // แก้แล้ว;
@@ -729,7 +801,13 @@ if ($EXCELMONTH != "") {
                             $QUERYPLANCHKVHCRG = sqlsrv_query($conn, $SQLPLANCHKVHCRG );
                             while($RSPLANCHKVHCRG = sqlsrv_fetch_array($QUERYPLANCHKVHCRG)) {
                                 $CHKTABIEANROD=$RSPLANCHKVHCRG["CHKVHCRGNB"];
-                                if ($CHKTABIEANROD =='61-4454'||$CHKTABIEANROD =='61-4456'||$CHKTABIEANROD =='61-3440'||$CHKTABIEANROD =='61-3441'||$CHKTABIEANROD =='61-4453'||$CHKTABIEANROD =='61-4457'||$CHKTABIEANROD =='61-4912'||$CHKTABIEANROD =='61-4913'||$CHKTABIEANROD =='61-4546'||$CHKTABIEANROD =='61-4547'||$CHKTABIEANROD =='64-3452'||$CHKTABIEANROD =='61-3445'||$CHKTABIEANROD =='61-3439'||$CHKTABIEANROD =='61-3443'||$CHKTABIEANROD =='61-3834'||$CHKTABIEANROD =='61-3835'||$CHKTABIEANROD =='61-3438'||$CHKTABIEANROD =='61-3437'||$CHKTABIEANROD =='62-9288'||$CHKTABIEANROD =='61-3836'||$CHKTABIEANROD =='61-4458'||$CHKTABIEANROD =='61-3444'||$CHKTABIEANROD =='60-3868'||$CHKTABIEANROD =='60-3870'||$CHKTABIEANROD =='61-3437'||$CHKTABIEANROD =='61-3452') {
+                                if ($CHKTABIEANROD =='61-4454'||$CHKTABIEANROD =='61-4456'||$CHKTABIEANROD =='61-3440'||$CHKTABIEANROD =='61-3441'||
+                                $CHKTABIEANROD =='61-4453'||$CHKTABIEANROD =='61-4457'||$CHKTABIEANROD =='61-4912'||$CHKTABIEANROD =='61-4913'||
+                                $CHKTABIEANROD =='61-4546'||$CHKTABIEANROD =='61-4547'||$CHKTABIEANROD =='64-3452'||$CHKTABIEANROD =='61-3445'||
+                                $CHKTABIEANROD =='61-3439'||$CHKTABIEANROD =='61-3443'||$CHKTABIEANROD =='61-3834'||$CHKTABIEANROD =='61-3835'||
+                                $CHKTABIEANROD =='61-3438'||$CHKTABIEANROD =='61-3437'||$CHKTABIEANROD =='62-9288'||$CHKTABIEANROD =='61-3836'||
+                                $CHKTABIEANROD =='61-4458'||$CHKTABIEANROD =='61-3444'||$CHKTABIEANROD =='60-3868'||$CHKTABIEANROD =='60-3870'||
+                                $CHKTABIEANROD =='61-3437'||$CHKTABIEANROD =='61-3452') {
                                     $OAVR_KUBOTA = 4.0;
                                     $SQLPLAN_LEFT="SELECT DISTINCT PositionNameT PSTN,VHCTPP.COMPANYCODE COM,VHCTPP.CUSTOMERCODE CUS,OTSN.OILDATAID OILID,VHCTPP.EMPLOYEECODE1 EMPC1,VHCTPP.EMPLOYEENAME1 EMPN1,VHCTPP.EMPLOYEECODE2 EMPC2,VHCTPP.EMPLOYEENAME2 EMPN2,CONVERT (VARCHAR (10),VHCTPP.DATEWORKING,20) DW,CONVERT (VARCHAR (10),OTSN.REFUELINGDATE,20) REFUEL,OTSN.OIL_BILLNUMBER OBLNB,OTSN.VEHICLEREGISNUMBER VHCRGNB,OTSN.VEHICLETYPE CARTYPE,VHCTPP.VEHICLETYPE VHCTPLAN,VHCTPP.JOBSTART JOBSTART,VHCTPP.JOBEND JOBEND,OTSN.MILEAGESTART MST,OTSN.MILEAGEEND MLE,OTSN.DISTANCE DTE,OTSN.OIL_AMOUNT,OTSN.OIL_AVERAGE OAVG,OTSN.OIL_TARGET OTG,VHCTPP.C3 AVG,VHCTPP.E1 MONEY,OTSN.JOBNO,VHCTPP.JOBNO,
                                     (SELECT SUM(ISNULL(CAST(OSGS_AM AS DECIMAL(6,2)),0)) AS OSGS_AM FROM OUTSIDE_GAS_STATION WHERE OSGS_PLID = VHCTPP.VEHICLETRANSPORTPLANID) AS OAM,
@@ -827,7 +905,8 @@ if ($EXCELMONTH != "") {
                                             }else if($EMPC2_LEFT!=$EMPC1_LEFT){
                                                 if( ($selcustomer2 == 'KUBOTA') || (($RSJOB_LEFT=="TAKANO")||($RSJOB_LEFT=="KEIHIN")||($RSJOB_LEFT=="KEIHIN,TAKANO")||($RSJOB_LEFT=="INGY")||($RSJOB_LEFT=="BJKC + INGY")) ){
                                                     if($RSJOB_LEFT == "คลังโคราช"){
-                                                        $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '0.00'); // แก้แล้ว; 
+                                                        // $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '0.00'); // แก้แล้ว; 
+                                                        $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '=(R'.$i.'*S'.$i.')/2'); // แก้แล้ว; 03/03/2568
                                                     }else{
                                                         $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '=(R'.$i.'*S'.$i.')/2'); // แก้แล้ว; 
                                                     }
@@ -849,8 +928,7 @@ if ($EXCELMONTH != "") {
                                             $objPHPExcel->getActiveSheet()->setCellValue('AL' . $i, $REMARKOILRIGHT); // แก้แล้ว;
                                         }
                                     }
-                                }else if($CHKTABIEANROD =='60-3871'||$CHKTABIEANROD =='61-3442'||$CHKTABIEANROD =='60-2391'||$CHKTABIEANROD =='61-3444'||$CHKTABIEANROD =='76-8919'||$CHKTABIEANROD =='61-4458'||$CHKTABIEANROD =='79-2521'||$CHKTABIEANROD =='79-2522'||$CHKTABIEANROD =='79-2525'||$CHKTABIEANROD =='74-5653'||$CHKTABIEANROD =='74-5684'||$CHKTABIEANROD =='74-5684'||$CHKTABIEANROD =='74-5654') {
-                                    $OAVR_KUBOTA = 3.5;  
+                                }else if($CHKTABIEANROD =='74-5653'||$CHKTABIEANROD =='74-5684') {
                                     $SQLPLAN_RIGHT="SELECT DISTINCT PositionNameT PSTN,VHCTPP.COMPANYCODE COM,VHCTPP.CUSTOMERCODE CUS,OTSN.OILDATAID OILID,VHCTPP.EMPLOYEECODE1 EMPC1,VHCTPP.EMPLOYEENAME1 EMPN1,VHCTPP.EMPLOYEECODE2 EMPC2,CONVERT (VARCHAR (10),VHCTPP.DATEWORKING,20) DW,CONVERT (VARCHAR (10),OTSN.REFUELINGDATE,20) REFUEL,OTSN.OIL_BILLNUMBER OBLNB,OTSN.VEHICLEREGISNUMBER VHCRGNB,OTSN.VEHICLETYPE CARTYPE,VHCTPP.VEHICLETYPE VHCTPLAN,VHCTPP.JOBSTART JOBSTART,VHCTPP.JOBEND JOBEND,OTSN.MILEAGESTART MST,OTSN.MILEAGEEND MLE,OTSN.DISTANCE DTE,OTSN.OIL_AMOUNT,OTSN.OIL_AVERAGE OAVG,OTSN.OIL_TARGET OTG,VHCTPP.C3 AVG,VHCTPP.E1 MONEY,OTSN.JOBNO,VHCTPP.JOBNO,
                                     (SELECT SUM(ISNULL(CAST(OSGS_AM AS DECIMAL(6,2)),0)) AS OSGS_AM FROM OUTSIDE_GAS_STATION WHERE OSGS_PLID = VHCTPP.VEHICLETRANSPORTPLANID) AS OAM,
                                     (SELECT SUM(ISNULL(CAST(OSGS_AM AS DECIMAL(6,2)),0)) AS OSGS_AM FROM OUTSIDE_GAS_STATION WHERE OSGS_PLID = VHCTPP.VEHICLETRANSPORTPLANID AND OSGS_TY IN(1,2,3)) AS OAMOUT,
@@ -871,6 +949,11 @@ if ($EXCELMONTH != "") {
                                             $RSJOB_RIGHT=$JOBEND_RIGHT;
                                         }else{
                                             $RSJOB_RIGHT=$JOBSTART_RIGHT;
+                                        }
+                                        if($JOBEND_RIGHT=='คลังโคราช'){
+                                            $OAVR_KUBOTA = 3.00;
+                                        }else{
+                                            $OAVR_KUBOTA = 3.75;
                                         }
                                         $MST_RIGHT=$RSPLAN_RIGHT["MST"];
                                         $MLE_RIGHT=$RSPLAN_RIGHT["MLE"];
@@ -952,7 +1035,8 @@ if ($EXCELMONTH != "") {
                                             }else if($EMPC2_RIGHT!=$EMPC1_RIGHT){
                                                 if( ($selcustomer2 == 'KUBOTA') || (($RSJOB_RIGHT=="TAKANO")||($RSJOB_RIGHT=="KEIHIN")||($RSJOB_RIGHT=="KEIHIN,TAKANO")||($RSJOB_RIGHT=="INGY")||($RSJOB_RIGHT=="BJKC + INGY")) ){
                                                     if($RSJOB_RIGHT == "คลังโคราช"){
-                                                        $objPHPExcel->getActiveSheet()->setCellValue('AI' . $i, '0.00'); // แก้แล้ว; 
+                                                        // $objPHPExcel->getActiveSheet()->setCellValue('AI' . $i, '0.00'); // แก้แล้ว; 
+                                                        $objPHPExcel->getActiveSheet()->setCellValue('AI' . $i, '=(AG'.$i.'*AH'.$i.')/2'); // แก้แล้ว; 03/03/2568
                                                     }else{
                                                         $objPHPExcel->getActiveSheet()->setCellValue('AI' . $i, '=(AG'.$i.'*AH'.$i.')/2'); // แก้แล้ว;
                                                     }
@@ -1065,12 +1149,44 @@ if ($EXCELMONTH != "") {
                                         $objPHPExcel->getActiveSheet()->setCellValue('O' . $i, '=(L'.$i.'+M'.$i.')-N'.$i); // แก้แล้ว;                                         
                                         $SQLOAVG_LEFT="SELECT DISTINCT OILAVERAGE.OILAVERAGE OAVR FROM OILAVERAGE WHERE OILAVERAGE.COMPANYCODE = '$COM_LEFT' AND OILAVERAGE.CUSTOMERCODE = '$CUS_LEFT' AND OILAVERAGE.VEHICLETYPE = '$VHCTPLAN_LEFT'";
                                             $QUERYOAVG_LEFT = sqlsrv_query($conn, $SQLOAVG_LEFT ); while($RSOAVG_LEFT = sqlsrv_fetch_array($QUERYOAVG_LEFT)) {                                         
-                                                if ($VHCRGNB_LEFT =='61-4454'||$VHCRGNB_LEFT =='61-4456'||$VHCRGNB_LEFT =='61-3440'||$VHCRGNB_LEFT =='61-3441'||$VHCRGNB_LEFT =='61-4453'||$VHCRGNB_LEFT =='61-4457'||$VHCRGNB_LEFT =='61-4912'||$VHCRGNB_LEFT =='61-4913'||$VHCRGNB_LEFT =='61-4546'||$VHCRGNB_LEFT =='61-4547'||$VHCRGNB_LEFT =='64-3452'||$VHCRGNB_LEFT =='61-3445'||$VHCRGNB_LEFT =='61-3439'||$VHCRGNB_LEFT =='61-3443'||$VHCRGNB_LEFT =='61-3834'||$VHCRGNB_LEFT =='61-3835'||$VHCRGNB_LEFT =='61-3438'||$VHCRGNB_LEFT =='61-3437'||$VHCRGNB_LEFT =='62-9288'||$VHCRGNB_LEFT =='61-3836'||$VHCRGNB_LEFT =='61-4458'||$VHCRGNB_LEFT =='61-3444'||$VHCRGNB_LEFT =='60-3868'||$VHCRGNB_LEFT =='60-3870'||$VHCRGNB_LEFT =='61-3437'||$VHCRGNB_LEFT =='61-3452') {
-                                                    $OAVR_LEFT = 4.0;    
-                                                }else if($VHCRGNB_LEFT =='60-3871'||$VHCRGNB_LEFT =='61-3442'||$VHCRGNB_LEFT =='60-2391'||$VHCRGNB_LEFT =='61-3444'||$VHCRGNB_LEFT =='76-8919'||$VHCRGNB_LEFT =='61-4458'||$VHCRGNB_LEFT =='79-2521'||$VHCRGNB_LEFT =='79-2522'||$VHCRGNB_LEFT =='79-2525'||$VHCRGNB_LEFT =='74-5653'||$VHCRGNB_LEFT =='74-5684'||$VHCRGNB_LEFT =='74-5684'||$VHCRGNB_LEFT =='74-5654') {
+                                                if ($VHCRGNB_LEFT =='61-4456' || $VHCRGNB_LEFT =='61-3441' || $VHCRGNB_LEFT =='61-4457' ||
+                                                    $VHCRGNB_LEFT =='61-4913' || $VHCRGNB_LEFT =='61-4547' || $VHCRGNB_LEFT =='64-3452' || 
+                                                    $VHCRGNB_LEFT =='61-3445' || $VHCRGNB_LEFT =='61-3443' || $VHCRGNB_LEFT =='62-9288' || 
+                                                    $VHCRGNB_LEFT =='61-3836' || $VHCRGNB_LEFT =='61-4458' ){
+                                                    $OAVR_LEFT = 4.0;
+                                                }else if($VHCRGNB_LEFT =='61-3442' || $VHCRGNB_LEFT =='61-3444' || $VHCRGNB_LEFT =='76-8919' || 
+                                                        $VHCRGNB_LEFT =='61-4458' || $VHCRGNB_LEFT =='79-2521' || $VHCRGNB_LEFT =='79-2522' || 
+                                                        $VHCRGNB_LEFT =='79-2525' || $VHCRGNB_LEFT =='74-5654'){
                                                     $OAVR_LEFT = 3.5;  
+                                                }else if($VHCRGNB_LEFT =='61-3440' || $VHCRGNB_LEFT =='60-3868' || $VHCRGNB_LEFT =='61-3439' ||
+                                                        $VHCRGNB_LEFT =='61-4546' || $VHCRGNB_LEFT =='60-3870' || $VHCRGNB_LEFT =='61-4912' ||
+                                                        $VHCRGNB_LEFT =='61-3452' || $VHCRGNB_LEFT =='61-3835' || $VHCRGNB_LEFT =='61-4454' ||
+                                                        $VHCRGNB_LEFT =='61-3437' || $VHCRGNB_LEFT =='61-3438' || $VHCRGNB_LEFT =='61-3834' ||
+                                                        $VHCRGNB_LEFT =='61-4453' ||
+                                                        $VHCRGNB_LEFT =='74-5610' || $VHCRGNB_LEFT =='74-5611' || $VHCRGNB_LEFT =='74-5612' ||
+                                                        $VHCRGNB_LEFT =='74-5613' || $VHCRGNB_LEFT =='74-5658' || $VHCRGNB_LEFT =='74-5660' ||
+                                                        $VHCRGNB_LEFT =='74-5675' || $VHCRGNB_LEFT =='74-5676' || $VHCRGNB_LEFT =='74-5677' ||
+                                                        $VHCRGNB_LEFT =='74-5678' || $VHCRGNB_LEFT =='74-5679' || $VHCRGNB_LEFT =='74-5688' ||
+                                                        $VHCRGNB_LEFT =='74-5690' ){
+                                                    if($JOBEND_LEFT=='คลังโคราช'){
+                                                        $OAVR_LEFT = 3.75; // คลังโคราช ประเภทรถ 6W ใช้เรท 3.75
+                                                    }else{
+                                                        $OAVR_LEFT = 4.25; // งานขายทั่วประเทศ ประเภทรถ 6W ใช้เรท 4.25
+                                                    }
+                                                }else if($VHCRGNB_LEFT =='60-3871' || $VHCRGNB_LEFT =='60-2391' ||
+                                                        $VHCRGNB_LEFT =='74-5653' || $VHCRGNB_LEFT =='74-5684' ){
+                                                    if($JOBEND_LEFT=='คลังโคราช'){
+                                                        $OAVR_LEFT = 3.00; // คลังโคราช ประเภทรถ 10W ใช้เรท 3.00 มีทะเบียน 74-5653 และ 74-5684
+                                                    }else{
+                                                        $OAVR_LEFT = 3.75; // งานขายทั่วประเทศ ประเภทรถ 10W ใช้เรท 3.75 มีทะเบียน 74-5653 และ 74-5684
+                                                    }
                                                 }else{
-                                                    $OAVR_LEFT=$RSOAVG_LEFT["OAVR"]; 
+                                                    if($JOBEND_LEFT=='BJKC + INGY' || $JOBEND_LEFT=='INGY' || 
+                                                        $JOBEND_LEFT=='INGY (Rayong)' || $JOBEND_LEFT=='INGY+BJKC (Rayong)' ){
+                                                            $OAVR_LEFT = 6.50;
+                                                    }else{
+                                                        $OAVR_LEFT = $RSOAVG_LEFT["OAVR"]; 
+                                                    }
                                                 }
 
                                                 $objPHPExcel->getActiveSheet()->setCellValue('P' . $i, $OAVR_LEFT); // แก้แล้ว;
@@ -1091,7 +1207,8 @@ if ($EXCELMONTH != "") {
                                             }else if($EMPC2_LEFT!=$EMPC1_LEFT){
                                                 if( ($selcustomer2 == 'KUBOTA') || (($RSJOB_LEFT=="TAKANO")||($RSJOB_LEFT=="KEIHIN")||($RSJOB_LEFT=="KEIHIN,TAKANO")||($RSJOB_LEFT=="INGY")||($RSJOB_LEFT=="BJKC + INGY")) ){
                                                     if($RSJOB_LEFT == "คลังโคราช"){
-                                                        $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '0.00'); // แก้แล้ว;  
+                                                        // $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '0.00'); // แก้แล้ว;  
+                                                        $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '=(R'.$i.'*S'.$i.')/2'); // แก้แล้ว;  03/03/2568
                                                     }else{
                                                         $objPHPExcel->getActiveSheet()->setCellValue('T' . $i, '=(R'.$i.'*S'.$i.')/2'); // แก้แล้ว;  
                                                     }

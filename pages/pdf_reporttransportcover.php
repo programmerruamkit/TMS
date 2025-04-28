@@ -209,14 +209,14 @@ if ($_GET['companycode'] == 'RKS') {
                       <td     style="width: 10%;border:1px solid #000;padding:4px;text-align:center;">NO</td>
                       <td     style="width: 20%;border:1px solid #000;padding:4px;text-align:center">TRUCKNO</td>
                       <td     style="width: 25%;border:1px solid #000;padding:4px;text-align:center">VEHICLETYPE</td>
-                      <td     style="width: 30%;border:1px solid #000;padding:4px;text-align:center">DRIVER.1</td>
+                      <td     style="width: 35%;border:1px solid #000;padding:4px;text-align:center">DRIVER.1</td>
                       <td     style="width: 30%;border:1px solid #000;padding:4px;text-align:center">DRIVER.2</td>
                       <td     style="width: 40%;border:1px solid #000;padding:4px;text-align:center">FROM</td>
-                      <td     style="width: 35%;border:1px solid #000;padding:4px;text-align:center">TO</td>
+                      <td     style="width: 60%;border:1px solid #000;padding:4px;text-align:center">TO</td>
                       <td     style="width: 12%;border:1px solid #000;padding:4px;text-align:center">UNIT</td>
                       <td     style="width: 10%;border:1px solid #000;padding:4px;text-align:center">ROUTE</td>
                       <td     style="width: 15%;border:1px solid #000;padding:4px;text-align:center">NORMAL</td>
-                      <td     style="width: 30%;border:1px solid #000;padding:4px;text-align:center">DO/PO</td>
+                      <td     style="width: 50%;border:1px solid #000;padding:4px;text-align:center">DO/PO</td>
                       <td     style="width: 15%;border:1px solid #000;padding:4px;text-align:center">PRICE</td>
                       <td     style="width: 15%;border:1px solid #000;padding:4px;text-align:center">REMARK</td>
                     </tr>

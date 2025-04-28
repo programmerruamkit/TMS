@@ -720,37 +720,37 @@ $result_seEmp1 = sqlsrv_fetch_array($query_seEmp1, SQLSRV_FETCH_ASSOC);
                     if (chkstatus4hur == 'YES' || chkstatus2hur == 'YES') {
                         // alert('P1');
                         // alert('Go Actual officer')
-                        window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivinggoplanid=' + drivinggoplanid+'&checksection='+ checksection, '_blank');
+                        window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivingbackplanid=' + drivingbackplanid+'&checksection='+ checksection, '_blank');
                         window.location.reload();
                     }else{
                         if ((checksection == '1') && ('<?=$result_seData['STATUS_UNLOCK_P1']?>' == 'YES')) {
                             
-                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivinggoplanid=' + drivinggoplanid+'&checksection='+ checksection, '_blank');
+                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivingbackplanid=' + drivingbackplanid+'&checksection='+ checksection, '_blank');
                             window.location.reload();
 
                         }else if ((checksection == '2') && ('<?=$result_seData['STATUS_UNLOCK_P2']?>' == 'YES')){
                             
-                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivinggoplanid=' + drivinggoplanid+'&checksection='+ checksection, '_blank');
+                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivingbackplanid=' + drivingbackplanid+'&checksection='+ checksection, '_blank');
                             window.location.reload();
 
                         }else if ((checksection == '3') && ('<?=$result_seData['STATUS_UNLOCK_P3']?>' == 'YES')){
                             
-                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivinggoplanid=' + drivinggoplanid+'&checksection='+ checksection, '_blank');
+                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivingbackplanid=' + drivingbackplanid+'&checksection='+ checksection, '_blank');
                             window.location.reload();
 
                         }else if ((checksection == '4') && ('<?=$result_seData['STATUS_UNLOCK_P4']?>' == 'YES')){
                             
-                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivinggoplanid=' + drivinggoplanid+'&checksection='+ checksection, '_blank');
+                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivingbackplanid=' + drivingbackplanid+'&checksection='+ checksection, '_blank');
                             window.location.reload();
 
                         }else if ((checksection == '5') && ('<?=$result_seData['STATUS_UNLOCK_P5']?>' == 'YES')){
                             
-                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivinggoplanid=' + drivinggoplanid+'&checksection='+ checksection, '_blank');
+                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivingbackplanid=' + drivingbackplanid+'&checksection='+ checksection, '_blank');
                             window.location.reload();
 
                         }else if ((checksection == '6') && ('<?=$result_seData['STATUS_UNLOCK_P6']?>' == 'YES')){
                             
-                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivinggoplanid=' + drivinggoplanid+'&checksection='+ checksection, '_blank');
+                            window.open('meg_searchDrivingPatternPlanBackActualDriverInsert.php?drivingbackplanid=' + drivingbackplanid+'&checksection='+ checksection, '_blank');
                             window.location.reload();
 
                         }else{

@@ -48,7 +48,22 @@ $params_seEmployee = array(
 $query_seEmployee = sqlsrv_query($conn, $sql_seEmployee, $params_seEmployee);
 $result_seEmployee = sqlsrv_fetch_array($query_seEmployee, SQLSRV_FETCH_ASSOC);
 
-$empcode = ($_GET['employeecode1'] != "") ? $_GET['employeecode1'] : $_GET['employeecode2'];
+// $empcode = ($_GET['employeecode1'] != "") ? $_GET['employeecode1'] : $_GET['employeecode2'];
+
+if ($_GET['employeecode1'] != "") {
+
+    $empcode = $_GET['employeecode1'];
+
+}else if ($_GET['employeecode2'] != "") {
+
+    $empcode = $_GET['employeecode2'];
+
+}else {
+
+    $empcode = $_GET['employeecode3'];
+
+}
+
 $condition2 = "  AND a.PersonCode = '" . $empcode . "'";
 $sql_seEmployee2 = "{call megEmployeeEHR_v2(?,?)}";
 $params_seEmployee2 = array(
@@ -92,6 +107,16 @@ $params_seTenkobefore2 = array(
 $query_seTenkobefore2 = sqlsrv_query($conn, $sql_seTenkobefore2, $params_seTenkobefore2);
 $result_seTenkobefore2 = sqlsrv_fetch_array($query_seTenkobefore2, SQLSRV_FETCH_ASSOC);
 
+$conditionTenkobefore3 = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND a.TENKOMASTERDIRVERCODE = '" . $_GET['employeecode3'] . "'";
+$sql_seTenkobefore3 = "{call megEdittenkobefore_v2(?,?,?)}";
+$params_seTenkobefore3 = array(
+    array('select_tenkobefore', SQLSRV_PARAM_IN),
+    array($conditionTenkobefore3, SQLSRV_PARAM_IN),
+    array('', SQLSRV_PARAM_IN)
+);
+$query_seTenkobefore3 = sqlsrv_query($conn, $sql_seTenkobefore3, $params_seTenkobefore3);
+$result_seTenkobefore3 = sqlsrv_fetch_array($query_seTenkobefore3, SQLSRV_FETCH_ASSOC);
+
 
 $conditionTenkomaster = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "'";
 $sql_seTenkomaster = "{call megEdittenkomaster_v2(?,?)}";
@@ -121,8 +146,10 @@ $result_checkSexT = sqlsrv_fetch_array($query_checkSexT, SQLSRV_FETCH_ASSOC);
 
 if ($result_checkSexT['SexT'] == 'หญิง') {
     $sex = 'นางสาว';
-}else{
+}else if ($result_checkSexT['SexT'] == 'ชาย'){
     $sex = 'นาย';
+}else{
+    $sex = '';
 }
 ?>
 
@@ -691,6 +718,101 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                 
                                 
 
+                            } else if ($_GET['employeecode3'] != "") {
+                                $sql_seSimuData = "SELECT TOP 1 SIMUID, DRIVERCODE,DRIVERNAME,YEARSSIMU,TLEP_FIRSTDATE,TLEP_FOLLOWUP,SIMUDATA1,SIMUDATA2,SIMUDATA3,CREATEBY,CREATEDATE,
+                                    CAST(DATEDIFF(yy, TLEP_FOLLOWUP, GETDATE()) AS varchar(4)) +' Year ' AS 'TLEP_YEAR',
+                                    CAST(DATEDIFF(mm, DATEADD(yy, DATEDIFF(yy, TLEP_FOLLOWUP, GETDATE()), TLEP_FOLLOWUP), GETDATE()) AS varchar(2)) +' Month ' AS 'TLEP_MONTH'
+                                    FROM  [dbo].[SIMULATORHISTORY] 
+                                    WHERE DRIVERCODE = '".$_GET['employeecode3']."'
+                                    ORDER BY TLEP_FOLLOWUP DESC
+                                    --AND YEARSSIMU =  YEAR(GETDATE())";
+                                $params_seSimuData = array();
+                                $query_seSimuData  = sqlsrv_query($conn, $sql_seSimuData , $params_seSimuData);
+                                $result_seSimuData  = sqlsrv_fetch_array($query_seSimuData , SQLSRV_FETCH_ASSOC);
+
+                                // $sql_seDriverAge = "SELECT BirthDate103,[yearb],monthb,dayb FROM EMPLOYEEEHR2
+                                //     WHERE PersonCode ='".$_GET['employeecode2']."'";
+                                // $params_seDriverAge = array();
+                                // $query_seDriverAge  = sqlsrv_query($conn, $sql_seDriverAge , $params_seDriverAge);
+                                // $result_seDriverAge  = sqlsrv_fetch_array($query_seDriverAge , SQLSRV_FETCH_ASSOC);
+                                
+                                // $sql_seWorkAge = "SELECT StartDate,PassDate,StartWork,[yearw],monthw,dayw FROM EMPLOYEEEHR2
+                                //     WHERE PersonCode ='".$_GET['employeecode2']."'";
+                                // $params_seWorkAge = array();
+                                // $query_seWorkAge  = sqlsrv_query($conn, $sql_seWorkAge , $params_seWorkAge);
+                                // $result_seWorkAge  = sqlsrv_fetch_array($query_seWorkAge , SQLSRV_FETCH_ASSOC);
+
+                                $sql_seEmp = "SELECT  BirthDate103,StartDate FROM EMPLOYEEEHR2
+                                    WHERE PersonCode ='".$_GET['employeecode3']."'";
+                                $params_seEmp = array();
+                                $query_seEmp  = sqlsrv_query($conn, $sql_seEmp , $params_seEmp);
+                                $result_seEmp  = sqlsrv_fetch_array($query_seEmp , SQLSRV_FETCH_ASSOC);
+                                
+
+                                ///คำนวนหาอายุงาน
+                                // $datework = $result_seEmp['StartDate'];
+
+                                $day =  substr($result_seEmp['StartDate'],0,2);
+                                $month =  substr($result_seEmp['StartDate'],3,2);
+                                $year =  substr($result_seEmp['StartDate'],6);
+
+                                $datework = $month."/".$day."/".$year;
+
+
+                                $sql_CalculateWork = "{call megCalculatorDate(?,?)}";
+                                $params_CalculateWork = array(
+                                    array('calculate_work', SQLSRV_PARAM_IN),
+                                    array($datework, SQLSRV_PARAM_IN)
+                                );
+                                $query_CalculateWork = sqlsrv_query($conn, $sql_CalculateWork, $params_CalculateWork);
+                                $result_CalculateWork = sqlsrv_fetch_array($query_CalculateWork, SQLSRV_FETCH_ASSOC);
+                                // echo $result_CalculateWork['RS'];
+
+                                ///คำนวนหาอายุตน
+
+                                $dayAge =  substr($result_seEmp['BirthDate103'],0,2);
+                                $monthAge =  substr($result_seEmp['BirthDate103'],3,2);
+                                $yearAge =  substr($result_seEmp['BirthDate103'],6);
+
+                                $dateworkAge = $monthAge."/".$dayAge."/".$yearAge;
+
+
+                                $sql_CalculateAge = "{call megCalculatorDate(?,?)}";
+                                $params_CalculateAge = array(
+                                    array('calculate_work', SQLSRV_PARAM_IN),
+                                    array($dateworkAge, SQLSRV_PARAM_IN)
+                                );
+                                $query_CalculateAge = sqlsrv_query($conn, $sql_CalculateAge, $params_CalculateAge);
+                                $result_CalculateAge = sqlsrv_fetch_array($query_CalculateAge, SQLSRV_FETCH_ASSOC);
+                                // echo $result_CalculateAge['RS'];
+
+                                //   //หาระยะเวลา กี่วัน กี่เดือน จากการทำ TLEP FOLLOW UP รูปแบบข้อมูล Y-m-d
+                                // $followup_date = $result_seSimuData['TLEP_FOLLOWUP'];      
+                                // $today = date("Y-m-d");   //จุดต้องเปลี่ยน
+
+                                // // echo "<br>";
+                                // // echo $today;
+                                // // echo "<br>";
+
+                                // list($byear, $bmonth, $bday)= explode("-",$followup_date);       
+                                // list($tyear, $tmonth, $tday)= explode("-",$today);               
+
+                                // $mfollowup_date = mktime(0, 0, 0, $bmonth, $bday, $byear); 
+                                // $mnow = mktime(0, 0, 0, $tmonth, $tday, $tyear );
+                                // $mage = ($mnow - $mfollowup_date);
+
+                                // // echo "วันเกิด $followup_date"."<br>\n";
+
+                                // // echo "วันที่ปัจจุบัน $today"."<br>\n";
+
+                                // // echo "รับค่า $mage"."<br>\n";
+
+                                // $u_y = date("Y", $mage)-1970;
+                                // $u_m = date("m",$mage);
+                                // $u_d = date("d",$mage)-1;
+                                
+                                
+
                             }
                             
         
@@ -947,58 +1069,13 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                             <div class="row" >
 
                                 <?php
-                                $sql_seBeforeresult1 = "{call megEdittenkobefore_v2(?,?,?)}";
-                                $params_seBeforeresult1 = array(
-                                    array('select_beforeresult', SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE1'], SQLSRV_PARAM_IN)
-                                );
-                                $query_seBeforeresult1 = sqlsrv_query($conn, $sql_seBeforeresult1, $params_seBeforeresult1);
-                                $result_seBeforeresult1 = sqlsrv_fetch_array($query_seBeforeresult1, SQLSRV_FETCH_ASSOC);
 
-
-                                $sql_seBeforeresult2 = "{call megEdittenkobefore_v2(?,?,?)}";
-                                $params_seBeforeresult2 = array(
-                                    array('select_beforeresult', SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
-                                );
-                                $query_seBeforeresult2 = sqlsrv_query($conn, $sql_seBeforeresult2, $params_seBeforeresult2);
-                                $result_seBeforeresult2 = sqlsrv_fetch_array($query_seBeforeresult2, SQLSRV_FETCH_ASSOC);
-
-
-                                $sql_seBeforecheck1 = "{call megEdittenkobefore_v2(?,?,?)}";
-                                $params_seBeforecheck1 = array(
-                                    array('select_beforecheck', SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE1'], SQLSRV_PARAM_IN)
-                                );
-                                $query_seBeforecheck1 = sqlsrv_query($conn, $sql_seBeforecheck1, $params_seBeforecheck1);
-                                $result_seBeforecheck1 = sqlsrv_fetch_array($query_seBeforecheck1, SQLSRV_FETCH_ASSOC);
-
-
-
-                                $sql_seBeforecheck2 = "{call megEdittenkobefore_v2(?,?,?)}";
-                                $params_seBeforecheck2 = array(
-                                    array('select_beforecheck', SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
-                                );
-                                $query_seBeforecheck2 = sqlsrv_query($conn, $sql_seBeforecheck2, $params_seBeforecheck2);
-                                $result_seBeforecheck2 = sqlsrv_fetch_array($query_seBeforecheck2, SQLSRV_FETCH_ASSOC);
-
-
-
-                                // เช็ค Selfcheck Status ของพนักงาน ว่ามีการกดยืนยันหรือไม่
-                                // กรณี ACTIVESTATUS = 0 คือ ไม่มีการกดยืนยัน
-			                    // กรณี ACTIVESTATUS = 1 คือ มีการกดยืนยัน
-
-                                $sql_seDrivercode = "SELECT EMPLOYEECODE1 AS 'EMP1',EMPLOYEECODE2 AS 'EMP2'
+                                $sql_seDrivercode = "SELECT EMPLOYEECODE1 AS 'EMP1',EMPLOYEECODE2 AS 'EMP2',EMPLOYEECODE3 AS 'EMP3'
                                 FROM VEHICLETRANSPORTPLAN WHERE VEHICLETRANSPORTPLANID ='".$_GET['vehicletransportplanid']."'";
                                 $params_seDrivercode = array();
                                 $query_seDrivercode = sqlsrv_query($conn, $sql_seDrivercode, $params_seDrivercode);
                                 $result_seDrivercode = sqlsrv_fetch_array($query_seDrivercode, SQLSRV_FETCH_ASSOC);
- 
+
                                 // echo $result_seDrivercode['EMP1'];
                                 // echo '<br>';
                                 // echo $result_seDrivercode['EMP2'];
@@ -1017,24 +1094,111 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                 // echo 'selfcheck1: ';
                                 // echo $result_seDriverselfcheck1['DRIVERSELFCHECK'];
 
-                            
-                                 // EMP2
-                                 $empchk_selfcheck2 = $result_seDrivercode['EMP2'];
-                                 $sql_seDriverselfcheck2 = "{call megEdittenkobefore_v2(?,?,?)}";
-                                 $params_seDriverselfcheck2 = array(
-                                     array('select_driverselfcheck_check', SQLSRV_PARAM_IN),
-                                     array($_GET['vehicletransportplanid'], SQLSRV_PARAM_IN),
-                                     array($empchk_selfcheck2, SQLSRV_PARAM_IN)
-                                 );
-                                 $query_seDriverselfcheck2 = sqlsrv_query($conn, $sql_seDriverselfcheck2, $params_seDriverselfcheck2);
-                                 $result_seDriverselfcheck2 = sqlsrv_fetch_array($query_seDriverselfcheck2, SQLSRV_FETCH_ASSOC);
- 
+
+                                // EMP2
+                                $empchk_selfcheck2 = $result_seDrivercode['EMP2'];
+                                $sql_seDriverselfcheck2 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seDriverselfcheck2 = array(
+                                    array('select_driverselfcheck_check', SQLSRV_PARAM_IN),
+                                    array($_GET['vehicletransportplanid'], SQLSRV_PARAM_IN),
+                                    array($empchk_selfcheck2, SQLSRV_PARAM_IN)
+                                );
+                                $query_seDriverselfcheck2 = sqlsrv_query($conn, $sql_seDriverselfcheck2, $params_seDriverselfcheck2);
+                                $result_seDriverselfcheck2 = sqlsrv_fetch_array($query_seDriverselfcheck2, SQLSRV_FETCH_ASSOC);
+
+
+                                // EMP3
+                                $empchk_selfcheck3 = $result_seDrivercode['EMP3'];
+                                $sql_seDriverselfcheck3 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seDriverselfcheck3 = array(
+                                    array('select_driverselfcheck_check', SQLSRV_PARAM_IN),
+                                    array($_GET['vehicletransportplanid'], SQLSRV_PARAM_IN),
+                                    array($empchk_selfcheck3, SQLSRV_PARAM_IN)
+                                );
+                                $query_seDriverselfcheck3 = sqlsrv_query($conn, $sql_seDriverselfcheck3, $params_seDriverselfcheck3);
+                                $result_seDriverselfcheck3 = sqlsrv_fetch_array($query_seDriverselfcheck3, SQLSRV_FETCH_ASSOC);
+
+
                                 //  echo '<br>';
                                 //  echo 'selfcheck2: ';
                                 //  echo $result_seDriverselfcheck2['DRIVERSELFCHECK'];
-                            
+
                                 //////////////////////////////////////////////////////////////////////////////////////
 
+                                // CHECK AND RESULT TENKO BEFORE พขร.1
+                                $sql_seBeforeresult1 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seBeforeresult1 = array(
+                                    array('select_beforeresult', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE1'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seBeforeresult1 = sqlsrv_query($conn, $sql_seBeforeresult1, $params_seBeforeresult1);
+                                $result_seBeforeresult1 = sqlsrv_fetch_array($query_seBeforeresult1, SQLSRV_FETCH_ASSOC);
+
+                                $sql_seBeforecheck1 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seBeforecheck1 = array(
+                                    array('select_beforecheck', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE1'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seBeforecheck1 = sqlsrv_query($conn, $sql_seBeforecheck1, $params_seBeforecheck1);
+                                $result_seBeforecheck1 = sqlsrv_fetch_array($query_seBeforecheck1, SQLSRV_FETCH_ASSOC);
+
+
+                                // CHECK AND RESULT TENKO BEFORE พขร.2
+                                $sql_seBeforeresult2 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seBeforeresult2 = array(
+                                    array('select_beforeresult', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seBeforeresult2 = sqlsrv_query($conn, $sql_seBeforeresult2, $params_seBeforeresult2);
+                                $result_seBeforeresult2 = sqlsrv_fetch_array($query_seBeforeresult2, SQLSRV_FETCH_ASSOC);
+
+                                $sql_seBeforecheck2 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seBeforecheck2 = array(
+                                    array('select_beforecheck', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seBeforecheck2 = sqlsrv_query($conn, $sql_seBeforecheck2, $params_seBeforecheck2);
+                                $result_seBeforecheck2 = sqlsrv_fetch_array($query_seBeforecheck2, SQLSRV_FETCH_ASSOC);
+
+
+                                // CHECK AND RESULT TENKO BEFORE พขร.3
+                                $sql_seBeforeresult3 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seBeforeresult3 = array(
+                                    array('select_beforeresult', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seBeforeresult3 = sqlsrv_query($conn, $sql_seBeforeresult3, $params_seBeforeresult3);
+                                $result_seBeforeresult3 = sqlsrv_fetch_array($query_seBeforeresult3, SQLSRV_FETCH_ASSOC);
+
+                                $sql_seBeforecheck3 = "{call megEdittenkobefore_v2(?,?,?)}";
+                                $params_seBeforecheck3 = array(
+                                    array('select_beforecheck', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seBeforecheck3 = sqlsrv_query($conn, $sql_seBeforecheck3, $params_seBeforecheck3);
+                                $result_seBeforecheck3 = sqlsrv_fetch_array($query_seBeforecheck3, SQLSRV_FETCH_ASSOC);
+
+
+                                // เช็ค Selfcheck Status ของพนักงาน ว่ามีการกดยืนยันหรือไม่
+                                // กรณี ACTIVESTATUS = 0 คือ ไม่มีการกดยืนยัน
+			                    // กรณี ACTIVESTATUS = 1 คือ มีการกดยืนยัน
+
+                                
+                                 // CHECK AND RESULT TENKO TRANSPORT พขร.1
+                                $sql_seTransportcheck1 = "{call megEdittenkotransport_v2(?,?,?)}";
+                                $params_seTransportcheck1 = array(
+                                    array('select_transportcheck', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE1'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seTransportcheck1 = sqlsrv_query($conn, $sql_seTransportcheck1, $params_seTransportcheck1);
+                                $result_seTransportcheck1 = sqlsrv_fetch_array($query_seTransportcheck1, SQLSRV_FETCH_ASSOC);
 
                                 $sql_seTransportresult1 = "{call megEdittenkotransport_v2(?,?,?,?,?)}";
                                 $params_seTransportresult1 = array(
@@ -1048,6 +1212,16 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                 $result_seTransportresult1 = sqlsrv_fetch_array($query_seTransportresult1, SQLSRV_FETCH_ASSOC);
 
 
+                                // CHECK AND RESULT TENKO TRANSPORT พขร.2
+                                $sql_seTransportcheck2 = "{call megEdittenkotransport_v2(?,?,?)}";
+                                $params_seTransportcheck2 = array(
+                                    array('select_transportcheck', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seTransportcheck2 = sqlsrv_query($conn, $sql_seTransportcheck2, $params_seTransportcheck2);
+                                $result_seTransportcheck2 = sqlsrv_fetch_array($query_seTransportcheck2, SQLSRV_FETCH_ASSOC);
+                                
                                 $sql_seTransportresult2 = "{call megEdittenkotransport_v2(?,?,?,?,?)}";
                                 $params_seTransportresult2 = array(
                                     array('select_transportresultnew', SQLSRV_PARAM_IN),
@@ -1060,26 +1234,37 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                 $result_seTransportresult2 = sqlsrv_fetch_array($query_seTransportresult2, SQLSRV_FETCH_ASSOC);
 
 
-                                $sql_seTransportcheck1 = "{call megEdittenkotransport_v2(?,?,?)}";
-                                $params_seTransportcheck1 = array(
+                                 // CHECK AND RESULT TENKO TRANSPORT พขร.3
+                                $sql_seTransportcheck3 = "{call megEdittenkotransport_v2(?,?,?)}";
+                                $params_seTransportcheck3 = array(
                                     array('select_transportcheck', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seTransportcheck3 = sqlsrv_query($conn, $sql_seTransportcheck3, $params_seTransportcheck3);
+                                $result_seTransportcheck3 = sqlsrv_fetch_array($query_seTransportcheck3, SQLSRV_FETCH_ASSOC);
+                                
+                                $sql_seTransportresult3 = "{call megEdittenkotransport_v2(?,?,?,?,?)}";
+                                $params_seTransportresult3 = array(
+                                    array('select_transportresultnew', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'], SQLSRV_PARAM_IN),
+                                    array('', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster["DATEINPUT_F1"], SQLSRV_PARAM_IN)
+                                );
+                                $query_seTransportresult3 = sqlsrv_query($conn, $sql_seTransportresult3, $params_seTransportresult3);
+                                $result_seTransportresult3 = sqlsrv_fetch_array($query_seTransportresult3, SQLSRV_FETCH_ASSOC);   
+
+
+                                 // CHECK AND RESULT TENKO AFTER พขร.1
+                                $sql_seAftercheck1 = "{call megEdittenkoafter_v2(?,?,?)}";
+                                $params_seAftercheck1 = array(
+                                    array('select_aftercheck', SQLSRV_PARAM_IN),
                                     array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
                                     array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE1'], SQLSRV_PARAM_IN)
                                 );
-                                $query_seTransportcheck1 = sqlsrv_query($conn, $sql_seTransportcheck1, $params_seTransportcheck1);
-                                $result_seTransportcheck1 = sqlsrv_fetch_array($query_seTransportcheck1, SQLSRV_FETCH_ASSOC);
-
-
-
-                                $sql_seTransportcheck2 = "{call megEdittenkotransport_v2(?,?,?)}";
-                                $params_seTransportcheck2 = array(
-                                    array('select_transportcheck', SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
-                                );
-                                $query_seTransportcheck2 = sqlsrv_query($conn, $sql_seTransportcheck2, $params_seTransportcheck2);
-                                $result_seTransportcheck2 = sqlsrv_fetch_array($query_seTransportcheck2, SQLSRV_FETCH_ASSOC);
-
+                                $query_seAftercheck1 = sqlsrv_query($conn, $sql_seAftercheck1, $params_seAftercheck1);
+                                $result_seAftercheck1 = sqlsrv_fetch_array($query_seAftercheck1, SQLSRV_FETCH_ASSOC);
 
                                 $sql_seAfterresult1 = "{call megEdittenkoafter_v2(?,?,?)}";
                                 $params_seAfterresult1 = array(
@@ -1091,6 +1276,16 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                 $result_seAfterresult1 = sqlsrv_fetch_array($query_seAfterresult1, SQLSRV_FETCH_ASSOC);
 
 
+                                // CHECK AND RESULT TENKO AFTER พขร.2
+                                $sql_seAftercheck2 = "{call megEdittenkoafter_v2(?,?,?)}";
+                                $params_seAftercheck2 = array(
+                                    array('select_aftercheck', SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
+                                );
+                                $query_seAftercheck2 = sqlsrv_query($conn, $sql_seAftercheck2, $params_seAftercheck2);
+                                $result_seAftercheck2 = sqlsrv_fetch_array($query_seAftercheck2, SQLSRV_FETCH_ASSOC);
+
                                 $sql_seAfterresult2 = "{call megEdittenkoafter_v2(?,?,?)}";
                                 $params_seAfterresult2 = array(
                                     array('select_afterresult', SQLSRV_PARAM_IN),
@@ -1101,24 +1296,25 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                 $result_seAfterresult2 = sqlsrv_fetch_array($query_seAfterresult2, SQLSRV_FETCH_ASSOC);
 
 
-                                $sql_seAftercheck1 = "{call megEdittenkoafter_v2(?,?,?)}";
-                                $params_seAftercheck1 = array(
+                                // CHECK AND RESULT TENKO AFTER พขร.3
+                                $sql_seAftercheck3 = "{call megEdittenkoafter_v2(?,?,?)}";
+                                $params_seAftercheck3 = array(
                                     array('select_aftercheck', SQLSRV_PARAM_IN),
                                     array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE1'], SQLSRV_PARAM_IN)
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'], SQLSRV_PARAM_IN)
                                 );
-                                $query_seAftercheck1 = sqlsrv_query($conn, $sql_seAftercheck1, $params_seAftercheck1);
-                                $result_seAftercheck1 = sqlsrv_fetch_array($query_seAftercheck1, SQLSRV_FETCH_ASSOC);
+                                $query_seAftercheck3 = sqlsrv_query($conn, $sql_seAftercheck3, $params_seAftercheck3);
+                                $result_seAftercheck3 = sqlsrv_fetch_array($query_seAftercheck3, SQLSRV_FETCH_ASSOC);
 
-
-                                $sql_seAftercheck2 = "{call megEdittenkoafter_v2(?,?,?)}";
-                                $params_seAftercheck2 = array(
-                                    array('select_aftercheck', SQLSRV_PARAM_IN),
+                                $sql_seAfterresult3 = "{call megEdittenkoafter_v2(?,?,?)}";
+                                $params_seAfterresult3 = array(
+                                    array('select_afterresult', SQLSRV_PARAM_IN),
                                     array($result_seTenkomaster_temp['TENKOMASTERID'], SQLSRV_PARAM_IN),
-                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE2'], SQLSRV_PARAM_IN)
+                                    array($result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'], SQLSRV_PARAM_IN)
                                 );
-                                $query_seAftercheck2 = sqlsrv_query($conn, $sql_seAftercheck2, $params_seAftercheck2);
-                                $result_seAftercheck2 = sqlsrv_fetch_array($query_seAftercheck2, SQLSRV_FETCH_ASSOC);
+                                $query_seAfterresult3 = sqlsrv_query($conn, $sql_seAfterresult3, $params_seAfterresult3);
+                                $result_seAfterresult3 = sqlsrv_fetch_array($query_seAfterresult3, SQLSRV_FETCH_ASSOC);    
+
 
 
                                 // $sql_seChkConfirm = "{call megEdittenkoafter_v2(?,?,?)}";
@@ -1328,6 +1524,27 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                         <tr>
                                             <td>
                                                 <label>ปลายทาง : <?= $result_sePlain['JOBEND'] ?></label>
+                                            </td>
+
+                                        </tr>
+                                        <tr style="display:none">
+                                            <td>
+                                                <input type="text" id="txt_companycode_tdc" value="<?= $result_sePlain['COMPANYCODE'] ?>"></input>
+                                                <?php
+                                                if ($result_sePlain['COMPANYCODE'] == "RKR" || $result_sePlain['COMPANYCODE'] == "RKL" || $result_sePlain['COMPANYCODE'] == "RKS") {
+                                                ?>
+                                                     <input type="text" id="txt_vehicleregisnumber_tdc" value="<?= $result_sePlain['THAINAME'] ?>"></input>
+                                                     <input type="text" id="txt_area_tdc" value="AMT"></input>
+                                                <?php
+                                                }else {
+                                                ?>
+                                                     <input type="text" id="txt_vehicleregisnumber_tdc" value="<?= $result_sePlain['VEHICLEREGISNUMBER1'] ?>"></input>
+                                                     <input type="text" id="txt_area_tdc" value="GW"></input>
+                                                <?php
+                                                }
+                                                ?>
+                                               
+                                                <input type="text" id="txt_officer_tdc" value="<?=$_SESSION['USERNAME']?>"></input>
                                             </td>
 
                                         </tr>
@@ -1585,6 +1802,119 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                 <?php
                                             }
                                             ?>
+                                            <?php
+                                            if ($result_sePlain['EMPLOYEENAME3'] != "") { /// พขร คนที่ 3
+                                                ?>
+                                                <tr>
+                                                    <?php
+                                                    if ($result_sePlain['COMPANYCODE'] == 'RRC' || $result_sePlain['COMPANYCODE'] == 'RCC' || $result_sePlain['COMPANYCODE'] == 'RATC') {
+                                                        ?>
+                                                        <td><a href="#" onclick="save_tenkomastergw('<?= $_GET['vehicletransportplanid'] ?>', '<?= $result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'] ?>', '3')"><?= $result_sePlain['EMPLOYEENAME3'] ?>(3)</a></td>
+                                                        <?php
+                                                    } else {
+                                                        ?>
+                                                        <td><a href="#" onclick="save_tenkomasteramt('<?= $_GET['vehicletransportplanid'] ?>', '', '<?= $result_seTenkomaster_temp['TENKOMASTERDIRVERCODE3'] ?>', '3')"><?= $result_sePlain['EMPLOYEENAME3'] ?>(3)</a></td>
+                                                        <?php
+                                                    }
+                                                    ?>
+
+                                                    <!-- ก่อนเริ่มงาน -->
+                                                    <!-- ตรวจสอบ -->
+                                                    <td style="text-align: center">
+                                                        <?php
+                                                        if ($result_seBeforecheck3['TENKOBEFORECHECK'] == "1" && $result_seDriverselfcheck3['DRIVERSELFCHECK'] == "1") {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_beforecheckok3" style="color: green"></span>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_beforecheckno3" style="display: none;color: red"></span>
+                                                            <?php
+                                                        } else {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_beforecheckno3" style="color: red"></span>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_beforecheckok3" style="display: none;color: green"></span>
+                                                            <?php
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                    <!-- ก่อนเริ่มงาน -->
+                                                    <!-- ผลตรวจ -->
+                                                    <td style="text-align: center">
+                                                        <?php
+                                                        if ($result_seBeforeresult3['TENKOBEFORERESULT'] == "1" && $result_seDriverselfcheck3['DRIVERSELFCHECK'] == "1") {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_beforeresultok3" style="color: green"></span>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_beforeresultno3" style="display: none;color: red"></span>
+                                                            <?php
+                                                        } else {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_beforeresultno3" style="color: red"></span>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_beforeresultok3" style="display: none;color: green"></span>
+                                                            <?php
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                    <!--END ก่อนเริ่มงาน -->
+
+                                                    
+                                                    <td style="text-align: center">
+                                                        <?php
+                                                        if ($result_seTransportcheck3['TENKOTRANSPORTCHECK'] == "1") {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_transportcheckok3" style="color: green"></span>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_transportcheckno3" style="display: none;color: red"></span>
+                                                            <?php
+                                                        } else {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_transportcheckno3" style="color: red"></span>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_transportcheckok3" style="display: none;color: green"></span>
+                                                            <?php
+                                                        }
+                                                        ?></td>
+                                                    <td style="text-align: center"><?php
+                                                        if ($result_seTransportresult3['TENKOTRANSPORTRESULT'] == '1') {
+                                                            ?>
+
+                                                            <span class="glyphicon glyphicon-ok" id="icon_transportrsok3" style="color: green"></span>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_transportrsno3" style="display: none;color: red"></span>
+                                                            <?php
+                                                        } else {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_transportrsno3" style="color: red"></span>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_transportrsok3" style="display: none;color: green"></span>
+
+                                                            <?php
+                                                        }
+                                                        ?></td>
+
+                                                    <td style="text-align: center"><?php
+                                                        if ($result_seAftercheck3['TENKOAFTERCHECK'] == "1") {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_afftercheckok3" style="color: green"></span>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_afftercheckno3" style="display: none;color: red"></span>
+                                                            <?php
+                                                        } else {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_afftercheckno3" style="color: red"></span>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_afftercheckok3" style="display: none;color: green"></span>
+                                                            <?php
+                                                        }
+                                                        ?></td>
+                                                    <td style="text-align: center"><?php
+                                                        if ($result_seAfterresult3['TENKOAFTERRESULT'] == "1") {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_affterresultok3" style="color: green"></span>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_affterresultno3" style="display: none;color: red"></span>
+                                                            <?php
+                                                        } else {
+                                                            ?>
+                                                            <span class="glyphicon glyphicon-remove" id="icon_affterresultno3" style="color: red"></span>
+                                                            <span class="glyphicon glyphicon-ok" id="icon_affterresultok3" style="display: none;color: green"></span>
+                                                            <?php
+                                                        }
+                                                        ?></td>
+                                                </tr>
+                                                <?php
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1647,10 +1977,14 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                      $empchkconfirm = $_GET['employeecode1'];
                                      //empchk สำหรับตรวจสอบ tap ตรวจสอบการใช้งานโทรศัพท์
                                      $empchk = substr($_GET['employeecode1'],0,2);
-                                }else {
+                                }else if($_GET['employeecode2'] != '') {
                                      $empchkconfirm = $_GET['employeecode2'];
                                       //empchk สำหรับตรวจสอบ tap ตรวจสอบการใช้งานโทรศัพท์
                                      $empchk = substr($_GET['employeecode2'],0,2);
+                                }else {
+                                    $empchkconfirm = $_GET['employeecode3'];
+                                     //empchk สำหรับตรวจสอบ tap ตรวจสอบการใช้งานโทรศัพท์
+                                    $empchk = substr($_GET['employeecode3'],0,2);
                                 }
                                 // echo $result_seTenkomaster['TENKOMASTERID'];
                                 $sql_seChkConfirm = "SELECT CONFIRMDETAILBY,CONFIRMDETAILDATE FROM TENKOBEFORE 
@@ -1765,13 +2099,13 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                     $RS_TENKORESTDATA = ($result_seChktenkorest['TENKORESTDATA'] > 24) ? '24' : $result_seChktenkorest['TENKORESTDATA'];
 
 
-                                    $sql_seTenkorest = "{call megEdittenkobefore_v2(?,?)}";
-                                    $params_seTenkorest = array(
-                                        array('select_tenkorest', SQLSRV_PARAM_IN),
-                                        array($employeecode1, SQLSRV_PARAM_IN)
-                                    );
-                                    $query_seTenkorest = sqlsrv_query($conn, $sql_seTenkorest, $params_seTenkorest);
-                                    $result_seTenkorest = sqlsrv_fetch_array($query_seTenkorest, SQLSRV_FETCH_ASSOC);
+                                    // $sql_seTenkorest = "{call megEdittenkobefore_v2(?,?)}";
+                                    // $params_seTenkorest = array(
+                                    //     array('select_tenkorest', SQLSRV_PARAM_IN),
+                                    //     array($employeecode1, SQLSRV_PARAM_IN)
+                                    // );
+                                    // $query_seTenkorest = sqlsrv_query($conn, $sql_seTenkorest, $params_seTenkorest);
+                                    // $result_seTenkorest = sqlsrv_fetch_array($query_seTenkorest, SQLSRV_FETCH_ASSOC);
 
                                     ?>
 
@@ -3814,8 +4148,14 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                         $result_seKeyDropTime1 = sqlsrv_fetch_array($query_seKeyDropTime1, SQLSRV_FETCH_ASSOC);
                                                         
                                                         // ช่วงเวลาการพักผ่อน(ระยะเวลาการพักผ่อน) 8 ชั่วโมง
-                                                        $DATERESTSTART1 = str_replace("T"," ",$result_seKeyDropTime1['KEYDROPTIME']);
-                                                        $DATERESTSTART = str_replace("-","/",$DATERESTSTART1);
+                                                        if ($result_seKeyDropTime1['KEYDROPTIME'] == '') {
+                                                                                        
+                                                            $DATERESTSTART1 = str_replace("T"," ",$result_seSelfCheck1['SLEEPRESTSTART']);
+                                                            $DATERESTSTART = str_replace("-","/",$DATERESTSTART1);
+                                                        }else {
+                                                            $DATERESTSTART1 = str_replace("T"," ",$result_seKeyDropTime1['KEYDROPTIME']);
+                                                            $DATERESTSTART = str_replace("-","/",$DATERESTSTART1);
+                                                        }
 
                                                         $DATERESTEND1 = str_replace("T"," ",$result_seSelfCheck1['SLEEPRESTEND']);
                                                         $DATERESTEND = str_replace("-","/",$DATERESTEND1);
@@ -3938,7 +4278,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                             ?>
                                                                         </div>
                                                                         <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการพักผ่อน</p>
-                                                                        
+                                                                        <p style="color:red">*ในกรณีไม่มีเวลาเลิกงานของวันที่แล้ว ระบบจะใช้เวลาที่เจ้าหน้าที่ลงข้อมูล</p>
                                                                     </td>
                                                                 <?php
                                                                 }else { // NG
@@ -3979,7 +4319,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                             
                                                                         </div>
                                                                         <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการพักผ่อน</p>
-                                                                        
+                                                                        <p style="color:red">*ในกรณีไม่มีเวลาเลิกงานของวันที่แล้ว ระบบจะใช้เวลาที่เจ้าหน้าที่ลงข้อมูล</p>
                                                                     </td>
                                                                 <?php
                                                                 }
@@ -6563,7 +6903,15 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     ?>
                                                     
                                                     <?php
-                                                    $emp = ($_GET['employeecode1'] != "") ? $_GET['employeecode1'] : $_GET['employeecode2'];
+                                                    // $emp = ($_GET['employeecode1'] != "") ? $_GET['employeecode1'] : $_GET['employeecode2'];
+                                                    if ($_GET['employeecode1'] != "") {
+                                                        $emp = $_GET['employeecode1'];
+                                                    }else if ($_GET['employeecode2'] != ""){
+                                                        $emp = $_GET['employeecode2'];
+                                                    }else{
+                                                        $emp = $_GET['employeecode3'];
+                                                    }
+
                                                     if ($emp != "") {
                                                         ?>
 
@@ -6607,10 +6955,9 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                 <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px;<?= $licensechk1?>"><b><?=$year11end?><?=$year12end?></b></td>
                                                 <!-- <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px;<?= $licensechk1?>"   onclick="inserttimeworkingdata('<?=$_GET['employeecode1']?>','<?= $result_sePlain['EMPLOYEENAME1'] ?>','<?=$result_seSelfCheck1['SELFCHECKID']?>')"><b><?=$year11end?><?=$year12end?></b></td> -->
                                                 <!-- กราฟสุขภาพ -->
-                                                
                                                 <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b><input style="width:160px;" type="button" onclick="se_graphdatacheck('<?= $_GET['employeecode1'] ?>');" name="btnSend" id="btnSend" value="ดูกราฟข้อมูลสุขภาพ" class="btn btn-primary"></b></td>
-                                                <!-- เอกสารเท็งโกะ -->
-                                                <!-- <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><button type="button" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" data-toggle="modal" data-target="#myModalFeedback">ข้อมูล Feedback พขร.1</button></td> -->
+                                                <!-- เอกสารตรวจรถ -->
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><input style="width:160px;" type="button" onclick="se_truckdailycheck('<?= $_GET['employeecode1'] ?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการตรวจรถ" class="btn btn-primary"></b></td>
                                                     
                                             </tr>
                                             
@@ -7398,7 +7745,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                             
                                           
                                             <tr>
-                                                <th colspan = "40" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ :   <?= $result_sePlain['EMPLOYEENAME1'] ?> || รหัสพนักงาน : <?=$_GET['employeecode1']?> || ตำแหน่ง : <?=$result_seDriverData1['PositionNameT']?> || อายุงาน : <?= $result_CalculateWork['RS']?></font></th>
+                                                <th colspan = "40" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ : <?=$sex?>  <?= $result_sePlain['EMPLOYEENAME1'] ?> || รหัสพนักงาน : <?=$_GET['employeecode1']?> || ตำแหน่ง : <?=$result_seDriverData1['PositionNameT']?> || อายุงาน : <?= $result_CalculateWork['RS']?></font></th>
                                             </tr>
                                             <tr>
                                                 <th colspan = "16" style="font-size:18px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ตรวจสอบข้อมูลการนอน(พขร.1)ข้อมูลจากระบบแจ้งสุขภาพตนเอง</th>  
@@ -7896,13 +8243,14 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                     $RS_TENKORESTDATA = ($result_seChktenkorest['TENKORESTDATA'] > 24) ? '24' : $result_seChktenkorest['TENKORESTDATA'];
 
 
-                                    $sql_seTenkorest = "{call megEdittenkobefore_v2(?,?)}";
-                                    $params_seTenkorest = array(
-                                        array('select_tenkorest', SQLSRV_PARAM_IN),
-                                        array($employeecode2, SQLSRV_PARAM_IN)
-                                    );
-                                    $query_seTenkorest = sqlsrv_query($conn, $sql_seTenkorest, $params_seTenkorest);
-                                    $result_seTenkorest = sqlsrv_fetch_array($query_seTenkorest, SQLSRV_FETCH_ASSOC);
+                                    // $sql_seTenkorest = "{call megEdittenkobefore_v2(?,?)}";
+                                    // $params_seTenkorest = array(
+                                    //     array('select_tenkorest', SQLSRV_PARAM_IN),
+                                    //     array($employeecode2, SQLSRV_PARAM_IN)
+                                    // );
+                                    // $query_seTenkorest = sqlsrv_query($conn, $sql_seTenkorest, $params_seTenkorest);
+                                    // $result_seTenkorest = sqlsrv_fetch_array($query_seTenkorest, SQLSRV_FETCH_ASSOC);
+
                                     ?>
 
                                     <!-- รายละเอียดข้อมูลพนักงานคนที 2 -->
@@ -9939,9 +10287,15 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                         $result_seKeyDropTime2 = sqlsrv_fetch_array($query_seKeyDropTime2, SQLSRV_FETCH_ASSOC);
                                                         
                                                         // ช่วงเวลาการพักผ่อน(ระยะเวลาการพักผ่อน) 8 ชั่วโมง
-                                                        $DATERESTSTART2 = str_replace("T"," ",$result_seKeyDropTime2['KEYDROPTIME']);
-                                                        $DATERESTSTART = str_replace("-","/",$DATERESTSTART2);
-
+                                                        if ($result_seKeyDropTime2['KEYDROPTIME'] == '') {
+                                                                                        
+                                                            $DATERESTSTART2 = str_replace("T"," ",$result_seSelfCheck1['SLEEPRESTSTART']);
+                                                            $DATERESTSTART = str_replace("-","/",$DATERESTSTART2);
+                                                        }else {
+                                                            $DATERESTSTART2 = str_replace("T"," ",$result_seKeyDropTime2['KEYDROPTIME']);
+                                                            $DATERESTSTART = str_replace("-","/",$DATERESTSTART2);
+                                                        }
+                                                        
                                                         $DATERESTEND2 = str_replace("T"," ",$result_seSelfCheck1['SLEEPRESTEND']);
                                                         $DATERESTEND = str_replace("-","/",$DATERESTEND2);
 
@@ -10063,6 +10417,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                             
                                                                         </div>
                                                                         <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการพักผ่อน</p>
+                                                                        <p style="color:red">*ในกรณีไม่มีเวลาเลิกงานของวันที่แล้ว ระบบจะใช้เวลาที่เจ้าหน้าที่ลงข้อมูล</p>
                                                                     </td>
                                                                 <?php
                                                                 }else { // OK
@@ -10103,6 +10458,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                             
                                                                         </div>
                                                                         <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการพักผ่อน</p>
+                                                                        <p style="color:red">*ในกรณีไม่มีเวลาเลิกงานของวันที่แล้ว ระบบจะใช้เวลาที่เจ้าหน้าที่ลงข้อมูล</p>
                                                                     </td>
                                                                 <?php
                                                                 }
@@ -10111,7 +10467,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
 
                                                             <!-- การนอนหลับ (6 ชม. ขึ้นไป) -->
                                                             <tr>
-                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.2 การนอนหลับ <br>(6 ชม. ขึ้นไป)2</b>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.2 การนอนหลับ <br>(6 ชม. ขึ้นไป)</b>
                                                                     
                                                                 </td>
                                                                 <?php
@@ -12654,7 +13010,15 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     ?>
                                                     
                                                     <?php
-                                                    $emp = ($_GET['employeecode1'] != "") ? $_GET['employeecode1'] : $_GET['employeecode2'];
+                                                    // $emp = ($_GET['employeecode1'] != "") ? $_GET['employeecode1'] : $_GET['employeecode2'];
+                                                    if ($_GET['employeecode1'] != "") {
+                                                        $emp = $_GET['employeecode1'];
+                                                    }else if ($_GET['employeecode2'] != ""){
+                                                        $emp = $_GET['employeecode2'];
+                                                    }else{
+                                                        $emp = $_GET['employeecode3'];
+                                                    }
+
                                                     if ($emp != "") {
                                                         ?>
                                                         <div class="col-lg-10 text-right">
@@ -12691,8 +13055,9 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                 <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px"><b>วันหมดอายุ</b></td>
                                                 <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px;<?= $licensechk2?>" ><b><?=$year21end?><?=$year22end?></b></td>
                                                 <!-- กราฟสุขภาพ -->
-                                                <td style="width:160px;border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b><input style="width:160px;" type="button" onclick="se_graphdatacheck('<?= $_GET['employeecode2'] ?>');" name="btnSend" id="btnSend" value="ดูกราฟข้อมูลสุขภาพ" class="btn btn-primary"></b></td>
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b><input style="width:160px;" type="button" onclick="se_graphdatacheck('<?= $_GET['employeecode2'] ?>');" name="btnSend" id="btnSend" value="ดูกราฟข้อมูลสุขภาพ" class="btn btn-primary"></b></td>
                                                 <!-- เอกสารเท็งโกะ -->
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><input style="width:160px;" type="button" onclick="se_truckdailycheck('<?= $_GET['employeecode2'] ?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการตรวจรถ" class="btn btn-primary"></b></td>
                                                 <!-- <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><button type="button" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" data-toggle="modal" data-target="#myModalFeedback">ข้อมูล Feedback พขร.2</button></td> -->
                                             </tr>
                                         </table>    
@@ -13465,7 +13830,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                             <input type="hidden"  id="txt_employeecodeD2"  name="txt_employeecodeD2"   class="form-control" value="<?= $_GET['employeecode2'] ?>">
                                             
                                             <tr>
-                                                <th colspan = "40" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ :   <?= $result_sePlain['EMPLOYEENAME2'] ?> || รหัสพนักงาน : <?=$_GET['employeecode2']?> || ตำแหน่ง : <?=$result_seDriverData2['PositionNameT']?> || อายุงาน : <?= $result_CalculateWork['RS']?></font></th>
+                                                <th colspan = "40" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ : <?=$sex?>  <?= $result_sePlain['EMPLOYEENAME2'] ?> || รหัสพนักงาน : <?=$_GET['employeecode2']?> || ตำแหน่ง : <?=$result_seDriverData2['PositionNameT']?> || อายุงาน : <?= $result_CalculateWork['RS']?></font></th>
                                             </tr>
                                             <tr>
                                                 <th colspan = "16" style="font-size:18px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ตรวจสอบข้อมูลการนอน(พขร.2)ข้อมูลจากระบบแจ้งสุขภาพตนเอง</th>  
@@ -13946,6 +14311,6097 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
 
 
                                     <?php
+                                    // TENKO พนักงานคนที่ 3
+                                    // start_tenko3_14193
+                                } else if ($_GET['employeecode3'] != "") {
+                                    
+                                    $sql_seChktenkorest = "SELECT DATEDIFF(HOUR,
+                                                                        (SELECT TOP 1 MODIFIEDDATE FROM [dbo].[TENKOAFTER] WHERE [TENKOMASTERDIRVERCODE] = '" . $_GET['employeecode3'] . "' ORDER BY [MODIFIEDDATE]  DESC)
+                                                                        ,(SELECT GETDATE()))  AS 'TENKORESTDATA'";
+                                    $query_seChktenkorest = sqlsrv_query($conn, $sql_seChktenkorest, $params_seChktenkorest);
+                                    $result_seChktenkorest = sqlsrv_fetch_array($query_seChktenkorest, SQLSRV_FETCH_ASSOC);
+                                    //edit_tenkobeforetxt1($result_seChktenkorest['TENKORESTDATA'], 'TENKORESTDATA', $result_seTenkobefore['TENKOBEFOREID']);
+                                    //editTenkobefore('edit_tenkobefore', $result_seTenkobefore['TENKOBEFOREID'], 'TENKORESTDATA', $result_seChktenkorest['TENKORESTDATA']);
+                                    //editTenkobefore('edit_tenkobefore', $result_seTenkobefore['TENKOBEFOREID'], 'TENKORESTRESULT', 1);
+                                    $RS_TENKORESTDATA = ($result_seChktenkorest['TENKORESTDATA'] > 24) ? '24' : $result_seChktenkorest['TENKORESTDATA'];
+
+
+                                    // $sql_seTenkorest = "{call megEdittenkobefore_v2(?,?)}";
+                                    // $params_seTenkorest = array(
+                                    //     array('select_tenkorest', SQLSRV_PARAM_IN),
+                                    //     array($employeecode3, SQLSRV_PARAM_IN)
+                                    // );
+                                    // $query_seTenkorest = sqlsrv_query($conn, $sql_seTenkorest, $params_seTenkorest);
+                                    // $result_seTenkorest = sqlsrv_fetch_array($query_seTenkorest, SQLSRV_FETCH_ASSOC);
+
+                                    ?>
+
+                                    <!-- รายละเอียดข้อมูลพนักงานคนที 3 -->
+                                    <div class="tab-pane fade in active" id="tenko_driverdetail">
+
+
+                                        <?php
+                                        $sql_seCompanycodeD3 = "SELECT COMPANYCODE FROM VEHICLETRANSPORTPLAN
+                                        WHERE VEHICLETRANSPORTPLANID ='" . $_GET['vehicletransportplanid'] . "'";
+                                        $params_seCompanycodeD3  = array();
+                                        $query_seCompanycodeD3   = sqlsrv_query($conn, $sql_seCompanycodeD3 , $params_seCompanycodeD3);
+                                        $result_seCompanycodeD3  = sqlsrv_fetch_array($query_seCompanycodeD3 , SQLSRV_FETCH_ASSOC);
+
+                                        $sql_seMonthD3 = "SELECT FORMAT(GETDATE(),'MMMM') AS 'MONTH'";
+                                        $params_seMonthD3  = array();
+                                        $query_seMonthD3   = sqlsrv_query($conn, $sql_seMonthD3 , $params_seMonthD3);
+                                        $result_seMonthD3  = sqlsrv_fetch_array($query_seMonthD3 , SQLSRV_FETCH_ASSOC);
+                                                        
+                                        $sql_seYearsD3 = "SELECT YEAR(GETDATE()) AS 'YEARS'";
+                                        $params_seYearsD3  = array();
+                                        $query_seYearsD3   = sqlsrv_query($conn, $sql_seYearsD3 , $params_seYearsD3);
+                                        $result_seYearsD3  = sqlsrv_fetch_array($query_seYearsD3 , SQLSRV_FETCH_ASSOC);
+
+                                        if ($result_seCompanycodeD3['COMPANYCODE'] == 'RKS' || $result_seCompanycodeD3['COMPANYCODE'] == 'RKR' || $result_seCompanycodeD3['COMPANYCODE'] == 'RKL') {
+                                            $sql_seSafetyThemeD3 = "SELECT SAFETYDATA AS 'SAFETYTHEME' FROM SAFETYFOCUSTHEME 
+                                            WHERE  MONTHENG ='".$result_seMonthD3['MONTH']."' AND YEARTHEME ='".$result_seYearsD3['YEARS']."'
+                                            AND AREA ='amt'";
+                                            $params_seSafetyThemeD3  = array();
+                                            $query_seSafetyThemeD3   = sqlsrv_query($conn, $sql_seSafetyThemeD3 , $params_seSafetyThemeD3);
+                                            $result_seSafetyThemeD3  = sqlsrv_fetch_array($query_seSafetyThemeD3 , SQLSRV_FETCH_ASSOC);
+                                        }else {
+                                            $sql_seSafetyThemeD3 = "SELECT SAFETYDATA AS 'SAFETYTHEME' FROM SAFETYFOCUSTHEME 
+                                            WHERE  MONTHENG ='".$result_seMonthD3['MONTH']."' AND YEARTHEME ='".$result_seYearsD3['YEARS']."'
+                                            AND AREA ='gw'";
+                                            $params_seSafetyThemeD3  = array();
+                                            $query_seSafetyThemeD3   = sqlsrv_query($conn, $sql_seSafetyThemeD3 , $params_seSafetyThemeD3);
+                                            $result_seSafetyThemeD3  = sqlsrv_fetch_array($query_seSafetyThemeD3 , SQLSRV_FETCH_ASSOC);
+                                        }
+
+                                        $YEAR = date("Y");
+                                        $sql_sehealth = "SELECT  TOP 1 ID,SHORTSIGHT,SHORTSIGHT_R,SHORTSIGHT_L
+                                                    ,LONGSIGHT,LONGSIGHT_R,LONGSIGHT_L
+                                                    ,OBLIQUESIGHT,OBLIQUESIGHT_R,OBLIQUESIGHT_L,CREATEYEAR
+                                                    FROM [dbo].[HEALTHHISTORY]
+                                                    WHERE EMPLOYEECODE ='" . $_GET['employeecode3'] . "'
+                                                    AND CREATEYEAR ='" . $YEAR . "'
+                                                    AND ACTIVESTATUS ='1'
+                                                    ORDER BY CREATEDATE DESC";
+                                        $params_sehealth = array();
+                                        $query_sehealth = sqlsrv_query($conn, $sql_sehealth, $params_sehealth);
+                                        $result_sehealth = sqlsrv_fetch_array($query_sehealth, SQLSRV_FETCH_ASSOC);    
+
+                                        // ข้อมูลใบขับขี่คนที่3
+                                        $sql_seDriverData3 = "SELECT a.PersonID,a.nameT,a.CarLicenceID,a.PositionNameT,a.yearw,a.monthw,a.dayw,a.TaxID,
+                                        FORMAT (b.ExpireCar_Start, 'dd/MM/yyyy') 'STARTDATE',
+                                        FORMAT (b.ExpireCar_End, 'dd/MM/yyyy') AS 'ENDDATE' ,
+                                        DATEDIFF(month, FORMAT (b.ExpireCar_End, 'yyyy/MM/dd '), FORMAT (GETDATE(), 'yyyy/MM/dd ')) AS 'MONTHDIFF'
+                                        FROM [dbo].[EMPLOYEEEHR2] a
+                                        INNER JOIN [dbo].[EMPLOYEEDETAILEHR] b ON a.PersonID = b.PersonID
+                                        WHERE PersonCode ='".$_GET['employeecode3']."'";
+                                        $query_seDriverData3 = sqlsrv_query($conn, $sql_seDriverData3, $params_seDriverData1);
+                                        $result_seDriverData3 = sqlsrv_fetch_array($query_seDriverData3, SQLSRV_FETCH_ASSOC);
+
+                                        // echo $result_seDriverData1['TaxID'];
+                                        // echo $result_seCarData1['MONTHDIFF'];
+                                        // echo '|';
+                                        if ($result_seDriverData3['MONTHDIFF'] == '-3') {
+                                            // echo '1';
+                                            $licensechk3 = "background-color: #f6ff54";
+                                        }else if($result_seDriverData3['MONTHDIFF'] == '-2'){
+                                            // echo '2';
+                                            $licensechk3 = "background-color: #ff9e54";
+                                        }else if($result_seDriverData3['MONTHDIFF'] == '-1' || $result_seDriverData3['MONTHDIFF'] >= '0'){
+                                            // echo '1';
+                                            $licensechk3 = "background-color: #ff5454";
+                                        }else{
+                                            // echo '0';
+                                            // ปกติ สีเขียว
+                                            $licensechk3 = "background-color: #94FA67";
+                                        
+                                            
+                                        }
+
+
+                                        //เปลี่ยนปี ค.ศ เป็น พ.ศ วันที่ออกบัตรพนักงานคนที่2
+                                        if ($result_seDriverData3['STARTDATE'] == NULL) {
+                                            $year11start =  '';
+                                            $year12start =  '';
+                                        }else {
+                                            $year11start =  substr($result_seDriverData3['STARTDATE'],0,6);
+                                            $year12start =  substr($result_seDriverData3['STARTDATE'],6,10)+543;
+                                        }
+                                        //เปลี่ยนปี ค.ศ เป็น พ.ศ วันที่หมดอายุพนักงานคนที่2
+                                        if ($result_seDriverData3['ENDDATE'] == NULL) {
+                                            $year11end =  '';
+                                            $year12end =  '';
+                                        }else {
+                                            $year11end =  substr($result_seDriverData3['ENDDATE'],0,6);
+                                            $year12end =  substr($result_seDriverData3['ENDDATE'],6,10)+543;
+                                        }
+
+                                        // echo $year11start;
+                                        // echo "<br>";
+                                        // echo $year12start;
+
+                                        // START DATE คือ CURRENT DATE - 7 
+                                        $sql_seStartDate = "SELECT CONVERT(VARCHAR(25),(GETDATE()-6),105) AS 'STARTDATE'";
+                                        $params_seStartDate = array();
+                                        $query_seStartDate = sqlsrv_query($conn, $sql_seStartDate, $params_seStartDate);
+                                        $result_seStartDate = sqlsrv_fetch_array($query_seStartDate, SQLSRV_FETCH_ASSOC);
+                                        
+                                        // DATE END คือ CURRENT DATE
+                                        $sql_seEndDate = "SELECT CONVERT(VARCHAR(25),GETDATE(),105) AS 'ENDDATE'";
+                                        $params_seEndDate = array();
+                                        $query_seEndDate = sqlsrv_query($conn, $sql_seEndDate, $params_seEndDate);
+                                        $result_seEndDate = sqlsrv_fetch_array($query_seEndDate, SQLSRV_FETCH_ASSOC);
+                                        
+                                        // $sql_seCountData = "SELECT COUNT(b.TENKOMASTERID) AS 'COUNT'
+                                        // FROM  TENKOBEFORE b
+                                        $sql_seCountData = "SELECT COUNT(DISTINCT CONVERT(VARCHAR(10),CREATEDATE,120))  AS 'COUNT'
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) BETWEEN CONVERT(DATE,'".$result_seStartDate['STARTDATE']."',103) AND CONVERT(DATE,'".$result_seEndDate['ENDDATE']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')";
+                                        $params_seCountData = array();
+                                        $query_seCountData = sqlsrv_query($conn, $sql_seCountData, $params_seCountData);
+                                        $result_seCountData = sqlsrv_fetch_array($query_seCountData, SQLSRV_FETCH_ASSOC);
+                                        
+                                        
+
+                                        // ค้นหาวันแรกของเดือนปัจจุบัน
+                                        $sql_seDatestart = "SELECT FORMAT(GETDATE(), 'dd/MM/yyyy') AS 'DS'";
+                                        $params_seDatestart = array();
+                                        $query_seDatestart = sqlsrv_query($conn, $sql_seDatestart, $params_seDatestart);
+                                        $result_seDatestart = sqlsrv_fetch_array($query_seDatestart, SQLSRV_FETCH_ASSOC);
+
+                                        $sql_seAdddateweek = "{call megGetdate_v2(?,?)}";
+                                        $params_seAdddateweek = array(
+                                            array('select_dategraph7days', SQLSRV_PARAM_IN),
+                                            array($result_seDatestart['DS'], SQLSRV_PARAM_IN)
+                                        );
+                                        $query_seAdddateweek = sqlsrv_query($conn, $sql_seAdddateweek, $params_seAdddateweek);
+                                        $result_seAdddateweek = sqlsrv_fetch_array($query_seAdddateweek, SQLSRV_FETCH_ASSOC);
+                                        // echo $result_seAdddateweek['D1'] . '|' . $result_seAdddateweek['D2'] . '|' . $result_seAdddateweek['D3'] . '|' . $result_seAdddateweek['D4'] . '|' . $result_seAdddateweek['D5'] . '|' . $result_seAdddateweek['D6'] . '|' . $result_seAdddateweek['D7'];
+                                        
+                                        // check Area หาค่ามาตรฐานข้อมูลตรวจร่างกาย
+                                        $checkArea = substr($result_sePlain['JOBNO'],0,3);
+
+                                        if ($checkArea == 'RKS' || $checkArea == 'RKR' || $checkArea == 'RKL') {
+                                            $areashow = '(AMT)';
+                                            $sql_seTenkoSTD = "SELECT STD_ID,MAXSYS,MINSYS,MAXDIA,MINDIA,MAXPULSE,MINPULSE,TEMP,OXYGEN,ALCOHOL,REMARK
+                                            FROM STANDARDTENKODATA
+                                            WHERE REMARK ='AMT'";
+                                        }else{
+                                            $areashow = '(GW)';
+                                            $sql_seTenkoSTD = "SELECT STD_ID,MAXSYS,MINSYS,MAXDIA,MINDIA,MAXPULSE,MINPULSE,TEMP,OXYGEN,ALCOHOL,REMARK
+                                            FROM STANDARDTENKODATA
+                                            WHERE REMARK ='GW'";
+                                        }
+                                        
+                                        $query_seTenkoSTD = sqlsrv_query($conn, $sql_seTenkoSTD, $params_seTenkoSTD);
+                                        $result_seTenkoSTD = sqlsrv_fetch_array($query_seTenkoSTD, SQLSRV_FETCH_ASSOC);
+
+                                        /////////////////QUERY ค้นหาข้อมูล///////////////////////////////////////////////////
+                                        //DAY1
+                                        $sql_seDay1 = "SELECT
+                                        b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+                                        ,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+                                        ,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+                                        ,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+                                        ,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) = CONVERT(DATE,'".$result_seAdddateweek['D1']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+                                        ORDER BY b.CREATEDATE DESC";
+                                        $params_seDay1 = array();
+                                        $query_seDay1 = sqlsrv_query($conn, $sql_seDay1, $params_seDay1);
+                                        $result_seDay1 = sqlsrv_fetch_array($query_seDay1, SQLSRV_FETCH_ASSOC);
+                                        // SYSDAY1
+                                        if($result_seDay1['TENKOPRESSUREDATA_90160'] > $result_seTenkoSTD['MAXSYS']){
+                                            if ($result_seDay1['TENKOPRESSUREDATA_90160_2'] > $result_seTenkoSTD['MAXSYS']) {
+                                                if ($result_seDay1['TENKOPRESSUREDATA_90160_3'] > $result_seTenkoSTD['MAXSYS']) {
+                                                    $SYSDAY1 = '0'; // ความดันบนครั้งที่ 3 เกิน
+                                                }else {
+                                                    
+                                                    $SYSDAY1 = $result_seDay1['TENKOPRESSUREDATA_90160_3'] ; 
+                                                        
+                                                        
+                                                }
+                                                
+                                            }else {
+                                                    
+                                                    $SYSDAY1 = $result_seDay1['TENKOPRESSUREDATA_90160_2'] ; 
+                                                
+                                            }
+                                            
+                                        }else{
+                                                    
+                                                    $SYSDAY1 = $result_seDay1['TENKOPRESSUREDATA_90160'] ;     
+                                        }
+                                        //DIADAY1
+                                        if($result_seDay1['TENKOPRESSUREDATA_60100'] > $result_seTenkoSTD['MAXDIA']){
+                                            if ($result_seDay1['TENKOPRESSUREDATA_60100_2'] > $result_seTenkoSTD['MAXDIA']) {
+                                                if ($result_seDay1['TENKOPRESSUREDATA_60100_3'] > $result_seTenkoSTD['MAXDIA']) {
+                                                    $DIADAY1 = '0'; // ความดันล่างครั้งที่ 3 เกิน
+                                                }else {
+
+                                                    $DIADAY1 = $result_seDay1['TENKOPRESSUREDATA_60100_3'];
+                                                    
+                                                }
+                                                
+                                            }else {
+
+                                                    $DIADAY1 = $result_seDay1['TENKOPRESSUREDATA_60100_2'];
+                                                
+                                            }
+                                            
+                                        }else{
+                                                
+                                                    $DIADAY1 = $result_seDay1['TENKOPRESSUREDATA_60100'] ; 
+                            
+                                        }
+                                        //PULSEDAY1
+                                        if($result_seDay1['TENKOPRESSUREDATA_60110'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay1['TENKOPRESSUREDATA_60110'] < $result_seTenkoSTD['MINPULSE']){
+                                            if ($result_seDay1['TENKOPRESSUREDATA_60110_2'] > $result_seTenkoSTD['MAXPULSE']  || $result_seDay1['TENKOPRESSUREDATA_60110_2'] < $result_seTenkoSTD['MINPULSE']) {
+                                                if ($result_seDay1['TENKOPRESSUREDATA_60110_3'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay1['TENKOPRESSUREDATA_60110_3'] < $result_seTenkoSTD['MINPULSE']) {
+                                                    $PULSEDAY1 = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
+                                                }else {
+                                                    
+                                                    
+                                                    $PULSEDAY1 = $result_seDay1['TENKOPRESSUREDATA_60110_3'];
+                                                    
+                                                    
+                                                }
+                                                
+                                            }else {
+
+                                                    $PULSEDAY1 = $result_seDay1['TENKOPRESSUREDATA_60110_2'];
+                                                
+                                            }
+                                            
+                                        }else{
+                                                
+                                                    $PULSEDAY1 = $result_seDay1['TENKOPRESSUREDATA_60110']; 
+                                                
+                                        }
+                                        //////////////////////////////////////////////////////////////////////
+                                        //DAY2
+                                        $sql_seDay2 = "SELECT
+                                        b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+                                        ,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+                                        ,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+                                        ,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+                                        ,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) = CONVERT(DATE,'".$result_seAdddateweek['D2']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+                                        ORDER BY b.CREATEDATE DESC";
+                                        $params_seDay2 = array();
+                                        $query_seDay2 = sqlsrv_query($conn, $sql_seDay2, $params_seDay2);
+                                        $result_seDay2 = sqlsrv_fetch_array($query_seDay2, SQLSRV_FETCH_ASSOC);
+                                        // SYSDAY2
+                                        if($result_seDay2['TENKOPRESSUREDATA_90160'] > $result_seTenkoSTD['MAXSYS']){
+                                            if ($result_seDay2['TENKOPRESSUREDATA_90160_2'] > $result_seTenkoSTD['MAXSYS']) {
+                                                if ($result_seDay2['TENKOPRESSUREDATA_90160_3'] > $result_seTenkoSTD['MAXSYS']) {
+                                                    $SYSDAY2 = '0'; // ความดันบนครั้งที่ 3 เกิน
+                                                }else {
+                                                    $SYSDAY2 = $result_seDay2['TENKOPRESSUREDATA_90160_3'];
+                                                }
+                                                
+                                            }else {
+                                                $SYSDAY2 = $result_seDay2['TENKOPRESSUREDATA_90160_2'];
+                                            }
+                                            
+                                        }else{
+                                                $SYSDAY2 = $result_seDay2['TENKOPRESSUREDATA_90160'] ; 
+                                        }
+                                        //DIADAY2
+                                        if($result_seDay2['TENKOPRESSUREDATA_60100'] > $result_seTenkoSTD['MAXDIA']){
+                                            if ($result_seDay2['TENKOPRESSUREDATA_60100_2'] > $result_seTenkoSTD['MAXDIA']) {
+                                                if ($result_seDay2['TENKOPRESSUREDATA_60100_3'] > $result_seTenkoSTD['MAXDIA']) {
+                                                    $DIADAY2 = '0'; // ความดันล่างครั้งที่ 3 เกิน
+                                                }else {
+                                                    $DIADAY2 = $result_seDay2['TENKOPRESSUREDATA_60100_3'];
+                                                }
+                                                
+                                            }else {
+                                                $DIADAY2 = $result_seDay2['TENKOPRESSUREDATA_60100_2'];
+                                            }
+                                            
+                                        }else{
+                                                $DIADAY2 = $result_seDay2['TENKOPRESSUREDATA_60100'] ; 
+                                        }
+                                        //PULSEDAY2
+                                        if($result_seDay2['TENKOPRESSUREDATA_60110'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay2['TENKOPRESSUREDATA_60110'] < $result_seTenkoSTD['MINPULSE']){
+                                            if ($result_seDay2['TENKOPRESSUREDATA_60110_2'] > $result_seTenkoSTD['MAXPULSE']  || $result_seDay2['TENKOPRESSUREDATA_60110_2'] < $result_seTenkoSTD['MINPULSE']) {
+                                                if ($result_seDay2['TENKOPRESSUREDATA_60110_3'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay2['TENKOPRESSUREDATA_60110_3'] < $result_seTenkoSTD['MINPULSE']) {
+                                                    $PULSEDAY2 = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
+                                                }else {
+                                                    $PULSEDAY2 = $result_seDay2['TENKOPRESSUREDATA_60110_3'];
+                                                }
+                                                
+                                            }else {
+                                                $PULSEDAY2 = $result_seDay2['TENKOPRESSUREDATA_60110_2'];
+                                            }
+                                            
+                                        }else{
+                                                $PULSEDAY2 = $result_seDay2['TENKOPRESSUREDATA_60110'] ; 
+                                        }
+                                        //////////////////////////////////////////////////////////////////////
+                                        //DAY3
+                                        $sql_seDay3 = "SELECT
+                                        b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+                                        ,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+                                        ,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+                                        ,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+                                        ,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) = CONVERT(DATE,'".$result_seAdddateweek['D3']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+                                        ORDER BY b.CREATEDATE DESC";
+                                        $params_seDay3 = array();
+                                        $query_seDay3 = sqlsrv_query($conn, $sql_seDay3, $params_seDay3);
+                                        $result_seDay3 = sqlsrv_fetch_array($query_seDay3, SQLSRV_FETCH_ASSOC);
+                                        // SYSDAY3
+                                        if($result_seDay3['TENKOPRESSUREDATA_90160'] > $result_seTenkoSTD['MAXSYS']){
+                                            if ($result_seDay3['TENKOPRESSUREDATA_90160_2'] > $result_seTenkoSTD['MAXSYS']) {
+                                                if ($result_seDay3['TENKOPRESSUREDATA_90160_3'] > $result_seTenkoSTD['MAXSYS']) {
+                                                    $SYSDAY3 = '0'; // ความดันบนครั้งที่ 3 เกิน
+                                                }else {
+                                                    $SYSDAY3 = $result_seDay3['TENKOPRESSUREDATA_90160_3'];
+                                                }
+                                                
+                                            }else {
+                                                $SYSDAY3 = $result_seDay3['TENKOPRESSUREDATA_90160_2'];
+                                            }
+                                            
+                                        }else{
+                                                $SYSDAY3 = $result_seDay3['TENKOPRESSUREDATA_90160'] ; 
+                                        }
+                                        //DIADAY3
+                                        if($result_seDay3['TENKOPRESSUREDATA_60100'] > $result_seTenkoSTD['MAXDIA']){
+                                            if ($result_seDay3['TENKOPRESSUREDATA_60100_2'] > $result_seTenkoSTD['MAXDIA']) {
+                                                if ($result_seDay3['TENKOPRESSUREDATA_60100_3'] > $result_seTenkoSTD['MAXDIA']) {
+                                                    $DIADAY3 = '0'; // ความดันล่างครั้งที่ 3 เกิน
+                                                }else {
+                                                    $DIADAY3 = $result_seDay3['TENKOPRESSUREDATA_60100_3'];
+                                                }
+                                                
+                                            }else {
+                                                $DIADAY3 = $result_seDay3['TENKOPRESSUREDATA_60100_2'];
+                                            }
+                                            
+                                        }else{
+                                                $DIADAY3 = $result_seDay3['TENKOPRESSUREDATA_60100'] ; 
+                                        }
+                                        //PULSEDAY3
+                                        if($result_seDay3['TENKOPRESSUREDATA_60110'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay3['TENKOPRESSUREDATA_60110'] < $result_seTenkoSTD['MINPULSE']){
+                                            if ($result_seDay3['TENKOPRESSUREDATA_60110_2'] > $result_seTenkoSTD['MAXPULSE']  || $result_seDay3['TENKOPRESSUREDATA_60110_2'] < $result_seTenkoSTD['MINPULSE']) {
+                                                if ($result_seDay3['TENKOPRESSUREDATA_60110_3'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay3['TENKOPRESSUREDATA_60110_3'] < $result_seTenkoSTD['MINPULSE']) {
+                                                    $PULSEDAY3 = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
+                                                }else {
+                                                    $PULSEDAY3 = $result_seDay3['TENKOPRESSUREDATA_60110_3'];
+                                                }
+                                                
+                                            }else {
+                                                $PULSEDAY3 = $result_seDay3['TENKOPRESSUREDATA_60110_2'];
+                                            }
+                                            
+                                        }else{
+                                                $PULSEDAY3 = $result_seDay3['TENKOPRESSUREDATA_60110'] ; 
+                                        }
+                                        //////////////////////////////////////////////////////////////////////
+                                        //DAY4
+                                        $sql_seDay4 = "SELECT
+                                        b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+                                        ,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+                                        ,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+                                        ,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+                                        ,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) = CONVERT(DATE,'".$result_seAdddateweek['D4']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+                                        ORDER BY b.CREATEDATE DESC";
+                                        $params_seDay4 = array();
+                                        $query_seDay4 = sqlsrv_query($conn, $sql_seDay4, $params_seDay4);
+                                        $result_seDay4 = sqlsrv_fetch_array($query_seDay4, SQLSRV_FETCH_ASSOC);
+                                        // SYSDAY4
+                                        if($result_seDay4['TENKOPRESSUREDATA_90160'] > $result_seTenkoSTD['MAXSYS']){
+                                            if ($result_seDay4['TENKOPRESSUREDATA_90160_2'] > $result_seTenkoSTD['MAXSYS']) {
+                                                if ($result_seDay4['TENKOPRESSUREDATA_90160_3'] > $result_seTenkoSTD['MAXSYS']) {
+                                                    $SYSDAY4 = '0'; // ความดันบนครั้งที่ 3 เกิน
+                                                }else {
+                                                    $SYSDAY4 = $result_seDay4['TENKOPRESSUREDATA_90160_3'];
+                                                }
+                                                
+                                            }else {
+                                                $SYSDAY4 = $result_seDay4['TENKOPRESSUREDATA_90160_2'];
+                                            }
+                                            
+                                        }else{
+                                                $SYSDAY4 = $result_seDay4['TENKOPRESSUREDATA_90160'] ; 
+                                        }
+                                        //DIADAY4
+                                        if($result_seDay4['TENKOPRESSUREDATA_60100'] > $result_seTenkoSTD['MAXDIA']){
+                                            if ($result_seDay4['TENKOPRESSUREDATA_60100_2'] > $result_seTenkoSTD['MAXDIA']) {
+                                                if ($result_seDay4['TENKOPRESSUREDATA_60100_3'] > $result_seTenkoSTD['MAXDIA']) {
+                                                    $DIADAY4 = '0'; // ความดันล่างครั้งที่ 3 เกิน
+                                                }else {
+                                                    $DIADAY4 = $result_seDay4['TENKOPRESSUREDATA_60100_3'];
+                                                }
+                                                
+                                            }else {
+                                                $DIADAY4 = $result_seDay4['TENKOPRESSUREDATA_60100_2'];
+                                            }
+                                            
+                                        }else{
+                                                $DIADAY4 = $result_seDay4['TENKOPRESSUREDATA_60100'] ; 
+                                        }
+                                        //PULSEDAY4
+                                        if($result_seDay4['TENKOPRESSUREDATA_60110'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay4['TENKOPRESSUREDATA_60110'] < $result_seTenkoSTD['MINPULSE']){
+                                            if ($result_seDay4['TENKOPRESSUREDATA_60110_2'] > $result_seTenkoSTD['MAXPULSE']  || $result_seDay4['TENKOPRESSUREDATA_60110_2'] < $result_seTenkoSTD['MINPULSE']) {
+                                                if ($result_seDay4['TENKOPRESSUREDATA_60110_3'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay4['TENKOPRESSUREDATA_60110_3'] < $result_seTenkoSTD['MINPULSE']) {
+                                                    $PULSEDAY4 = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
+                                                }else {
+                                                    $PULSEDAY4 = $result_seDay4['TENKOPRESSUREDATA_60110_3'];
+                                                }
+                                                
+                                            }else {
+                                                $PULSEDAY4 = $result_seDay4['TENKOPRESSUREDATA_60110_2'];
+                                            }
+                                            
+                                        }else{
+                                                $PULSEDAY4 = $result_seDay4['TENKOPRESSUREDATA_60110'] ; 
+                                        }
+                                        //////////////////////////////////////////////////////////////////////
+                                        //DAY5
+                                        $sql_seDay5 = "SELECT
+                                        b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+                                        ,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+                                        ,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+                                        ,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+                                        ,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) = CONVERT(DATE,'".$result_seAdddateweek['D5']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+                                        ORDER BY b.CREATEDATE DESC";
+                                        $params_seDay5 = array();
+                                        $query_seDay5 = sqlsrv_query($conn, $sql_seDay5, $params_seDay5);
+                                        $result_seDay5 = sqlsrv_fetch_array($query_seDay5, SQLSRV_FETCH_ASSOC);
+                                        // SYSDAY5
+                                        if($result_seDay5['TENKOPRESSUREDATA_90160'] > $result_seTenkoSTD['MAXSYS']){
+                                            if ($result_seDay5['TENKOPRESSUREDATA_90160_2'] > $result_seTenkoSTD['MAXSYS']) {
+                                                if ($result_seDay5['TENKOPRESSUREDATA_90160_3'] > $result_seTenkoSTD['MAXSYS']) {
+                                                    $SYSDAY5 = '0'; // ความดันบนครั้งที่ 3 เกิน
+                                                }else {
+                                                    $SYSDAY5 = $result_seDay5['TENKOPRESSUREDATA_90160_3'];
+                                                }
+                                                
+                                            }else {
+                                                $SYSDAY5 = $result_seDay5['TENKOPRESSUREDATA_90160_2'];
+                                            }
+                                            
+                                        }else{
+                                                $SYSDAY5 = $result_seDay5['TENKOPRESSUREDATA_90160'] ; 
+                                        }
+                                        //DIADAY5
+                                        if($result_seDay5['TENKOPRESSUREDATA_60100'] > $result_seTenkoSTD['MAXDIA']){
+                                            if ($result_seDay5['TENKOPRESSUREDATA_60100_2'] > $result_seTenkoSTD['MAXDIA']) {
+                                                if ($result_seDay5['TENKOPRESSUREDATA_60100_3'] > $result_seTenkoSTD['MAXDIA']) {
+                                                    $DIADAY5 = '0'; // ความดันล่างครั้งที่ 3 เกิน
+                                                }else {
+                                                    $DIADAY5 = $result_seDay5['TENKOPRESSUREDATA_60100_3'];
+                                                }
+                                                
+                                            }else {
+                                                $DIADAY5 = $result_seDay5['TENKOPRESSUREDATA_60100_2'];
+                                            }
+                                            
+                                        }else{
+                                                $DIADAY5 = $result_seDay5['TENKOPRESSUREDATA_60100'] ; 
+                                        }
+                                        //PULSEDAY5
+                                        if($result_seDay5['TENKOPRESSUREDATA_60110'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay5['TENKOPRESSUREDATA_60110'] < $result_seTenkoSTD['MINPULSE']){
+                                            if ($result_seDay5['TENKOPRESSUREDATA_60110_2'] > $result_seTenkoSTD['MAXPULSE']  || $result_seDay5['TENKOPRESSUREDATA_60110_2'] < $result_seTenkoSTD['MINPULSE']) {
+                                                if ($result_seDay5['TENKOPRESSUREDATA_60110_3'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay5['TENKOPRESSUREDATA_60110_3'] < $result_seTenkoSTD['MINPULSE']) {
+                                                    $PULSEDAY5 = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
+                                                }else {
+                                                    $PULSEDAY5 = $result_seDay5['TENKOPRESSUREDATA_60110_3'];
+                                                }
+                                                
+                                            }else {
+                                                $PULSEDAY5 = $result_seDay5['TENKOPRESSUREDATA_60110_2'];
+                                            }
+                                            
+                                        }else{
+                                                $PULSEDAY5 = $result_seDay5['TENKOPRESSUREDATA_60110'] ; 
+                                        }
+                                        //////////////////////////////////////////////////////////////////////
+                                        //DAY6
+                                        $sql_seDay6 = "SELECT
+                                        b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+                                        ,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+                                        ,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+                                        ,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+                                        ,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) = CONVERT(DATE,'".$result_seAdddateweek['D6']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+                                        ORDER BY b.CREATEDATE DESC";
+                                        $params_seDay6 = array();
+                                        $query_seDay6 = sqlsrv_query($conn, $sql_seDay6, $params_seDay2);
+                                        $result_seDay6 = sqlsrv_fetch_array($query_seDay6, SQLSRV_FETCH_ASSOC);
+                                        // SYSDAY6
+                                        if($result_seDay6['TENKOPRESSUREDATA_90160'] > $result_seTenkoSTD['MAXSYS']){
+                                            if ($result_seDay6['TENKOPRESSUREDATA_90160_2'] > $result_seTenkoSTD['MAXSYS']) {
+                                                if ($result_seDay6['TENKOPRESSUREDATA_90160_3'] > $result_seTenkoSTD['MAXSYS']) {
+                                                    $SYSDAY6 = '0'; // ความดันบนครั้งที่ 3 เกิน
+                                                }else {
+                                                    $SYSDAY6 = $result_seDay6['TENKOPRESSUREDATA_90160_3'];
+                                                }
+                                                
+                                            }else {
+                                                $SYSDAY6 = $result_seDay6['TENKOPRESSUREDATA_90160_2'];
+                                            }
+                                            
+                                        }else{
+                                                $SYSDAY6 = $result_seDay6['TENKOPRESSUREDATA_90160'] ; 
+                                        }
+                                        //DIADAY6
+                                        if($result_seDay6['TENKOPRESSUREDATA_60100'] > $result_seTenkoSTD['MAXDIA']){
+                                            if ($result_seDay6['TENKOPRESSUREDATA_60100_2'] > $result_seTenkoSTD['MAXDIA']) {
+                                                if ($result_seDay6['TENKOPRESSUREDATA_60100_3'] > $result_seTenkoSTD['MAXDIA']) {
+                                                    $DIADAY6 = '0'; // ความดันล่างครั้งที่ 3 เกิน
+                                                }else {
+                                                    $DIADAY6 = $result_seDay6['TENKOPRESSUREDATA_60100_3'];
+                                                }
+                                                
+                                            }else {
+                                                $DIADAY6 = $result_seDay6['TENKOPRESSUREDATA_60100_2'];
+                                            }
+                                            
+                                        }else{
+                                                $DIADAY6 = $result_seDay6['TENKOPRESSUREDATA_60100'] ; 
+                                        }
+                                        //PULSEDAY6
+                                        if($result_seDay6['TENKOPRESSUREDATA_60110'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay6['TENKOPRESSUREDATA_60110'] < $result_seTenkoSTD['MINPULSE']){
+                                            if ($result_seDay6['TENKOPRESSUREDATA_60110_2'] > $result_seTenkoSTD['MAXPULSE']  || $result_seDay6['TENKOPRESSUREDATA_60110_2'] < $result_seTenkoSTD['MINPULSE']) {
+                                                if ($result_seDay6['TENKOPRESSUREDATA_60110_3'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay6['TENKOPRESSUREDATA_60110_3'] < $result_seTenkoSTD['MINPULSE']) {
+                                                    $PULSEDAY6 = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
+                                                }else {
+                                                    $PULSEDAY6 = $result_seDay6['TENKOPRESSUREDATA_60110_3'];
+                                                }
+                                                
+                                            }else {
+                                                $PULSEDAY6 = $result_seDay6['TENKOPRESSUREDATA_60110_2'];
+                                            }
+                                            
+                                        }else{
+                                                $PULSEDAY6 = $result_seDay6['TENKOPRESSUREDATA_60110'] ; 
+                                        }
+                                        //////////////////////////////////////////////////////////////////////
+                                        //DAY7
+                                        $sql_seDay7 = "SELECT
+                                        b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+                                        ,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+                                        ,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+                                        ,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+                                        ,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+                                        FROM  TENKOBEFORE b
+                                        WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                        AND CONVERT(DATE,b.CREATEDATE) = CONVERT(DATE,'".$result_seAdddateweek['D7']."',103)
+                                        AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+                                        OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+                                        OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+                                        OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+                                        OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+                                        OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+                                        ORDER BY b.CREATEDATE DESC";
+                                        $params_seDay7 = array();
+                                        $query_seDay7 = sqlsrv_query($conn, $sql_seDay7, $params_seDay7);
+                                        $result_seDay7 = sqlsrv_fetch_array($query_seDay7, SQLSRV_FETCH_ASSOC);
+                                        // SYSDAY7
+                                        if($result_seDay7['TENKOPRESSUREDATA_90160'] > $result_seTenkoSTD['MAXSYS']){
+                                            if ($result_seDay7['TENKOPRESSUREDATA_90160_2'] > $result_seTenkoSTD['MAXSYS']) {
+                                                if ($result_seDay7['TENKOPRESSUREDATA_90160_3'] > $result_seTenkoSTD['MAXSYS']) {
+                                                    $SYSDAY7 = '0'; // ความดันบนครั้งที่ 3 เกิน
+                                                }else {
+                                                    $SYSDAY7 = $result_seDay7['TENKOPRESSUREDATA_90160_3'];
+                                                }
+                                                
+                                            }else {
+                                                $SYSDAY7 = $result_seDay7['TENKOPRESSUREDATA_90160_2'];
+                                            }
+                                            
+                                        }else{
+                                                $SYSDAY7 = $result_seDay7['TENKOPRESSUREDATA_90160']; 
+                                        }
+                                        //DIADAY7
+                                        if($result_seDay7['TENKOPRESSUREDATA_60100'] > $result_seTenkoSTD['MAXDIA']){
+                                            if ($result_seDay7['TENKOPRESSUREDATA_60100_2'] > $result_seTenkoSTD['MAXDIA']) {
+                                                if ($result_seDay7['TENKOPRESSUREDATA_60100_3'] > $result_seTenkoSTD['MAXDIA']) {
+                                                    $DIADAY7 = '0'; // ความดันล่างครั้งที่ 3 เกิน
+                                                }else {
+                                                    $DIADAY7 = $result_seDay7['TENKOPRESSUREDATA_60100_3'];
+                                                }
+                                                
+                                            }else {
+                                                $DIADAY7 = $result_seDay7['TENKOPRESSUREDATA_60100_2'];
+                                            }
+                                            
+                                        }else{
+                                                $DIADAY7 = $result_seDay7['TENKOPRESSUREDATA_60100'] ; 
+                                                // $DIADAY71 = $result_seDay7['TENKOPRESSUREDATA_60100'] ; 
+                                                // if ($DIADAY71 == '') {
+                                                //     $DIADAY7 = '0';
+                                                // }else {
+                                                //     $DIADAY7 = $DIADAY71;
+                                                // }
+                                        }
+                                        //PULSEDAY7
+                                        if($result_seDay7['TENKOPRESSUREDATA_60110'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay7['TENKOPRESSUREDATA_60110'] < $result_seTenkoSTD['MINPULSE']){
+                                            if ($result_seDay7['TENKOPRESSUREDATA_60110_2'] > $result_seTenkoSTD['MAXPULSE']  || $result_seDay7['TENKOPRESSUREDATA_60110_2'] < $result_seTenkoSTD['MINPULSE']) {
+                                                if ($result_seDay7['TENKOPRESSUREDATA_60110_3'] > $result_seTenkoSTD['MAXPULSE'] || $result_seDay7['TENKOPRESSUREDATA_60110_3'] < $result_seTenkoSTD['MINPULSE']) {
+                                                    $PULSEDAY7 = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
+                                                }else {
+                                                    $PULSEDAY7 = $result_seDay7['TENKOPRESSUREDATA_60110_3'];
+                                                }
+                                                
+                                            }else {
+                                                $PULSEDAY7 = $result_seDay7['TENKOPRESSUREDATA_60110_2'];
+                                            }
+                                            
+                                        }else{
+                                                $PULSEDAY7 = $result_seDay7['TENKOPRESSUREDATA_60110'] ; 
+                                        }
+                                        //////////////////////////////////////////////////////////////////////
+                                        
+                                        $SYSAVG = ($SYSDAY1    + $SYSDAY2  + $SYSDAY3  + $SYSDAY4  + $SYSDAY5 + 
+                                                $SYSDAY6  + $SYSDAY7  )/$result_seCountData['COUNT'];
+
+
+                                        $DIAAVG = ($DIADAY1     + $DIADAY2  + $DIADAY3  + $DIADAY4  + $DIADAY5 + 
+                                                $DIADAY6  + $DIADAY7 )/$result_seCountData['COUNT'];
+
+                                        $PULSEAVG = ($PULSEDAY1   + $PULSEDAY2  + $PULSEDAY3  + $PULSEDAY4  + $PULSEDAY5 +
+                                                $PULSEDAY6  + $PULSEDAY7  )/$result_seCountData['COUNT']; 
+                                    
+
+                                        $TEMPAVG = ($result_seDay1['TENKOTEMPERATUREDATA'] + $result_seDay2['TENKOTEMPERATUREDATA'] + 
+                                        $result_seDay3['TENKOTEMPERATUREDATA'] + $result_seDay4['TENKOTEMPERATUREDATA'] + 
+                                        $result_seDay5['TENKOTEMPERATUREDATA'] + $result_seDay6['TENKOTEMPERATUREDATA'] + 
+                                        $result_seDay7['TENKOTEMPERATUREDATA'] ) / $result_seCountData['COUNT'];       
+                                               
+                                        $OXYGENAVG = ($result_seDay1['TENKOOXYGENDATA'] + $result_seDay2['TENKOOXYGENDATA'] +
+                                        $result_seDay3['TENKOOXYGENDATA'] + $result_seDay4['TENKOOXYGENDATA'] + 
+                                        $result_seDay5['TENKOOXYGENDATA'] + $result_seDay6['TENKOOXYGENDATA'] + 
+                                        $result_seDay7['TENKOOXYGENDATA'] )/$result_seCountData['COUNT']; 
+
+                                      
+                                        $ALCOAVG = ($result_seDay1['TENKOALCOHOLDATA'] + $result_seDay2['TENKOALCOHOLDATA'] +
+                                        $result_seDay3['TENKOALCOHOLDATA'] + $result_seDay4['TENKOALCOHOLDATA'] + 
+                                        $result_seDay5['TENKOALCOHOLDATA'] + $result_seDay6['TENKOALCOHOLDATA'] + 
+                                        $result_seDay7['TENKOALCOHOLDATA'] )/$result_seCountData['COUNT']; 
+
+                                        // ข้อมูลวันที่รายงานตัวและวันที่ทำงานคนที่1 เพื่อเช็ค Self Check
+                                        // DATEWORKING ใน SELFCHECK คือ DATERK ในแผน
+                                        $sql_seDateSelfCheck3 = "SELECT CONVERT(VARCHAR(10),DATERK,103) AS 'DATERK',
+                                        CONVERT(VARCHAR(10),DATEPRESENT,103)  AS 'DATEPRESENT'
+                                        FROM VEHICLETRANSPORTPLAN
+                                        WHERE VEHICLETRANSPORTPLANID ='".$_GET['vehicletransportplanid']."'";
+                                        $query_seDateSelfCheck3 = sqlsrv_query($conn, $sql_seDateSelfCheck3, $params_seDateSelfCheck3);
+                                        $result_seDateSelfCheck3 = sqlsrv_fetch_array($query_seDateSelfCheck3, SQLSRV_FETCH_ASSOC);
+
+                                        // echo $result_seDateSelfCheck1['DATEWORKING'];
+                                        // echo "<br>";
+                                        // echo $result_seDateSelfCheck1['DATEPRESENT'];
+
+                                        $dateself3 = date("d/m/Y"); //วันที่ปัจจุบันพนักงานคนที่1
+
+                                        //SELF CHECKคนที่3
+                                        $sql_seSelfCheck3 = "SELECT TOP 1 SELFCHECKID,SLEEPRESTSTART,SLEEPRESTEND,TIMESLEEPREST,
+                                        SLEEPNORMALSTART,SLEEPNORMALEND,TIMESLEEPNORMAL,SLEEPNORMALYES,SLEEPNORMALNO,
+                                        SLEEPEXTRASTART,SLEEPEXTRAEND,TIMESLEEPEXTRA,SLEEPEXTRAYES,SLEEPEXTRANO,
+                                        KEYDROPTIME,TIMEWORKING
+                                        FROM DRIVERSELFCHECK WHERE EMPLOYEECODE ='".$_GET['employeecode3']."' 
+                                        AND (CONVERT(VARCHAR(10),CREATEDATE,103) ='".$result_seDateSelfCheck3['DATERK']."' 
+                                        OR CONVERT(VARCHAR(10),CREATEDATE,103) ='".$result_seDateSelfCheck3['DATEPRESENT']."')
+                                        AND ACTIVESTATUS ='1'
+                                        ORDER BY  CONVERT(CHAR(5), CREATEDATE, 108) DESC";
+                                        $query_seSelfCheck3 = sqlsrv_query($conn, $sql_seSelfCheck3, $params_seSelfCheck3);
+                                        $result_seSelfCheck3 = sqlsrv_fetch_array($query_seSelfCheck3, SQLSRV_FETCH_ASSOC);
+
+                                        // echo "TEST";
+                                        // echo $result_seSelfCheck3['TIMESLEEPEXTRA'];
+
+                                        // $x = "Geeks";
+                                        // $y = "for";
+                                        // $z = "Geeks";
+                                        // $a = 5;
+                                        // $b = 10;
+
+                                        // function concatenate() {
+                                        //     // Using global keyword
+                                        //     global $x, $y, $z;
+                                        //     return $x.$y.$z;
+                                        // }
+                                        // echo concatenate();
+
+
+
+
+                                        //เช็คจำนวนชั่วโมงในการนอน 4.5 ชั่วโมง
+                                        if ($result_seSelfCheck3['TIMESLEEPEXTRA'] == '' || $result_seSelfCheck3['TIMESLEEPEXTRA'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') {
+                                            $TIMESLEEPEXTRAHOURCHK3 = '0'; 
+                                            $TIMESLEEPEXTRAMINCHK3  = '0';
+
+                                            
+                                        }else {
+                                            // $TIMESLEEPEXTRA  = str_replace(":","",substr($result_seSelfCheck['TIMESLEEPEXTRA'],0,6));
+                                            //$TIMESLEEPEXTRA = $result_seSelfCheck['TIMESLEEPEXTRA'];
+                                            //เช็คจำนวนชั่วโมงในการนอน 
+                                            $TIMESLEEPEXTRAHOURCHK3 = substr($result_seSelfCheck3['TIMESLEEPEXTRA'],0,2);
+                                            //เช็คจำนวนนาทีในการนอน
+                                            $TIMESLEEPEXTRAMINCHK3 = substr($result_seSelfCheck3['TIMESLEEPEXTRA'],2,3);
+
+                                            // echo "TEST2";
+                                        if ($TIMESLEEPEXTRAHOURCHK3  == '4:') { //กรณีที่เท่ากับ 4 
+                                                $TIMESLEEPEXTRAHOURCHK3 = 'HG4'; //HG4 mean Greater than 4 hour มากกว่า 4 ชม
+                                        }else if ($TIMESLEEPEXTRAHOURCHK3 > '4') {
+                                                $TIMESLEEPEXTRAHOURCHK3 = 'HGG4'; //เลข 4 ขึ้นไปและเลขสองหลัก ex 5, 6, 10
+                                        }
+                                        else {
+                                                $TIMESLEEPEXTRAHOURCHK3 = 'HL4'; //HL4 mean Less than 4 hour น้อยกว่า 4 ชม  
+                                        }
+                                        //เช็คจำนวนนาทีในการนอน
+                                        $TIMESLEEPEXTRAMINCHK3 = substr($result_seSelfCheck3['TIMESLEEPEXTRA'],2,3);
+                                        if ($TIMESLEEPEXTRAMINCHK3 >= '30') {
+                                                $TIMESLEEPEXTRAMINCHK3 = 'MG3'; //MG3 mean Greater than 30 minute มากกว่า 30นาที
+                                        }else {
+                                                $TIMESLEEPEXTRAMINCHK3 = 'ML3'; //ML3 mean Less than 30 minute น้อยกว่า 30นาที   
+                                        }
+
+                                        }   
+
+
+                                        //เวลาการพักผ่อน 8 ชั่วโมง
+                                        if ($result_seSelfCheck3['TIMESLEEPREST'] == '' || $result_seSelfCheck3['TIMESLEEPREST'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') {
+                                            $TIMESLEEPREST3 = '0';
+                                        }else {
+                                            $TIMESLEEPREST3 = substr($result_seSelfCheck3['TIMESLEEPREST'],0,2);
+                                        }
+
+                                        //เวลาการนอนปกติ 6 ชั่วโมง
+                                        if ($result_seSelfCheck3['TIMESLEEPNORMAL'] == '' || $result_seSelfCheck3['TIMESLEEPNORMAL'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') {
+                                            $TIMESLEEPNORMAL3 = '0';
+                                        }else {
+                                            $TIMESLEEPNORMAL3 = substr($result_seSelfCheck3['TIMESLEEPNORMAL'],0,2);
+                                        }
+
+                                        // เวลานอนปกติ ratio box หลับสนิท/หลับไม่สนิท 
+                                        $sleepnormalyes = ($result_seSelfCheck3['SLEEPNORMALYES'] == '1') ? "checked" : "";
+                                        $sleepnormalno  = ($result_seSelfCheck3['SLEEPNORMALNO'] == '1') ? "checked" : "";
+                                       
+                                        // เวลานอนเพิ่มเติม ratio box หลับสนิท/หลับไม่สนิท 
+                                        $sleepextrayes = ($result_seSelfCheck3['SLEEPEXTRAYES'] == '1') ? "checked" : "";
+                                        $sleepextrano  = ($result_seSelfCheck3['SLEEPEXTRANO'] == '1') ? "checked" : "";
+
+                                        // echo $TIMESLEEPNORMAL2;
+
+                                        // ข้อมูลสุขภาพของพนักงาน พขร.3
+                                        $sql_sehealthhis = "SELECT  TOP 1 ID,DIABETES,HIGHTBLOODPRESSURE,LOWBLOODPRESSURE,
+                                            HEARTDISEASE, EPILEPPSY, BRAINSURGERY, SHORTSIGHT,SHORTSIGHT_R,SHORTSIGHT_L,LONGSIGHT,LONGSIGHT_R,LONGSIGHT_L,
+                                            OBLIQUESIGHT,OBLIQUESIGHT_R,OBLIQUESIGHT_L,COLORBLIND_OK,COLORBLIND_NG,OTHERDISEASE1,OTHERDISEASE2,OTHERDISEASE3,
+                                            OTHERDISEASE4,OTHERDISEASE5,OTHERDISEASE6,CREATEDATE
+                                            FROM [dbo].[HEALTHHISTORY]
+                                            WHERE EMPLOYEECODE ='" . $_GET['employeecode3'] . "'
+                                            AND CREATEYEAR ='" . $result_seYearsD3['YEARS'] . "'
+                                            AND ACTIVESTATUS ='1'
+                                            ORDER BY CREATEDATE DESC";
+                                        $params_sehealthhis = array();
+                                        $query_sehealthhis  = sqlsrv_query($conn, $sql_sehealthhis, $params_sehealthhis);
+                                        $result_sehealthhis = sqlsrv_fetch_array($query_sehealthhis, SQLSRV_FETCH_ASSOC);
+
+                                    
+                                        // 5 โรคเสี่ยง
+                                        if ($result_sehealthhis['DIABETES'] == '1' || $result_sehealthhis['HIGHTBLOODPRESSURE'] == '1' || $result_sehealthhis['LOWBLOODPRESSURE'] == '1'
+                                        || $result_sehealthhis['HEARTDISEASE'] == '1' || $result_sehealthhis['EPILEPPSY'] == '1' || $result_sehealthhis['BRAINSURGERY'] == '1') {
+                                            $fiverisk = 'YES';
+                                        }else {
+                                            $fiverisk = 'NO';
+                                        }
+
+                                        // ปัญหาสายตา
+                                        if ($result_sehealthhis['SHORTSIGHT'] == '1'  || $result_sehealthhis['LONGSIGHT'] == '1' 
+                                        || $result_sehealthhis['OBLIQUESIGHT'] == '1' || $result_sehealthhis['COLORBLIND_NG'] == '1' ) {
+                                            $eyeproblem = 'YES';
+                                            if ($result_sehealthhis['SHORTSIGHT'] == '1') {
+                                                $textshortsight = 'สายตาสั้น(L/R)'.": ".$result_sehealthhis['SHORTSIGHT_L']."/".$result_sehealthhis['SHORTSIGHT_R'];
+                                            }if ($result_sehealthhis['LONGSIGHT'] == '1') {
+                                                $textlongsight = 'สายตายาว(L/R)'.": ".$result_sehealthhis['LONGSIGHT_L']."/".$result_sehealthhis['LONGSIGHT_R'];
+                                            }if ($result_sehealthhis['OBLIQUESIGHT'] == '1') {
+                                                $textobliquesight = 'สายตาเอียง(L/R)'.": ".$result_sehealthhis['OBLIQUESIGHT_L']."/".$result_sehealthhis['OBLIQUESIGHT_R'];
+                                            }else{
+
+                                            }
+                                        }else {
+                                            $eyeproblem = 'NO';
+                                            $textshortsight = '';
+                                            $textlongsight  = '';
+                                            $textobliquesight = '';
+                                        }
+
+
+                                        //เช็คโรคเบาหวาน
+                                        if ($result_sehealthhis['DIABETES'] == '1') {
+                                            $disease1 = 'โรคเบาหวาน';
+                                        }else{
+                                            $disease1 = ' ';
+                                        }
+                                        //เช็คโรคความดันโลหิตสูง
+                                        if ($result_sehealthhis['HIGHTBLOODPRESSURE'] == '1') {
+                                            $disease2 = 'โรคความดันโลหิตสูง';
+                                        }else{
+                                            $disease2 = ' ';
+                                        }
+                                        //เช็คโรคความดันโลหิตต่ำ
+                                        if ($result_sehealthhis['LOWBLOODPRESSURE'] == '1') {
+                                            $disease3 = 'โรคความดันโลหิตต่ำ';
+                                        }else{
+                                            $disease3 = ' ';
+                                        }
+                                        //เช็คโรคหัวใจ
+                                        if ($result_sehealthhis['HEARTDISEASE'] == '1') {
+                                            $disease4 = 'โรคหัวใจ';
+                                        }else{
+                                            $disease4 = ' ';
+                                        }
+                                        //เช็คลมชัก/ลมบ้าหมู
+                                        if ($result_sehealthhis['EPILEPPSY'] == '1') {
+                                            $disease5 = 'ลมชัก/ลมบ้าหมู';
+                                        }else{
+                                            $disease5 = ' ';
+                                        }
+                                        //เช็คผ่าตัดสมอง
+                                        if ($result_sehealthhis['BRAINSURGERY'] == '1') {
+                                            $disease6 = 'ผ่าตัดสมอง';
+                                        }else{
+                                            $disease6 = ' ';
+                                        }
+
+
+
+
+                                        // โรคอื่นๆ
+                                        if (($result_sehealthhis['OTHERDISEASE1'] == NULL ||  $result_sehealthhis['OTHERDISEASE1'] == '') && 
+                                        ($result_sehealthhis['OTHERDISEASE2'] == NULL ||  $result_sehealthhis['OTHERDISEASE2'] == '') &&
+                                        ($result_sehealthhis['OTHERDISEASE3'] == NULL ||  $result_sehealthhis['OTHERDISEASE3'] == '') &&
+                                        ($result_sehealthhis['OTHERDISEASE4'] == NULL ||  $result_sehealthhis['OTHERDISEASE4'] == '') &&
+                                        ($result_sehealthhis['OTHERDISEASE5'] == NULL ||  $result_sehealthhis['OTHERDISEASE5'] == '') ) {
+                                            $otherdisease = 'NO';
+                                        }else {
+                                            $otherdisease = 'YES';
+                                        }
+
+
+                                        ?>
+                                        <!-- ใบขับขี่และ Self Check พขร2 -->
+                                        <table style="width:100%;border: 1px solid black;border-collapse: collapse;">
+                                            <tr>
+                                                <th colspan = "34" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left;font-size: 15px"><b>Safety Focus Theme (<?=$result_seMonthD3['MONTH']?><?=$result_seYearsD3['YEARS']?>) &nbsp; </b><font style="color:red;font-size: 20px">"<?=$result_seSafetyThemeD3['SAFETYTHEME']?>"</font></th>
+                                            </tr>
+                                            <!-- <tr>
+                                                <th colspan = "34" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ : <?=$sex?>  <?= $result_sePlain['EMPLOYEENAME1'] ?> || รหัสพนักงาน : <?=$_GET['employeecode1']?> || ตำแหน่ง : <?=$result_seDriverData1['PositionNameT']?> || อายุงาน :  <?= $result_CalculateWork['RS']?> || อายุตน :  <?= $result_CalculateAge['RS']?></font></th>
+                                            </tr> -->
+                                            <tr>
+                                                <th colspan = "4" rowspan="5" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center"><img  style="padding:4px;text-align:center;height: 200px;width: 200px;" src="../images/employee/<?=$_GET['employeecode3']?>.JPG" data-action="zoom" alt="Pic_Driver3" ></th>
+                                                <th colspan = "3" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left;font-size: 16px">รหัสพนักงาน</th>
+                                                <th colspan = "3" style="border: 1px solid black;background-color: #FFFFFF;border-collapse: collapse;padding: 5px;text-align: left"><?=$_GET['employeecode3']?></th> 
+                                                <th colspan = "6" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ข้อมูลวันหมดอายุใบขับขี่ พขร.3</th>
+                                                <th colspan = "2" rowspan="2" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ข้อมูลสุขภาพของพนักงาน</th> 
+                                                <th colspan = "2" style="border: 1px solid black;background-color: #FFFFFF;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">Result</th> 
+                                                <th colspan = "4" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">รายละเอียด</th> 
+                                                <!-- <th colspan = "4" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center"></th>      -->
+                                            </tr>
+                                            <tr>
+                                            
+                                                <th colspan = "3" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left;font-size: 16px">ชื่อ-สกุล</th>
+                                                <th colspan = "3" style="width:100px;border: 1px solid black;background-color: #FFFFFF;border-collapse: collapse;padding: 5px;text-align: left;font-size: 14px;"><?= $result_sePlain['EMPLOYEENAME3'] ?></th> 
+                                                <th colspan = "3" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left">เลขที่ใบขับขี่</th>
+                                                <th colspan = "3" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><?=$result_seDriverData3['CarLicenceID']?></th>
+                                                <th colspan = "1" style="width:160px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">OK</th>
+                                                <th colspan = "1" style="width:160px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">NG</th>
+                                                <th colspan = "4" style="width:160px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center"><button type="button" style= "height:40px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="healthdata('<?= $result_sePlain['EMPLOYEENAME3'] ?>','<?=$result_seYearsD3['YEARS']?>')">Health_Driver3</button></th>
+                                                    
+                                            </tr>
+                                            <tr>
+                                                <th colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px;font-size: 16px">อายุตน</th>
+                                                <th colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #FFFFFF;text-align: left;padding: 5px"><?= $result_CalculateAge['RS']?></th>
+                                                <td colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px"><b>วันออกบัตร</b></td>
+                                                <td colspan = "3" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b><?=$year11start?><?=$year12start?></b></td>
+                                                <th colspan = "2" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px">ประวัติสุขภาพ (5 โรคเสี่ยง)</th>
+                                                <!-- ประวัติสุขภาพ (5 โรคเสี่ยง) -->
+                                                <?php
+                                                if ($fiverisk == 'YES') { //NG
+                                                ?>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                    <td colspan ="4" style="border:1px solid black;font-size: 13px;text-align: left"><?=$disease1?>,<?=$disease2?>,<?=$disease3?> <br><?=$disease4?>,<?=$disease5?>,<?=$disease6?></td>
+                                                <?php
+                                                }else { // OK
+                                                ?>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                    <td colspan ="4" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                <?php
+                                                }
+                                                ?>
+                                                <!-- <td colspan = "1" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px">66</td>
+                                                <td colspan = "1" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px">91</td> -->
+                                                
+                                            </tr>
+                                            <tr>
+                                          
+                                                <th colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align:left;padding: 5px;font-size: 16px">อายุงาน</th>
+                                                <th colspan = "3" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><?= $result_CalculateWork['RS']?></th>
+                                                <td colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px"><b>วันหมดอายุ</b></td>
+                                                <td colspan = "3" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px;<?= $licensechk1?>"><b><?=$year11end?><?=$year12end?></b></td>
+                                                <th colspan = "2" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px">ปัญหาสายตา</th>
+                                                <!-- ปัญหาสายตา -->
+                                                <?php
+                                                if ($eyeproblem == 'YES') { //NG
+                                                ?>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                    <td colspan ="4" style="border:1px solid black;font-size: 13px;text-align: left"><b><?=$textshortsight?><br>
+                                                                                                                                     <b><?=$textlongsight?></b><br>
+                                                                                                                                     <b><?=$textobliquesight?></b>
+                                                    </td>
+                                                <?php
+                                                }else { // OK
+                                                ?>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: left"></td>
+                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left"></td>
+                                                <?php
+                                                }
+                                                ?>
+                                            </tr>
+                                            <tr>
+                                                <th colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px;font-size: 16px">สายงาน</th>
+                                                <th colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #FFFFFF;text-align: left;padding: 5px"><?= $result_seDriverData1['Position'] ?></th>
+                                                <td colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px"></td>
+                                                <td colspan = "3" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px"></td>
+                                                <th colspan = "2" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px">โรคอื่นๆ</th>
+                                                <!-- โรคอื่นๆ -->
+                                                <?php
+                                                if ($otherdisease == 'YES') { //NG
+                                                ?>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                    <td colspan ="4" style="border:1px solid black;font-size: 13px;text-align: left"><?=$result_sehealthhis['OTHERDISEASE1']?>,<?=$result_sehealthhis['OTHERDISEASE2']?>,<?=$result_sehealthhis['OTHERDISEASE3']?>,<?=$result_sehealthhis['OTHERDISEASE4']?>,<?=$result_sehealthhis['OTHERDISEASE5']?>,<?=$result_sehealthhis['OTHERDISEASE6']?></td>
+                                                <?php
+                                                }else { // OK
+                                                ?>  
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                    <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                    <td colspan ="4" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                <?php
+                                                }
+                                                ?>
+                                            </tr>
+                                        </table>
+                                        <div class = "row">
+                                            <label ></label>
+                                        </div> 
+                                        <!-- Tenko Result -->
+                                        <div id="data_score"></div>
+                                            <div style="text-align: center;">
+                                                    <?php
+
+                                                        $sql_CountTruckCheck = "SELECT COUNT(TRUCKCAMCHECKID) AS 'TRUCKCOUNT' FROM TRUCKCAMERACHECK
+                                                        WHERE DRIVERCODE ='".$_GET['employeecode3']."'
+                                                        AND YEARSTRUCKCAMCHECK ='".$result_seYearsD3['YEARS']."'";
+                                                        $params_CountTruckCheck = array();
+                                                        $query_CountTruckCheck  = sqlsrv_query($conn, $sql_CountTruckCheck, $params_CountTruckCheck);
+                                                        $result_CountTruckCheck = sqlsrv_fetch_array($query_CountTruckCheck, SQLSRV_FETCH_ASSOC);
+                                                    
+                                                        if ($result_CountTruckCheck['TRUCKCOUNT'] >= '1') {
+                                                            $TruckCheck = 'NG';
+                                                        }else {
+                                                            $TruckCheck = 'OK';
+                                                        }
+                                                        // echo $WorkingCheck;
+                                                        
+                                                        $sql_CountAccident = "SELECT COUNT(ACCI_ID) AS 'ACCICOUNT' FROM ACCIDENTHISTORY  
+                                                        WHERE DRIVERCODE ='".$_GET['employeecode3']."'
+                                                        AND YEARS ='".$result_seYearsD3['YEARS']."'";
+                                                        $params_CountAccident = array();
+                                                        $query_CountAccident  = sqlsrv_query($conn, $sql_CountAccident, $params_CountAccident);
+                                                        $result_CountAccident = sqlsrv_fetch_array($query_CountAccident, SQLSRV_FETCH_ASSOC);
+                                                    
+                                                        if ($result_CountAccident['ACCICOUNT'] >= '1') {
+                                                            $AcciCheck = 'NG';
+                                                        }else {
+                                                            $AcciCheck = 'OK';
+                                                        }
+                                                        // echo $AcciCheck;
+                                                        
+                                                        $sql_WorkingIssue = "SELECT COUNT(WORKINGISSUEID) AS 'WORKINGCOUNT' FROM WORKINGISSUE
+                                                        WHERE DRIVERCODE ='".$_GET['employeecode3']."'
+                                                        AND YEARSWORKINGISSUECHECK ='".$result_seYearsD3['YEARS']."'";
+                                                        $params_WorkingIssue = array();
+                                                        $query_WorkingIssue  = sqlsrv_query($conn, $sql_WorkingIssue, $params_WorkingIssue);
+                                                        $result_WorkingIssue = sqlsrv_fetch_array($query_WorkingIssue, SQLSRV_FETCH_ASSOC);
+                                                    
+                                                        if ($result_WorkingIssue['WORKINGCOUNT'] >= '1') {
+                                                            $WorkingCheck = 'NG';
+                                                        }else {
+                                                            $WorkingCheck = 'OK';
+                                                        }
+                                                        // echo $WorkingCheck;
+
+                                                    ?>
+                                                
+                                                <table style="width:100%;border:1px solid black;">
+                                                    <thead style="border:1px solid black;">
+                                                        <tr>
+                                                        
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">Tenko Result STD DRI3</th>
+                                                            <th colspan ="6"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">มาตรฐานข้อมูลการตรวจร่างกาย</th>
+                                                        </tr>
+                                                        <!-- <tr>
+                                                            
+                                                            <th colspan ="1"  rowspan ="2" style="text-align: center;border:1px solid black;background-color: #bfbfbf">มาตรฐานตามช่วงอายุ</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">ค่าบน (mmHg)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">ค่าล่าง (mmHg)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">หัวใจ (ครั้ง/นาที)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">อุณหภูมิ (°C)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">ออกซิเจน (%)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">แอลกอฮอล์ (mg%)</th>
+                                                            
+                                                        </tr>
+                                                        <tr>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: left">1</th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: left">2</th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: left">3</th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: left">4</th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: left">5</th>
+                                                        
+                                                        </tr> -->
+                                                        <tr>
+                                                            
+                                                            <th colspan ="1"  rowspan ="2" style="text-align: center;border:1px solid black;background-color: #bfbfbf">มาตรฐานกลุ่มร่วมกิจ <?=$areashow?></th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">ค่าบน (mmHg)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">ค่าล่าง (mmHg)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">หัวใจ (ครั้ง/นาที)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">อุณหภูมิ (°C)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">ออกซิเจน (%)</th>
+                                                            <th colspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">แอลกอฮอล์ (mg%)</th>
+                                                            
+                                                        </tr>
+                                                        <tr>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: center"><?= $result_seTenkoSTD['MAXSYS'] ?></th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: center"><?= $result_seTenkoSTD['MAXDIA'] ?></th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: center"><?= $result_seTenkoSTD['MAXPULSE'] ?></th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: center"><?= $result_seTenkoSTD['TEMP'] ?></th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: center"><?= $result_seTenkoSTD['OXYGEN'] ?> </th>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 14px;text-align: center"><?= $result_seTenkoSTD['ALCOHOL'] ?></th>
+                                                        
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    
+                                                        <!-- <tr>
+                                                            <th colspan ="1" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #f7e968">&nbsp;<b>มาตรฐานกลุ่มร่วมกิจ</b></th>
+                                                            <th colspan ="1" style="border:1px solid black;text-align: center;background-color: #bfbfbf">ค่าบน</th>
+                                                            <th colspan ="1" style="border:1px solid black;text-align: center;background-color: #bfbfbf">ค่าล่าง</th>
+                                                            <th colspan ="1" style="border:1px solid black;text-align: center;background-color: #bfbfbf">หัวใจ</th>
+                                                            <th colspan ="1" style="border:1px solid black;text-align: center;background-color: #bfbfbf">อุณหภูมิ</th>
+                                                            <th colspan ="1" style="border:1px solid black;text-align: center;background-color: #bfbfbf">แอลกอฮอล์</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th rowspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">1</th>
+                                                            <th rowspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">2</th>
+                                                            <th rowspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">3</th>
+                                                            <th rowspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">4</th>
+                                                            <th rowspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">5</th>
+                                                            <th rowspan ="1"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">6</th>
+                                                        </tr> -->
+                                                    </tbody>
+                                                    
+                                                </table>
+                                        </div>
+                                        <div class = "row">
+                                            <label ></label>
+                                        </div>
+                                        <!-- Graph Tenko -->
+                                        <div id="data_score"></div>
+                                            <div style="text-align: center;">
+                                                <div>
+                                                    <div class="col-lg-6" style="border:1px solid black;text-align: center;background-color: #bfbfbf">
+                                                        <!-- .col-6 Count:<?=$result_seCountData['COUNT']?> -->
+                                                        <?php
+                                                        //  echo $result_seDatestart['DS'];
+                                                        //  echo $result_seAdddateweek['D1'] . '|' . $result_seAdddateweek['D2'] . '|' . $result_seAdddateweek['D3'] . '|' . $result_seAdddateweek['D4'] . '|' . $result_seAdddateweek['D5'] . '|' . $result_seAdddateweek['D6'] . '|' . $result_seAdddateweek['D7'];
+                                                        ?>
+                                                        <!-- กราฟกราฟข้อมูลค่าความดันค่าบน ของพนักงาน  -->
+                                                        <div class="row">
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h4 class="page-header"><i class="fa fa-bar-chart-o fa-fw"></i>  
+                                                                กราฟข้อมูลค่าดันค่าบนของพนักงาน
+                                                                </h4>
+                                                            </div>   
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h5 class=""><i class=""></i>  
+                                                                <b>Avg.บน</b>&nbsp;&nbsp;  <input type="text"   style ="text-align:center" id="txt_avgsys" value="" disabled="true">
+                                                                </h5>
+                                                            </div>                      
+                                                            <div class="col-lg-12">
+
+
+                                                                <?php
+                                                                
+                                                                // Tag for query
+
+                                                                
+                                                                ?>
+                                                                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                                                                <!-- <script type="text/javascript" src="js/jquery.min.js"></script>
+                                                                <script type="text/javascript" src="js/Chart.min.js"></script> -->
+                                                                <script type="text/javascript">
+                                                                        
+                                                                   
+                                                                    document.getElementById("txt_avgsys").value = <?=number_format($SYSAVG,2)?>;
+
+                                                                    google.charts.load('current', {'packages': ['corechart']});
+                                                                    google.charts.setOnLoadCallback(drawChart);
+
+                                                                    function drawChart() {
+
+                                                                        var data = google.visualization.arrayToDataTable([
+                                                                            ['Day', 'SYS (ความดันบน)', 'MinStd.บน (<?=$result_seTenkoSTD['MINSYS']?>)', 'MaxStd.บน (<?=$result_seTenkoSTD['MAXSYS']?>)','Avg.ความดันบน'],
+                                                                            ['<?= $result_seAdddateweek['D1'] ?>', <?=$SYSDAY1?>, <?=$result_seTenkoSTD['MINSYS']?>, <?=$result_seTenkoSTD['MAXSYS']?>,<?=$SYSAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D2'] ?>', <?=$SYSDAY2?>, <?=$result_seTenkoSTD['MINSYS']?>, <?=$result_seTenkoSTD['MAXSYS']?>,<?=$SYSAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D3'] ?>', <?=$SYSDAY3?>, <?=$result_seTenkoSTD['MINSYS']?>, <?=$result_seTenkoSTD['MAXSYS']?>,<?=$SYSAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D4'] ?>', <?=$SYSDAY4?>, <?=$result_seTenkoSTD['MINSYS']?>, <?=$result_seTenkoSTD['MAXSYS']?>,<?=$SYSAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D5'] ?>', <?=$SYSDAY5?>, <?=$result_seTenkoSTD['MINSYS']?>, <?=$result_seTenkoSTD['MAXSYS']?>,<?=$SYSAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D6'] ?>', <?=$SYSDAY6?>, <?=$result_seTenkoSTD['MINSYS']?>, <?=$result_seTenkoSTD['MAXSYS']?>,<?=$SYSAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D7'] ?>', <?=$SYSDAY7?>, <?=$result_seTenkoSTD['MINSYS']?>, <?=$result_seTenkoSTD['MAXSYS']?>,<?=$SYSAVG?>  ]
+                                                                        ]);
+                                                                        
+                                                                        var view = new google.visualization.DataView(data);
+                                                                        view.setColumns([0, 1,
+                                                                                { calc: "stringify",
+                                                                                    sourceColumn: 1,
+                                                                                    type: "string",
+                                                                                    role: "annotation" },
+                                                                                2, 
+
+                                                                                3, 
+                                                                                
+                                                                                4,
+
+                                                                                ]);
+
+                                                                                        
+
+                                                                        var options = {
+                                                                            title: '',
+                                                                            curveType: '',
+                                                                            legend: {position: 'top'},
+                                                                            series: {
+                                                                                        0: { lineWidth: 5,pointShape:'circle',pointSize: 10 },
+                                                                                        1: { lineWidth: 3,color: '#030100'      },
+                                                                                        2: { lineWidth: 4,color: '#030100'      },
+                                                                                        3: { lineWidth: 5,lineDashStyle: [2, 2, 20, 2, 20, 2]  }
+                                                                                    },
+                                                                            lineWidth: 5,
+                                                                            tooltip: {
+                                                                                        
+                                                                                    } ,
+                                                                            colors: ['#3498DB', '#239B56','#00FFEE','#00FFEE']
+
+                                                                            
+                                                                        };
+
+
+                                                                        var chart = new google.visualization.LineChart(document.getElementById('curve_chartsys'));
+                                                                        chart.draw(view, options);
+                                                                        
+                                                                    }
+                                                                </script>
+
+                                                                <div id="curve_chartsys" style="width: 100%; height: 150px"></div>
+
+
+                                                            </div>
+                                                            <!-- /.col-lg-8 (nested) -->
+                                                        </div>
+                                                        <!-- กราฟกราฟข้อมูลค่าความดันค่าบน ของพนักงาน  -->
+                                                        <div class="row">
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h4 class="page-header"><i class="fa fa-bar-chart-o fa-fw"></i>  
+                                                                กราฟข้อมูลค่าดันค่าล่างของพนักงาน
+                                                                </h4>
+                                                            </div>   
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h5 class=""><i class=""></i>  
+                                                                <b>Avg.ล่าง</b>&nbsp;&nbsp;  <input type="text"   style ="text-align:center" id="txt_avgdia" value="" disabled="true">
+                                                                </h5>
+                                                            </div>                      
+                                                            <div class="col-lg-12">
+
+
+                                                                <?php
+                                                                
+                                                                // Tag for query
+
+                                                                
+                                                                ?>
+                                                                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                                                                <!-- <script type="text/javascript" src="js/jquery.min.js"></script>
+                                                                <script type="text/javascript" src="js/Chart.min.js"></script> -->
+                                                                <script type="text/javascript">
+                                                                        
+                                                                   
+                                                                    document.getElementById("txt_avgdia").value = <?=number_format($DIAAVG,2)?>;
+
+                                                                    google.charts.load('current', {'packages': ['corechart']});
+                                                                    google.charts.setOnLoadCallback(drawChart);
+
+                                                                    function drawChart() {
+
+                                                                        var data = google.visualization.arrayToDataTable([
+                                                                            ['Day', 'DIA (ความดันบน)', 'MinStd.ล่าง (<?=$result_seTenkoSTD['MINDIA']?>)', 'MaxStd.ล่าง (<?=$result_seTenkoSTD['MAXDIA']?>)','Avg.ความดันล่าง'],
+                                                                            ['<?= $result_seAdddateweek['D1'] ?>', <?=$DIADAY1?>, <?=$result_seTenkoSTD['MINDIA']?>, <?=$result_seTenkoSTD['MAXDIA']?>,<?=$DIAAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D2'] ?>', <?=$DIADAY2?>, <?=$result_seTenkoSTD['MINDIA']?>, <?=$result_seTenkoSTD['MAXDIA']?>,<?=$DIAAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D3'] ?>', <?=$DIADAY3?>, <?=$result_seTenkoSTD['MINDIA']?>, <?=$result_seTenkoSTD['MAXDIA']?>,<?=$DIAAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D4'] ?>', <?=$DIADAY4?>, <?=$result_seTenkoSTD['MINDIA']?>, <?=$result_seTenkoSTD['MAXDIA']?>,<?=$DIAAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D5'] ?>', <?=$DIADAY5?>, <?=$result_seTenkoSTD['MINDIA']?>, <?=$result_seTenkoSTD['MAXDIA']?>,<?=$DIAAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D6'] ?>', <?=$DIADAY6?>, <?=$result_seTenkoSTD['MINDIA']?>, <?=$result_seTenkoSTD['MAXDIA']?>,<?=$DIAAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D7'] ?>', <?=$DIADAY7?>, <?=$result_seTenkoSTD['MINDIA']?>, <?=$result_seTenkoSTD['MAXDIA']?>,<?=$DIAAVG?>  ]
+                                                                        ]);
+                                                                        
+                                                                        var view = new google.visualization.DataView(data);
+                                                                        view.setColumns([0, 1,
+                                                                                { calc: "stringify",
+                                                                                    sourceColumn: 1,
+                                                                                    type: "string",
+                                                                                    role: "annotation" },
+                                                                                2, 
+
+                                                                                3, 
+
+                                                                                4,    
+
+                                                                                ]);
+
+                                                                                        
+
+                                                                        var options = {
+                                                                            title: '',
+                                                                            curveType: '',
+                                                                            legend: {position: 'top'},
+                                                                            series: {
+                                                                                        0: { lineWidth: 5,pointShape:'circle',pointSize: 10 },
+                                                                                        1: { lineWidth: 4,color: '#030100'      },
+                                                                                        2: { lineWidth: 3,color: '#030100'      },
+                                                                                        3: { lineWidth: 5,lineDashStyle: [2, 2, 20, 2, 20, 2]  }
+                                                                                    },
+                                                                            lineWidth: 5,
+                                                                            tooltip: {
+                                                                                        
+                                                                                    } ,
+                                                                            colors: ['#3498DB', '#239B56','#00FFEE','#00FFEE']
+
+                                                                            
+                                                                        };
+
+
+                                                                        var chart = new google.visualization.LineChart(document.getElementById('curve_chartdia'));
+                                                                        chart.draw(view, options);
+                                                                        
+                                                                    }
+                                                                </script>
+
+                                                                <div id="curve_chartdia" style="width: 100%; height: 150px"></div>
+
+
+                                                            </div>
+                                                            <!-- /.col-lg-8 (nested) -->
+                                                        </div>
+                                                        <!-- กราฟอัตราการเต้นของหัวใจ  -->
+                                                        <div class="row">
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h4 class="page-header"><i class="fa fa-bar-chart-o fa-fw"></i>  
+                                                                กราฟข้อมูลค่าอัตราการเต้นของหัวใจของพนักงาน
+                                                                </h4>
+                                                            </div>   
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h5 class=""><i class=""></i>  
+                                                                <b>Avg.อัตราการเต้นของหัวใจ</b>&nbsp;&nbsp;  <input type="text"   style ="text-align:center" id="txt_pulse" value="" disabled="true">
+                                                                </h5>
+                                                            </div>                      
+                                                            <div class="col-lg-12">
+
+
+                                                                <?php
+                                                                
+                                                                // Tag for query
+
+                                                                
+                                                                ?>
+                                                                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                                                                <!-- <script type="text/javascript" src="js/jquery.min.js"></script>
+                                                                <script type="text/javascript" src="js/Chart.min.js"></script> -->
+                                                                <script type="text/javascript">
+                                                                        
+                                                                   
+                                                                    document.getElementById("txt_pulse").value = <?=number_format($PULSEAVG,2)?>;
+
+                                                                    google.charts.load('current', {'packages': ['corechart']});
+                                                                    google.charts.setOnLoadCallback(drawChart);
+
+                                                                    function drawChart() {
+
+                                                                        var data = google.visualization.arrayToDataTable([
+                                                                            ['Day', 'อัตราการเต้นของหัวใจ', 'MinStd.ล่าง (<?=$result_seTenkoSTD['MINPULSE']?>)', 'MaxStd.ล่าง (<?=$result_seTenkoSTD['MAXPULSE']?>)','Avg.อัตราการเต้นของหัวใจ'],
+                                                                            ['<?= $result_seAdddateweek['D1'] ?>', <?=$PULSEDAY1?>, <?=$result_seTenkoSTD['MINPULSE']?>, <?=$result_seTenkoSTD['MAXPULSE']?>,<?=$PULSEAVG?>],
+                                                                            ['<?= $result_seAdddateweek['D2'] ?>', <?=$PULSEDAY2?>, <?=$result_seTenkoSTD['MINPULSE']?>, <?=$result_seTenkoSTD['MAXPULSE']?>,<?=$PULSEAVG?> ],
+                                                                            ['<?= $result_seAdddateweek['D3'] ?>', <?=$PULSEDAY3?>, <?=$result_seTenkoSTD['MINPULSE']?>, <?=$result_seTenkoSTD['MAXPULSE']?>,<?=$PULSEAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D4'] ?>', <?=$PULSEDAY4?>, <?=$result_seTenkoSTD['MINPULSE']?>, <?=$result_seTenkoSTD['MAXPULSE']?>,<?=$PULSEAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D5'] ?>', <?=$PULSEDAY5?>, <?=$result_seTenkoSTD['MINPULSE']?>, <?=$result_seTenkoSTD['MAXPULSE']?>,<?=$PULSEAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D6'] ?>', <?=$PULSEDAY6?>, <?=$result_seTenkoSTD['MINPULSE']?>, <?=$result_seTenkoSTD['MAXPULSE']?>,<?=$PULSEAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D7'] ?>', <?=$PULSEDAY7?>, <?=$result_seTenkoSTD['MINPULSE']?>, <?=$result_seTenkoSTD['MAXPULSE']?>,<?=$PULSEAVG?>  ]
+                                                                        ]);
+                                                                        
+                                                                        var view = new google.visualization.DataView(data);
+                                                                        view.setColumns([0, 1,
+                                                                                { calc: "stringify",
+                                                                                    sourceColumn: 1,
+                                                                                    type: "string",
+                                                                                    role: "annotation" },
+                                                                                2, 
+
+                                                                                3,    
+
+                                                                                4,    
+
+                                                                                ]);
+
+                                                                                        
+
+                                                                        var options = {
+                                                                            title: '',
+                                                                            curveType: '',
+                                                                            legend: {position: 'top'},
+                                                                            series: {
+                                                                                        0: { lineWidth: 5,pointShape:'circle',pointSize: 10 },
+                                                                                        1: { lineWidth: 4,color: '#030100'      },
+                                                                                        2: { lineWidth: 3,color: '#030100'      },
+                                                                                        3: { lineWidth: 5,lineDashStyle: [2, 2, 20, 2, 20, 2]  }
+                                                                                    },
+                                                                            lineWidth: 5,
+                                                                            tooltip: {
+                                                                                        
+                                                                                    } ,
+                                                                            colors: ['#3498DB', '#239B56','#00FFEE','#00FFEE']
+
+                                                                            
+                                                                        };
+
+
+                                                                        var chart = new google.visualization.LineChart(document.getElementById('curve_chartheartrate'));
+                                                                        chart.draw(view, options);
+                                                                        
+                                                                    }
+                                                                </script>
+
+                                                                <div id="curve_chartheartrate" style="width: 100%; height: 150px"></div>
+
+
+                                                            </div>
+                                                            <!-- /.col-lg-8 (nested) -->
+                                                        </div>
+                                                        <!-- กราฟข้อมูลค่าอุณหภูมิของพนักงาน -->
+                                                        <div class="row">
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h4 class="page-header"><i class="fa fa-bar-chart-o fa-fw"></i>  
+                                                                กราฟข้อมูลค่าอุณหภูมิของพนักงาน
+                                                                </h4>
+                                                            </div>   
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h5 class=""><i class=""></i>  
+                                                                <b>Avg.อุณหภูมิ</b>&nbsp;&nbsp;  <input type="text"   style ="text-align:center" id="txt_temp" value="" disabled="true">
+                                                                </h5>
+                                                            </div>                      
+                                                            <div class="col-lg-12">
+
+
+                                                                <?php
+                                                                
+                                                                // Tag for query
+
+                                                                
+                                                                ?>
+                                                                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                                                                <!-- <script type="text/javascript" src="js/jquery.min.js"></script>
+                                                                <script type="text/javascript" src="js/Chart.min.js"></script> -->
+                                                                <script type="text/javascript">
+                                                                        
+                                                                   
+                                                                    document.getElementById("txt_temp").value = <?=number_format($TEMPAVG,2)?>;
+
+                                                                    google.charts.load('current', {'packages': ['corechart']});
+                                                                    google.charts.setOnLoadCallback(drawChart);
+
+                                                                    function drawChart() {
+
+                                                                        var data = google.visualization.arrayToDataTable([
+                                                                            ['Day', 'อุณหภูมิ', 'ค่ามาตรฐาน (<?=$result_seTenkoSTD['TEMP']?>)','Avg.อุณหภูมิ'],
+                                                                            ['<?= $result_seAdddateweek['D1'] ?>', <?=$result_seDay1['TENKOTEMPERATUREDATA']?>, <?=$result_seTenkoSTD['TEMP']?>,<?=$TEMPAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D2'] ?>', <?=$result_seDay2['TENKOTEMPERATUREDATA']?>, <?=$result_seTenkoSTD['TEMP']?>,<?=$TEMPAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D3'] ?>', <?=$result_seDay3['TENKOTEMPERATUREDATA']?>, <?=$result_seTenkoSTD['TEMP']?>,<?=$TEMPAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D4'] ?>', <?=$result_seDay4['TENKOTEMPERATUREDATA']?>, <?=$result_seTenkoSTD['TEMP']?>,<?=$TEMPAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D5'] ?>', <?=$result_seDay5['TENKOTEMPERATUREDATA']?>, <?=$result_seTenkoSTD['TEMP']?>,<?=$TEMPAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D6'] ?>', <?=$result_seDay6['TENKOTEMPERATUREDATA']?>, <?=$result_seTenkoSTD['TEMP']?>,<?=$TEMPAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D7'] ?>', <?=$result_seDay7['TENKOTEMPERATUREDATA']?>, <?=$result_seTenkoSTD['TEMP']?>,<?=$TEMPAVG?>  ]
+                                                                        ]);
+                                                                        
+                                                                        var view = new google.visualization.DataView(data);
+                                                                        view.setColumns([0, 1,
+                                                                                { calc: "stringify",
+                                                                                    sourceColumn: 1,
+                                                                                    type: "string",
+                                                                                    role: "annotation" },
+                                                                                2,  
+
+                                                                                3,    
+
+                                                                                ]);
+
+                                                                                        
+
+                                                                        var options = {
+                                                                            title: '',
+                                                                            curveType: '',
+                                                                            legend: {position: 'top'},
+                                                                            series: {
+                                                                                        0: { lineWidth: 5,pointShape:'circle',pointSize: 10, },
+                                                                                        1: { lineWidth: 4,color: '#030100'},
+                                                                                        2: { lineWidth: 5,lineDashStyle: [2, 2, 20, 2, 20, 2]  }
+                                                                                    },
+                                                                            lineWidth: 5,
+                                                                            tooltip: {
+                                                                                        
+                                                                                    } ,
+                                                                            colors: ['#3498DB', '#239B56','#00FFEE']
+
+                                                                            
+                                                                        };
+
+
+                                                                        var chart = new google.visualization.LineChart(document.getElementById('curve_charttemp'));
+                                                                        chart.draw(view, options);
+                                                                        
+                                                                    }
+                                                                </script>
+
+                                                                <div id="curve_charttemp" style="width: 100%; height: 150px"></div>
+
+
+                                                            </div>
+                                                            <!-- /.col-lg-8 (nested) -->
+                                                        </div> 
+                                                        <!-- กราฟข้อมูลค่าออกซิเจนของพนักงาน -->
+                                                        <div class="row">
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h4 class="page-header"><i class="fa fa-bar-chart-o fa-fw"></i>  
+                                                                กราฟข้อมูลค่าออกซิเจนในเลือดของพนักงาน
+                                                                </h4>
+                                                            </div>   
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h5 class=""><i class=""></i>  
+                                                                <b>Avg.ออกซิเจน</b>&nbsp;&nbsp;  <input type="text"   style ="text-align:center" id="txt_oxygen" value="" disabled="true">
+                                                                </h5>
+                                                            </div>                      
+                                                            <div class="col-lg-12">
+
+
+                                                                <?php
+                                                                
+                                                                // Tag for query
+
+                                                                
+                                                                ?>
+                                                                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                                                                <!-- <script type="text/javascript" src="js/jquery.min.js"></script>
+                                                                <script type="text/javascript" src="js/Chart.min.js"></script> -->
+                                                                <script type="text/javascript">
+                                                                        
+                                                                   
+                                                                    document.getElementById("txt_oxygen").value = <?=number_format($OXYGENAVG,2)?>;
+
+                                                                    google.charts.load('current', {'packages': ['corechart']});
+                                                                    google.charts.setOnLoadCallback(drawChart);
+
+                                                                    function drawChart() {
+
+                                                                        var data = google.visualization.arrayToDataTable([
+                                                                            ['Day', 'อุณหภูมิ', 'ค่าออกซิเจนในเลือด (<?=$result_seTenkoSTD['OXYGEN']?>)','Avg.ออกซิเจน'],
+                                                                            ['<?= $result_seAdddateweek['D1'] ?>', <?=$result_seDay1['TENKOOXYGENDATA']?>, <?=$result_seTenkoSTD['OXYGEN']?>,<?=$OXYGENAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D2'] ?>', <?=$result_seDay2['TENKOOXYGENDATA']?>, <?=$result_seTenkoSTD['OXYGEN']?>,<?=$OXYGENAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D3'] ?>', <?=$result_seDay3['TENKOOXYGENDATA']?>, <?=$result_seTenkoSTD['OXYGEN']?>,<?=$OXYGENAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D4'] ?>', <?=$result_seDay4['TENKOOXYGENDATA']?>, <?=$result_seTenkoSTD['OXYGEN']?>,<?=$OXYGENAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D5'] ?>', <?=$result_seDay5['TENKOOXYGENDATA']?>, <?=$result_seTenkoSTD['OXYGEN']?>,<?=$OXYGENAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D6'] ?>', <?=$result_seDay6['TENKOOXYGENDATA']?>, <?=$result_seTenkoSTD['OXYGEN']?>,<?=$OXYGENAVG?>  ],
+                                                                            ['<?= $result_seAdddateweek['D7'] ?>', <?=$result_seDay7['TENKOOXYGENDATA']?>, <?=$result_seTenkoSTD['OXYGEN']?>,<?=$OXYGENAVG?>  ]
+                                                                        ]);
+                                                                        
+                                                                        var view = new google.visualization.DataView(data);
+                                                                        view.setColumns([0, 1,
+                                                                                { calc: "stringify",
+                                                                                    sourceColumn: 1,
+                                                                                    type: "string",
+                                                                                    role: "annotation" },
+                                                                                2,  
+
+                                                                                3,    
+
+                                                                                ]);
+
+                                                                                        
+
+                                                                        var options = {
+                                                                            title: '',
+                                                                            curveType: '',
+                                                                            legend: {position: 'top'},
+                                                                            series: {
+                                                                                        0: { lineWidth: 5,pointShape:'circle',pointSize: 10, },
+                                                                                        1: { lineWidth: 4,color: '#030100'},
+                                                                                        2: { lineWidth: 5,lineDashStyle: [2, 2, 20, 2, 20, 2]  }
+                                                                                    },
+                                                                            lineWidth: 5,
+                                                                            tooltip: {
+                                                                                        
+                                                                                    } ,
+                                                                            colors: ['#3498DB', '#239B56','#00FFEE']
+
+                                                                            
+                                                                        };
+
+
+                                                                        var chart = new google.visualization.LineChart(document.getElementById('curve_chartoxygen'));
+                                                                        chart.draw(view, options);
+                                                                        
+                                                                    }
+                                                                </script>
+
+                                                                <div id="curve_chartoxygen" style="width: 100%; height: 150px"></div>
+
+
+                                                            </div>
+                                                            <!-- /.col-lg-8 (nested) -->
+                                                        </div> 
+                                                        <!-- กราฟข้อมูลค่าแอลกอฮอล์ของพนักงาน -->   
+                                                        <div class="row">
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h4 class="page-header"><i class="fa fa-bar-chart-o fa-fw"></i>  
+                                                                กราฟข้อมูลค่าแอลกอฮอล์ของพนักงาน
+                                                                </h4>
+                                                            </div>   
+                                                            <div class="col-lg-12" style="text-align:center;">
+                                                                <h5 class=""><i class=""></i>  
+                                                                <b>Avg.แอลกอฮอล์</b>&nbsp;&nbsp;  <input type="text"   style ="text-align:center" id="txt_alcohol" value="" disabled="true">
+                                                                </h5>
+                                                            </div>                      
+                                                            <div class="col-lg-12">
+
+
+                                                                <?php
+                                                                
+                                                                // Tag for query
+
+                                                                
+                                                                ?>
+                                                                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                                                                <!-- <script type="text/javascript" src="js/jquery.min.js"></script>
+                                                                <script type="text/javascript" src="js/Chart.min.js"></script> -->
+                                                                <script type="text/javascript">
+                                                                        
+                                                                   
+                                                                        document.getElementById("txt_alcohol").value = <?=number_format($ALCOAVG,2)?>;
+
+                                                                        google.charts.load('current', {'packages': ['corechart']});
+                                                                        google.charts.setOnLoadCallback(drawChart);
+
+                                                                        function drawChart() {
+
+                                                                            var data = google.visualization.arrayToDataTable([
+                                                                                ['Day', 'แอลกอฮอล์', 'ค่ามาตรฐาน (<?=$result_seTenkoSTD['ALCOHOL']?>)','Avg.แอลกอฮอล์'],
+                                                                                ['<?= $result_seAdddateweek['D1'] ?>', <?=$result_seDay1['TENKOALCOHOLDATA']?>, 0,<?=$ALCOAVG?>  ],
+                                                                                ['<?= $result_seAdddateweek['D2'] ?>', <?=$result_seDay2['TENKOALCOHOLDATA']?>, 0,<?=$ALCOAVG?> ],
+                                                                                ['<?= $result_seAdddateweek['D3'] ?>', <?=$result_seDay3['TENKOALCOHOLDATA']?>, 0,<?=$ALCOAVG?>  ],
+                                                                                ['<?= $result_seAdddateweek['D4'] ?>', <?=$result_seDay4['TENKOALCOHOLDATA']?>, 0,<?=$ALCOAVG?>  ],
+                                                                                ['<?= $result_seAdddateweek['D5'] ?>', <?=$result_seDay5['TENKOALCOHOLDATA']?>, 0,<?=$ALCOAVG?>  ],
+                                                                                ['<?= $result_seAdddateweek['D6'] ?>', <?=$result_seDay6['TENKOALCOHOLDATA']?>, 0,<?=$ALCOAVG?>  ],
+                                                                                ['<?= $result_seAdddateweek['D7'] ?>', <?=$result_seDay7['TENKOALCOHOLDATA']?>, 0,<?=$ALCOAVG?>  ]
+                                                                            ]);
+                                                                            
+                                                                            var view = new google.visualization.DataView(data);
+                                                                            view.setColumns([0, 1,
+                                                                                    { calc: "stringify",
+                                                                                        sourceColumn: 1,
+                                                                                        type: "string",
+                                                                                        role: "annotation" },
+                                                                                    2, 
+                                                                                
+                                                                                    3,    
+                                                                                    ]);
+
+                                                                                            
+
+                                                                            var options = {
+                                                                                title: '',
+                                                                                curveType: '',
+                                                                                legend: {position: 'top'},
+                                                                                series: {
+                                                                                            0: { lineWidth: 5,pointShape:'circle',pointSize: 10, },
+                                                                                            1: { lineWidth: 4,color: '#030100'      },
+                                                                                            2: { lineWidth: 5,lineDashStyle: [2, 2, 20, 2, 20, 2]  }
+                                                                                            
+                                                                                        },
+                                                                                lineWidth: 5,
+                                                                                tooltip: {
+                                                                                            
+                                                                                        } ,
+                                                                                colors: ['#3498DB', '#239B56','#00FFEE']
+
+                                                                                
+                                                                            };
+
+
+                                                                            var chart = new google.visualization.LineChart(document.getElementById('curve_chartalco'));
+                                                                            chart.draw(view, options);
+                                                                            
+                                                                        }
+                                                                </script>
+
+                                                                <div id="curve_chartalco" style="width: 100%; height: 150px"></div>
+
+                                                                <div class = "row">
+                                                                    <label ><br></label>
+                                                                </div>
+
+                                                            </div>
+                                                            <!-- /.col-lg-8 (nested) -->
+                                                        </div>
+                                                    <!-- END COLUMN -->
+                                                    </div>
+                                                
+
+                                                    <!-- Data table แสดงข้อมูล TENKO -->
+                                                    <div class="col-lg-6" style="border:1px solid black;text-align: center;background-color: #ffffff">
+                                                        <label for="">Tenko Result DRI3 Data Table</label><br>
+                                                        <button type="button" style= "height:40px;width:170px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="tenkoresultdata('<?= $_GET['employeecode3'] ?>','<?=$result_seYearsD3['YEARS']?>')">กราฟข้อมูลสุขภาพ พขร.3</button>
+                                                        <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example_tenko" role="grid" aria-describedby="dataTables-example_info" >
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="background-color: #bfbfbf" rowspan ="2">ลำดับ</th>
+                                                                    <th style="background-color: #bfbfbf" rowspan ="2">วันที่/เวลา</th>
+                                                                    <th style="background-color: #bfbfbf">ค่าบน</th>
+                                                                    <th style="background-color: #bfbfbf">ค่าล่าง</th>
+                                                                    <th style="background-color: #bfbfbf">หัวใจ</th>
+                                                                    <th style="background-color: #bfbfbf">อุณหภูมิ</th>
+                                                                    <th style="background-color: #bfbfbf">ออกซิเจน</th>
+                                                                    <th style="background-color: #bfbfbf">แอลกอฮอล์</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="background-color: #bfbfbf"><b><?=$result_seTenkoSTD['MAXSYS']?></b></td>
+                                                                    <td style="background-color: #bfbfbf"><b><?=$result_seTenkoSTD['MAXDIA']?></b></td>
+                                                                    <td style="background-color: #bfbfbf"><b><?=$result_seTenkoSTD['MAXPULSE']?></b></td>
+                                                                    <td style="background-color: #bfbfbf"><b><?=$result_seTenkoSTD['TEMP']?></b></td>
+                                                                    <td style="background-color: #bfbfbf"><b><?=$result_seTenkoSTD['OXYGEN']?></b></td>
+                                                                    <td style="background-color: #bfbfbf"><b><?=$result_seTenkoSTD['ALCOHOL']?></b></td>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <?php
+
+                                                            // $condiReporttransport1 = " AND CONVERT(DATE,a.DATEVLIN) BETWEEN CONVERT(DATE,'" . $_POST['datestart'] . "',103) AND CONVERT(DATE,'" . $_POST['dateend'] . "',103)";
+                                                            // $condiReporttransport2 = "";
+                                                            // $condiReporttransport3 = "";
+
+                                                            $i = 1;
+                                                            $sql_seData = "SELECT b.nameT,b.TaxID,b.PersonCode,CARDNUMBER,DRIVER_WEIGHT,DRIVER_HEIGHT,DRIVER_BMI,
+                                                            CONVERT( NUMERIC(10,2), DRIVER_TEMPERATURE) AS 'DRIVER_TEMPERATURE',
+                                                            DRIVER_SYS,DRIVER_DIA,DRIVER_PULSE,DRIVER_OXYGEN,
+                                                            CASE
+                                                                WHEN DRIVER_ALCOHOL = '0.0' THEN '0'
+                                                                ELSE DRIVER_ALCOHOL
+                                                            END AS 'DRIVER_ALCOHOL',
+                                                            CREATEBY,CONVERT(VARCHAR(16),CREATEDATE,103) AS 'CREATEDATE'
+                                                                                                                        
+                                                            FROM LABOTRONWEBSERVICEDATA a 
+                                                            INNER JOIN EMPLOYEEEHR2 b ON b.TaxID = a.CREATEBY
+                                                            WHERE CONVERT(DATE,CREATEDATE) BETWEEN CONVERT(DATE,DATEADD(DAY,-7,GETDATE())) AND CONVERT(DATE,GETDATE())
+                                                            AND CARDNUMBER ='".$result_seDriverData3['TaxID']."'
+                                                            --WHERE CARDNUMBER IN ('5320890008815','1639900241323')
+                                                            ORDER BY CONVERT(VARCHAR(18),CREATEDATE,103) DESC";
+                                                            $params_seData = array();
+                                                            $query_seData = sqlsrv_query($conn, $sql_seData, $params_seData);
+                                                            while ($result_seData = sqlsrv_fetch_array($query_seData, SQLSRV_FETCH_ASSOC)) {
+
+                                                             
+                                                                global $pageTitleTEMP,$pageTitleSYS,$pageTitleDIA,$pageTitlePULSE,$pageTitleOXYGEN,$pageTitleALCOHOL;
+                                                                
+
+                                                                //อุณหภูมิ ไม่เกิน 37.5
+                                                                if ($result_seData['DRIVER_TEMPERATURE'] >  $result_seTenkoSTD['TEMP']  || $result_seData['DRIVER_TEMPERATURE'] == '' ) {
+                                                                    $colortemp = "background-color: #FF6A66";
+                                                                    $pageTitleTemp = "อุณหภูมิร่างกายสูงหรือต่ำเกินมาตรฐาน...";
+                                                                } else {
+                                                                    $colortemp = "";
+                                                                    $pageTitleTemp = "";
+                                                                }
+                                                                
+                                                                
+                                                                //ค่าความดันบน 60-150
+                                                                if ($result_seData['DRIVER_SYS'] < $result_seTenkoSTD['MINSYS'] || $result_seData['DRIVER_SYS'] > $result_seTenkoSTD['MAXSYS']) {
+                                                                    $colorsys = "background-color: #FF6A66";
+                                                                    $pageTitleSYS = "ความดันบนสูงหรือต่ำเกินมาตรฐาน...";
+                                                                } else {
+                                                                    $colorsys = "";
+                                                                    $pageTitleSYS = "";
+                                                                }
+
+                                                                //ค่าความดันล่าง 60-95
+                                                                if ($result_seData['DRIVER_DIA'] < $result_seTenkoSTD['MINDIA'] || $result_seData['DRIVER_DIA'] > $result_seTenkoSTD['MAXDIA']) {
+                                                                    $colordia = "background-color: #FF6A66";
+                                                                    $pageTitleDIA = "ความดันล่างสูงหรือต่ำเกินมาตรฐาน...";
+                                                                } else {
+                                                                    $colordia = "";
+                                                                    $pageTitleDIA = "";
+                                                                }
+
+                                                                //อัตตราการเต้นหัวใจ
+                                                                if ($result_seData['DRIVER_PULSE'] < $result_seTenkoSTD['MINPULSE'] || $result_seData['DRIVER_PULSE'] > $result_seTenkoSTD['MAXPULSE']) {
+                                                                    $colorpulse = "background-color: #FF6A66";
+                                                                    $pageTitlePULSE = "อัตราการเต้นของหัวใจสูงหรือต่ำเกินมาตรฐาน...";
+                                                                } else {
+                                                                    $colorpulse = "";
+                                                                    $pageTitlePULSE = "";
+                                                                }
+
+                                                                //ค่าออกซิเจนในเลือด
+                                                                if ($result_seData['DRIVER_OXYGEN'] < $result_seTenkoSTD['OXYGEN']) {
+                                                                    $coloroxygen = "background-color: #FF6A66";
+                                                                    $pageTitleOXYGEN = "ออกซิเจนใจเลือดต่ำเกินมาตรฐาน...";
+                                                                } else {
+                                                                    $coloroxygen = "";
+                                                                    $pageTitleOXYGEN = "";
+                                                                }
+
+                                                                //ค่าแอลกอฮอล์
+                                                                if ($result_seData['DRIVER_ALCOHOL'] > $result_seTenkoSTD['ALCOHOL'] || $result_seData['DRIVER_ALCOHOL'] == '') {
+                                                                    $coloralcohol = "background-color: #FF6A66";
+                                                                    $pageTitleALCOHOL = "แอลกอฮอล์ต้องเป็น 0 เท่านั้น...";
+                                                                } else {
+                                                                    $coloralcohol = "";
+                                                                    $pageTitleALCOHOL = "";
+                                                                }
+
+                                                                 //ค่า BMI
+                                                                 if ($result_seData['DRIVER_BMI'] > '0' && $result_seData['DRIVER_BMI'] < '18') {
+                                                                    $colorbmi = "background-color: #66FAFF";
+                                                                } else if ($result_seData['DRIVER_BMI'] > '18' && $result_seData['DRIVER_BMI'] < '23') {
+                                                                    $colorbmi = "background-color: #66FF72";
+                                                                }else if ($result_seData['DRIVER_BMI'] > '23'  && $result_seData['DRIVER_BMI'] < '25') {
+                                                                    $colorbmi = "background-color: #FFA966";
+                                                                }else if ($result_seData['DRIVER_BMI'] > '25'  && $result_seData['DRIVER_BMI'] < '30') {
+                                                                    $colorbmi = "background-color: #FF6A66";
+                                                                }else if ($result_seData['DRIVER_BMI']  == ''){
+                                                                    $colorbmi = "";    
+                                                                }else{
+                                                                    $colorbmi = "background-color: #FF6A66";    
+                                                                }
+
+                                                                // echo $result_seData['DRIVER_BMI'];
+                                                                // echo '<br>';
+                                                                ?>
+
+                                                                <tr>
+                                                                    <td style="text-align: center"><?= $i ?> </td>
+                                                                    <td><?=$result_seData['CREATEDATE']?> </td>
+                                                                    <td title="<?=$pageTitleSYS?>"      style="<?= $colorsys ?>"><?=$result_seData['DRIVER_SYS'];?>    </td>
+                                                                    <td title="<?=$pageTitleDIA?>"      style="<?= $colordia ?>"><?=$result_seData['DRIVER_DIA'];?>    </td>
+                                                                    <td title="<?=$pageTitlePULSE?>"    style="<?= $colorpulse   ?>"><?=$result_seData['DRIVER_PULSE'];?>  </td>
+                                                                    <td title="<?=$pageTitleTemp?>"     style="<?= $colortemp ?>"><?=number_format($result_seData['DRIVER_TEMPERATURE'],1);?>    </td>
+                                                                    <td title="<?=$pageTitleOXYGEN?>"   style="<?= $coloroxygen  ?>"><?=$result_seData['DRIVER_OXYGEN']?>  </td>
+                                                                    <td title="<?=$pageTitleALCOHOL?>"  style="<?= $coloralcohol ?>"><?=$result_seData['DRIVER_ALCOHOL']?> </td>
+                                                                </tr>
+                                                                <?php
+                                                                $i++;
+                                                                }
+                                                            ?>
+
+
+
+
+                                                            </tbody>
+
+                                                        </table> 
+
+                                                        <!-- ตาราง ข้อมูล Self Check -->
+                                                        <?php
+                                                        // อัพเดทข้อมูลการตรวจร่างกาย ถ้าข้อมูลไม่ถูกต้อง SET ACTIVESTATUS = '0'
+                                                        // self check id ที่น้อยกว่าวันที่ปัจจุบัน 
+                                                         $sql_seUpdateData = "UPDATE DRIVERSELFCHECK 
+                                                             SET ACTIVESTATUS ='0'
+                                                             WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+                                                             AND (DATEWORKING ='' OR DATEPRESENT ='' OR CONFIRMEDBY IS NULL)
+                                                             AND CONVERT(DATE,DATEJOBSTART,103) < CONVERT(DATE,GETDATE(),103)";
+                                                         $params_seUpdateData = array();
+                                                         $query_seUpdateData = sqlsrv_query($conn, $sql_seUpdateData, $params_seUpdateData);
+                                                         $result_seUpdateData = sqlsrv_fetch_array($query_seUpdateData, SQLSRV_FETCH_ASSOC);
+
+                                                        $sql_seSelfCheckShow3 = "SELECT TOP 1 SELFCHECKID,EMPLOYEECODE,EMPLOYEENAME,DATEJOBSTART,DATEWORKING,DATEPRESENT,
+                                                            TIREDNOCHK,ILLNESSNOCHK,DROWSENOCHK,INJURYNOCHK,TAKEMEDICINENOCHK,HEALTHYYESCHK,
+                                                            DISEASE,SEEDOCTORNO,WORRYYES,WORRYNO,HOUSEHOLDYES,HOUSEHOLDNO,EYEPROBLEMYES,EYEPROBLEMNO,EYEGLASSESYES,EYEGLASSESNO,
+                                                            CARRYEYEGLASSESYES,CARRYEYEGLASSESNO,CARRYHEARINGAIDYES,CARRYHEARINGAIDNO,TEMPERATURE,SYSVALUE1,SYSVALUE2,SYSVALUE3,PULSEVALUE1,
+                                                            DIAVALUE1,DIAVALUE2,DIAVALUE3,PULSEVALUE1,PULSEVALUE2,PULSEVALUE3,OXYGENVALUE,ALCOHOLTYPE,ALCOHOLVOLUME,
+                                                            ACTIVESTATUS,CREATEBY,CREATEDATE,CONFIRMEDBY,CONFIRMEDDATE,
+                                                            CONVERT(VARCHAR(10),CREATEDATE,120) AS 'CREATEDATESHOW',
+                                                            CONVERT(VARCHAR(15),CONFIRMEDDATE,103) AS 'CFDATE',CONVERT(VARCHAR(5), CONFIRMEDDATE, 108) AS 'CFTIME',
+                                                            CONVERT(VARCHAR(10),CREATEDATE,103) AS 'CREATEDATE',CONVERT(VARCHAR(5), CREATEDATE, 108) AS 'TIMECREATE'
+                                                            FROM DRIVERSELFCHECK WHERE EMPLOYEECODE ='".$_GET['employeecode3']."' 
+                                                            AND SELFCHECKID = '".$result_seSelfCheck3['SELFCHECKID']."'
+                                                            AND ACTIVESTATUS ='1'
+                                                            ORDER BY  CONVERT(CHAR(5), CREATEDATE, 108) DESC";
+                                                        $params_seSelfCheckShow3 = array();
+                                                        $query_seSelfCheckShow3  = sqlsrv_query($conn, $sql_seSelfCheckShow3, $params_seSelfCheckShow3);
+                                                        $result_seSelfCheckShow3 = sqlsrv_fetch_array($query_seSelfCheckShow3, SQLSRV_FETCH_ASSOC);
+
+                                                        // Confirmby และ Confirm date เป็นค่าว่าง ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['CONFIRMEDBY'] == '' || $result_seSelfCheckShow3['CONFIRMEDDATE'] == '') {
+                                                            $confirmcolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $confirmcolorchk3 = "";
+                                                        }
+
+                                                        // Confirmby และ Confirm date เป็นค่าว่าง ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['DATEWORKING'] == '' || $result_seSelfCheckShow3['DATEPRESENT'] == '') {
+                                                            $datecolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $datecolorchk3 = "";
+                                                        }
+
+                                                        // Temp เป็นค่าว่าง ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['TEMPERATURE'] == '') {
+                                                            $tempcolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $tempcolorchk3 = "";
+                                                        }
+
+                                                        // OXYGEN เป็นค่าว่าง ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['OXYGENVALUE'] == '') {
+                                                            $oxygencolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $oxygencolorchk3 = "";
+                                                        }
+
+                                                        // SYS1 เป็นค่าว่าง ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['SYSVALUE1'] == '') {
+                                                            $syscolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $syscolorchk3 = "";
+                                                        }
+
+                                                        // DIA1 เป็นค่าว่าง ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['DIAVALUE1'] == '') {
+                                                            $diacolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $diacolorchk3 = "";
+                                                        }
+
+                                                        // PULSE1 เป็นค่าว่าง ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['PULSEVALUE1'] == '') {
+                                                            $pulsecolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $pulsecolorchk3 = "";
+                                                        }
+
+                                                        // ALCOHOL VOLUME เป็นค่าว่าง  หรือ มากกว่า 0 ตารางแสดงข้อมูลของ selfcheck จะเป็นสีแดง
+                                                        if ($result_seSelfCheckShow3['ALCOHOLVOLUME'] == '' || $result_seSelfCheckShow3['ALCOHOLVOLUME'] > '0') {
+                                                            $alcoholcolorchk3 = "background-color: #FA9F9F";
+                                                        }else{
+                                                            $alcoholcolorchk3 = "";
+                                                        }
+
+                                                        // เช็คสภาพร่างกาย
+                                                        if ($result_seSelfCheckShow3['TIREDNOCHK']  == '1'        && $result_seSelfCheckShow3['ILLNESSNOCHK']    == '1'  &&
+                                                            $result_seSelfCheckShow3['DROWSENOCHK'] == '1'        && $result_seSelfCheckShow3['INJURYNOCHK']     == '1'  &&
+                                                            $result_seSelfCheckShow3['TAKEMEDICINENOCHK'] == '1'  && $result_seSelfCheckShow3['HEALTHYYESCHK']   == '1') {
+                                                            $selfallchk = 'OK';
+                                                        }else {
+                                                            $selfallchk = 'NG';
+                                                        }
+
+                                                        // เช็คอาการป่วย
+                                                        if (($result_seSelfCheckShow3['DISEASE'] == '' || $result_seSelfCheckShow3['DISEASE'] == '-') && $result_seSelfCheckShow3['SEEDOCTORNO'] == '1') {
+                                                            $diseasechk = 'OK';
+                                                        }else {
+                                                            $diseasechk = 'NG';
+                                                        }
+
+                                                        // เรื่องกังวลใจ
+                                                        if ($result_seSelfCheckShow3['WORRYNO'] == '1') {
+                                                            $worrychk = 'OK';
+                                                        }else {
+                                                            if ($result_seSelfCheckShow3['WORRYYES'] == '') {
+                                                                // WORRYYES = ค่าว่าง หมายถึงไม่ได้ประเมินเรื่องกังวลใจ
+                                                                $worrychk = 'BLANK';
+                                                            }else{
+                                                                $worrychk = 'NG';
+                                                            }
+                                                            
+                                                        }
+
+                                                        // การใช้เวลาช่วงพักผ่อน
+                                                        if ($result_seSelfCheckShow3['HOUSEHOLDYES'] == '1') {
+                                                            $householdchk = 'OK';
+                                                        }else {
+                                                            if ($result_seSelfCheckShow3['HOUSEHOLDNO'] == '') {
+                                                                // HOUSEHOLDNO = ค่าว่าง หมายถึงไม่ได้ประเมินการใช้เวลาช่วงพักผ่อน
+                                                                $householdchk = 'BLANK';
+                                                            }else{
+                                                                $householdchk = 'NG';
+                                                            }
+                                                            
+                                                        }
+
+                                                        // ปัญหาสายตา
+                                                        if ($result_seSelfCheckShow3['EYEPROBLEMNO'] == '1') {
+                                                            $eyeproblemchk = 'OK';
+                                                        }else {
+                                                            if ($result_seSelfCheckShow3['EYEPROBLEMYES'] == '') {
+                                                                // EYEPROBLEMYES = ค่าว่าง หมายถึงไม่ได้ประเมินปัญหาสายตา
+                                                                $eyeproblemchk = 'BLANK';
+                                                            }else{
+                                                                $eyeproblemchk = 'NG';
+                                                            }
+                                                        }
+
+                                                        // สวมใส่แว่นสายตา
+                                                        if ($result_seSelfCheckShow3['EYEGLASSESNO'] == '1') {
+                                                            $eyeglasschk = 'OK';
+                                                        }else {
+                                                            if ($result_seSelfCheckShow3['EYEGLASSESYES'] == '') {
+                                                                // EYEGLASSESYES = ค่าว่าง หมายถึงไม่ได้ประเมินสวมใส่แว่นสายตา
+                                                                $eyeglasschk = 'BLANK';
+                                                            }else{
+                                                                $eyeglasschk = 'NG';
+                                                            }
+                                                        }
+
+                                                        // พกใส่แว่นสายตา
+                                                        if ($result_seSelfCheckShow3['CARRYEYEGLASSESYES'] == '1') {
+                                                            $carryeyeglasschk = 'OK';
+                                                        }else {
+                                                            if ($result_seSelfCheckShow3['CARRYEYEGLASSESNO'] == '') {
+                                                                // CARRYEYEGLASSESYES = ค่าว่าง หมายถึงไม่ได้ประเมินพกแว่นสายตา
+                                                                $carryeyeglasschk = 'BLANK';
+                                                            }else{
+                                                                $carryeyeglasschk = 'NG';
+                                                            }
+                                                        }
+
+                                                        // สวมใส่เครื่องช่วยฟัง
+                                                        if ($result_seSelfCheckShow3['CARRYHEARINGAIDNO'] == '1') {
+                                                            $carryhearingaidchk = 'OK';
+                                                        }else {
+                                                            if ($result_seSelfCheckShow3['CARRYHEARINGAIDYES'] == '') {
+                                                                // CARRYEYEGLASSESYES = ค่าว่าง หมายถึงไม่ได้ประเมินพกแว่นสายตา
+                                                                $carryhearingaidchk = 'BLANK';
+                                                            }else{
+                                                                $carryhearingaidchk = 'NG';
+                                                            }
+                                                        }
+
+                                                        // เวลาวางกุญแจสำหรับเจ้าหน้าที่เช็ค ต้องน้อยกว่าไอดีอันเดิม และเป็นเวลาแรกสุด
+                                                        $sql_seKeyDropTime3 = "SELECT TOP 1 SELFCHECKID,KEYDROPTIME,EMPLOYEECODE FROM DRIVERSELFCHECK WHERE 
+                                                            EMPLOYEECODE ='".$_GET['employeecode3']."' AND SELFCHECKID < '".$result_seSelfCheck3['SELFCHECKID']."'
+                                                            AND ACTIVESTATUS ='1'
+                                                            ORDER BY SELFCHECKID DESC";
+                                                        $params_seKeyDropTime3 = array();
+                                                        $query_seKeyDropTime3 = sqlsrv_query($conn, $sql_seKeyDropTime3, $params_seKeyDropTime3);
+                                                        $result_seKeyDropTime3 = sqlsrv_fetch_array($query_seKeyDropTime3, SQLSRV_FETCH_ASSOC);
+                                                        
+                                                        // ช่วงเวลาการพักผ่อน(ระยะเวลาการพักผ่อน) 8 ชั่วโมง
+                                                        if ($result_seKeyDropTime3['KEYDROPTIME'] == '') {
+                                                                                        
+                                                            $DATERESTSTART3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPRESTSTART']);
+                                                            $DATERESTSTART = str_replace("-","/",$DATERESTSTART3);
+                                                        }else {
+                                                            $DATERESTSTART3 = str_replace("T"," ",$result_seKeyDropTime3['KEYDROPTIME']);
+                                                            $DATERESTSTART = str_replace("-","/",$DATERESTSTART3);
+                                                        }
+
+                                                        $DATERESTEND3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPRESTEND']);
+                                                        $DATERESTEND = str_replace("-","/",$DATERESTEND3);
+
+                                                        /////////////////////////////////////////////////////////////////////////
+                                                        // ช่วงเวลาของการนอน(ปกติ) 6 ชั่วโมง
+                                                        $DATESLEEPNORMALSTART3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPNORMALSTART']);
+                                                        $DATESLEEPNORMALSTART = str_replace("-","/",$DATESLEEPNORMALSTART3);
+
+                                                        $DATESLEEPNORMALEND3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPNORMALEND']);
+                                                        $DATESLEEPNORMALEND = str_replace("-","/",$DATESLEEPNORMALEND3);
+
+                                                        /////////////////////////////////////////////////////////////////////////
+                                                        // ช่วงเวลาของการนอนเพิ่ม 4 ชั่วโมงครึ่ง ขึ้นไป
+                                                        $DATESLEEPEXTRASTART3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPEXTRASTART']);
+                                                        $DATESLEEPEXTRASTART  = str_replace("-","/",$DATESLEEPEXTRASTART3);
+
+                                                        $DATESLEEPEXTRAEND3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPEXTRAEND']);
+                                                        $DATESLEEPEXTRAEND  = str_replace("-","/",$DATESLEEPEXTRAEND3);
+
+
+                                                        ?>
+                                                        <table style="width:100%;border: 1px solid black;border-collapse: collapse;">
+                                                            <tr>
+                                                                <th colspan = "12" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center;font-size: 15px"><b>ข้อมูลตรวจสอบตัวเอง พขร.3 (Self Check) หมายเลข: <?=$result_seSelfCheck3['SELFCHECKID']?> </b></th>
+                                                            </tr>
+                                                            <!-- <tr>
+                                                                <th colspan = "34" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ : <?=$sex?>  <?= $result_sePlain['EMPLOYEENAME1'] ?> || รหัสพนักงาน : <?=$_GET['employeecode1']?> || ตำแหน่ง : <?=$result_seDriverData1['PositionNameT']?> || อายุงาน :  <?= $result_CalculateWork['RS']?> || อายุตน :  <?= $result_CalculateAge['RS']?></font></th>
+                                                            </tr> -->
+                                                            <tr>
+                                                                <th colspan = "6" rowspan="2" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center;font-size: 14px">ตรวจสอบตัวเอง<br>(Self Check)</th>
+                                                                <th colspan = "2" style="border: 1px solid black;background-color: #FFFFFF;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">Result</th> 
+                                                                <th colspan = "4" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">รายละเอียด</th> 
+                                                                <!-- <th colspan = "4" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center"></th>      -->
+                                                            </tr>
+                                                            <tr>
+                                                                <th colspan = "1" style="width:40px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">OK</th>
+                                                                <th colspan = "1" style="width:40px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">NG</th>
+                                                                <?php
+                                                                if ($result_seSelfCheck3['SELFCHECKID'] == '') {
+                                                                ?>
+                                                                    <!-- <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="function warning(){alert('ไม่สามารถดูข้อมูลได้เนื่องจากพนักงานยังไม่ได้ทำการแจ้งสุขภาพตนเอง!!!\nหรือไม่มีการกดยืนยันข้อมูลการตรวจสุขภาพตนเองจากเจ้าหน้าที่!!!!!!')};warning();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"></th> -->
+                                                                    <th colspan = "4" style="width:160px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center"><input type="button" onclick="warning_selfcheck();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"></th>
+                                                                <?php
+                                                                }else {
+                                                                ?>
+                                                                    <th colspan = "4" style="width:280px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center"><input type="button" onclick="se_selfcheck('<?=$result_seSelfCheck3['SELFCHECKID']?>','<?= $result_seEmployee2['nameT'] ?>','<?= $_GET['employeecode3'] ?>','<?=$dateself3?>','<?=$result_seDateSelfCheck3['DATERK'] ?>','<?=$result_seDateSelfCheck3['DATEPRESENT'] ?>','<?= $result_seEmployee['nameT']?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check3" class="btn btn-primary"></th>    
+                                                                <?php
+                                                                }
+                                                                ?>
+
+                                                            </tr>
+
+                                                            <!-- สภาพร่างกาย -->
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>1.สภาพร่างกาย</b></td>
+                                                                <?php
+                                                                if ($selfallchk == 'OK') { // OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ปกติ</td>
+                                                                <?php
+                                                                }else { //NG
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่ปกติ</td>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+
+                                                            <!-- เวลาพักผ่อน/เวลานอนหลับ -->
+                                                            <tr>
+                                                                <td colspan = "12" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>2.เวลาพักผ่อน/เวลานอนหลับ</b></td>
+                                                            </tr>
+
+                                                            <!-- ระยะเวลาการพักผ่อน (8 ชม. ขึ้นไป) -->
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;font-size: 14px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1 การพักผ่อน<br> (8 ชม. ขึ้นไป) </b>
+                                                                    
+                                                                </td>
+                                                                <?php
+                                                                if ($TIMESLEEPREST3 >= '8') { //NG
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเลิกงาน3</u></label>
+                                                                            <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_reststart" name="daysleep_reststart"  value="<?= $DATERESTSTART ?>" min="" max="" autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเริ่มปฏิบัติงาน</u></label>
+                                                                            <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_restend" name="daysleep_restend" value="<?= $DATERESTEND ?>" min="" max=""  autocomplete="off">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>ปุ่มคำนวณเวลาการพักผ่อน</u></label>
+                                                                            <button type="button" id="btn_timesleeprest" name="btn_timesleeprest" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfrestcheck('<?=$result_seSelfCheck3['SELFCHECKID']?>','<?=$_GET['employeecode3']?>');" >กดคำนวณเวลาการพักผ่อน3</button>
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label >ระยะเวลาที่พักผ่อน</label>
+                                                                            <?php
+                                                                            if ($TIMESLEEPREST3 == '0') {
+                                                                            ?>
+                                                                            <input readonly  style="height:40px; width:170px" type="text" class="form-control" id="timesleep_rest" name="timesleep_rest" value= "" autocomplete="off">    
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPREST3 >= '8') {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #94FA67;" type="text" class="form-control" id="timesleep_rest" name="timesleep_rest" value= "<?= $result_seSelfCheck3['TIMESLEEPREST'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }else {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #FA6767;" type="text" class="form-control" id="timesleep_rest" name="timesleep_rest" value= "<?= $result_seSelfCheck3['TIMESLEEPREST'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        </div>
+                                                                        <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการพักผ่อน</p>
+                                                                        <p style="color:red">*ในกรณีไม่มีเวลาเลิกงานของวันที่แล้ว ระบบจะใช้เวลาที่เจ้าหน้าที่ลงข้อมูล</p>
+                                                                    </td>
+                                                                <?php
+                                                                }else { // OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเลิกงาน</u></label>
+                                                                            <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_reststart" name="daysleep_reststart"  value="<?= $DATERESTSTART ?>" min="" max="" autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเริ่มปฏิบัติงาน</u></label>
+                                                                            <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_restend" name="daysleep_restend" value="<?= $DATERESTEND ?>" min="" max=""  autocomplete="off">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>ปุ่มคำนวณเวลาการพักผ่อน</u></label>
+                                                                            <button type="button" id="btn_timesleeprest" name="btn_timesleeprest" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfrestcheck('<?=$result_seSelfCheck3['SELFCHECKID']?>','<?=$_GET['employeecode3']?>');" >กดคำนวณเวลาการพักผ่อน3</button>
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label >ระยะเวลาที่พักผ่อน</label>
+                                                                            <?php
+                                                                            if ($TIMESLEEPREST3 == '0') {
+                                                                            ?>
+                                                                            <input readonly  style="height:40px; width:170px" type="text" class="form-control" id="timesleep_rest" name="timesleep_rest" value= "" autocomplete="off">    
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPREST3 >= '8') {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #94FA67;" type="text" class="form-control" id="timesleep_rest" name="timesleep_rest" value= "<?= $result_seSelfCheck3['TIMESLEEPREST'] ?>" autocomplete="off">
+                                                                            <?php   
+                                                                            }else {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #FA6767;" type="text" class="form-control" id="timesleep_rest" name="timesleep_rest" value= "<?= $result_seSelfCheck3['TIMESLEEPREST'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        </div>
+                                                                        <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการพักผ่อน</p>
+                                                                        <p style="color:red">*ในกรณีไม่มีเวลาเลิกงานของวันที่แล้ว ระบบจะใช้เวลาที่เจ้าหน้าที่ลงข้อมูล</p>
+                                                                    </td>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+
+                                                            <!-- การนอนหลับ (6 ชม. ขึ้นไป) -->
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.2 การนอนหลับ <br>(6 ชม. ขึ้นไป)</b>
+                                                                    
+                                                                </td>
+                                                                <?php
+                                                                if ($TIMESLEEPNORMAL3 >= '6') { //OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเริ่มนอน</u></label>
+                                                                            <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_normalstart" name="daysleep_normalstart"  value="<?= $DATESLEEPNORMALSTART ?>" min="" max="" autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาตื่นนอน</u></label>
+                                                                            <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_normalend" name="daysleep_normalend" value="<?= $DATESLEEPNORMALEND ?>" min="" max=""  autocomplete="off">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>ปุ่มคำนวณเวลาการนอน</u></label>
+                                                                            <button type="button" id="btn_timesleepnormal" name="btn_timesleepnormal" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfnormalcheck('<?=$result_seSelfCheck3['SELFCHECKID']?>');" >กดคำนวณเวลาการนอน</button>
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label >ระยะเวลาที่นอน</label>
+                                                                            <?php
+                                                                            if ($TIMESLEEPNORMAL3 == '0') {
+                                                                            ?>
+                                                                            <input readonly  style="height:40px; width:170px" type="text" class="form-control" id="timesleep_normal" name="timesleep_normal" value= "" autocomplete="off">    
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPNORMAL3 >= '6') {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #94FA67;" type="text" class="form-control" id="timesleep_normal" name="timesleep_normal" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }else {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #FA6767;" type="text" class="form-control" id="timesleep_normal" name="timesleep_normal" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        </div>
+                                                                        <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการนอน</p>
+                                                                        <div class="col-lg-12" style="font-size: 14px;text-align: center">
+                                                                            <table style="background-color: #e7e7e7"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th style="width: 100%;text-align: center;" >ประเมิน(การนอนปกติ)</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style="width: 100%;text-align: center;">
+                                                                                        <selfnormalsleepyes>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfnormalsleepyes" <?= $sleepnormalyes ?> name="selfnormalsleep" value="selfnormalsleepyes">
+                                                                                            <label for="selfnormalsleepyes">หลับสนิท</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                        </selfnormalsleepyes>    
+                                                                                        <selfnormalsleepno>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfnormalsleepno"  <?= $sleepnormalno ?> name="selfnormalsleep" value="selfnormalsleepno">
+                                                                                            <label for="selfnormalsleepno">หลับไม่สนิท</label>
+                                                                                        </selfnormalsleepno>    
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <br><br>
+                                                                    </td>
+                                                                <?php
+                                                                }else { // NG
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเริ่มนอน</u></label>
+                                                                            <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_normalstart" name="daysleep_normalstart"  value="<?= $DATESLEEPNORMALSTART ?>" min="" max="" autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาตื่นนอน</u></label>
+                                                                            <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_normalend" name="daysleep_normalend" value="<?= $DATESLEEPNORMALEND ?>" min="" max=""  autocomplete="off">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>ปุ่มคำนวณเวลาการนอน</u></label>
+                                                                            <button type="button" id="btn_timesleepnormal" name="btn_timesleepnormal" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfnormalcheck('<?=$result_seSelfCheck1['SELFCHECKID']?>');" >กดคำนวณเวลาการนอน</button>
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label >ระยะเวลาที่นอน</label>
+                                                                            <?php
+                                                                            if ($TIMESLEEPNORMAL3 == '0') {
+                                                                            ?>
+                                                                            <input readonly  style="height:40px; width:170px" type="text" class="form-control" id="timesleep_normal" name="timesleep_normal" value= "" autocomplete="off">    
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPNORMAL3 >= '6') {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #94FA67;" type="text" class="form-control" id="timesleep_normal" name="timesleep_normal" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }else {
+                                                                            ?>
+                                                                            <input readonly style="height:40px; width:170px;background-color: #FA6767;" type="text" class="form-control" id="timesleep_normal" name="timesleep_normal" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        </div>
+                                                                        <p style="color:red">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการนอน</p>
+                                                                        <div class="col-lg-12" style="font-size: 14px;text-align: center">
+                                                                            <table style="background-color: #e7e7e7"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th style="width: 100%;text-align: center;" >ประเมิน(การนอนปกติ)</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style="width: 100%;text-align: center;">
+                                                                                        <selfnormalsleepyes>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfnormalsleepyes" <?= $sleepnormalyes ?> name="selfnormalsleep" value="selfnormalsleepyes">
+                                                                                            <label for="selfnormalsleepyes">หลับสนิท</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                        </selfnormalsleepyes>    
+                                                                                        <selfnormalsleepno>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfnormalsleepno"  <?= $sleepnormalno ?> name="selfnormalsleep" value="selfnormalsleepno">
+                                                                                            <label for="selfnormalsleepno">หลับไม่สนิท</label>
+                                                                                        </selfnormalsleepno>    
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <br><br>
+                                                                    </td>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+
+                                                            <!-- การนอนเพิ่ม(ถ้ามี) -->
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.3 การนอนเพิ่ม <br>(4 ชั่วโมงครึ่ง ขึ้นไป)</b>
+                                                                    
+                                                                </td>
+
+                                                                <?php
+                                                                //echo $result_seSelfCheck['TIMESLEEPEXTRA']; 
+                                                                if ($TIMESLEEPEXTRAHOURCHK3 == '0') {
+                                                                    // $TIMESLEEPEXTRAHOURCHK2 == '0' คือ ไม่มีเวลาหรือไม่ได้กดคำนวณ และมีการเลือกนอนหลับ หรือ นอนไม่หลับ
+                                                                    // จะแสดงเป็น NG เลย
+                                                                    // echo '1544';
+                                                                ?>
+                                                                    <?php
+                                                                    if ($sleepextrayes == 'checked' || $sleepextrano == 'checked') {
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                    <?php
+                                                                    }else{
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเริ่มพักผ่อน(กะกลางคืน)</u></label>
+                                                                            <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_extrastart" name="daysleep_extrastart"  value="<?= $DATESLEEPEXTRASTART ?>" min="" max="" autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาตื่นพักผ่อน(กะกลางคืน)</u></label>
+                                                                            <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_extraend" name="daysleep_extraend" value="<?= $DATESLEEPEXTRAEND ?>" min="" max=""  autocomplete="off">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>ปุ่มคำนวณเวลาการนอนเพิ่ม</u></label>
+                                                                            <button type="button" id="btn_timesleepextra" name="btn_timesleepextra" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfextracheck('<?=$result_seSelfCheck3['SELFCHECKID']?>');" >กดยืนยันเวลานอนเพิ่ม</button>
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label >ระยะเวลาที่นอน(กะกลางคืน)</label>
+                                                                            <?php
+                                                                            //echo $result_seSelfCheck['TIMESLEEPEXTRA']; 
+                                                                            if ($TIMESLEEPEXTRAHOURCHK3 == '0') {
+                                                                                // echo '1';
+                                                                            ?>
+                                                                                <input readonly style="height:40px;width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "" autocomplete="off">
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง กรณีเท่ากับ 4 
+                                                                                // echo '2';
+                                                                                if ($TIMESLEEPEXTRAMINCHK3 == 'MG3') { //เช็คชนาที ต้องมากกว่า 30 นาที กรณีเท่ากับ 4เช็ค นาทีต่อ
+                                                                               ?>
+                                                                                <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                               <?php
+                                                                                }else {
+                                                                                ?>
+                                                                                <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                <?php
+                                                                                }
+                                                                            ?>
+                                                                                
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HGG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง
+                                                                                // echo '3';
+                                                                            ?>
+                                                                                <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                               
+                                                                            <?php
+                                                                            }else {
+                                                                                // echo '4';
+                                                                            ?>
+                                                                                <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        </div>
+                                                                        <p style="color:red;">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการนอน(นอนเพิ่ม) </p>
+                                                                        <div class="col-lg-12" style="font-size: 14px;text-align: center">
+                                                                            <table style="background-color: #e7e7e7"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th style="width: 100%;text-align: center;" >ประเมิน(การนอนเพิ่ม)</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style="width: 100%;text-align: center;"> 
+                                                                                        <selfextrasleepyes>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepyes" <?= $sleepextrayes ?> name="selfextrasleep" value="selfextrasleepyes">
+                                                                                            <label for="selfextrasleepyes">หลับสนิท</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                        </selfextrasleepyes>   
+                                                                                        <selfextrasleepno>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepno" <?= $sleepextrano ?> name="selfextrasleep" value="selfextrasleepno">
+                                                                                            <label for="selfextrasleepno">หลับไม่สนิท</label>
+                                                                                        </selfextrasleepno>    
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <br><br>
+                                                                    </td>
+                                                                <?php
+                                                                }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง กรณีเท่ากับ 4 
+                                                                    // echo '2111';
+                                                                    if ($TIMESLEEPEXTRAMINCHK3 == 'MG3' && $sleepextrayes == 'checked') { //เช็คชนาที ต้องมากกว่า 30 นาที กรณีเท่ากับ 4เช็ค นาทีต่อ และต้องตอลเป็นหลับสนิท
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;">&#10004;</td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label ><u>เวลาเริ่มพักผ่อน(กะกลางคืน)</u></label>
+                                                                                <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_extrastart" name="daysleep_extrastart"  value="<?= $DATESLEEPEXTRASTART ?>" min="" max="" autocomplete="off">
+                                                                            </div>
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label ><u>เวลาตื่นพักผ่อน(กะกลางคืน)</u></label>
+                                                                                <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_extraend" name="daysleep_extraend" value="<?= $DATESLEEPEXTRAEND ?>" min="" max=""  autocomplete="off">
+                                                                            </div>
+                                                                            <br>
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label ><u>ปุ่มคำนวณเวลาการนอนเพิ่ม</u></label>
+                                                                                <button type="button" id="btn_timesleepextra" name="btn_timesleepextra" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfextracheck('<?=$result_seSelfCheck3['SELFCHECKID']?>');" >กดยืนยันเวลานอนเพิ่ม</button>
+                                                                            </div>
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label >ระยะเวลาที่นอน(กะกลางคืน)</label>
+                                                                                <?php
+                                                                                //echo $result_seSelfCheck['TIMESLEEPEXTRA']; 
+                                                                                if ($TIMESLEEPEXTRAHOURCHK3 == '0') {
+                                                                                    // echo '1';
+                                                                                ?>
+                                                                                    <input readonly style="height:40px;width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "" autocomplete="off">
+                                                                                <?php
+                                                                                }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง กรณีเท่ากับ 4 
+                                                                                    // echo '2';
+                                                                                    if ($TIMESLEEPEXTRAMINCHK3 == 'MG3') { //เช็คชนาที ต้องมากกว่า 30 นาที กรณีเท่ากับ 4เช็ค นาทีต่อ
+                                                                                ?>
+                                                                                    <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                <?php
+                                                                                    }else {
+                                                                                    ?>
+                                                                                    <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                    <?php
+                                                                                    }
+                                                                                ?>
+                                                                                    
+                                                                                <?php
+                                                                                }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HGG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง
+                                                                                    // echo '3';
+                                                                                ?>
+                                                                                    <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                
+                                                                                <?php
+                                                                                }else {
+                                                                                    // echo '4';
+                                                                                ?>
+                                                                                    <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                <?php
+                                                                                }
+                                                                                ?>
+                                                                                
+                                                                            </div>
+                                                                            <p style="color:red;">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการนอน(นอนเพิ่ม) </p>
+                                                                            <div class="col-lg-12" style="font-size: 14px;text-align: center">
+                                                                                <table style="background-color: #e7e7e7"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th style="width: 100%;text-align: center;" >ประเมิน(การนอนเพิ่ม)</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <td style="width: 100%;text-align: center;"> 
+                                                                                            <selfextrasleepyes>
+                                                                                                <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepyes" <?= $sleepextrayes ?> name="selfextrasleep" value="selfextrasleepyes">
+                                                                                                <label for="selfextrasleepyes">หลับสนิท</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                            </selfextrasleepyes>   
+                                                                                            <selfextrasleepno>
+                                                                                                <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepno" <?= $sleepextrano ?> name="selfextrasleep" value="selfextrasleepno">
+                                                                                                <label for="selfextrasleepno">หลับไม่สนิท</label>
+                                                                                            </selfextrasleepno>    
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                            <br><br>
+                                                                        </td>
+                                                                    <?php
+                                                                    }else {
+                                                                        // echo "2544";
+                                                                    ?>
+                                                                     
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label ><u>เวลาเริ่มพักผ่อน(กะกลางคืน)</u></label>
+                                                                                <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_extrastart" name="daysleep_extrastart"  value="<?= $DATESLEEPEXTRASTART ?>" min="" max="" autocomplete="off">
+                                                                            </div>
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label ><u>เวลาตื่นพักผ่อน(กะกลางคืน)</u></label>
+                                                                                <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_extraend" name="daysleep_extraend" value="<?= $DATESLEEPEXTRAEND ?>" min="" max=""  autocomplete="off">
+                                                                            </div>
+                                                                            <br>
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label ><u>ปุ่มคำนวณเวลาการนอนเพิ่ม</u></label>
+                                                                                <button type="button" id="btn_timesleepextra" name="btn_timesleepextra" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfextracheck('<?=$result_seSelfCheck3['SELFCHECKID']?>');" >กดยืนยันเวลานอนเพิ่ม</button>
+                                                                            </div>
+                                                                            <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                                <label >ระยะเวลาที่นอน(กะกลางคืน)</label>
+                                                                                <?php
+                                                                                //echo $result_seSelfCheck['TIMESLEEPEXTRA']; 
+                                                                                if ($TIMESLEEPEXTRAHOURCHK3 == '0') {
+                                                                                    // echo '1';
+                                                                                ?>
+                                                                                    <input readonly style="height:40px;width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "" autocomplete="off">
+                                                                                <?php
+                                                                                }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง กรณีเท่ากับ 4 
+                                                                                    // echo '2';
+                                                                                    if ($TIMESLEEPEXTRAMINCHK3 == 'MG3') { //เช็คชนาที ต้องมากกว่า 30 นาที กรณีเท่ากับ 4เช็ค นาทีต่อ
+                                                                                ?>
+                                                                                    <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                <?php
+                                                                                    }else {
+                                                                                    ?>
+                                                                                    <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                    <?php
+                                                                                    }
+                                                                                ?>
+                                                                                    
+                                                                                <?php
+                                                                                }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HGG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง
+                                                                                    // echo '3';
+                                                                                ?>
+                                                                                    <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                
+                                                                                <?php
+                                                                                }else {
+                                                                                    // echo '4';
+                                                                                ?>
+                                                                                    <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                <?php
+                                                                                }
+                                                                                ?>
+                                                                                
+                                                                            </div>
+                                                                            <p style="color:red;">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการนอน(นอนเพิ่ม) </p>
+                                                                            <div class="col-lg-12" style="font-size: 14px;text-align: center">
+                                                                                <table style="background-color: #e7e7e7"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th style="width: 100%;text-align: center;" >ประเมิน(การนอนเพิ่ม)</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <td style="width: 100%;text-align: center;"> 
+                                                                                            <selfextrasleepyes>
+                                                                                                <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepyes" <?= $sleepextrayes ?> name="selfextrasleep" value="selfextrasleepyes">
+                                                                                                <label for="selfextrasleepyes">หลับสนิท</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                            </selfextrasleepyes>   
+                                                                                            <selfextrasleepno>
+                                                                                                <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepno" <?= $sleepextrano ?> name="selfextrasleep" value="selfextrasleepno">
+                                                                                                <label for="selfextrasleepno">หลับไม่สนิท</label>
+                                                                                            </selfextrasleepno>    
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                            <br><br>
+                                                                        </td>
+                                                                    <?php
+                                                                    }
+                                                                ?>
+                                                                    
+                                                                <?php
+                                                                }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HGG4'  && $sleepextrayes == 'checked') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง
+                                                                    // echo '3544';
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;">&#10004;</td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเริ่มพักผ่อน(กะกลางคืน)</u></label>
+                                                                            <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_extrastart" name="daysleep_extrastart"  value="<?= $DATESLEEPEXTRASTART ?>" min="" max="" autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาตื่นพักผ่อน(กะกลางคืน)</u></label>
+                                                                            <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_extraend" name="daysleep_extraend" value="<?= $DATESLEEPEXTRAEND ?>" min="" max=""  autocomplete="off">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>ปุ่มคำนวณเวลาการนอนเพิ่ม</u></label>
+                                                                            <button type="button" id="btn_timesleepextra" name="btn_timesleepextra" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfextracheck('<?=$result_seSelfCheck3['SELFCHECKID']?>');" >กดยืนยันเวลานอนเพิ่ม</button>
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label >ระยะเวลาที่นอน(กะกลางคืน)</label>
+                                                                            <?php
+                                                                            //echo $result_seSelfCheck['TIMESLEEPEXTRA']; 
+                                                                            if ($TIMESLEEPEXTRAHOURCHK3 == '0') {
+                                                                                // echo '1';
+                                                                            ?>
+                                                                                <input readonly style="height:40px;width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "" autocomplete="off">
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง กรณีเท่ากับ 4 
+                                                                                // echo '2';
+                                                                                if ($TIMESLEEPEXTRAMINCHK3 == 'MG3') { //เช็คชนาที ต้องมากกว่า 30 นาที กรณีเท่ากับ 4เช็ค นาทีต่อ
+                                                                            ?>
+                                                                                <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                                }else {
+                                                                                ?>
+                                                                                <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                <?php
+                                                                                }
+                                                                            ?>
+                                                                                
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HGG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง
+                                                                                // echo '3';
+                                                                            ?>
+                                                                                <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                            
+                                                                            <?php
+                                                                            }else {
+                                                                                // echo '4';
+                                                                            ?>
+                                                                                <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        </div>
+                                                                        <p style="color:red;">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการนอน(นอนเพิ่ม) </p>
+                                                                        <div class="col-lg-12" style="font-size: 14px;text-align: center">
+                                                                            <table style="background-color: #e7e7e7"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th style="width: 100%;text-align: center;" >ประเมิน(การนอนเพิ่ม)</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style="width: 100%;text-align: center;"> 
+                                                                                        <selfextrasleepyes>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepyes" <?= $sleepextrayes ?> name="selfextrasleep" value="selfextrasleepyes">
+                                                                                            <label for="selfextrasleepyes">หลับสนิท</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                        </selfextrasleepyes>   
+                                                                                        <selfextrasleepno>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepno" <?= $sleepextrano ?> name="selfextrasleep" value="selfextrasleepno">
+                                                                                            <label for="selfextrasleepno">หลับไม่สนิท</label>
+                                                                                        </selfextrasleepno>    
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <br><br>
+                                                                    </td>
+                                                                    
+                                                                <?php
+                                                                }else {
+                                                                    //เช็คชั่วโมง น้อยกว่า 4 ชั่วโมง
+                                                                    // echo '4544';
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาเริ่มพักผ่อน(กะกลางคืน)</u></label>
+                                                                            <input class="form-control dateen"   style="height:30px; width:170px;"  id="daysleep_extrastart" name="daysleep_extrastart"  value="<?= $DATESLEEPEXTRASTART ?>" min="" max="" autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>เวลาตื่นพักผ่อน(กะกลางคืน)</u></label>
+                                                                            <input class="form-control dateen"  style="height:30px; width:170px"    id="daysleep_extraend" name="daysleep_extraend" value="<?= $DATESLEEPEXTRAEND ?>" min="" max=""  autocomplete="off">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label ><u>ปุ่มคำนวณเวลาการนอนเพิ่ม</u></label>
+                                                                            <button type="button" id="btn_timesleepextra" name="btn_timesleepextra" style="font-size: 14px;text-align: center;height:40px; width:170px" class="btn btn-primary btn-lg" onclick ="timesleepselfextracheck('<?=$result_seSelfCheck3['SELFCHECKID']?>');" >กดยืนยันเวลานอนเพิ่ม</button>
+                                                                        </div>
+                                                                        <div class="col-lg-6" style="font-size: 14px;text-align: left"> 
+                                                                            <label >ระยะเวลาที่นอน(กะกลางคืน)</label>
+                                                                            <?php
+                                                                            //echo $result_seSelfCheck['TIMESLEEPEXTRA']; 
+                                                                            if ($TIMESLEEPEXTRAHOURCHK3 == '0') {
+                                                                                // echo '1';
+                                                                            ?>
+                                                                                <input readonly style="height:40px;width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "" autocomplete="off">
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง กรณีเท่ากับ 4 
+                                                                                // echo '2';
+                                                                                if ($TIMESLEEPEXTRAMINCHK3 == 'MG3') { //เช็คชนาที ต้องมากกว่า 30 นาที กรณีเท่ากับ 4เช็ค นาทีต่อ
+                                                                            ?>
+                                                                                <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                                }else {
+                                                                                ?>
+                                                                                <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                                <?php
+                                                                                }
+                                                                            ?>
+                                                                                
+                                                                            <?php
+                                                                            }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HGG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง
+                                                                                // echo '3';
+                                                                            ?>
+                                                                                <input readonly style="background-color: #94FA67;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                            
+                                                                            <?php
+                                                                            }else {
+                                                                                // echo '4';
+                                                                            ?>
+                                                                                <input readonly style="background-color: #FA6767;height:40px; width:170px" type="text" class="form-control" id="timesleep_extra" name="timesleep_extra" value= "<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>" autocomplete="off">
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        </div>
+                                                                        <p style="color:red;">*กดปุ่มยืนยันทุกครั้งที่มีการแก้ไขเวลา เพื่อคำนวณชั่วโมงการนอน(นอนเพิ่ม) </p>
+                                                                        <div class="col-lg-12" style="font-size: 14px;text-align: center">
+                                                                            <table style="background-color: #e7e7e7"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th style="width: 100%;text-align: center;" >ประเมิน(การนอนเพิ่ม)</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style="width: 100%;text-align: center;"> 
+                                                                                        <selfextrasleepyes>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepyes" <?= $sleepextrayes ?> name="selfextrasleep" value="selfextrasleepyes">
+                                                                                            <label for="selfextrasleepyes">หลับสนิท</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                        </selfextrasleepyes>   
+                                                                                        <selfextrasleepno>
+                                                                                            <input disabled="" style="height:30px; width:30px; vertical-align: middle;" type="radio" id="selfextrasleepno" <?= $sleepextrano ?> name="selfextrasleep" value="selfextrasleepno">
+                                                                                            <label for="selfextrasleepno">หลับไม่สนิท</label>
+                                                                                        </selfextrasleepno>    
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <br><br>
+                                                                    </td>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+
+                                                            <!-- อาการป่วย -->
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>3.อาการป่วย</b></td>
+                                                                <?php
+                                                                if ($diseasechk == 'OK') { // OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่มีอาการป่วย</td>
+                                                                <?php
+                                                                }else { //NG
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;<?=$result_seSelfCheck['DISEASE']?></td>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+
+                                                            <!-- เรื่องกังวลใจ -->
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>4.เรื่องกังวลใจ</b></td>
+                                                                <?php
+                                                                if ($worrychk == 'OK') { // OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่มีเรื่องกังวลใจ</td>
+                                                                <?php
+                                                                }else { //NG
+                                                                ?>
+                                                                    <?php
+                                                                    if ($worrychk == 'BLANK') {
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินเรื่องกังวลใจ</td>
+                                                                    <?php
+                                                                    }else{
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;มีเรื่องกังวลใจ</td>
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+
+                                                            <!-- การใช้เวลาช่วงพักผ่อน -->
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>5.การใช้เวลาช่วงพักผ่อน</b></td>
+                                                                <?php
+                                                                if ($householdchk == 'OK') { // OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ในบ้าน</td>
+                                                                <?php
+                                                                }else { //NG
+                                                                ?>
+                                                                    <?php
+                                                                    if ($householdchk == 'BLANK') {
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินการใช้เวลาช่วงพักผ่อน</td>
+                                                                    <?php
+                                                                    }else{
+                                                                    ?>  
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;นอกบ้าน</td>
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+
+                                                            <!-- ปัญหาสายตา/แว่นสายตา -->
+                                                            <tr>
+                                                                <td colspan = "12" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>6.ปัญหาสายตา/แว่นสายตา3</b></td>
+                                                            </tr>
+
+                                                            <!-- ปัญหาสายตา -->
+                                                            <!-- เฉพาะ RCC,RATC ที่อ้างอิงข้อมูลจาก TLEP -->
+                                                            <?php
+                                                            $sql_seComEmpChk3 = "SELECT Company_Code AS 'COMCHK' 
+                                                                FROM EMPLOYEEEHR2 
+                                                                WHERE PersonCode ='".$_GET['employeecode3']."'";
+                                                            $query_seComEmpChk3 = sqlsrv_query($conn, $sql_seComEmpChk3, $params_seComEmpChk3);
+                                                            $result_seComEmpChk3 = sqlsrv_fetch_array($query_seComEmpChk3, SQLSRV_FETCH_ASSOC);
+                                                            
+                                                            ?>
+                                                            
+                                                            <?php
+                                                            if ($result_seComEmpChk3['COMCHK'] == 'RCC' || $result_seComEmpChk3['COMCHK'] == 'RATC' || $result_seComEmpChk3['COMCHK'] == 'RIT' ) {
+                                                            ?>
+                                                                <?php
+                                                                $sql_seEyeproblem3 = "SELECT TOP 1 TLEP_WEARGLASSES
+                                                                    FROM  [dbo].[SIMULATORHISTORY] 
+                                                                    WHERE DRIVERCODE = '".$_GET['employeecode3']."'
+                                                                    ORDER BY TLEP_FOLLOWUP DESC";
+                                                                $query_seEyeproblem3 = sqlsrv_query($conn, $sql_seEyeproblem3, $params_seEyeproblem3);
+                                                                $result_seEyeproblem3 = sqlsrv_fetch_array($query_seEyeproblem3, SQLSRV_FETCH_ASSOC);
+                                                                ?>       
+
+
+                                                                <?php                                                   
+                                                                if ($result_seEyeproblem3['TLEP_WEARGLASSES'] == '1') {
+                                                                ?>
+                                                                    <!-- ถ้า TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบ OK จะเป็น NG -->
+                                                                    <tr>
+                                                                        <td colspan = "12" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px">
+                                                                            <br>
+                                                                            <label style="">การประเมินปัญหาสายตา TLEP พขร.3: <u><?=$result_seEyeproblem3['TLEP_WEARGLASSES']     == '1' ? 'มีปัญหาสายตา' : 'ไม่มีปัญหาสายตา' ?></u></label>
+                                                                            <br>
+                                                                            <label style="">การประเมินสวมแว่นสายตา TLEP พขร.3: <u><?=$result_seEyeproblem3['TLEP_WEARGLASSES']   == '1' ? 'ต้องสวมแว่นสายตา' : 'ไม่ต้องสวมแว่นสายตา' ?></u></label>
+                                                                            
+                                                                        </td>
+                                                                        
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1 ปัญหาสายตา <br>TLEP พขร.2</b></td>
+                                                                        <?php
+                                                                        if ($eyeproblemchk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;พขร. ประเมินว่าตนเองไม่มีปัญหาสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>  
+                                                                            <?php
+                                                                            if ($eyeproblemchk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินปัญหาสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                            <!-- else คือ กรณีที่ TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบว่าตนเองมีปัญหาสายตา จะเป็น OK -->
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;<?=$textshortsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textlongsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textobliquesight?></td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                    <!-- สวมใส่แว่นตา -->
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2 สวมใส่แว่นตา <br>TLEP พขร.3</b></td>
+                                                                        <?php
+                                                                        if ($eyeglasschk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;พขร. ประเมินว่าตนเองไม่ต้องสวมแว่นสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>
+                                                                            <?php
+                                                                            if ($eyeglasschk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินสวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;สวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                <?php
+                                                                }else {
+                                                                ?>
+                                                                    <!-- ถ้า TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบ OK จะเป็น NG -->
+                                                                    <tr>
+                                                                        <td colspan = "12" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px">
+                                                                            <br>
+                                                                            <label style="">การประเมินปัญหาสายตา TLEP พขร.3: <u><?=$result_seEyeproblem3['TLEP_WEARGLASSES']     == '1' ? 'มีปัญหาสายตา' : 'ไม่มีปัญหาสายตา' ?></u></label>
+                                                                            <br>
+                                                                            <label style="">การประเมินสวมแว่นสายตา TLEP พขร.3: <u><?=$result_seEyeproblem3['TLEP_WEARGLASSES']   == '1' ? 'ต้องสวมแว่นสายตา' : 'ไม่ต้องสวมแว่นสายตา' ?></u></label>
+                                                                            
+                                                                        </td>
+                                                                        
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1 ปัญหาสายตา <br>TLEP พขร.3</b></td>
+                                                                        <?php
+                                                                        if ($eyeproblemchk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่มีปัญหาสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>  
+                                                                            <?php
+                                                                            if ($eyeproblemchk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินปัญหาสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                            <!-- else คือ กรณีที่ TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบว่าตนเองมีปัญหาสายตา จะเป็น OK -->
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;<?=$textshortsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textlongsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textobliquesight?></td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                    <!-- สวมใส่แว่นตา -->
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2 สวมใส่แว่นตา <br>TLEP พขร.3</b></td>
+                                                                        <?php
+                                                                        if ($eyeglasschk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่สวมแว่นสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>
+                                                                            <?php
+                                                                            if ($eyeglasschk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินสวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;สวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                <?php
+                                                                }
+                                                                ?>
+
+                                                            <?php
+                                                            }else if ($result_seComEmpChk3['COMCHK'] == 'RRC') {
+                                                            ?>
+                                                                <?php
+                                                                $sql_seEyeproblem3 = "SELECT TOP 1 SHORTSIGHT,LONGSIGHT,OBLIQUESIGHT 
+                                                                FROM HEALTHHISTORY 
+                                                                WHERE CREATEYEAR ='".date("Y")."'
+                                                                AND EMPLOYEECODE ='".$_GET['employeecode3']."'";
+                                                                $query_seEyeproblem3 = sqlsrv_query($conn, $sql_seEyeproblem3, $params_seEyeproblem3);
+                                                                $result_seEyeproblem3 = sqlsrv_fetch_array($query_seEyeproblem3, SQLSRV_FETCH_ASSOC);
+                                                                
+                                                                if ($result_seEyeproblem3['SHORTSIGHT'] == '1' || $result_seEyeproblem3['LONGSIGHT'] == '1' || $result_seEyeproblem3['OBLIQUESIGHT'] == '1') {
+                                                                    $eyecheck3 = '1';
+                                                                }else {
+                                                                    $eyecheck3 = '0';
+                                                                }
+                                                                
+                                                                ?>       
+
+
+                                                                <?php                                                   
+                                                                if ($eyecheck3 == '1') {
+                                                                ?>
+                                                                    <!-- ถ้า TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบ OK จะเป็น NG -->
+                                                                    <tr>
+                                                                        <td colspan = "12" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px">
+                                                                            <label style=""><u>สายงาน RRC ประเมินจากการตรวจสุขภาพประจำปี</u></label>
+                                                                            <br>
+                                                                            <label style="">การประเมินปัญหาสายตา RRC พขร.2: <u><?=$eyecheck3 == '1' ? 'มีปัญหาสายตา' : 'ไม่มีปัญหาสายตา' ?></u></label>
+                                                                            <br>
+                                                                            <label style="">การประเมินสวมแว่นสายตา RRC พขร.2: <u><?=$eyecheck3  == '1' ? 'ต้องสวมแว่นสายตา' : 'ไม่ต้องสวมแว่นสายตา' ?></u></label>
+                                                                            
+                                                                        </td>
+                                                                        
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1 ปัญหาสายตา <br>RRC พขร.3</b></td>
+                                                                        <?php
+                                                                        if ($eyeproblemchk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;พขร. ประเมินว่าตนเองไม่มีปัญหาสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>  
+                                                                            <?php
+                                                                            if ($eyeproblemchk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินปัญหาสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                            <!-- else คือ กรณีที่ TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบว่าตนเองมีปัญหาสายตา จะเป็น OK -->
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;<?=$textshortsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textlongsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textobliquesight?></td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                    <!-- สวมใส่แว่นตา -->
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2 สวมใส่แว่นตา <br>RRC พขร.3</b></td>
+                                                                        <?php
+                                                                        if ($eyeglasschk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;พขร. ประเมินว่าตนเองไม่ต้องสวมแว่นสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>
+                                                                            <?php
+                                                                            if ($eyeglasschk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินสวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;สวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                <?php
+                                                                }else {
+                                                                ?>
+                                                                    <!-- ถ้า TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบ OK จะเป็น NG -->
+                                                                    <tr>
+                                                                        <td colspan = "12" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px">
+                                                                            <label style=""><u>สายงาน RRC ประเมินจากการตรวจสุขภาพประจำปี</u></label>
+                                                                            <br>
+                                                                            <label style="">การประเมินปัญหาสายตา RRC พขร.3: <u><?=$eyecheck2 == '1' ? 'มีปัญหาสายตา' : 'ไม่มีปัญหาสายตา' ?></u></label>
+                                                                            <br>
+                                                                            <label style="">การประเมินสวมแว่นสายตา RRC พขร.3: <u><?=$eyecheck2  == '1' ? 'ต้องสวมแว่นสายตา' : 'ไม่ต้องสวมแว่นสายตา' ?></u></label>
+                                                                            
+                                                                        </td>
+                                                                        
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1 ปัญหาสายตา <br>RRC พขร.3</b></td>
+                                                                        <?php
+                                                                        if ($eyeproblemchk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่มีปัญหาสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>  
+                                                                            <?php
+                                                                            if ($eyeproblemchk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินปัญหาสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                            <!-- else คือ กรณีที่ TLEP ประเมินว่าสวมแว่นตา และพนักงานตอบว่าตนเองมีปัญหาสายตา จะเป็น OK -->
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;<?=$textshortsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textlongsight?><br>
+                                                                                                                                                            &nbsp;&nbsp;<?=$textobliquesight?></td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                    <!-- สวมใส่แว่นตา -->
+                                                                    <tr>
+                                                                        <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2 สวมใส่แว่นตา <br>RRC พขร.2</b></td>
+                                                                        <?php
+                                                                        if ($eyeglasschk == 'OK') { // OK
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่สวมแว่นสายตา</td>
+                                                                        <?php
+                                                                        }else { //NG
+                                                                        ?>
+                                                                            <?php
+                                                                            if ($eyeglasschk == 'BLANK') {
+                                                                            ?>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินสวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }else{
+                                                                            ?>  
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                                <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                                <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;สวมแว่นสายตา</td>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </tr>
+                                                                <?php
+                                                                }
+                                                                ?>
+    
+                                                            <?php
+                                                            }else{
+                                                            ?>
+                                                                <tr>
+                                                                    <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1 ปัญหาสายตา</b></td>
+                                                                    <?php
+                                                                    if ($eyeproblemchk == 'OK') { // OK
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่มีปัญหาสายตา</td>
+                                                                    <?php
+                                                                    }else { //NG
+                                                                    ?>
+                                                                        <?php
+                                                                        if ($eyeproblemchk == 'BLANK') {
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินปัญหาสายตา</td>
+                                                                        <?php
+                                                                        }else{
+                                                                        ?>  
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;<?=$textshortsight?><br>
+                                                                                                                                                        &nbsp;&nbsp;<?=$textlongsight?><br>
+                                                                                                                                                        &nbsp;&nbsp;<?=$textobliquesight?></td>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+                                                                </tr>
+
+                                                                <!-- สวมใส่แว่นตา -->
+                                                                <tr>
+                                                                    <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2 สวมใส่แว่นตา</b></td>
+                                                                    <?php
+                                                                    if ($eyeglasschk == 'OK') { // OK
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่สวมแว่นสายตา</td>
+                                                                    <?php
+                                                                    }else { //NG
+                                                                    ?>
+                                                                        <?php
+                                                                        if ($eyeglasschk == 'BLANK') {
+                                                                        ?>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินสวมแว่นสายตา</td>
+                                                                        <?php
+                                                                        }else{
+                                                                        ?>  
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                            <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                            <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;สวมแว่นสายตา</td>
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+                                                                </tr>
+
+
+                                                            <?php
+                                                            }
+                                                            ?>   
+
+                                                            <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px;"><b>6.3. สวมใส่เครื่องช่วยฟัง</b></td>
+                                                                <?php
+                                                                if ($carryhearingaidchk == 'OK') { // OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่สวมเครื่องช่วยฟัง</td>
+                                                                <?php
+                                                                }else { //NG
+                                                                ?>
+                                                                    <?php
+                                                                    if ($carryhearingaidchk == 'BLANK') {
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินการสวมเครื่องช่วยฟัง</td>
+                                                                    <?php
+                                                                    }else{
+                                                                    ?>  
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;สวมเครื่องช่วยฟัง</td>
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+
+                                                                    
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+                                                            
+                                                            
+
+                                                            <!-- พกแว่นสายตามาปฎิบัติงาน -->
+                                                            <!-- <tr>
+                                                                <td colspan = "6" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.3 พกแว่นสายตามาปฎิบัติงาน</b></td>
+                                                                <?php
+                                                                if ($carryeyeglasschk == 'OK') { // OK
+                                                                ?>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                                    <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                    <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;พกแว่นสายตา</td>
+                                                                <?php
+                                                                }else { //NG
+                                                                ?>
+                                                                    <?php
+                                                                    if ($carryeyeglasschk == 'BLANK') {
+                                                                    ?>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;"></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left;background-color: #FA9F9F;">&nbsp;&nbsp;ยังไม่ได้ประเมินพกแว่นสายตา</td>
+                                                                    <?php
+                                                                    }else{
+                                                                    ?>  
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"></td>
+                                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                                        <td colspan ="4" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;&nbsp;ไม่พกแว่นสายตา</td>
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tr> -->
+
+                                                            <!-- ขั้น td -->
+                                                            <tr>
+                                                                <td colspan ="12" style="background-color: #ffffff;border:1px solid black;font-size: 16px;border-collapse: collapse;text-align: left;padding: 5px"><br></td>
+                                                            </tr>
+                                                            <!-- ข้อมูลบันทึกและยืนยันโดยเจ้าหน้าที่ -->
+                                                            <tr>
+                                                                <td colspan ="7" style="background-color: #f0c402;border:1px solid black;font-size: 15px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;บันทึกและยืนยันข้อมูล พขร.3</b></td>
+                                                                <td colspan ="5" style="background-color: #f0c402;border:1px solid black;font-size: 15px;text-align: left;<?= $confirmcolorchk3 ?>">&nbsp;&nbsp;<b>ผู้ยืนยันข้อมูล:</b> <?= $result_seSelfCheckShow3['CONFIRMEDBY'] ?>&nbsp;&nbsp;<b>ยืนยันข้อมูลล่าสุด:</b> <?=$result_seSelfCheckShow3['CFDATE']?> <?=$result_seSelfCheckShow3['CFTIME']?> </td>
+                                                                
+                                                            </tr>
+                                                            <!-- ข้อมูลวันที่ -->
+                                                            <tr>
+                                                                <td colspan ="7" style="background-color: #f0c402;border:1px solid black;font-size: 15px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ข้อมูลวันที่</b></td>
+                                                                <td colspan ="5" style="background-color: #f0c402;border:1px solid black;font-size: 15px;text-align: left;<?= $datecolorchk3 ?>">&nbsp;&nbsp;<b>DATEWORKING:</b> <?= $result_seSelfCheckShow3['DATEWORKING'] ?>&nbsp;&nbsp;<b>DATEPRESENT:</b> <?=$result_seSelfCheckShow3['DATEPRESENT']?></td>
+                                                                
+                                                            </tr>
+                                                        </table>
+                                                        <table>
+                                                            <tr>
+                                                                <td colspan ="7" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;width:235px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;อุณภูมิ3</b></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;width:185px;text-align: left;<?= $tempcolorchk2 ?>">&nbsp;&nbsp;<?= $result_seSelfCheckShow3['TEMPERATURE'] ?></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;width:186px;text-align: left;">&nbsp;&nbsp;<b>ออกซิเจนในเลือด</b></td>   
+                                                                <td colspan ="1" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;width:186px;text-align: left;<?= $oxygencolorchk2 ?>">&nbsp;&nbsp;<?= $result_seSelfCheckShow3['OXYGENVALUE'] ?></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan ="7" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ความดันบน</b></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;<?= $syscolorchk2 ?>">&nbsp;&nbsp;<b>ครั้งที่ 1:</b> <?= $result_seSelfCheckShow3['SYSVALUE1'] ?></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;">&nbsp;&nbsp;<b>ครั้งที่ 2:</b> <?= $result_seSelfCheckShow3['SYSVALUE2'] ?></td>
+                                                                <td colspan ="1" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;">&nbsp;&nbsp;<b>ครั้งที่ 3:</b> <?= $result_seSelfCheckShow3['SYSVALUE3'] ?></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan ="7" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ความดันล่าง</b></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;<?= $diacolorchk2 ?>">&nbsp;&nbsp;<b>ครั้งที่ 1:</b> <?= $result_seSelfCheckShow3['DIAVALUE1'] ?></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;">&nbsp;&nbsp;<b>ครั้งที่ 2:</b> <?= $result_seSelfCheckShow3['DIAVALUE2'] ?></td>
+                                                                <td colspan ="1" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;">&nbsp;&nbsp;<b>ครั้งที่ 3:</b> <?= $result_seSelfCheckShow3['DIAVALUE3'] ?></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan ="7" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;อัตราเต้นหัวใจ</b></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;<?= $pulsecolorchk2 ?>">&nbsp;&nbsp;<b>ครั้งที่ 1:</b> <?= $result_seSelfCheckShow3['PULSEVALUE1'] ?></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;">&nbsp;&nbsp;<b>ครั้งที่ 2:</b> <?= $result_seSelfCheckShow3['PULSEVALUE2'] ?></td>
+                                                                <td colspan ="1" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;">&nbsp;&nbsp;<b>ครั้งที่ 3:</b> <?= $result_seSelfCheckShow3['PULSEVALUE3'] ?></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan ="7" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;border-collapse: collapse;text-align: left;padding: 5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;แอลกอฮอล์</b></td>
+                                                                <td colspan ="2" style="background-color: #e7e7e7;border:1px solid black;font-size: 15px;text-align: left;<?= $alcoholcolorchk2 ?>">&nbsp;&nbsp;<b>ปริมาณ:</b>&nbsp;&nbsp; <?= $result_seSelfCheckShow3['ALCOHOLVOLUME'] ?></td>
+                                                            </tr>
+                                                        </table>
+                                                        <div class = "col-lg-12" style="text-align: left;">
+                                                            <label ><font color="red">* กรณีข้อมูลไม่แสดงให้กด ตรวจสอบข้อมูลอีกครั้ง</font></label>
+                                                        </div>
+                                                        <div class="col-lg-12" style="text-align: left;">
+                                                            <button type="button" style= "height:40px;width:300px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="recheck_driver3('<?=$result_seSelfCheckShow3['SELFCHECKID']?>','EMP3')">ตรวจสอบข้อมูลอีกครั้ง พนักงานที่3</button>
+                                                        </div>
+                                                        <div class = "row" style="height: 95px;width: 100%;">
+                                                            <label ></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <div class = "row">
+                                            <label ></label>
+                                        </div>
+                                        <div class = "row">
+                                            <label ></label>
+                                        </div>
+                                        <!-- วันที่เริ่มปฎิบัติงานพขร3 -->
+                                        <div class="col-lg-6" >
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading" style="background-color: #6fa8dc;">
+                                                <?php
+                                                // $result_seSelfCheck['CREATEDATE']
+                                                $date = $result_seSelfCheckShow3['CREATEDATESHOW'];
+                                                // $date = '15/02/2023';
+                                                // $date = '2023-02-15'; // sunday
+                                                //  echo date("Y-m-d", strtotime('monday this week', strtotime($date))), "\n";   
+                                                //  echo date("Y-m-d", strtotime('sunday this week', strtotime($date))), "\n";
+                                                
+                                                $datestartchk =  date("d/m/Y", strtotime('monday this week',    strtotime($date)));
+                                                $dateendchk   =  date("d/m/Y", strtotime('saturday this week',  strtotime($date)));
+
+                                                if ($checkArea == 'RKS' || $checkArea == 'RKR' || $checkArea == 'RKL') {
+                                                    // AMT +- 30 Minute
+                                                    $sql_seFixStartTimeChk = "SELECT TOP 1 SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPRESTEND,
+                                                        SUBSTRING(SLEEPRESTEND, 12, 16) AS 'TIME',
+                                                        CONVERT(CHAR(16), DATEADD(HH,-30, REPLACE(SLEEPRESTEND, 'T', ' ')), 121) AS 'DATETIME_START',
+                                                        CONVERT(CHAR(16), DATEADD(HH,+30, REPLACE(SLEEPRESTEND, 'T', ' ')), 121) AS 'DATETIME_END',
+                                                        CONVERT(CHAR(5), DATEADD(MINUTE,-30, REPLACE(SLEEPRESTEND, 'T', ' ')), 108) AS 'TIME_START',
+                                                        CONVERT(CHAR(5), DATEADD(MINUTE,+30, REPLACE(SLEEPRESTEND, 'T', ' ')), 108) AS 'TIME_END',
+                                                        ROW_NUMBER() OVER(ORDER BY SLEEPRESTEND ASC)  AS 'ROWCHK'
+                                                        FROM DRIVERSELFCHECK 
+                                                        WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+                                                        AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datestartchk."',103) AND CONVERT(DATE,'".$dateendchk."',103)
+                                                        AND ACTIVESTATUS ='1'
+                                                        ORDER BY CREATEDATE ASC";
+                                                }else{
+                                                    // GW +- 2 Hour
+                                                    $sql_seFixStartTimeChk = "SELECT TOP 1 SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPRESTEND,
+                                                        SUBSTRING(SLEEPRESTEND, 12, 16) AS 'TIME',
+                                                        CONVERT(CHAR(16), DATEADD(HH,-2, REPLACE(SLEEPRESTEND, 'T', ' ')), 121) AS 'DATETIME_START',
+                                                        CONVERT(CHAR(16), DATEADD(HH,+2, REPLACE(SLEEPRESTEND, 'T', ' ')), 121) AS 'DATETIME_END',
+                                                        CONVERT(CHAR(5), DATEADD(HH,-2, REPLACE(SLEEPRESTEND, 'T', ' ')), 108) AS 'TIME_START',
+                                                        CONVERT(CHAR(5), DATEADD(HH,+2, REPLACE(SLEEPRESTEND, 'T', ' ')), 108) AS 'TIME_END',
+                                                        ROW_NUMBER() OVER(ORDER BY SLEEPRESTEND ASC)  AS 'ROWCHK'
+                                                        FROM DRIVERSELFCHECK 
+                                                        WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+                                                        AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datestartchk."',103) AND CONVERT(DATE,'".$dateendchk."',103)
+                                                        AND ACTIVESTATUS ='1'
+                                                        ORDER BY CREATEDATE ASC";
+                                                }
+                                                
+                                                $query_seFixStartTimeChk = sqlsrv_query($conn, $sql_seFixStartTimeChk, $params_seFixStartTimeChk);
+                                                $result_seFixStartTimeChk = sqlsrv_fetch_array($query_seFixStartTimeChk, SQLSRV_FETCH_ASSOC);
+
+                                                    $start =  str_replace(" ","T",$result_seFixStartTimeChk['TIME_START']);
+                                                // echo "<br>"; 
+                                                    $end = str_replace(" ","T",$result_seFixStartTimeChk['TIME_END']);
+                                                // echo "<br>";
+
+                                                 // check คือ check เวลาเริ่มต้นสัปดาห์ว่ามากกว่า เที่ยงคืน (00:00)หรือไม่
+                                                // strtotime ของเวลา 00:00 คือ 1711731600 หรือ substr แล้ว เท่ากับ 00
+                                                // $check = strtotime($result_seFixStartTimeChk['TIME']);
+                                                // echo "<br>";
+                                                $check = substr($result_seFixStartTimeChk['TIME'],0,2);
+
+                                                // echo $check = strtotime('08:41');
+                                                // echo "<br>";
+                                                // echo   $datestart =  str_replace(" ","T",$result_seFixStartTimeChk['DATETIME_START']);
+                                                // echo "<br>";
+                                                // echo   $dateend = str_replace(" ","T",$result_seFixStartTimeChk['DATETIME_END']);
+                                                // echo "<br>";
+                                                
+                                                ?>
+                                                <label><font style="font-size: 16px">วันที่เริ่มปฎิบัติงาน (<?=  $datestartchk?> - <?=$dateendchk?>)</font></label>
+                                                </div>
+                                                <!-- /.panel-heading -->
+                                                <div class="panel-body">
+                                                    <label><font style="font-size: 16px">Fix Start Time พขร.3 (<?=  $result_seFixStartTimeChk['TIME_START']?> - <?=$result_seFixStartTimeChk['TIME_END']?>)</font></label>
+                                                    <div class = "row">
+                                                        <div class="col-lg-12">
+                                                            <div class="panel-body">
+                                                                <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th style="text-align: center;font-size:16px">ลำดับ</th>
+                                                                            <th style="text-align: center;font-size:16px">วันที่ และเวลา (เริ่มปฎิบัติงาน)</th>
+                                                                            
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    <?php
+                                                                        
+                                                                        $i = 1;
+
+                                                                        
+                                                                        // $sql_seTimeWorking = "SELECT SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPRESTEND,
+                                                                        // SUBSTRING(SLEEPRESTEND, 0, 12) AS 'SLEEPDATECHK',
+                                                                        // SUBSTRING(SLEEPRESTEND, 12, 16) AS 'TIME',
+                                                                        // CONVERT(CHAR(10), DATEADD(HH,-2, REPLACE(SLEEPRESTEND, 'T', ' ')), 121) AS 'DATETIME_START',
+                                                                        // CONVERT(CHAR(10), DATEADD(HH,+2, REPLACE(SLEEPRESTEND, 'T', ' ')), 121) AS 'DATETIME_END'
+                                                                        // FROM DRIVERSELFCHECK 
+                                                                        // WHERE EMPLOYEECODE ='".$_GET['employeecode1']."'
+                                                                        // AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datestartchk."',103) AND CONVERT(DATE,'".$dateendchk."',103)
+                                                                        // AND ACTIVESTATUS ='1'
+                                                                        // ORDER BY CREATEDATE ASC";
+
+                                                                        if ($checkArea == 'RKS' || $checkArea == 'RKR' || $checkArea == 'RKL') {
+                                                                            // $query_seTimeWorking = sqlsrv_query($conn, $sql_seTimeWorking, $params_seTimeWorking);
+                                                                            // ใช้เวลาของวันที่ TOP 1 มาเป็นเงื่อนไขเช็ค
+                                                                            // ถ้า check คือเวลาของวันที่แรกที่ทำงานของสัปดาห์ มากกว่า 00:00 จะต้อง +0 hrs ของ DATETIME_START และ +24 hrs ไปใน  DATETIME_END 
+                                                                            // 1711731600 คือเวลาเที่ยงคืน 
+                                                                            if ($check == '00') {
+                                                                                $sql_seTimeWorking = "SELECT SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPRESTEND,
+                                                                                    SUBSTRING(SLEEPRESTEND, 0, 12) AS 'SLEEPDATECHK',
+                                                                                    SUBSTRING(SLEEPRESTEND, 12, 16) AS 'TIME',
+                                                                                    CONVERT(CHAR(10), DATEADD(MINUTE,-30, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_START',
+                                                                                    CONVERT(CHAR(10), DATEADD(MINUTE,+30, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_END'
+                                                                                    FROM DRIVERSELFCHECK 
+                                                                                    WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+                                                                                    AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datestartchk."',103) AND CONVERT(DATE,'".$dateendchk."',103)
+                                                                                    AND ACTIVESTATUS ='1'
+                                                                                    ORDER BY CREATEDATE ASC";
+                                                                            }else {
+                                                                                $sql_seTimeWorking = "SELECT SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPRESTEND,
+                                                                                    SUBSTRING(SLEEPRESTEND, 0, 12) AS 'SLEEPDATECHK',
+                                                                                    SUBSTRING(SLEEPRESTEND, 12, 16) AS 'TIME',
+                                                                                    CONVERT(CHAR(10), DATEADD(MINUTE,-30, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_START',
+                                                                                    CONVERT(CHAR(10), DATEADD(MINUTE,+30, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_END'
+                                                                                    FROM DRIVERSELFCHECK 
+                                                                                    WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+                                                                                    AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datestartchk."',103) AND CONVERT(DATE,'".$dateendchk."',103)
+                                                                                    AND ACTIVESTATUS ='1'
+                                                                                    ORDER BY CREATEDATE ASC";
+                                                                            }
+                                                                        }else {
+                                                                            
+                                                                            // $query_seTimeWorking = sqlsrv_query($conn, $sql_seTimeWorking, $params_seTimeWorking);
+                                                                            // ใช้เวลาของวันที่ TOP 1 มาเป็นเงื่อนไขเช็ค
+                                                                            // ถ้า check คือเวลาของวันที่แรกที่ทำงานของสัปดาห์ มากกว่า 00:00 จะต้อง +0 hrs ของ DATETIME_START และ +24 hrs ไปใน  DATETIME_END 
+                                                                            // 1711731600 คือเวลาเที่ยงคืน 
+                                                                            if ($check == '00') {
+                                                                                $sql_seTimeWorking = "SELECT SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPRESTEND,
+                                                                                    SUBSTRING(SLEEPRESTEND, 0, 12) AS 'SLEEPDATECHK',
+                                                                                    SUBSTRING(SLEEPRESTEND, 12, 16) AS 'TIME',
+                                                                                    CONVERT(CHAR(10), DATEADD(HH,-0, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_START',
+                                                                                    CONVERT(CHAR(10), DATEADD(HH,+24, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_END'
+                                                                                    FROM DRIVERSELFCHECK 
+                                                                                    WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+                                                                                    AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datestartchk."',103) AND CONVERT(DATE,'".$dateendchk."',103)
+                                                                                    AND ACTIVESTATUS ='1'
+                                                                                    ORDER BY CREATEDATE ASC";
+                                                                            }else {
+                                                                                $sql_seTimeWorking = "SELECT SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPRESTEND,
+                                                                                    SUBSTRING(SLEEPRESTEND, 0, 12) AS 'SLEEPDATECHK',
+                                                                                    SUBSTRING(SLEEPRESTEND, 12, 16) AS 'TIME',
+                                                                                    CONVERT(CHAR(10), DATEADD(HH,-2, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_START',
+                                                                                    CONVERT(CHAR(10), DATEADD(HH,+2, SUBSTRING(SLEEPRESTEND, 0, 11))+' '+'".$result_seFixStartTimeChk['TIME']."', 121) AS 'DATETIME_END'
+                                                                                    FROM DRIVERSELFCHECK 
+                                                                                    WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+                                                                                    AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datestartchk."',103) AND CONVERT(DATE,'".$dateendchk."',103)
+                                                                                    AND ACTIVESTATUS ='1'
+                                                                                    ORDER BY CREATEDATE ASC";
+                                                                            }
+
+                                                                        }
+                                                                                
+                                                                        
+
+                                                                        $query_seTimeWorking = sqlsrv_query($conn, $sql_seTimeWorking, $params_seTimeWorking);
+                                                                        while ($result_seTimeWorking = sqlsrv_fetch_array($query_seTimeWorking, SQLSRV_FETCH_ASSOC)) {
+                                                                            
+                                                                            // echo $startchk = $result_seTimeWorking['SLEEPDATECHK'].$start;
+                                                                            // echo "<br>";
+                                                                            // echo $endchk = $result_seTimeWorking['SLEEPDATECHK'].$end;
+                                                                            // echo "<br>";
+                                                                            // echo $result_seTimeWorking['DATETIME_END1'];
+                                                                            // echo "<br>";
+
+                                                                                $startchk = strtotime($result_seTimeWorking['DATETIME_START']."T".$start);
+                                                                            // echo "&nbsp";echo "&nbsp";
+                                                                            // echo "<br>";
+                                                                                $endchk = strtotime($result_seTimeWorking['DATETIME_END']."T".$end);
+                                                                            // echo "<br>";
+                                                                            // echo strtotime($result_seTimeWorking['SLEEPRESTEND']);
+                                                                            // echo "<br>";
+                                                                            // echo "------------------";
+                                                                          
+                                                                            // check คือ ค่า strtotime ของวันที่แรกของการทำงานในสัปดาห์ ที่มากกว่า 00:00
+                                                                            // 1711731600 คือเวลาเที่ยงคืน
+                                                                            // กรณีที่ 1 คือ กรณีที่เวลา ของวันแรกเกิน 00:00 และ จะต้องไม่ใช่วันแรกของสัปดาห์ หรือ top 1 selfcheck of week
+                                                                            if ($check == '00' && ($result_seFixStartTimeChk['SELFCHECKID'] != $result_seTimeWorking['SELFCHECKID'] )) {
+                                                                                // echo ":L";
+                                                                                // echo "<br>";
+                                                                                // echo $result_seTimeWorking['SELFCHECKID'];
+                                                                                // echo "<br>";
+
+                                                                                // check วันที่ลำดับต่อมาว่า เวลามาปฎิบัติงานต้องไม่น้อยกว่า (เร็วกว่า) START TIME และ หรือ ต้องไม่มากกว่า END TIME
+                                                                                // ถ้า น้อยกว่า หรือ มากกว่า จะเป็นกรณี NG ทันที
+                                                                                if(strtotime($result_seTimeWorking['SLEEPRESTEND']) < $startchk ||  strtotime($result_seTimeWorking['SLEEPRESTEND']) > $endchk) {
+                                                                                    // ng
+                                                                                    // echo "NG";
+                                                                                    // echo "<br>";
+                                                                                    $trcolor = 'style="background-color: #FA6767"';
+                                                                                }else {
+                                                                                    
+                                                                                    // ok
+                                                                                    // echo "OK";
+                                                                                    // echo "<br>";
+                                                                                    $trcolor = '';
+                                                                                }
+                                                                            }else {
+                                                                                // กรณีต่อมาคือ เคสปกติที่วันที่ปฎิบัติงานในวันแรก ไม่เกิน 00:00 
+                                                                                // check between วันที่ปฎิบัติงานจะต้อง มากกว่า START TIME และ น้อยกว่า END TIME 
+                                                                                // ถ้าเข้าเงื่อนไขนี้แสดงว่า ไม่ได้มาก่อน หรือ มาหลัง Fix Start Time จะเป็นกรณี OK ทันที
+                                                                                if(strtotime($result_seTimeWorking['SLEEPRESTEND']) >= $startchk &&  strtotime($result_seTimeWorking['SLEEPRESTEND']) <= $endchk) {
+                                                                                    // echo ":R";
+                                                                                    // echo "<br>";
+                                                                                    // ok
+                                                                                    // echo "OK";
+                                                                                    // echo "<br>";
+                                                                                    $trcolor = '';
+                                                                                }else {
+                                                                                    // กรณีต่อมา check ว่าเวลาในการปฎิบัติงานในวันแรก มากกว่า 00:00 หรือไม่
+                                                                                    // และเป็นกรณีข้ามวัน เช่น ทำงานวันที่ 27 (ทำงาน),28(ไม่ได้ทำงาน),29 (ทำงาน)
+                                                                                    if ($check == '00') {
+                                                                                        // echo ":U";
+                                                                                        // echo "<br>";
+                                                                                        // ถ้า เวลาในการปฎิบัติงานในวันแรก มากกว่า 00:00
+                                                                                        // จะเช็คว่า เวลาปฎิบัติงาน น้อยกว่า START DATE หรือไม่ ถ้า น้อยว่า จะ OK ถ้ามากกว่าจะ NG
+                                                                                        // ตัวอย่างเช่น เวลาปฎิบัติงานวันที่ 27= 00:02,28 =(ไม่ได้ทำงาน),29 ='23:00' และ Fix Start Time (GW) คือ 22:02-02:02 
+                                                                                        // ตัวอย่างนี้ เวลาในการปฎิบัติงานในวันแรก จะน้อยกว่า เวลา Start ของ Fix Start Time ตามหลักสากล เวลา 00:02 จะมาก่อน(น้อยกว่า) เวลา 22:02
+                                                                                        if (strtotime($result_seTimeWorking['SLEEPRESTEND']) <= $startchk) {
+                                                                                            // ok
+                                                                                            // echo "OK";
+                                                                                            // echo "<br>";
+                                                                                            $trcolor = '';
+                                                                                        }else{
+                                                                                            // ng
+                                                                                            // echo "NG";
+                                                                                            // echo "<br>";
+                                                                                            $trcolor = 'style="background-color: #FA6767"';
+                                                                                        }
+                                                                                        
+                                                                                    }else {
+                                                                                        // เคสอื่นๆ จะเป็น NG ทั้งหมด
+                                                                                        // echo ":E";
+                                                                                        // echo "<br>";
+                                                                                        // ng
+                                                                                        // echo "NG";
+                                                                                        // echo "<br>";
+                                                                                        $trcolor = 'style="background-color: #FA6767"';
+                                                                                    }
+                                                                                    
+                                                                                }
+                                                                            }
+                                                                                    
+                                                                            
+                                                                                
+
+                                                                                
+
+                                                                            $startworkchk = date_create($result_seTimeWorking['SLEEPRESTEND']);
+                                                                            $startwork =  date_format($startworkchk,"d/m/Y H:i");
+                                                                    ?>
+                                                                    
+                                                                        <tr <?= $trcolor?> >
+                                                                            <td style="text-align: center;font-size:14px"><?= $i ?></td>
+                                                                            <td style="text-align: center;font-size:14px"><?= $startwork ?></td>
+                                                                        </tr> 
+
+                                                                    <?php
+                                                                        $i++;
+                                                                    }
+                                                                    ?>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <!-- ข้อมูลเวลานอนหลับ  -->  
+                                         <div class="col-lg-6" >
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading" style="background-color: #7cc859;">
+                                                <?php
+                                                // $result_seSelfCheck['CREATEDATE']
+                                                $datenormal = $result_seSelfCheckShow3['CREATEDATESHOW'];
+                                                // $date = '15/02/2023';
+                                                // $date = '2023-02-15'; // sunday
+                                                //  echo date("Y-m-d", strtotime('monday this week', strtotime($date))), "\n";   
+                                                //  echo date("Y-m-d", strtotime('sunday this week', strtotime($date))), "\n";
+                                                
+                                                $datenormalstartchk =  date("d/m/Y", strtotime('monday this week',    strtotime($datenormal)));
+                                                $datenormalendchk   =  date("d/m/Y", strtotime('saturday this week',  strtotime($datenormal)));
+
+                                                ?>
+                                                <label><font style="font-size: 16px">ข้อมูลเวลานอนหลับ (<?=  $datenormalstartchk?> - <?=$datenormalendchk?>)</font></label>
+                                                </div>
+                                                <!-- <div><br></div> -->
+                                                <!-- /.panel-heading -->
+                                                <div class="panel-body">
+                                                    <label for=""></label>
+                                                    <div class = "row">
+                                                        <div class="col-lg-12">
+                                                            <div class="panel-body">
+                                                                <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th style="text-align: center;font-size:16px">ลำดับ</th>
+                                                                            <th style="text-align: center;font-size:16px">วันที่และเวลา (เริ่มนอน)</th>
+                                                                            <th style="text-align: center;font-size:16px">วันที่และเวลา (ตื่นนอน)</th>
+                                                                            <th style="text-align: center;font-size:16px">รวมเวลา</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    <?php
+                                                                        
+                                                                        $i = 1;
+
+                                                                        // $sql_seTimeWorking = "SELECT SELFCHECKID,EMPLOYEECODE,CREATEDATE,REPLACE(SLEEPRESTEND, 'T', '   ') AS 'DATETIME' 
+                                                                        $sql_seTimeNormal = "SELECT SELFCHECKID,EMPLOYEECODE,CREATEDATE,SLEEPNORMALSTART,SLEEPNORMALEND,TIMESLEEPNORMAL
+                                                                        FROM DRIVERSELFCHECK 
+                                                                        WHERE EMPLOYEECODE ='".$_GET['employeecode3']."'
+																		AND ACTIVESTATUS ='1'
+                                                                        AND CONVERT(DATE,CREATEDATE,103) BETWEEN CONVERT(DATE,'".$datenormalstartchk."',103) AND CONVERT(DATE,'".$datenormalendchk."',103)
+                                                                        ORDER BY CREATEDATE ASC";
+
+                                                                        $query_seTimeNormal = sqlsrv_query($conn, $sql_seTimeNormal, $params_seTimeNormal);
+                                                                        while ($result_seTimeNormal = sqlsrv_fetch_array($query_seTimeNormal, SQLSRV_FETCH_ASSOC)) {
+
+                                                                            $startnormalchk = date_create($result_seTimeNormal['SLEEPNORMALSTART']);
+                                                                            $startnormal    =  date_format($startnormalchk,"d/m/Y H:i");
+
+                                                                            $endnormalchk = date_create($result_seTimeNormal['SLEEPNORMALEND']);
+                                                                            $endnormal    =  date_format($endnormalchk,"d/m/Y H:i");
+                                                                    ?>
+                                                                    <tr>
+                                                                        <td style="text-align: center;font-size:14px"><?= $i ?></td>
+                                                                        <td style="text-align: center;font-size:14px"><?= $startnormal ?></td>
+                                                                        <td style="text-align: center;font-size:14px"><?= $endnormal ?></td>
+                                                                        <td style="text-align: center;font-size:14px"><?= $result_seTimeNormal['TIMESLEEPNORMAL'] ?></td>
+                                                                    </tr>   
+                                                                    <?php
+                                                                        $i++;
+                                                                    }
+                                                                    ?>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>  
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- //////////////////////////////////////////////////////////// -->
+                                        <!-- KPI Result -->
+                                        <div id="data_score"></div>
+                                            <div style="text-align: center;">
+                                                    <?php
+
+                                                
+                                                        $sql_CountTruckCheck = "SELECT COUNT(TRUCKCAMCHECKID) AS 'TRUCKCOUNT' FROM TRUCKCAMERACHECK
+                                                        WHERE DRIVERCODE ='".$_GET['employeecode3']."'
+                                                        AND YEARSTRUCKCAMCHECK ='".$result_seYearsD3['YEARS']."'";
+                                                        $params_CountTruckCheck = array();
+                                                        $query_CountTruckCheck  = sqlsrv_query($conn, $sql_CountTruckCheck, $params_CountTruckCheck);
+                                                        $result_CountTruckCheck = sqlsrv_fetch_array($query_CountTruckCheck, SQLSRV_FETCH_ASSOC);
+                                                    
+                                                        if ($result_CountTruckCheck['TRUCKCOUNT'] >= '1') {
+                                                            $TruckCheck = 'NG';
+                                                        }else {
+                                                            $TruckCheck = 'OK';
+                                                        }
+                                                        // echo $WorkingCheck;
+                                                        
+                                                        $sql_CountAccident = "SELECT COUNT(ACCI_ID) AS 'ACCICOUNT' FROM ACCIDENTHISTORY  
+                                                        WHERE DRIVERCODE ='".$_GET['employeecode3']."'
+                                                        AND YEARS ='".$result_seYearsD3['YEARS']."'";
+                                                        $params_CountAccident = array();
+                                                        $query_CountAccident  = sqlsrv_query($conn, $sql_CountAccident, $params_CountAccident);
+                                                        $result_CountAccident = sqlsrv_fetch_array($query_CountAccident, SQLSRV_FETCH_ASSOC);
+                                                    
+                                                        if ($result_CountAccident['ACCICOUNT'] >= '1') {
+                                                            $AcciCheck = 'NG';
+                                                        }else {
+                                                            $AcciCheck = 'OK';
+                                                        }
+                                                        // echo $AcciCheck;
+                                                        
+                                                        $sql_WorkingIssue = "SELECT COUNT(WORKINGISSUEID) AS 'WORKINGCOUNT' FROM WORKINGISSUE
+                                                        WHERE DRIVERCODE ='".$_GET['employeecode3']."'
+                                                        AND YEARSWORKINGISSUECHECK ='".$result_seYearsD3['YEARS']."'";
+                                                        $params_WorkingIssue = array();
+                                                        $query_WorkingIssue  = sqlsrv_query($conn, $sql_WorkingIssue, $params_WorkingIssue);
+                                                        $result_WorkingIssue = sqlsrv_fetch_array($query_WorkingIssue, SQLSRV_FETCH_ASSOC);
+                                                    
+                                                        if ($result_WorkingIssue['WORKINGCOUNT'] >= '1') {
+                                                            $WorkingCheck = 'NG';
+                                                        }else {
+                                                            $WorkingCheck = 'OK';
+                                                        }
+                                                        // echo $WorkingCheck;
+
+                                                        
+
+
+                                                    ?>
+                                                
+                                            <table style="width:100%;border:1px solid black;">
+                                                <thead style="border:1px solid black;">
+                                                    <tr>
+                                                    
+                                                        <th rowspan ="2"  width="20%" style="text-align: center;border:1px solid black;background-color: #bfbfbf">ข้อมูล KPI</th>
+                                                        <th colspan ="2"  width="10%" style="text-align: center;border:1px solid black;background-color: #bfbfbf">Result</th>
+                                                        <th rowspan ="2"  width="20%" colspan ="1" style="text-align: center;border:1px solid black;background-color: #bfbfbf">รายละเอียด</th>
+                                                        <th rowspan ="2"  width="20%" colspan ="1" style="text-align: center;border:1px solid black;background-color: #bfbfbf"></th>
+                                                    </tr>
+                                                    <tr>
+
+                                                        <th width="5%"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">OK</th>
+                                                        <th width="5%"  style="text-align: center;border:1px solid black;background-color: #bfbfbf">NG</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;<b>การตรวจสอบกล้องหน้ารถ</b></td>
+                                                        <?php
+                                                        if ($TruckCheck == 'OK') { //OK คือไม่มีข้อมูล Truvk Camera
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: left">ไม่มีข้อมูลการตรวจสอบรถผิดปกติประจำปี:&nbsp;<b><?=$result_seYearsD3['YEARS']?> </b></td>
+                                                        <?php
+                                                        }else { // OK
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: left"></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: left">มีข้อมูลการตรวจสอบรถผิดปกติประจำปี:&nbsp;<b><?=$result_seYearsD3['YEARS']?></b> &nbsp;&nbsp;จำนวน:&nbsp;<b><?=$result_CountTruckCheck['TRUCKCOUNT']?></b>&nbsp;ครั้ง</b></td>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"><button type="button" style= "height:40px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="truckcamera('<?=$empchkconfirm?>','<?=$result_seYearsD3['YEARS']?>','<?=$result_seYearsD3['YEARS']?>')">Truck_Driver3</button></td>
+                                                        
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;<b>ประวัติการเกิดอุบัติเหตุ</b></td>
+                                                        <?php
+                                                        if ($AcciCheck == 'OK') { //NO คือไม่มีข้อมูลอุบัติเหตุ
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: left">ไม่มีข้อมูลอุบัติเหตุประจำปี:&nbsp;<b><?=$result_seYearsD3['YEARS']?> </b></td>
+                                                        <?php
+                                                        }else { // OK
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: left"></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: left">มีอุบัติเหตุประจำปี:&nbsp;<b><?=$result_seYearsD3['YEARS']?></b> &nbsp;&nbsp;จำนวน:&nbsp;<b><?=$result_CountAccident['ACCICOUNT']?></b>&nbsp;ครั้ง</b></td>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"><button type="button" style= "height:40px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="acidentdata('<?=$empchkconfirm?>','<?=$result_seYearsD3['YEARS']?>','<?=$result_seYearsD3['YEARS']?>')">Acident_Driver3</button></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: left">&nbsp;<b>ปัญหาจากการทำงาน</b></td>
+                                                        <?php
+                                                        if ($WorkingCheck == 'OK') { //NO คือไม่มีข้อมูลอุบัติเหตุ
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #94FA67;"><b>&#10004;</b></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center"></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: left">ไม่มีข้อมูลปัญหาการทำงานประจำปี:&nbsp;<b><?=$result_seYearsD3['YEARS']?></b></td>
+                                                        <?php
+                                                        }else { // OK
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: left"></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 18px;text-align: center;background-color: #FA9F9F;"><b>&#10006;</b></td>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: left">มีข้อมูลปัญหาการทำงานประจำปี:&nbsp;<b><?=$result_seYearsD3['YEARS']?></b>&nbsp;&nbsp;จำนวน:&nbsp;<b><?=$result_WorkingIssue['WORKINGCOUNT']?></b>&nbsp;ครั้ง</b></td>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                        <td colspan ="1" style="border:1px solid black;font-size: 16px;text-align: center"><button type="button" style= "height:40px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="workingissuedata('<?=$empchkconfirm?>','<?=$result_seYearsD3['YEARS']?>','<?=$result_seYearsD3['YEARS']?>')">Working_Driver3</button></td>
+                                                    </tr>
+                                                </tbody>
+                                                
+                                            </table>
+                                        </div>
+                                        <div class = "row">
+                                            <label ></label>
+                                        </div>
+                                        <!-- Abnormal Information Driver3 -->
+                                        <div class="row">
+                                            <?php
+                                            $month = date('m');
+
+                                            switch ($month) {
+                                              case "01":
+                                                $monthchk = "มกราคม";
+                                                break;
+                                              case "02":
+                                                $monthchk = "กุมภาพันธ์";
+                                                break;
+                                              case "03":
+                                                $monthchk = "มีนาคม";
+                                                break;
+                                              case "04":
+                                                $monthchk = "เมษายน";
+                                                break;
+                                              case "05":
+                                                $monthchk = "พฤษภาคม";
+                                                break;
+                                              case "06":
+                                                $monthchk = "มิถุนายน";
+                                                break;
+                                              case "07":
+                                                $monthchk = "กรกฎาคม";
+                                                break;
+                                              case "08":
+                                                $monthchk = "สิงหาคม";
+                                                break;
+                                              case "09":
+                                                $monthchk = "กันยายน";
+                                                break;
+                                              case "10":
+                                                $monthchk = "ตุลาคม";
+                                                break;
+                                              case "11":
+                                                $monthchk = "พฤศจิกายน";
+                                                break;
+                                              case "12":
+                                                $monthchk = "ธันวาคม";
+                                                break;  
+                                              default:
+                                                echo "Out Of Rang";
+                                            }
+                                            ?>
+                                            <div class="col-lg-12">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading" style="background-color: #e7e7e7">
+                                                    Abnormal Information <b>(ข้อมูลจากระบบตรวจร่างกายเดือนปัจจุบัน : <u><?=$monthchk?></u>)</b>
+                                                    </div>
+                                                    <!-- /.panel-heading -->
+
+                                                <div class="panel-body">
+
+                                                    <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                                                        <div id="datadef">
+                                                            <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-exampleabnormal" role="grid" aria-describedby="dataTables-example_info" style="width: 100%;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>ลำดับ</th>
+                                                                        <th>วันที่</th>
+                                                                        <th>หัวข้อ</th>
+                                                                        <th>เกณฑ์การตัดสิน</th>
+                                                                        <th>รายเอียดและการแนะนำ</th>
+                                                                </thead>
+                                                                <tbody>
+                                                                <?php
+                                                                $i = 1;
+
+                                                                $sql_seStartDateAb3 = "SELECT CONVERT(VARCHAR(25),DATEADD(dd,-(DAY(GETDATE())-1),GETDATE()),105) AS 'STARTDATE'";
+                                                                $params_seStartDateAb3 = array();
+                                                                $query_seStartDateAb3 = sqlsrv_query($conn, $sql_seStartDateAb3, $params_seStartDateAb3);
+                                                                $result_seStartDateAb3 = sqlsrv_fetch_array($query_seStartDateAb3, SQLSRV_FETCH_ASSOC);
+                                                                    
+                                                                $sql_seEndDateAb3 = "SELECT CONVERT(VARCHAR(25),DATEADD(dd,-(DAY(DATEADD(mm,1,GETDATE()))),DATEADD(mm,1,GETDATE())),105) AS 'ENDDATE'";
+                                                                $params_seEndDateAb3 = array();
+                                                                $query_seEndDateAb3 = sqlsrv_query($conn, $sql_seEndDateAb3, $params_seEndDateAb3);
+                                                                $result_seEndDateAb3 = sqlsrv_fetch_array($query_seEndDateAb3, SQLSRV_FETCH_ASSOC);
+                                                                
+                                                                // echo $result_seStartDateAb1['STARTDATE'];
+                                                                // echo "<br>";
+                                                                // echo $result_seEndDateAb1['ENDDATE'];
+                                                                
+                                                            
+
+                                                                $sql_seAbnormalData3 = "SELECT TENKOMASTERID,TENKOBEFOREID,REMARK,DATA1 FROM
+                                                                (
+                                                                    SELECT TENKOMASTERID,TENKOBEFOREID,TENKOBEFOREGREETREMARK,TENKOUNIFORMREMARK,TENKOBODYREMARK,TENKOTEMPERATUREREMARK
+                                                                ,TENKOPRESSUREREMARK,TENKOALCOHOLREMARK,TENKOOXYGENREMARK,TENKOWORRYREMARK,TENKODAILYTRAILERREMARK
+                                                                ,TENKOCARRYREMARK,TENKOJOBDETAILREMARK,TENKOLOADINFORMREMARK,TENKOAIRINFORMREMARK
+                                                                ,TENKOYOKOTENREMARK,TENKOCHIMOLATORREMARK,TENKOTRANSPORTREMARK,TENKOAFTERGREETREMARK
+                                                                ,TENKOSHORTSIGHTREMARK,TENKOLONGSIGHTREMARK,TENKOOBLIQUESIGHTREMARK
+                                                                    FROM  dbo.TENKOBEFORE 
+                                                                    WHERE TENKOMASTERDIRVERCODE='".$_GET['employeecode3']."'
+                                                                    AND CONVERT(DATE,CREATEDATE) BETWEEN CONVERT(DATE,'".$result_seStartDateAb3['STARTDATE']."',103) 
+                                                                    AND CONVERT(DATE,'".$result_seEndDateAb3['ENDDATE']."',103)
+                                                                    AND 
+                                                                (
+                                                                TENKOBEFOREGREETREMARK != ''      OR TENKOBEFOREGREETREMARK != NULL
+                                                                OR TENKOUNIFORMREMARK != ''       OR TENKOUNIFORMREMARK != NULL 
+                                                                OR TENKOBODYREMARK != ''          OR TENKOBODYREMARK != NULL 
+                                                                OR TENKOTEMPERATUREREMARK != ''   OR TENKOTEMPERATUREREMARK != NULL 
+                                                                OR TENKOPRESSUREREMARK != ''      OR TENKOPRESSUREREMARK != NULL 
+                                                                OR TENKOALCOHOLREMARK != ''       OR TENKOALCOHOLREMARK != NULL 
+                                                                OR TENKOOXYGENREMARK != ''        OR TENKOOXYGENREMARK != NULL 
+                                                                OR TENKOWORRYREMARK != ''         OR TENKOWORRYREMARK != NULL 
+                                                                OR TENKODAILYTRAILERREMARK != ''  OR TENKODAILYTRAILERREMARK != NULL 
+                                                                OR TENKOCARRYREMARK != ''         OR TENKOCARRYREMARK != NULL 
+                                                                OR TENKOJOBDETAILREMARK != ''     OR TENKOJOBDETAILREMARK != NULL 
+                                                                OR TENKOLOADINFORMREMARK != ''    OR TENKOLOADINFORMREMARK != NULL 
+                                                                OR TENKOAIRINFORMREMARK != ''     OR TENKOAIRINFORMREMARK != NULL 
+                                                                OR TENKOYOKOTENREMARK != ''       OR TENKOYOKOTENREMARK != NULL 
+                                                                OR TENKOCHIMOLATORREMARK != ''    OR TENKOCHIMOLATORREMARK != NULL 
+                                                                OR TENKOTRANSPORTREMARK != ''     OR TENKOTRANSPORTREMARK != NULL 
+                                                                OR TENKOAFTERGREETREMARK != ''    OR TENKOAFTERGREETREMARK != NULL
+                                                                OR TENKOSHORTSIGHTREMARK != ''    OR TENKOSHORTSIGHTREMARK != NULL 
+                                                                OR TENKOLONGSIGHTREMARK != ''     OR TENKOLONGSIGHTREMARK != NULL 
+                                                                OR TENKOOBLIQUESIGHTREMARK != ''  OR TENKOOBLIQUESIGHTREMARK != NULL 
+                                                                )
+                                                                
+                                                                
+                                                                ) a
+                                                                UNPIVOT 
+                                                                (DATA1 FOR REMARK IN (TENKOBEFOREGREETREMARK,TENKOUNIFORMREMARK,TENKOBODYREMARK,TENKOTEMPERATUREREMARK
+                                                                ,TENKOPRESSUREREMARK,TENKOALCOHOLREMARK,TENKOOXYGENREMARK,TENKOWORRYREMARK,TENKODAILYTRAILERREMARK
+                                                                ,TENKOCARRYREMARK,TENKOJOBDETAILREMARK,TENKOLOADINFORMREMARK,TENKOAIRINFORMREMARK
+                                                                ,TENKOYOKOTENREMARK,TENKOCHIMOLATORREMARK,TENKOTRANSPORTREMARK,TENKOAFTERGREETREMARK
+                                                                ,TENKOSHORTSIGHTREMARK,TENKOLONGSIGHTREMARK,TENKOOBLIQUESIGHTREMARK)	
+                                                                 ) as UNPIVT_DATA
+                                                                 WHERE DATA1 !=''
+                                                                 ORDER BY TENKOMASTERID ASC";
+                                                                $params_seAbnormalData3 = array();
+                                                                $query_seAbnormalData3 = sqlsrv_query($conn, $sql_seAbnormalData3, $params_seAbnormalData3);
+                                                                while ($result_seAbnormalData3 = sqlsrv_fetch_array($query_seAbnormalData3, SQLSRV_FETCH_ASSOC)) {
+                                                                    
+                                                                    $sql_sedateab3 = " SELECT DISTINCT CONVERT(VARCHAR(10),CREATEDATE,103) AS 'CREATEDATE'
+                                                                    FROM TENKOBEFORE 
+                                                                    WHERE TENKOMASTERID ='".$result_seAbnormalData3['TENKOMASTERID']."'";
+                                                                    $params_sedateab3 = array();
+                                                                    $query_sedateab3 = sqlsrv_query($conn, $sql_sedateab3, $params_sedateab3);
+                                                                    $result_sedateab3 = sqlsrv_fetch_array($query_sedateab3, SQLSRV_FETCH_ASSOC);
+                                                                
+                                                                    if ($result_seAbnormalData3['REMARK'] == 'TENKOBEFOREGREETREMARK') {
+                                                                        $Heading3  = 'การทักทายก่อนเริ่มเท็งโกะ';
+                                                                        $Criteria3 = 'ทักทายอย่างมีชีวิตชีวา';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOUNIFORMREMARK'){
+                                                                        $Heading3  = 'ตรวจเซ็คยูนิฟอร์ม';
+                                                                        $Criteria3 = 'สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOBODYREMARK'){
+                                                                        $Heading3  = 'ตรวจสอบสภาพร่างกาย';
+                                                                        $Criteria3 = 'สุขภาพร่างกายแข็งแรงดี';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOTEMPERATUREREMARK'){
+                                                                        $Heading3  = 'ตรวจเช็คอุณหภูมิ1';
+                                                                        $Criteria3 = 'ต่ำกว่า'.' '.$result_seTenkoSTD['TEMP'].' '.'องศา';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOPRESSUREREMARK'){
+                                                                        $Heading3  = 'วัดความดัน';
+                                                                        $Criteria3 = 'บน :'.' '.$result_seTenkoSTD['MINSYS'].'-'.$result_seTenkoSTD['MAXSYS'].'
+                                                                        ,ล่าง :'.' '.$result_seTenkoSTD['MINDIA'].'-'.$result_seTenkoSTD['MAXDIA'].'
+                                                                        ,อัตราการเต้นหัวใจ :'.' '.$result_seTenkoSTD['MINPULSE'].'-'.$result_seTenkoSTD['MAXPULSE'];
+                                                                        // $Criteria2 = 'บน : 90-150,ล่าง : 60-95,อัตราการเต้นหัวใจ : 60-100 ครั้ง';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOALCOHOLREMARK'){
+                                                                        $Heading3  = 'ตรวจเช็คแอลกอฮอล์';
+                                                                        $Criteria3 = 'แอลกอฮอล์เท่ากับ 0';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOOXYGENREMARK'){
+                                                                        $Heading3  = 'ตรวจเช็คออกซิเจนเลือด';
+                                                                        $Criteria3 = 'ออกซิเจนในเลือดตั้งแต่'.' '.$result_seTenkoSTD['OXYGEN'].' '.'%';
+                                                                        // $Criteria2 = 'ออกซิเจนในเลือดตั้งแต่ 98%';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOWORRYREMARK'){
+                                                                        $Heading3  = 'สอบถามเรื่องกังวลใจ';
+                                                                        $Criteria3 = 'ไม่มีเรื่องกังวลใจ';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKODAILYTRAILERREMARK'){
+                                                                        $Heading3  = 'ใบตรวจเทรลเลอร์ประจำวัน';
+                                                                        $Criteria3 = 'ไม่มีหัวข้อผิดปกติ';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOCARRYREMARK'){
+                                                                        $Heading3  = 'ตรวจสอบของที่พกพา';
+                                                                        $Criteria3 = 'ใบอนุญาติ (ขับขี่),ใบอนุญาติ (ผู้รับเหมา),ใบอนุญาติ (โฟล์คลิฟท์),ใบอนุญาติ (TLEP),ใบอนุญาติ (Trailer),โทรศัพท์,สายสมอลทอร์ค';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOJOBDETAILREMARK'){
+                                                                        $Heading3  = 'ตรวจสอบรายละเอียดการทำงาน';
+                                                                        $Criteria3 = 'เข้าใจเส้นทาง,จุดพักรถ,รูปแบบการขับขี่,ความสำคัญในการส่งรถ';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOLOADINFORMREMARK'){
+                                                                        $Heading3  = 'แจ้งสภาพถนน';
+                                                                        $Criteria3 = 'เข้าใจเนื้อหาที่แจ้ง';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOAIRINFORMREMARK'){
+                                                                        $Heading3  = 'แจ้งสภาพอากาศ';
+                                                                        $Criteria3 = 'เข้าใจเนื้อหาที่แจ้ง';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOYOKOTENREMARK'){
+                                                                        $Heading3  = 'แจ้งเรื่องโยโกะเด็น';
+                                                                        $Criteria3 = 'เข้าใจเนื้อหาที่แจ้ง';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOCHIMOLATORREMARK'){
+                                                                        $Heading3  = 'ตรวจสอบเป้าหมายการขับขี่จากเครื่องชิมูเลเตอร์';
+                                                                        $Criteria3 = 'ตรวจสอบกันทั้งสองฝ่าย';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOTRANSPORTREMARK'){
+                                                                        $Heading3  = 'สามารถวิ่งงานได้หรือไม่';
+                                                                        $Criteria3 = 'ไม่มีข้อบกพร่องต่อการวิ่งงาน';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOAFTERGREETREMARK'){
+                                                                        $Heading3  = 'การทักทายหลังทำเท็งโกะเสร็จ';
+                                                                        $Criteria3 = 'ทักทายอย่างมีชีวิตชีวา';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOSHORTSIGHTREMARK'){
+                                                                        $Heading3  = 'สายตาสั้น';
+                                                                        $Criteria3 = 'พนักงานพกแว่นสายตามาปฏิบัติงาน';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOLONGSIGHTREMARK'){
+                                                                        $Heading3  = 'สายตายาว';
+                                                                        $Criteria3 = 'พนักงานพกแว่นสายตามาปฏิบัติงาน';
+                                                                    }else if ($result_seAbnormalData3['REMARK'] == 'TENKOOBLIQUESIGHTREMARK'){
+                                                                        $Heading3  = 'สายตาเอียง';
+                                                                        $Criteria3 = 'พนักงานพกแว่นสายตามาปฏิบัติงาน';
+                                                                    }else{
+                                                                        $Heading3  = '';
+                                                                        $Criteria3 = '';
+                                                                    }
+                                                                    
+                                                                        
+                                                                        //////////////////////////////////////////////////////////////////////
+                                                                ?>
+
+                                                                <tr>
+                                                                    <td style="text-align:left;width: 8%"  ><?= $i ?></td>
+                                                                    <td style="text-align:left;width: 10%" ><?= $result_sedateab3['CREATEDATE'] ?></td>
+                                                                    <td style="text-align:left;width: 10%" ><?= $Heading3 ?></td>
+                                                                    <td style="text-align:left;width: 10%" ><?= $Criteria3 ?></td>
+                                                                    <td style="text-align:left;width: 10%" ><?= $result_seAbnormalData3['DATA1'] ?></td>
+                                                                 </tr>   
+
+                                                                 <?php
+                                                                    $i++;
+                                                                }
+                                                                ?>
+                                                                <tfoot>
+                                                                    <td colspan = "4" style="text-align:left;"></td>
+                                                                    <td style="text-align:left;background-color: #bfbfbf"><b>Abnormal Case : <?= $i-1 ?></b></td>
+                                                                </tfoot>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div id="datasr"></div>
+                                                    </div>
+
+
+                                                    <!-- /.panel-body -->
+                                                    </div>
+                                                    <!-- /.panel -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Punctuality Data Driver3-->
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="panel panel-default">
+                                                <div class="panel-heading" style="background-color: #e7e7e7">
+                                                 Punctuality <b>(ข้อมูลจากการส่งข้อมูลของ TDEM)</b>
+                                                </div>
+                                                <!-- /.panel-heading -->
+
+                                                <div class="panel-body">
+
+                                                    <div id="dataTables-example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                                                        <div id="datadef">
+                                                            <?php
+                                                                $dateyesterday = date('Y/m/d',strtotime("-1 day"));
+                                                                $GETEMP = $_GET['employeecode3'];
+                                                                $stmt_feedbackdriver = "SELECT * FROM DIGITALTENKO_FEEDBACKDRIVER TKFBD LEFT JOIN EMPLOYEEEHR2 EMP ON EMP.nameE = TKFBD.Driver_name WHERE NOT Hop IS NULL AND PersonCode = '$GETEMP' AND ROUTE_DATE = '$dateyesterday'";
+                                                                $query_feedbackdriver = sqlsrv_query($conn, $stmt_feedbackdriver);
+                                                            ?>
+                                                            <table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-examplepunc" role="grid" aria-describedby="dataTables-example_info" >
+                                                                <thead style="border:1px solid black;">
+                                                                    <tr>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">RUN SEQ</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">HOP</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">LOCATION</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">PLAN ARRIVAL</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">PLAN DEPARTURE</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">OPERATION TIME PLAN</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">ACTUAL ARRIVAL</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">ACTUAL DEPARTURE</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">OPERATION TIME ACTUAL</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">TYPE</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">PUNC OF ARRIVAL</th>
+                                                                        <th style="text-align: center;border:1px solid black;background-color: #bfbfbf">PUNC OF DEPARTURE</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <?php while($result_feedbackdriver = sqlsrv_fetch_array($query_feedbackdriver, SQLSRV_FETCH_ASSOC)) { ?>
+                                                                    <tr>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #fff8e0">&nbsp;<b><?php echo $result_feedbackdriver["RUN_SEQ"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #fff8e0">&nbsp;<b><?php echo $result_feedbackdriver["HOP"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #fff8e0">&nbsp;<b><?php echo $result_feedbackdriver["LOCATION"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #e0eaff">&nbsp;<b><?php echo $result_feedbackdriver["PLAN_ARRIVAL"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #e0eaff">&nbsp;<b><?php echo $result_feedbackdriver["PLAN_DEPARTURE"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #e0eaff">&nbsp;<b><?php echo $result_feedbackdriver["OPERATION_TIME_PLAN"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #e2ffe0">&nbsp;<b><?php echo $result_feedbackdriver["ACTUAL_ARRIVAL"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #e2ffe0">&nbsp;<b><?php echo $result_feedbackdriver["ACTUAL_DEPARTURE"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #e2ffe0">&nbsp;<b><?php echo $result_feedbackdriver["OPERATION_TIME_ACTUAL"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #ffe8e0">&nbsp;<b><?php echo $result_feedbackdriver["TYPE"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #ffe8e0">&nbsp;<b><?php echo $result_feedbackdriver["PUNC_OF_ARRIVAL"];?></b></td>
+                                                                        <td style="border:1px solid black;font-size: 14px;text-align: center;background-color: #ffe8e0">&nbsp;<b><?php echo $result_feedbackdriver["PUNC_OF_DEPARTURE"];?></b></td>
+                                                                    </tr>
+                                                                    <!-- <tr>
+                                                                        <td colspan ="6" style="font-size: 16px;">&nbsp;<b></b></td>
+                                                                    </tr>   -->
+                                                                <?php } ?>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div id="datasr"></div>
+                                                    </div>
+
+
+                                                    <!-- /.panel-body -->
+                                                    </div>
+                                                    <!-- /.panel -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <?php
+                                                $sql_selabdataToSelfcheck3 = "SELECT  TOP 1 LABOTRONDATAID,CARDNUMBER,
+                                                CONVERT( NUMERIC(10,2), DRIVER_TEMPERATURE) AS 'DRIVER_TEMPERATURE',
+                                                DRIVER_SYS,DRIVER_DIA,DRIVER_PULSE,DRIVER_OXYGEN,
+                                                CASE
+                                                    WHEN DRIVER_ALCOHOL = '0.0' THEN '0'
+                                                    ELSE DRIVER_ALCOHOL
+                                                END AS 'DRIVER_ALCOHOL',
+                                                CREATEBY,CONVERT(VARCHAR(16),CREATEDATE,103) AS 'CREATEDATE'
+                                                                                                                                                                        
+                                                FROM LABOTRONWEBSERVICEDATA a 
+                                                WHERE  CONVERT(DATE,CREATEDATE) = CONVERT(DATE,GETDATE())
+                                                AND CARDNUMBER ='".$result_seDriverData3['TaxID']."'
+                                                ORDER BY CONVERT(VARCHAR(16),CREATEDATE,103) DESC";
+                                                $params_selabdataToSelfcheck3 = array();
+                                                $query_selabdataToSelfcheck3 = sqlsrv_query($conn, $sql_selabdataToSelfcheck3, $params_selabdataToSelfcheck3);
+                                                $result_selabdataToSelfcheck3 = sqlsrv_fetch_array($query_selabdataToSelfcheck3, SQLSRV_FETCH_ASSOC); 
+                                            ?>
+
+                                            <!-- OFFCON: -->
+                                            <input disabled="" hidden type="text" id="txt_officerconfirm3"  name="txt_officerconfirm3"  value="<?= $result_seEmployee["nameT"] ?>">
+                                            <!-- DATEW&P: -->
+                                            <input disabled="" hidden type="text" id="txt_dateworkpre3"     name="txt_dateworkpre3"     value="<?= $result_seSelfCheckShow3["DATEJOBSTART"] ?>">
+                                            <!-- SELFCHECK: -->
+                                            <input disabled="" hidden type="text" id="txt_selfcheckid3"     name="txt_selfcheckid3"     value="<?=$result_seSelfCheck3['SELFCHECKID']?>">
+                                            <br>
+                                            <!-- TEMP: -->
+                                            <input disabled="" hidden type="text" id="txt_drivertemp3"      name="txt_drivertemp3"      value="<?=$result_selabdataToSelfcheck3['DRIVER_TEMPERATURE']?>">
+                                            <!-- SYS: -->
+                                            <input disabled="" hidden type="text" id="txt_driversys3"       name="txt_driversys3"       value="<?=$result_selabdataToSelfcheck3['DRIVER_SYS']?>">
+                                            <!-- DIA: -->
+                                            <input disabled="" hidden type="text" id="txt_driverdia3"       name="txt_driverdia3"       value="<?=$result_selabdataToSelfcheck3['DRIVER_DIA']?>">
+                                            <!-- PULSE: -->
+                                            <input disabled="" hidden type="text" id="txt_driverpulse3"     name="txt_driverpulse3"     value="<?=$result_selabdataToSelfcheck3['DRIVER_PULSE']?>">
+                                            <!-- OXYGEN: -->
+                                            <input disabled="" hidden type="text" id="txt_driveroxygen3"    name="txt_driveroxygen3"    value="<?=$result_selabdataToSelfcheck3['DRIVER_OXYGEN']?>">
+                                            <!-- ALCOHOL: -->
+                                            <input disabled="" hidden type="text" id="txt_driveralcohol3"   name="txt_driveralcohol3"   value="<?=$result_selabdataToSelfcheck3['DRIVER_ALCOHOL']?>">
+                                             
+                                            <div class="col-lg-12" style="text-align: right;">
+                                                <button type="button" style= "height:40px;width:300px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="confirm_chkdri('<?=$result_seTenkomaster_temp['TENKOMASTERID']?>','<?=$_GET['vehicletransportplanid']?>','<?=$_GET['employeecode3']?>','EMP3')">ยืนยันการตรวจสอบข้อมูล พนักงานที่3</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Tap 1 เท็งโกะก่อนเริมงาน -->
+                                    <!-- Tenko1 พนักงานคนที่3 -->
+                                    <!-- เท็งโกะก่อนเริ่มงาน -->
+                                    <div class="tab-pane fade" id="tenko1">
+
+                                        <?php
+                                        $conditionTenkobefore = " AND a.TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND a.TENKOMASTERDIRVERCODE = '" . $_GET['employeecode3'] . "'";
+                                        $sql_seTenkobefore = "{call megEdittenkobefore_v2(?,?,?)}";
+                                        $params_seTenkobefore = array(
+                                            array('select_tenkobefore', SQLSRV_PARAM_IN),
+                                            array($conditionTenkobefore, SQLSRV_PARAM_IN),
+                                            array('', SQLSRV_PARAM_IN)
+                                        );
+                                        $query_seTenkobefore = sqlsrv_query($conn, $sql_seTenkobefore, $params_seTenkobefore);
+                                        $result_seTenkobefore = sqlsrv_fetch_array($query_seTenkobefore, SQLSRV_FETCH_ASSOC);
+
+
+                                        $conditionTenkoafters = " AND TENKOMASTERID = '" . $result_seTenkomaster_temp['TENKOMASTERID'] . "' AND TENKOMASTERDIRVERCODE = '" . $_GET['employeecode3'] . "'";
+                                        $sql_seTenkoafters = "{call megEdittenkoafter_v2(?,?,?)}";
+                                        $params_seTenkoafters = array(
+                                            array('select_tenkoafter', SQLSRV_PARAM_IN),
+                                            array($conditionTenkoafters, SQLSRV_PARAM_IN),
+                                            array('', SQLSRV_PARAM_IN)
+                                        );
+                                        $query_seTenkoafters = sqlsrv_query($conn, $sql_seTenkoafters, $params_seTenkoafters);
+                                        $result_seTenkoafters = sqlsrv_fetch_array($query_seTenkoafters, SQLSRV_FETCH_ASSOC);
+
+                                        $sql_seTenkobeforerest = "SELECT DATEDIFF(HOUR,CONVERT(DATETIME,'" . $result_seTenkoafters['CREATEDATE'] . "',103),CONVERT(DATETIME,GETDATE())) AS AMOUNTREST FROM [dbo].[TENKOAFTER]
+                                                    WHERE TENKOMASTERDIRVERCODE = '" . $result_seTenkobefore['TENKOMASTERDIRVERCODE'] . "'
+                                                    AND TENKOAFTERID = (SELECT MAX(TENKOAFTERID) FROM [dbo].[TENKOAFTER] WHERE TENKOMASTERDIRVERCODE = '" . $result_seTenkobefore['TENKOMASTERDIRVERCODE'] . "')";
+                                        $query_seTenkobeforerest = sqlsrv_query($conn, $sql_seTenkobeforerest, $params_seTenkobeforerest);
+                                        $result_seTenkobeforerest = sqlsrv_fetch_array($query_seTenkobeforerest, SQLSRV_FETCH_ASSOC);
+
+                                        $YEAR = date("Y");
+                                        $sql_sehealth = "SELECT  TOP 1 ID,SHORTSIGHT,SHORTSIGHT_R,SHORTSIGHT_L
+                                                    ,LONGSIGHT,LONGSIGHT_R,LONGSIGHT_L
+                                                    ,OBLIQUESIGHT,OBLIQUESIGHT_R,OBLIQUESIGHT_L,CREATEYEAR
+                                                    FROM [dbo].[HEALTHHISTORY]
+                                                    WHERE EMPLOYEECODE ='" . $_GET['employeecode3'] . "'
+                                                    AND CREATEYEAR ='" . $YEAR . "'
+                                                    AND ACTIVESTATUS ='1'
+                                                    ORDER BY CREATEDATE DESC";
+                                        $params_sehealth = array();
+                                        $query_sehealth = sqlsrv_query($conn, $sql_sehealth, $params_sehealth);
+                                        $result_sehealth = sqlsrv_fetch_array($query_sehealth, SQLSRV_FETCH_ASSOC);    
+
+                                        // ข้อมูลใบขับขี่คนที่3
+                                        $sql_seCarData3 = "SELECT a.PersonID,a.nameT,a.CarLicenceID,a.PositionNameT,a.TaxID,a.yearw,a.monthw,a.dayw,
+                                        FORMAT (b.ExpireCar_Start, 'dd/MM/yyyy') 'STARTDATE',
+                                        FORMAT (b.ExpireCar_End, 'dd/MM/yyyy') AS 'ENDDATE',
+                                        DATEDIFF(month, FORMAT (b.ExpireCar_End, 'yyyy/MM/dd '), FORMAT (GETDATE(), 'yyyy/MM/dd ')) AS 'MONTHDIFF'
+                                        FROM [dbo].[EMPLOYEEEHR2] a
+                                        INNER JOIN [dbo].[EMPLOYEEDETAILEHR] b ON a.PersonID = b.PersonID
+                                        WHERE PersonCode ='".$_GET['employeecode3']."'";
+                                        $query_seCarData3 = sqlsrv_query($conn, $sql_seCarData3, $params_seCarData3);
+                                        $result_seCarData3 = sqlsrv_fetch_array($query_seCarData3, SQLSRV_FETCH_ASSOC);    
+                                        
+
+                                        // echo $result_seCarData2['MONTHDIFF'];
+                                        // echo '|';
+                                        if ($result_seCarData3['MONTHDIFF'] == '-3') {
+                                            // echo '1';
+                                            // ใกล้หมดระยะเวลา 3 เดือน
+                                            $licensechk3 = "background-color: #f6ff54";
+                                        }else if($result_seCarData3['MONTHDIFF'] == '-2'){
+                                            // echo '2';
+                                             // ใกล้หมดระยะเวลา 2 เดือน
+                                            $licensechk3 = "background-color: #ff9e54";
+                                        }else if($result_seCarData3['MONTHDIFF'] == '-1' || $result_seCarData3['MONTHDIFF'] >= '0'){
+                                            // echo '1';
+                                            // ใกล้หมดระยะเวลา 1 เดือน หรือ หมดอายุแล้ว
+                                            $licensechk3 = "background-color: #ff5454";
+                                        }else{
+                                            // echo '0';
+                                            // ปกติ สีเขียว
+                                            $licensechk3 = "background-color: #94FA67";
+                                           
+                                            
+                                        }
+
+                                        //เปลี่ยนปี ค.ศ เป็น พ.ศ วันที่ออกบัตรพนักงานคนที่2
+                                        if ($result_seCarData3['STARTDATE'] == NULL) {
+                                            $year31start =  '';
+                                            $year32start =  '';
+                                        }else {
+                                            $year31start =  substr($result_seCarData3['STARTDATE'],0,6);
+                                            $year32start =  substr($result_seCarData3['STARTDATE'],6,10)+543;
+                                        }
+                                        //เปลี่ยนปี ค.ศ เป็น พ.ศ วันที่หมดอายุพนักงานคนที่2
+                                        if ($result_seCarData3['ENDDATE'] == NULL) {
+                                            $year31end =  '';
+                                            $year32end =  '';
+                                        }else {
+                                            $year31end =  substr($result_seCarData3['ENDDATE'],0,6);
+                                            $year32end =  substr($result_seCarData3['ENDDATE'],6,10)+543;
+                                        }
+
+                                         // ข้อมูลวันที่รายงานตัวและวันที่ทำงานคนที่1 เพื่อเช็ค Self Check
+                                        //  DATE WORKING ใน SELFCHECK คือ DATERK ในแผน
+                                        $sql_seDateSelfCheck3 = "SELECT CONVERT(VARCHAR(10),DATERK,103) AS 'DATERK',
+                                        CONVERT(VARCHAR(10),DATEPRESENT,103)  AS 'DATEPRESENT'
+                                        FROM VEHICLETRANSPORTPLAN
+                                        WHERE VEHICLETRANSPORTPLANID ='".$_GET['vehicletransportplanid']."'";
+                                        $query_seDateSelfCheck3 = sqlsrv_query($conn, $sql_seDateSelfCheck3, $params_seDateSelfCheck3);
+                                        $result_seDateSelfCheck3 = sqlsrv_fetch_array($query_seDateSelfCheck3, SQLSRV_FETCH_ASSOC);
+                                        
+                                        // echo $result_seDateSelfCheck2['DATEWORKING'];
+                                        // echo "<br>";
+                                        // echo $result_seDateSelfCheck2['DATEPRESENT'];
+
+                                        $dateself3 = date("d/m/Y"); //วันที่ปัจจุบันพนักงานคนที่2
+
+                                        //SELF CHECKคนที่3
+                                        $sql_seSelfCheck3 = "SELECT TOP 1 SELFCHECKID,SLEEPRESTSTART,SLEEPRESTEND,TIMESLEEPREST,
+                                        SLEEPNORMALSTART,SLEEPNORMALEND,TIMESLEEPNORMAL,SLEEPEXTRASTART,SLEEPEXTRAEND,TIMESLEEPEXTRA,KEYDROPTIME,TIMEWORKING
+                                        FROM DRIVERSELFCHECK WHERE EMPLOYEECODE ='".$_GET['employeecode3']."' 
+                                        AND (CONVERT(VARCHAR(10),CREATEDATE,103) ='".$result_seDateSelfCheck3['DATERK']."' 
+                                        OR CONVERT(VARCHAR(10),CREATEDATE,103) ='".$result_seDateSelfCheck3['DATEPRESENT']."')
+                                        AND ACTIVESTATUS ='1'
+                                        ORDER BY  CONVERT(CHAR(5), CREATEDATE, 108) DESC";
+                                        $query_seSelfCheck3 = sqlsrv_query($conn, $sql_seSelfCheck3, $params_seSelfCheck3);
+                                        $result_seSelfCheck3 = sqlsrv_fetch_array($query_seSelfCheck3, SQLSRV_FETCH_ASSOC);
+
+                                        //เช็คจำนวนชั่วโมงในการนอน 4.5 ชั่วโมง
+                                        if ($result_seSelfCheck3['TIMESLEEPEXTRA'] == '' || $result_seSelfCheck3['TIMESLEEPEXTRA'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') {
+                                            $TIMESLEEPEXTRAHOURCHK3 = '0'; 
+                                            $TIMESLEEPEXTRAMINCHK3  = '0';
+                                        }else {
+                                            // $TIMESLEEPEXTRA  = str_replace(":","",substr($result_seSelfCheck['TIMESLEEPEXTRA'],0,6));
+                                            //$TIMESLEEPEXTRA = $result_seSelfCheck['TIMESLEEPEXTRA'];
+                                            //เช็คจำนวนชั่วโมงในการนอน 
+                                            $TIMESLEEPEXTRAHOURCHK3 = substr($result_seSelfCheck3['TIMESLEEPEXTRA'],0,2);
+                                            //เช็คจำนวนนาทีในการนอน
+                                            $TIMESLEEPEXTRAMINCHK3 = substr($result_seSelfCheck3['TIMESLEEPEXTRA'],2,3);
+                                           if ($TIMESLEEPEXTRAHOURCHK3  == '4:') { //กรณีที่เท่ากับ 4 
+                                                $TIMESLEEPEXTRAHOURCHK3 = 'HG4'; //HG4 mean Greater than 4 hour มากกว่า 4 ชม
+                                           }else if ($TIMESLEEPEXTRAHOURCHK3 > '4') {
+                                                $TIMESLEEPEXTRAHOURCHK3 = 'HGG4'; //เลข 4 ขึ้นไปและเลขสองหลัก ex 5, 6, 10
+                                           }
+                                           else {
+                                                $TIMESLEEPEXTRAHOURCHK3 = 'HL4'; //HL4 mean Less than 4 hour น้อยกว่า 4 ชม  
+                                           }
+                                           //เช็คจำนวนนาทีในการนอน
+                                           $TIMESLEEPEXTRAMINCHK3 = substr($result_seSelfCheck3['TIMESLEEPEXTRA'],2,3);
+                                           if ($TIMESLEEPEXTRAMINCHK3 >= '30') {
+                                                $TIMESLEEPEXTRAMINCHK3 = 'MG3'; //MG3 mean Greater than 30 minute มากกว่า 30นาที
+                                           }else {
+                                                $TIMESLEEPEXTRAMINCHK3 = 'ML3'; //ML3 mean Less than 30 minute น้อยกว่า 30นาที   
+                                           }
+
+                                        }
+
+                                        //เวลาการพักผ่อน 8 ชั่วโมง
+                                        if ($result_seSelfCheck3['TIMESLEEPREST'] == '' || $result_seSelfCheck3['TIMESLEEPREST'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') {
+                                            $TIMESLEEPREST3 = '0';
+                                        }else {
+                                            $TIMESLEEPREST3 = substr($result_seSelfCheck3['TIMESLEEPREST'],0,2);
+                                        }
+
+                                        //เวลาการนอนปกติ 6 ชั่วโมง
+                                        if ($result_seSelfCheck3['TIMESLEEPNORMAL'] == '' || $result_seSelfCheck3['TIMESLEEPNORMAL'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') {
+                                            $TIMESLEEPNORMAL3 = '0';
+                                        }else {
+                                            $TIMESLEEPNORMAL3 = substr($result_seSelfCheck3['TIMESLEEPNORMAL'],0,2);
+                                        }
+                                        
+                                        // echo $TIMESLEEPNORMAL2;
+
+                                        // ข้อมูลจาก LABOTRON ที่จะ Auto Insert data
+                                        // Auto2
+                                        $sql_seLabotronData3 = "SELECT TOP 1 CARDNUMBER,CAST(DRIVER_TEMPERATURE AS DECIMAL(15, 1)) AS 'TEMP',DRIVER_SYS AS 'SYS',DRIVER_DIA AS 'DIA',
+                                        DRIVER_PULSE AS 'PULSE',DRIVER_OXYGEN AS 'OXYGEN',
+                                        CASE
+                                            WHEN DRIVER_ALCOHOL = '0.0' THEN '0'
+                                            ELSE DRIVER_ALCOHOL
+                                        END AS 'ALCOHOL'  
+                                        FROM LABOTRONWEBSERVICEDATA 
+                                        WHERE CARDNUMBER='".$result_seCarData3['TaxID']."'
+										AND CONVERT(DATE,CREATEDATE) = CONVERT(DATE,GETDATE())
+                                        ORDER BY CONVERT(VARCHAR(18),CREATEDATE,103) DESC";
+                                        $query_seLabotronData3 = sqlsrv_query($conn, $sql_seLabotronData3, $params_seLabotronData3);
+                                        $result_seLabotronData3 = sqlsrv_fetch_array($query_seLabotronData3, SQLSRV_FETCH_ASSOC);
+                                        
+                                        // echo $result_seCarData2['TaxID'];
+                                        // echo "<br>";
+                                        // echo $result_seLabotronData2['TEMP'];
+                                        // echo "<br>";
+
+                                        // check box TEMP
+                                        if ($result_seTenkobefore['TENKOTEMPERATUREDATA'] == '') {
+                                            $TEMP3 = $result_seLabotronData3['TEMP'];
+                                            // echo $TEMP1;
+                                               
+                                        }else {
+                                            $TEMP3 = $result_seTenkobefore['TENKOTEMPERATUREDATA'];
+                                            // echo $TEMP1;
+                                            
+                                        }
+
+                                        // check box SYS
+                                        if ($result_seTenkobefore['TENKOPRESSUREDATA_90160'] == '') {
+                                            $SYS3 = $result_seLabotronData3['SYS']; 
+                                        }else {
+                                            $SYS3 = $result_seTenkobefore['TENKOPRESSUREDATA_90160'];
+                                        }
+                                        
+                                        // check box DIA
+                                        if ($result_seTenkobefore['TENKOPRESSUREDATA_60100'] == '') {
+                                            $DIA3 = $result_seLabotronData3['DIA']; 
+                                        }else {
+                                            $DIA3 = $result_seTenkobefore['TENKOPRESSUREDATA_60100'];
+                                        }
+
+                                        // check box Pulse
+                                        if ($result_seTenkobefore['TENKOPRESSUREDATA_60110'] == '') {
+                                            $PULSE3 = $result_seLabotronData3['PULSE']; 
+                                        }else {
+                                            $PULSE3 = $result_seTenkobefore['TENKOPRESSUREDATA_60110'];
+                                        }
+                                        
+                                        // check box Oxygen
+                                        if ($result_seTenkobefore['TENKOOXYGENDATA'] == '') {
+                                            $OXYGEN3 = $result_seLabotronData3['OXYGEN']; 
+                                        }else {
+                                            $OXYGEN3 = $result_seTenkobefore['TENKOOXYGENDATA'];
+                                        }
+                                        
+                                        // check box Alcohol
+                                        if ($result_seTenkobefore['TENKOALCOHOLDATA'] == '') {
+                                            $ALCOHOL3 = $result_seLabotronData3['ALCOHOL']; 
+                                        }else {
+                                            $ALCOHOL3 = $result_seTenkobefore['TENKOALCOHOLDATA'];
+                                        }
+
+                                        // CheckBox เงื่อนไขข้อมูลตรวจร่างกาย
+                                        // edit_tenkobeforetxt4 = เช็คอุณภูมิ
+                                        // edit_tenkobeforetxt5 = เช็คความดันบน
+                                        // edit_tenkobeforetxt6 = เช็คความดันล่าง
+                                        // edit_tenkobeforetxt20 = อัตราการเต้นของหัวใจ
+                                        // edit_tenkobeforetxt8 = ออกซิเจนในเลือด
+                                        // edit_tenkobeforetxt7 = แอลกอฮอล์
+                                        echo "<script type='text/javascript'> 
+                                                window.onload = function() {
+                                                    edit_tenkobeforetxt4();
+                                                    edit_tenkobeforetxt5();
+                                                    edit_tenkobeforetxt6();
+                                                    edit_tenkobeforetxt20();
+                                                    edit_tenkobeforetxt8();
+                                                    edit_tenkobeforetxt7();
+                                                }; 
+                                            </script>";
+
+
+                                        $check11 = ($result_seTenkobefore['TENKOBEFOREGREETCHECK'] == '1') ? "checked" : "";
+                                        $check12 = ($result_seTenkobefore['TENKOUNIFORMCHECK'] == '1') ? "checked" : "";
+                                        $check13 = ($result_seTenkobefore['TENKOBODYCHECK'] == '1') ? "checked" : "";
+                                        //if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL' || $result_sePlain['COMPANYCODE'] == 'RKS') {
+                                        $check14 = ($result_seTenkobefore['TENKORESTCHECK'] == '1' || $result_seTenkobefore['TENKORESTDATA'] > 7) ? "checked" : "";
+                                        $rs141 = ($result_seTenkobefore['TENKORESTDATA'] > 7) ? "checked" : "";
+                                        $rs140 = ($result_seTenkobefore['TENKORESTDATA'] < 8) ? "checked" : "";
+                                        //}
+                                        //else
+                                        //{
+                                        //    $check14 = ($result_seTenkobefore['TENKORESTCHECK'] == '1' || $RS_TENKORESTDATA > 7) ? "checked" : "";
+                                        //    $rs141 = ($RS_TENKORESTDATA > 7) ? "checked" : "";
+                                        //    $rs140 = ($RS_TENKORESTDATA < 8) ? "checked" : "";
+                                        //}
+                                        $check15 = ($result_seTenkobefore['TENKOSLEEPTIMECHECK'] == '1') ? "checked" : "";
+                                        $check16 = ($result_seTenkobefore['TENKOTEMPERATURECHECK'] == '1') ? "checked" : "";
+                                        $check17 = ($result_seTenkobefore['TENKOPRESSURECHECK'] == '1') ? "checked" : "";
+                                        $check18 = ($result_seTenkobefore['TENKOALCOHOLCHECK'] == '1') ? "checked" : "";
+                                        $check19 = ($result_seTenkobefore['TENKOWORRYCHECK'] == '1') ? "checked" : "";
+                                        $check110 = ($result_seTenkobefore['TENKODAILYTRAILERCHECK'] == '1') ? "checked" : "";
+                                        $check111 = ($result_seTenkobefore['TENKOCARRYCHECK'] == '1') ? "checked" : "";
+                                        $check112 = ($result_seTenkobefore['TENKOJOBDETAILCHECK'] == '1') ? "checked" : "";
+                                        $check113 = ($result_seTenkobefore['TENKOLOADINFORMCHECK'] == '1') ? "checked" : "";
+                                        $check114 = ($result_seTenkobefore['TENKOAIRINFORMCHECK'] == '1') ? "checked" : "";
+                                        $check115 = ($result_seTenkobefore['TENKOYOKOTENCHECK'] == '1') ? "checked" : "";
+                                        $check116 = ($result_seTenkobefore['TENKOCHIMOLATORCHECK'] == '1') ? "checked" : "";
+                                        $check117 = ($result_seTenkobefore['TENKOTRANSPORTCHECK'] == '1') ? "checked" : "";
+                                        $check118 = ($result_seTenkobefore['TENKOAFTERGREETCHECK'] == '1') ? "checked" : "";
+                                        $check119 = ($result_seTenkobefore['TENKOOXYGENCHECK'] == '1') ? "checked" : "";
+                                        
+                                        //เช็คค่าสายตาพนักงานคนที่2
+                                        // $checkshortsight = ($result_seTenkobefore['TENKOSHORTSIGHTCHECK'] == '1') ? "checked" : "";
+                                        // $checklongsight = ($result_seTenkobefore['TENKOLONGSIGHTCHECK'] == '1') ? "checked" : "";    
+                                        // $checkobliquesight =($result_seTenkobefore['TENKOOBLIQUESIGHTCHECK'] == '1') ? "checked" : ""; 
+                                        // //เช็คปกติ
+                                        // $rsshortsightok = ($result_seTenkobefore['TENKOSHORTSIGHTRESULT'] == '1') ? "checked" : "";
+                                        // $rslongsightok = ($result_seTenkobefore['TENKOLONGSIGHTRESULT'] == '1') ? "checked" : "";
+                                        // $rsobliquesightok = ($result_seTenkobefore['TENKOOBLIQUESIGHTRESULT'] == '1') ? "checked" : "";        
+                                        // //เช็คไม่ปกติ
+                                        // $rsshortsightng = ($result_seTenkobefore['TENKOSHORTSIGHTRESULT'] == '0' || $result_seTenkobefore['TENKOSHORTSIGHTRESULT'] == '') ? "checked" : "";
+                                        // $rslongsightng = ($result_seTenkobefore['TENKOLONGSIGHTRESULT'] == '0' || $result_seTenkobefore['TENKOLONGSIGHTRESULT'] == '') ? "checked" : "";
+                                        // $rsobliquesightng = ($result_seTenkobefore['TENKOOBLIQUESIGHTRESULT'] == '0' || $result_seTenkobefore['TENKOOBLIQUESIGHTRESULT'] == '') ? "checked" : "";   
+    
+                                        // แบบใหม่
+                                        // eyeproblem check
+                                        if ($result_seTenkobefore['TENKOSHORTSIGHTCHECK'] == '1'  || $result_seTenkobefore['TENKOLONGSIGHTCHECK'] == '1' 
+                                        || $result_seTenkobefore['TENKOOBLIQUESIGHTCHECK'] == '1' || $result_seTenkobefore['TENKOEYEPROBLEMCHECK'] == '1') {
+                                           $checkeyeproblem = "checked";
+                                        } else {
+                                           $checkeyeproblem = "";
+                                        }
+
+                                        // eyeproblem result
+                                        if ($result_seTenkobefore['TENKOSHORTSIGHTRESULT'] == '1'  || $result_seTenkobefore['TENKOLONGSIGHTRESULT'] == '1' 
+                                        || $result_seTenkobefore['TENKOOBLIQUESIGHTRESULT'] == '1' || $result_seTenkobefore['TENKOEYEPROBLEMRESULT'] == '1') {
+                                           $resulteyeproblemok = "checked";
+                                           $resulteyeproblemng = "";
+                                        } else {
+                                           $resulteyeproblemok = "";
+                                           $resulteyeproblemng = "checked";
+                                        }    
+ 
+                                        // eyeproblem remark
+                                        if ($result_seTenkobefore['TENKOSHORTSIGHTREMARK'] != '') {
+
+                                           $remarkeyeproblem = $result_seTenkobefore['TENKOSHORTSIGHTREMARK'];
+                                           
+                                        }else if ($result_seTenkobefore['TENKOLONGSIGHTREMARK'] != '') {
+
+                                            $remarkeyeproblem = $result_seTenkobefore['TENKOLONGSIGHTREMARK'];
+                                            
+                                        }else if ($result_seTenkobefore['TENKOOBLIQUESIGHTREMARK'] != '') {
+                                            
+                                             $remarkeyeproblem = $result_seTenkobefore['TENKOOBLIQUESIGHTREMARK'];
+                                           
+                                        }else {
+                                             $remarkeyeproblem = $result_seTenkobefore['TENKOEYEPROBLEMREMARK'];
+                                            
+                                        }    
+
+                                        /////////////////////////////////////////////////////////////////////////////////////////
+
+
+                                        $rs111 = ($result_seTenkobefore['TENKOBEFOREGREETRESULT'] == '1') ? "checked" : "";
+                                        $rs121 = ($result_seTenkobefore['TENKOUNIFORMRESULT'] == '1') ? "checked" : "";
+                                        $rs131 = ($result_seTenkobefore['TENKOBODYRESULT'] == '1') ? "checked" : "";
+                                        $rs151 = ($result_seTenkobefore['TENKOSLEEPTIMERESULT'] == '1') ? "checked" : "";
+                                        $rs161 = ($result_seTenkobefore['TENKOTEMPERATURERESULT'] == '1') ? "checked" : "";
+                                        $rs171 = ($result_seTenkobefore['TENKOPRESSURERESULT'] == '1') ? "checked" : "";
+                                        $rs181 = ($result_seTenkobefore['TENKOALCOHOLRESULT'] == '1') ? "checked" : "";
+                                        $rs191 = ($result_seTenkobefore['TENKOWORRYRESULT'] == '1') ? "checked" : "";
+                                        $rs1101 = ($result_seTenkobefore['TENKODAILYTRAILERRESULT'] == '1') ? "checked" : "";
+                                        $rs1111 = ($result_seTenkobefore['TENKOCARRYRESULT'] == '1') ? "checked" : "";
+                                        $rs1121 = ($result_seTenkobefore['TENKOJOBDETAILRESULT'] == '1') ? "checked" : "";
+                                        $rs1131 = ($result_seTenkobefore['TENKOLOADINFORMRESULT'] == '1') ? "checked" : "";
+                                        $rs1141 = ($result_seTenkobefore['TENKOAIRINFORMRESULT'] == '1') ? "checked" : "";
+                                        $rs1151 = ($result_seTenkobefore['TENKOYOKOTENRESULT'] == '1') ? "checked" : "";
+                                        $rs1161 = ($result_seTenkobefore['TENKOCHIMOLATORRESULT'] == '1') ? "checked" : "";
+                                        $rs1171 = ($result_seTenkobefore['TENKOTRANSPORTRESULT'] == '1') ? "checked" : "";
+                                        $rs1181 = ($result_seTenkobefore['TENKOAFTERGREETRESULT'] == '1') ? "checked" : "";
+                                        $rs1191 = ($result_seTenkobefore['TENKOOXYGENRESULT'] == '1') ? "checked" : "";
+
+                                        $rs110 = ($result_seTenkobefore['TENKOBEFOREGREETRESULT'] == '0' || $result_seTenkobefore['TENKOBEFOREGREETRESULT'] == '') ? "checked" : "";
+                                        $rs120 = ($result_seTenkobefore['TENKOUNIFORMRESULT'] == '0' || $result_seTenkobefore['TENKOUNIFORMRESULT'] == '') ? "checked" : "";
+                                        $rs130 = ($result_seTenkobefore['TENKOBODYRESULT'] == '0' || $result_seTenkobefore['TENKOBODYRESULT'] == '') ? "checked" : "";
+
+
+                                        $rs150 = ($result_seTenkobefore['TENKOSLEEPTIMERESULT'] == '0' || $result_seTenkobefore['TENKOSLEEPTIMERESULT'] == '') ? "checked" : "";
+                                        $rs160 = ($result_seTenkobefore['TENKOTEMPERATURERESULT'] == '0' || $result_seTenkobefore['TENKOTEMPERATURERESULT'] == '') ? "checked" : "";
+                                        $rs170 = ($result_seTenkobefore['TENKOPRESSURERESULT'] == '0' || $result_seTenkobefore['TENKOPRESSURERESULT'] == '') ? "checked" : "";
+                                        $rs180 = ($result_seTenkobefore['TENKOALCOHOLRESULT'] == '0' || $result_seTenkobefore['TENKOALCOHOLRESULT'] == '') ? "checked" : "";
+                                        $rs190 = ($result_seTenkobefore['TENKOWORRYRESULT'] == '0' || $result_seTenkobefore['TENKOWORRYRESULT'] == '') ? "checked" : "";
+                                        $rs1100 = ($result_seTenkobefore['TENKODAILYTRAILERRESULT'] == '0' || $result_seTenkobefore['TENKODAILYTRAILERRESULT'] == '') ? "checked" : "";
+                                        $rs1110 = ($result_seTenkobefore['TENKOCARRYRESULT'] == '0' || $result_seTenkobefore['TENKOCARRYRESULT'] == '') ? "checked" : "";
+                                        $rs1120 = ($result_seTenkobefore['TENKOJOBDETAILRESULT'] == '0' || $result_seTenkobefore['TENKOJOBDETAILRESULT'] == '') ? "checked" : "";
+                                        $rs1130 = ($result_seTenkobefore['TENKOLOADINFORMRESULT'] == '0' || $result_seTenkobefore['TENKOLOADINFORMRESULT'] == '') ? "checked" : "";
+                                        $rs1140 = ($result_seTenkobefore['TENKOAIRINFORMRESULT'] == '0' || $result_seTenkobefore['TENKOAIRINFORMRESULT'] == '') ? "checked" : "";
+                                        $rs1150 = ($result_seTenkobefore['TENKOYOKOTENRESULT'] == '0' || $result_seTenkobefore['TENKOYOKOTENRESULT'] == '') ? "checked" : "";
+                                        $rs1160 = ($result_seTenkobefore['TENKOCHIMOLATORRESULT'] == '0' || $result_seTenkobefore['TENKOCHIMOLATORRESULT'] == '') ? "checked" : "";
+                                        $rs1170 = ($result_seTenkobefore['TENKOTRANSPORTRESULT'] == '0' || $result_seTenkobefore['TENKOTRANSPORTRESULT'] == '') ? "checked" : "";
+                                        $rs1180 = ($result_seTenkobefore['TENKOAFTERGREETRESULT'] == '0' || $result_seTenkobefore['TENKOAFTERGREETRESULT'] == '') ? "checked" : "";
+                                        $rs1190 = ($result_seTenkobefore['TENKOOXYGENRESULT'] == '0' || $result_seTenkobefore['TENKOOXYGENRESULT'] == '') ? "checked" : "";
+                                        ?>
+                                        <!-- ใบขับขี่และ Self Check พขร3 -->
+                                        <table style="width:100%;border: 1px solid black;border-collapse: collapse;">
+                                            <tr>
+                                                <!-- 2222 -->
+                                                <th colspan = "25" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ : <?=$sex?>  <?= $result_sePlain['EMPLOYEENAME3'] ?> || รหัสพนักงาน : <?=$_GET['employeecode3']?> || ตำแหน่ง : <?=$result_seCarData3['PositionNameT']?> || อายุงาน : <?= $result_CalculateWork['RS']?></font></th>
+                                                <!-- <th colspan = "25" style="border: 1px solid black;background-color: #a3a3a3;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ : <?=$sex?>  <?= $result_sePlain['EMPLOYEENAME2'] ?></font></th> -->
+                                            </tr>
+                                            <tr>
+                                                <th colspan = "4" rowspan="4" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center"><img  style="padding:4px;text-align:center;height: 200px;width: 200px;" src="../images/employee/<?=$_GET['employeecode3']?>.JPG" data-action="zoom" alt="Pic_Driver1" ></th>
+                                                <th colspan = "6" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center;font-size: 12px;">ตรวจสอบปัญหาสายตา<font style="color:#ff0808"> *สีแดง หมายถึงมีปัญหาสายตา เจ้าหน้าที่ต้องเน้นย้ำ และตรวจสอบแว่นสายตาของพนักงาน </font></th>  
+                                                <th colspan = "8" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ข้อมูลวันหมดอายุใบขับขี่ พขร.3</th> 
+                                                <th colspan = "4" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ตรวจสอบ พขร.3</th>
+                                                <th colspan = "4" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">เอกสารเท็งโก๊ะ พขร.3</th>
+                                            </tr>
+                                            <tr>
+                                                <!-- สายตาสั้น -->
+                                                <?php
+                                                if ($result_sehealth['SHORTSIGHT'] == '1') {
+                                                   ?>
+                                                      <th colspan = "2" style="width:100px;border: 1px solid black;background-color: #FA9F9F;border-collapse: collapse;padding: 5px;text-align: center;">สายตาสั้น</th>   
+                                                   <?php
+                                                }else{
+                                                    ?>
+                                                        <th colspan = "2" style="width:100px;border: 1px solid black;background-color: #FFFFF;border-collapse: collapse;padding: 5px;text-align: center">สายตาสั้น</th> 
+                                                    <?php
+                                                }
+                                                ?>
+                                                <!-- สายตายาว -->
+                                               <?php
+                                                if ($result_sehealth['LONGSIGHT'] == '1') {
+                                                   ?>
+                                                      <th colspan = "2" style="width:100px;border: 1px solid black;background-color: #FA9F9F;border-collapse: collapse;padding: 5px;text-align: center;">สายตายาว</th>   
+                                                   <?php
+                                                }else{
+                                                    ?>
+                                                        <th colspan = "2" style="width:100px;border: 1px solid black;background-color: #FFFFF;border-collapse: collapse;padding: 5px;text-align: center">สายตายาว</th> 
+                                                    <?php
+                                                }
+                                                ?>
+                                                <!-- สายตาเอียง -->
+                                                    <?php
+                                                if ($result_sehealth['OBLIQUESIGHT'] == '1') {
+                                                   ?>
+                                                      <th colspan = "2" style="width:100px;border: 1px solid black;background-color: #FA9F9F;border-collapse: collapse;padding: 5px;text-align: center;">สายตาเอียง</th>   
+                                                   <?php
+                                                }else{
+                                                    ?>
+                                                        <th colspan = "2" style="width:100px;border: 1px solid black;background-color: #FFFFF;border-collapse: collapse;padding: 5px;text-align: center">สายตาเอียง</th> 
+                                                    <?php
+                                                }
+                                                ?>
+
+                                                    <th colspan = "4" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left">เลขที่ใบขับขี่</th>
+                                                    <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><?=$result_seCarData3['CarLicenceID']?></th>
+                                                    <?php
+                                                    if ($result_seSelfCheck2['SELFCHECKID'] == '') {
+                                                    ?>
+                                                        <!-- <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="function warning(){alert('ไม่สามารถดูข้อมูลได้เนื่องจากพนักงานยังไม่ได้ทำการแจ้งสุขภาพตนเอง!!!\nหรือไม่มีการกดยืนยันข้อมูลการตรวจสุขภาพตนเองจากเจ้าหน้าที่!!!!!!')};warning();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"></th> -->
+                                                        <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="warning_selfcheck();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"></th>
+                                                    <?php
+                                                    }else {
+                                                    ?>
+                                                        <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="se_selfcheck('<?=$result_seSelfCheck2['SELFCHECKID']?>','<?= $result_seEmployee3['nameT'] ?>','<?= $_GET['employeecode3'] ?>','<?=$dateself3?>','<?=$result_seDateSelfCheck3['DATERK']?>','<?=$result_seDateSelfCheck3['DATEPRESENT']?>','<?= $result_seEmployee['nameT']?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check3" class="btn btn-primary"></th>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                    
+                                                    <?php
+                                                    // $emp = ($_GET['employeecode1'] != "") ? $_GET['employeecode1'] : $_GET['employeecode2'];
+                                                    
+                                                    if ($_GET['employeecode1'] != "") {
+                                                        $emp = $_GET['employeecode1'];
+                                                    }else if ($_GET['employeecode2'] != ""){
+                                                        $emp = $_GET['employeecode2'];
+                                                    }else{
+                                                        $emp = $_GET['employeecode3'];
+                                                    }
+
+                                                    if ($emp != "") {
+                                                        ?>
+                                                        <div class="col-lg-10 text-right">
+
+                                                        <th colspan = "4" style="width:160px;background-color: coral;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><a href="pdf_reportemployee4_1.php?employeecode=<?= $emp ?>&tenkomasterid=<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>&vehicletransportplanid=<?= $_GET['vehicletransportplanid'] ?>&selfcheckid=<?= $result_seSelfCheck3['SELFCHECKID'] ?>"  target ="_blank" class="btn btn-default">พิมพ์เอกสารเท็งโกะ พขร.3<li class="fa fa-print"></li></a></th> 
+                                                        </div>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                            </tr>
+                                            <tr>
+                                                <td style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px">R(ข้างขวา)</td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px">L(ข้างซ้าย)</td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px">R(ข้างขวา)</td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px">L(ข้างซ้าย)</td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px">R(ข้างขวา)</td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: center;padding: 5px">L(ข้างซ้าย)</td>
+                                                <!--ใบขับขี่  -->
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px"><b>วันออกบัตร</b></td>
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b><?=$year31start?><?=$year32start?></b></td>
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b>SelfCheckID: <?=$result_seSelfCheck3['SELFCHECKID']?></b></td>
+                                                <!-- เอกสารเท็งโกะ -->
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><button type="button" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" data-toggle="modal" data-target="#myModalinsert"  >ข้อมูล Simulator พขร.3</button></td>
+                                            
+                                            </tr>
+                                            <tr>
+                                                <td style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><?=$result_sehealth['SHORTSIGHT_R']?></td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><?=$result_sehealth['SHORTSIGHT_L']?></td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><?=$result_sehealth['LONGSIGHT_R']?></td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><?=$result_sehealth['LONGSIGHT_L']?></td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><?=$result_sehealth['OBLIQUESIGHT_R']?></td>
+                                                <td style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><?=$result_sehealth['OBLIQUESIGHT_L']?></td>
+                                                <!--ใบขับขี่  -->
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;background-color: #c9c9c9;text-align: left;padding: 5px"><b>วันหมดอายุ</b></td>
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px;<?= $licensechk3?>" ><b><?=$year31end?><?=$year32end?></b></td>
+                                                <!-- กราฟสุขภาพ -->
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;text-align: left;padding: 5px"><b><input style="width:160px;" type="button" onclick="se_graphdatacheck('<?= $_GET['employeecode3'] ?>');" name="btnSend" id="btnSend" value="ดูกราฟข้อมูลสุขภาพ" class="btn btn-primary"></b></td>
+                                                <!-- เอกสารตรวจรถ -->
+                                                <td colspan = "4" style="border: 1px solid black;border-collapse: collapse;text-align: center;padding: 5px"><input style="width:160px;" type="button" onclick="se_truckdailycheck('<?= $_GET['employeecode3'] ?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการตรวจรถ" class="btn btn-primary"></b></td>
+                                            </tr>
+                                        </table>    
+                                        <table  width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                            <thead>
+                                                <tr>
+
+                                                    <th  colspan="7" ><input type="button" onclick="commit_1('<?=$result_seSelfCheck3['SELFCHECKID']?>','<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>','<?=$result_seTenkobefore['TENKOBEFOREID']?>','<?=$result_seEmployee['nameT']?>')" class="btn btn-success" value="Commit3_Before"> </th>
+
+                                                    <!-- <th  colspan="7" ><input type="button" onclick="commit_1('<?=$result_seSelfCheck2['SELFCHECKID']?>')" class="btn btn-success" value="Commit2_Before"> <font style="color: green">พนักงานขับรถ : <?=$sex?> <?= $result_sePlain['EMPLOYEENAME2'] ?></font></th> -->
+
+
+                                                    <th width="65">เจ้าหน้าที่</th>
+                                                    <th width="144" ><?= $result_seEmployee["nameT"] ?></th>
+                                                    <th width="40">พขร.</th>
+                                                    <th width="144" ><?= $result_sePlain['EMPLOYEENAME3'] ?></th>
+                                                </tr>
+                                                <tr>
+                                                    <th width="40" rowspan="2"  style="width: 40px;text-align: center">ข้อ</th>
+                                                    <th width="280" rowspan="2" style="width: 200px;text-align: center">หัวข้อ</th>
+                                                    <th width="92" rowspan="2" style="width: 20px;text-align: center">ช่องตรวจสอบ</th>
+                                                    <th colspan="2" rowspan="2" style="width: 400px;text-align: center">เกณฑ์การตัดสิน</th>
+                                                    <th colspan="2" style="width: 80px;text-align: center">ผล</th>
+                                                    <th colspan="4" style="text-align: center" rowspan="2">รายเอียดและการแนะนำ</th>
+                                                </tr>
+                                                <tr>
+                                                    <th width="40" style="width: 40px;text-align: center" >ปกติ</th>
+                                                    <th width="49" style="width: 40px;text-align: center" >ผิดปกติ</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="text-align: center">1</td>
+                                                    <td>การทักทายก่อนเริ่มเท็งโกะ</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check11 ?>  id="chk_11" name="chk_11"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2" >ทักทายอย่างมีชีวิตชีวา</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs111 ?> style="transform: scale(2)" id="chk_rs111" name="chk_rs111" onchange="edit_rs111()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs110 ?> style="transform: scale(2)" id="chk_rs110" name="chk_rs110" onchange="edit_rs110()"/></td>
+                                                    <td colspan="4" ><input type="text" id="txt_remark11" name="txt_remark11" class="form-control" value="<?= $result_seTenkobefore['TENKOBEFOREGREETREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">2</td>
+                                                    <td>ตรวจเซ็คยูนิฟอร์ม</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check12 ?> id="chk_12" name="chk_12"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">สวมชุดที่สะอาด ไม่ใส่เครื่องประดับที่อาจทำให้เกิดรอย, ตรวจรองเท้า, เข็มขัด, หมวกเซฟตี้</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs121 ?> style="transform: scale(2)" id="chk_rs121" name="chk_rs121" onchange="edit_rs121()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs120 ?> style="transform: scale(2)" id="chk_rs120" name="chk_rs120" onchange="edit_rs120()"/></td>
+                                                    <td colspan="4"  ><input type="text" id="txt_remark12" name="txt_remark12" class="form-control" value="<?= $result_seTenkobefore['TENKOUNIFORMREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">3</td>
+                                                    <td>ตรวจสอบสภาพร่างกาย</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check13 ?> id="chk_13" name="chk_13"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">สุขภาพร่างกายแข็งแรงดี</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs131 ?> style="transform: scale(2)" id="chk_rs131" name="chk_rs131" onchange="edit_rs131()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs130 ?> style="transform: scale(2)" id="chk_rs130" name="chk_rs130" onchange="edit_rs130()"/></td>
+                                                    <td colspan="4"  ><input type="text" id="txt_remark13" name="txt_remark13" class="form-control" value="<?= $result_seTenkobefore['TENKOBODYREMARK'] ?>"></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <!-- ตรวจสอบระยะการพักผ่อนคนที่2 -->
+                                                    <td style="text-align: center">4</td>
+                                                    <td>ตรวจสอบระยะการพักผ่อน</td>
+                                                    <!-- <td style="text-align: center"><input type="checkbox"  <?= $check14 ?> id="chk_14" name="chk_14"  style="transform: scale(2)"/></td> -->
+                                                    <?php
+                                                    if ($TIMESLEEPREST3 == '0') {
+                                                    ?>
+                                                    <td style="text-align: center"><input type="checkbox" disabled=""  id="chk_14" name="chk_14"  style="transform: scale(2)"/></td>    
+                                                    <?php
+                                                    }else {
+                                                    ?>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" checked  id="chk_14" name="chk_14"  style="transform: scale(2)"/></td>
+                                                    <?php
+                                                    }
+                                                    ?>
+
+                                                    <td>ตั้งแต่ 8 ชั่วโมง <b>พขร.3</b></td>
+                                                    <td>
+                                                        <label>ชั่วโมงการพักผ่อน</label>
+                                                        <?php
+                                                        if ($TIMESLEEPREST3 == '0') {
+                                                        ?>
+                                                        <input type="text" readonly="" class="form-control"  id="txt_rs14" name="txt_rs14" value="" ></td>    
+                                                        <?php
+                                                        }else if ($TIMESLEEPREST3 >= '8') {
+                                                        ?>
+                                                        <input type="text" readonly="" style="background-color: #94FA67;" class="form-control"  id="txt_rs14" name="txt_rs14" value="<?= $result_seSelfCheck3['TIMESLEEPREST'] ?>" ></td>
+                                                        <?php
+                                                        }else {
+                                                        ?>
+                                                        <input type="text" readonly="" style="background-color: #FA6767;" class="form-control"  id="txt_rs14" name="txt_rs14" value="<?= $result_seSelfCheck3['TIMESLEEPREST'] ?>" ></td>
+                                                        <?php
+                                                        }
+                                                        ?>
+
+                                                        <?php 
+                                                        if (($result_seSelfCheck3['SLEEPRESTSTART'] == '' || $result_seSelfCheck3['SLEEPRESTSTART'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>' || 
+                                                            $result_seSelfCheck3['SLEEPRESTEND'] == ''   || $result_seSelfCheck3['SLEEPRESTEND'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') || ($TIMESLEEPREST3 <'8')  ) {
+                                                        ?>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox"         style="transform: scale(2)" id="chk_rs141" name="chk_rs141" onchange="edit_rs141()"/></td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" checked style="transform: scale(2)" id="chk_rs140" name="chk_rs140" onchange="edit_rs140()"/></td>
+                                                        <?php
+                                                        }else {
+                                                        ?>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" checked style="transform: scale(2)" id="chk_rs141" name="chk_rs141" onchange="edit_rs141()"/></td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox"         style="transform: scale(2)" id="chk_rs140" name="chk_rs140" onchange="edit_rs140()"/></td>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                     </td>   
+                                                    <td colspan="2" >
+                                                        <!-- พักผ่อน 8 ชั่วโมงคนที่2 -->
+                                                        <label>เวลาเริ่มพักผ่อน(8 ชั่วโมง)</label>
+                                                        <input disabled="" type="datetime-local" id="txt_remark14" name="txt_remark14" class="form-control" value="<?= $result_seSelfCheck3['SLEEPRESTSTART'] ?>" style="">
+                                                        <!-- <input type="button"  data-toggle="modal"  data-target="#modal_tenkorestremark" id="btn_remark14" name="btn_remark14" class="btn btn-default" value="<?= $result_seTenkobefore['TENKORESTREMARK'] ?>"> -->
+                                                    </td>
+                                                    <td colspan="2" >
+                                                        <!--  พักผ่อน 8 ชั่วโมงคนที่2 -->
+                                                        <label>เวลาตื่นพักผ่อน(8 ชั่วโมง)</label>
+                                                        <input disabled="" type="datetime-local" id="txt_remark14" name="txt_remark14" class="form-control" value="<?= $result_seSelfCheck3['SLEEPRESTEND'] ?>" style="">
+                                                        <!-- <input type="button"  data-toggle="modal"  data-target="#modal_tenkorestremark" id="btn_remark14" name="btn_remark14" class="btn btn-default" value="<?= $result_seTenkobefore['TENKORESTREMARK'] ?>"> -->
+                                                    </td>   
+                                                </tr>
+                                                <tr>    
+                                                    <td rowspan="2" style="text-align: center">5</td>
+                                                    <td rowspan="2">ตรวจสอบชั่วโมงการนอนหลับ</td>
+                                                    <!-- <td style="text-align: center"><input type="checkbox"  <?= $check14 ?> id="chk_14" name="chk_14"  style="transform: scale(2)"/></td> -->
+                                                    <?php
+                                                    if ($TIMESLEEPNORMAL3 == '0') {
+                                                    ?>
+                                                    <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox"  id="chk_15" name="chk_15"  style="transform: scale(2)"/></td>    
+                                                    <?php
+                                                    }else {
+                                                    ?>
+                                                    <td rowspan="2" style="text-align: center"><input disabled="" checked type="checkbox"  id="chk_15" name="chk_15"  style="transform: scale(2)"/></td>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                    
+                                                    <td>การนอนปกติ ตั้งแต่ 6 ชั่วโมงขึ้นไป <b>พขร.3</b></td>
+                                                    <!--<td><input type="text"
+                                                               onKeyUp="if (isNaN(this.value)) {
+                                                                           alert('กรุณากรอกตัวเลข');
+                                                                           this.value = '0';
+                                                                       } else {
+                                                                           edit_tenkobeforetxt2(this.value, 'TENKOSLEEPTIMEDATA_AFTER6H', '<?//= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                       }"
+                                                               class="form-control" id="txt_rs151" name="txt_rs151" value="<?//= $result_seTenkobefore['TENKOSLEEPTIMEDATA_AFTER6H'] ?>"></td>-->
+                                                    <td>
+                                                        <label>ชั่วโมงการนอน</label>
+                                                        <!-- <input readonly="" type="text" class="form-control" id="txt_rs151" name="txt_rs151" value="<?= $result_seSelfCheck2['TIMESLEEPNORMAL'] ?>"></td> -->
+                                                        <?php
+                                                        if ($TIMESLEEPNORMAL3 == '0') {
+                                                        ?>
+                                                        <input readonly="" type="text" class="form-control" id="txt_rs151" name="txt_rs151" value=""></td>    
+                                                        <?php
+                                                        }else if ($TIMESLEEPNORMAL3 >= '6') {
+                                                        ?>
+                                                        <input readonly="" style="background-color: #94FA67;" type="text" class="form-control" id="txt_rs151" name="txt_rs151" value="<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>"></td>
+                                                        <?php
+                                                        }else {
+                                                        ?>
+                                                        <input readonly="" style="background-color: #FA6767;" type="text" class="form-control" id="txt_rs151" name="txt_rs151" value="<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>"></td>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                        
+                                                        <?php 
+                                                            if (($result_seSelfCheck3['SLEEPNORMALSTART'] == '' || $result_seSelfCheck3['SLEEPNORMALSTART'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>' || 
+                                                                $result_seSelfCheck3['SLEEPNORMALEND'] == ''   || $result_seSelfCheck3['SLEEPNORMALEND'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') || ($TIMESLEEPNORMAL3 <'6')   ) {
+                                                            ?>
+                                                            <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox"         style="transform: scale(2)" id="chk_rs151" name="chk_rs151" onchange="edit_rs151()"/></td>
+                                                            <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox" checked style="transform: scale(2)" id="chk_rs150" name="chk_rs150" onchange="edit_rs150()"/></td>
+                                                            <?php
+                                                            }else {
+                                                            ?>
+                                                            <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox" checked style="transform: scale(2)" id="chk_rs151" name="chk_rs151" onchange="edit_rs151()"/></td>
+                                                            <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox"         style="transform: scale(2)" id="chk_rs150" name="chk_rs150" onchange="edit_rs150()"/></td>
+                                                            <?php
+                                                            }
+                                                            ?>
+                                                    
+
+
+                                                    
+                                                    
+                                                        <!--<td colspan="4" rowspan="2" contenteditable="true" onkeyup="edit_tenkobefore(this, 'TENKOSLEEPTIMEREMARK', '<?//= $result_seTenkobefore['TENKOBEFOREID'] ?>')"><?//= $result_seTenkobefore['TENKOSLEEPTIMEREMARK'] ?></td>-->
+                                                    
+                                                        <td colspan="2" rowspan="2">
+                                                            <!-- นอน 6 ชั่วโมงคนที่2 -->
+                                                            <label>เวลาเริ่มนอน(6 ชั่วโมง)</label>
+                                                            <input disabled="" type="datetime-local" id="txt_remark15" name="txt_remark15" class="form-control" value="<?= $result_seSelfCheck3['SLEEPNORMALSTART'] ?>" style="">
+                                                        <!-- <input type="button"  data-toggle="modal"  data-target="#modal_tenkosleeptimeremark" id="btn_remark15" name="btn_remark15" class="btn btn-default" value="<?= $result_seTenkobefore['TENKOSLEEPTIMEREMARK'] ?>"> -->
+                                                            <!-- นอน 4 ชั่วโมงครึ่งคนที่2 -->
+                                                            <label>เวลาเริ่มนอนเพิ่ม(4 ชั่วโมงครึ่ง)</label>
+                                                            <input disabled="" type="datetime-local" id="txt_remark15" name="txt_remark15" class="form-control" value="<?= $result_seSelfCheck3['SLEEPEXTRASTART'] ?>" style="">
+                                                        </td>
+                                                        <td colspan="2"rowspan="2">
+                                                            <!-- นอน 6 ชั่วโมงคนที่2 -->
+                                                            <label>เวลาตื่นนอน(6 ชั่วโมง)</label>
+                                                            <input disabled="" type="datetime-local" id="txt_remark15" name="txt_remark15" class="form-control" value="<?= $result_seSelfCheck3['SLEEPNORMALEND'] ?>" style="">
+                                                        <!-- <input type="button"  data-toggle="modal"  data-target="#modal_tenkosleeptimeremark" id="btn_remark15" name="btn_remark15" class="btn btn-default" value="<?= $result_seTenkobefore['TENKOSLEEPTIMEREMARK'] ?>"> -->
+                                                            <!-- นอน 4 ชั่วโมงครึ่งคนที่2 -->
+                                                            <label>เวลาตื่นนอน(4 ชั่วโมงครึ่ง)</label>
+                                                            <input disabled="" type="datetime-local" id="txt_remark15" name="txt_remark15" class="form-control" value="<?= $result_seSelfCheck3['SLEEPEXTRAEND'] ?>" style="">
+                                                         </td>   
+                                                     </td>        
+                                                </tr>
+
+
+                                                <tr>
+                                                    <td>การนอนเพิ่ม (กะกลางคืน) ตั้งแต่ 4.5 ชั่วโมงขึ้นไป <b>พขร.3</b></td>
+
+                                                    <!-- <td><input type="text" class="form-control" id="txt_rs152" name="txt_rs152"
+                                                               onKeyUp="if (isNaN(this.value)) {
+                                                                           alert('กรุณากรอกตัวเลข');
+                                                                           this.value = '0';
+                                                                       } else {
+                                                                           edit_tenkobeforetxt3()
+                                                                       }"
+                                                               value="<?= $result_seTenkobefore['TENKOSLEEPTIMEDATA_ADD45H'] ?>"></td> -->
+
+                                                               <td>
+                                                        <?php
+                                                        //echo $result_seSelfCheck['TIMESLEEPEXTRA']; 
+                                                        if ($TIMESLEEPEXTRAHOURCHK3 == '0') {
+                                                            // echo '1';
+                                                        ?>
+                                                            <input readonly  type="text" class="form-control" id="txt_rs152" name="txt_rs152" value= "" autocomplete="off">
+                                                        <?php
+                                                        }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง กรณีเท่ากับ 4 
+                                                            // echo '2';
+                                                            if ($TIMESLEEPEXTRAMINCHK3 == 'MG3') { //เช็คชนาที ต้องมากกว่า 30 นาที กรณีเท่ากับ 4เช็ค นาทีต่อ
+                                                            ?>
+                                                            <input readonly style="background-color: #94FA67;" type="text" class="form-control" id="txt_rs152" name="txt_rs152"value="<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>">
+                                                            
+                                                            <?php
+                                                            }else {
+                                                            ?>
+                                                            <input readonly style="background-color: #FA6767;" type="text" class="form-control" id="txt_rs152" name="txt_rs152"value="<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>">
+                                                            
+                                                            <?php
+                                                            }
+                                                        ?>
+                                                            
+                                                        <?php
+                                                        }else if ($TIMESLEEPEXTRAHOURCHK3 == 'HGG4') { //เช็คชั่วโมง ต้องมากกว่า 4 ชั่วโมง
+                                                            // echo '3';
+                                                        ?>
+                                                            <input readonly style="background-color: #94FA67;" type="text" class="form-control" id="txt_rs152" name="txt_rs152"value="<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>">
+                                                            
+                                                        <?php
+                                                        }else {
+                                                            // echo '4';
+                                                        ?>
+                                                            <input readonly style="background-color: #FA6767;" type="text" class="form-control" id="txt_rs152" name="txt_rs152"value="<?= $result_seSelfCheck3['TIMESLEEPEXTRA'] ?>">
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                    
+                                                    </td>            
+                                                </tr>
+
+
+                                                <?php
+                                                // พขร.คนที่2
+                                                if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL' || $result_sePlain['COMPANYCODE'] == 'RCC' || $result_sePlain['COMPANYCODE'] == 'RRC' || $result_sePlain['COMPANYCODE'] == 'RATC') {
+                                                    ?>
+                                                    <tr>
+                                                        <td style="text-align: center">6</td>
+                                                        <td>ตรวจเช็คอุณหภูมิ(Auto3)</td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" id="chk_16" <?= $check16 ?> name="chk_16"  style="transform: scale(2)"/></td>
+                                                        <td>ต่ำกว่า <?=$result_seTenkoSTD['TEMP']?> องศา</td>
+                                                         <!-- $result_seTenkobefore['TENKOTEMPERATUREDATA'] -->
+                                                        <td><input type="text" class="form-control" id="txt_rs16" name="txt_rs16" value="<?= $TEMP3 ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '0';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt4(this.value, 'TENKOTEMPERATUREDATA', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                               update_selfcheck(this.value, 'TEMPERATURE', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   
+                                                                   ></td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" <?= $rs161 ?> style="transform: scale(2)" id="chk_rs161" name="chk_rs161" onchange="edit_rs161()"/></td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" <?= $rs160 ?> style="transform: scale(2)" id="chk_rs160" name="chk_rs160" onchange="edit_rs160()"/></td>
+                                                        <td colspan="4"  ><input type="text" id="txt_remark16" name="txt_remark16" class="form-control" value="<?= $result_seTenkobefore['TENKOTEMPERATUREREMARK'] ?>"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="3" style="text-align: center">7</td>
+                                                        <td rowspan="3">วัดความดัน(Auto3)</td>
+                                                        <td rowspan="3" style="text-align: center"><input disabled="" type="checkbox" <?= $check17 ?> id="chk_17" name="chk_17"  style="transform: scale(2)"/></td>
+                                                        <td>บน : <?=$result_seTenkoSTD['MINSYS']?>-<?=$result_seTenkoSTD['MAXSYS']?></td>
+                                                        <!-- $result_seTenkobefore['TENKOPRESSUREDATA_90160'] -->
+                                                        <td><input type="text" class="form-control" id="txt_rs171" name="txt_rs171" value="<?= $SYS3 ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt5()
+                                                                               update_selfcheck(this.value, 'SYSVALUE1', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs171_2" name="txt_rs171_2" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_90160_2'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt5_2(this.value, 'TENKOPRESSUREDATA_90160_2', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                               update_selfcheck(this.value, 'SYSVALUE2', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs171_3" name="txt_rs171_3" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_90160_3'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt5_3(this.value, 'TENKOPRESSUREDATA_90160_3', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                               update_selfcheck(this.value, 'SYSVALUE3', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ></td>
+                                                        <td rowspan="3" style="text-align: center"><input disabled="" type="checkbox" <?= $rs171 ?> style="transform: scale(2)" id="chk_rs171" name="chk_rs171" onchange="edit_rs171()"/></td>
+                                                        <td rowspan="3" style="text-align: center"><input disabled="" type="checkbox" <?= $rs170 ?> style="transform: scale(2)" id="chk_rs170" name="chk_rs170" onchange="edit_rs170()"/></td>
+                                                        <td colspan="4" rowspan="2" ><input type="text" id="txt_remark17" name="txt_remark17" class="form-control" value="<?= $result_seTenkobefore['TENKOPRESSUREREMARK'] ?>"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ล่าง : <?=$result_seTenkoSTD['MINDIA']?>-<?=$result_seTenkoSTD['MAXDIA']?></td>
+                                                        <!-- $result_seTenkobefore['TENKOPRESSUREDATA_60100'] -->
+                                                        <td><input type="text" class="form-control" id="txt_rs172" name="txt_rs172" value="<?= $DIA3 ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt6()
+                                                                               update_selfcheck(this.value, 'DIAVALUE1', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs172_2" name="txt_rs172_2" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_60100_2'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt6_2()
+                                                                               update_selfcheck(this.value, 'DIAVALUE2', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs172_3" name="txt_rs172_3" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_60100_3'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt6_3()
+                                                                               update_selfcheck(this.value, 'DIAVALUE3', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ></td>
+
+                                                    </tr>
+                                                    <tr>
+                                                    <!-- พขรคนที่2 -->
+                                                        <td>อัตราการเต้นหัวใจ : <?=$result_seTenkoSTD['MINPULSE']?>-<?=$result_seTenkoSTD['MAXPULSE']?> ครั้ง(Auto2)</td>
+                                                        <!--   $result_seTenkobefore['TENKOPRESSUREDATA_60110']-->
+                                                        <td><input type="text" class="form-control" id="txt_rs173" name="txt_rs173" value="<?= $PULSE3 ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt20()
+                                                                               update_selfcheck(this.value, 'PULSEVALUE1', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs173_2" name="txt_rs173_2" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_60110_2'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt20_2()
+                                                                               update_selfcheck(this.value, 'PULSEVALUE2', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs173_3" name="txt_rs173_3" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_60110_3'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                               Swal.fire(
+                                                                                    'Warning!',
+                                                                                    'กรุณากรอกตัวเลข!!',
+                                                                                    'warning'
+                                                                                )
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt20_3()
+                                                                               update_selfcheck(this.value, 'PULSEVALUE3', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                           }"
+                                                                   ></td>
+
+                                                    </tr>
+                                                    <?php
+                                                } else {
+                                                    ?>
+                                                    <!-- <tr>
+                                                        <td style="text-align: center">6</td>
+                                                        <td>ตรวจเช็คอุณหภูมิ</td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" id="chk_16" <?= $check16 ?> name="chk_16"  style="transform: scale(2)"/></td>
+                                                        <td>ต่ำกว่า 37 องศา</td>
+                                                        <td><input type="text" class="form-control" id="txt_rs16" name="txt_rs16" value="<?= $result_seTenkobefore['TENKOTEMPERATUREDATA'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               alert('กรุณากรอกตัวเลข');
+                                                                               this.value = '0';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt4(this.value, 'TENKOTEMPERATUREDATA', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           }"
+                                                                   ></td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" <?= $rs161 ?> style="transform: scale(2)" id="chk_rs161" name="chk_rs161" onchange="edit_rs161()"/></td>
+                                                        <td style="text-align: center"><input disabled="" type="checkbox" <?= $rs160 ?> style="transform: scale(2)" id="chk_rs160" name="chk_rs160" onchange="edit_rs160()"/></td>
+                                                        <td colspan="4" ><input type="text" id="txt_remark16" name="txt_remark16" class="form-control" value="<?= $result_seTenkobefore['TENKOTEMPERATUREREMARK'] ?>"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="2" style="text-align: center">7</td>
+                                                        <td rowspan="2">วัดความดัน</td>
+                                                        <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox" <?= $check17 ?> id="chk_17" name="chk_17" style="transform: scale(2)"/></td>
+                                                        <td>บน : 90-150</td>
+                                                        <td><input type="text" class="form-control" id="txt_rs171" name="txt_rs171" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_90160'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               alert('กรุณากรอกตัวเลข');
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt5(this.value, 'TENKOPRESSUREDATA_90160', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs171_2" name="txt_rs171_2" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_90160_2'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               alert('กรุณากรอกตัวเลข');
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt5_2(this.value, 'TENKOPRESSUREDATA_90160_2', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs171_3" name="txt_rs171_3" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_90160_3'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               alert('กรุณากรอกตัวเลข');
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt5_3(this.value, 'TENKOPRESSUREDATA_90160_3', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           }"
+                                                                   ></td>
+                                                        <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox" <?= $rs171 ?> style="transform: scale(2)" id="chk_rs171" name="chk_rs171" onchange="edit_rs171()"/></td>
+                                                        <td rowspan="2" style="text-align: center"><input disabled="" type="checkbox" <?= $rs170 ?> style="transform: scale(2)" id="chk_rs170" name="chk_rs170" onchange="edit_rs170()"/></td>
+                                                        <td colspan="4" rowspan="2" onkeyup="edit_tenkobefore(this, 'TENKOPRESSUREREMARK', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')"><input type="text" id="txt_remark17" name="txt_remark17" class="form-control" value="<?= $result_seTenkobefore['TENKOPRESSUREREMARK'] ?>"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ล่าง : 60-95</td>
+                                                        <td><input type="text" class="form-control" id="txt_rs172" name="txt_rs172" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_60100'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               alert('กรุณากรอกตัวเลข');
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt6(this.value, 'TENKOPRESSUREDATA_60100', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs172_2" name="txt_rs172_2" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_60100_2'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               alert('กรุณากรอกตัวเลข');
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt6_2(this.value, 'TENKOPRESSUREDATA_60100_2', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           }"
+                                                                   ><input type="text" class="form-control" id="txt_rs172_3" name="txt_rs172_3" value="<?= $result_seTenkobefore['TENKOPRESSUREDATA_60100_3'] ?>"
+                                                                   onKeyUp="if (isNaN(this.value)) {
+                                                                               alert('กรุณากรอกตัวเลข');
+                                                                               this.value = '';
+                                                                           } else {
+                                                                               edit_tenkobeforetxt6_3(this.value, 'TENKOPRESSUREDATA_60100_3', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           }"
+                                                                   >
+                                                            <input type="text" style="display: none" id="txt_rs173" name="txt_rs173">
+                                                            <input type="text" style="display: none" id="txt_rs173_2" name="txt_rs173">
+                                                            <input type="text" style="display: none" id="txt_rs173_3" name="txt_rs173">
+                                                        </td>
+
+                                                    </tr> -->
+
+                                                    <?php
+                                                }
+                                                ?>
+                                                <tr>
+                                                    <td style="text-align: center">8</td>
+                                                    <td>ตรวจเช็คแอลกอฮอล์(Auto3)</td>
+                                                    <!-- <?= $result_seTenkobefore['TENKOALCOHOLDATA'] ?> -->
+                                                    <td style="text-align: center"><input disabled="" type="checkbox" id="chk_18" <?= $check18 ?> name="chk_18"  style="transform: scale(2)"/></td>
+                                                    <td>[0]</td>
+                                                    <td><input type="text" class="form-control" id="txt_rs18" name="txt_rs18" value="<?= $ALCOHOL3 ?>"
+                                                               onKeyUp="if (isNaN(this.value)) {
+                                                                           <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                           Swal.fire(
+                                                                                'Warning!',
+																					'กรุณากรอกตัวเลข!!',
+                                                                                'warning'
+                                                                            )
+                                                                           this.value = '0';
+                                                                       } else {
+                                                                           edit_tenkobeforetxt7(this.value, 'TENKOALCOHOLDATA', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+																		   update_selfcheck(this.value, 'ALCOHOLVOLUME', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                       }"
+                                                               ></td>
+
+                                                    <td style="text-align: center"><input disabled="" type="checkbox" <?= $rs181 ?> style="transform: scale(2)" id="chk_rs181" name="chk_rs181" onchange="edit_rs181()"/></td>
+                                                    <td style="text-align: center"><input disabled="" type="checkbox" <?= $rs180 ?> style="transform: scale(2)" id="chk_rs180" name="chk_rs180" onchange="edit_rs180()"/></td>
+                                                    <td colspan="4"   ><input type="text" id="txt_remark18" name="txt_remark18" class="form-control" value="<?= $result_seTenkobefore['TENKOALCOHOLREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">9</td>
+                                                    <td>สอบถามเรื่องกังวลใจ</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check19 ?> id="chk_19" name="chk_19"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">ไม่มีเรื่องกังวลใจ</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs191 ?> style="transform: scale(2)" id="chk_rs191" name="chk_rs191" onchange="edit_rs191()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs190 ?> style="transform: scale(2)" id="chk_rs190" name="chk_rs190" onchange="edit_rs190()"/></td>
+                                                    <td colspan="4"   ><input type="text" id="txt_remark19" name="txt_remark19" class="form-control" value="<?= $result_seTenkobefore['TENKOWORRYREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">10</td>
+                                                    <td>ใบตรวจเทรลเลอร์ประจำวัน</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check110 ?> id="chk_110" name="chk_110"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">ไม่มีหัวข้อผิดปกติ</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1101 ?> style="transform: scale(2)" id="chk_rs1101" name="chk_rs1101" onchange="edit_rs1101()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1100 ?> style="transform: scale(2)" id="chk_rs1100" name="chk_rs1100" onchange="edit_rs1100()"/></td>
+                                                    <td colspan="4"  ><input type="text" id="txt_remark110" name="txt_remark110" class="form-control" value="<?= $result_seTenkobefore['TENKODAILYTRAILERREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">11</td>
+                                                    <td>ตรวจสอบของที่พกพา</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check111 ?> id="chk_111" name="chk_111" style="transform: scale(2)"/></td>
+                                                    <td colspan="2">ใบอนุญาติขับขี่,ใบอนุญาติ (ผู้รับเหมา),ใบอนุญาติ (โฟล์คลิฟท์),ใบอนุญาติ (TLEP),ใบอนุญาติ (Trailer),โทรศัพท์,สายสมอลทอร์ค</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1111 ?> style="transform: scale(2)" id="chk_rs1111" name="chk_rs1111" onchange="edit_rs1111()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1110 ?> style="transform: scale(2)" id="chk_rs1110" name="chk_rs1110" onchange="edit_rs1110()"/></td>
+                                                    <td colspan="4"   ><input type="text" id="txt_remark111" name="txt_remark111" class="form-control" value="<?= $result_seTenkobefore['TENKOCARRYREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">12</td>
+                                                    <td>ตรวจสอบรายละเอียดการทำงาน</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check112 ?> id="chk_112" name="chk_112"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">เข้าใจเส้นทาง,จุดพักรถ,รูปแบบการขับขี่,ความสำคัญในการส่งรถ</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1121 ?> style="transform: scale(2)" id="chk_rs1121" name="chk_rs1121" onchange="edit_rs1121()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1120 ?> style="transform: scale(2)" id="chk_rs1120" name="chk_rs1120" onchange="edit_rs1120()"/></td>
+                                                    <td colspan="4"  ><input type="text" id="txt_remark112" name="txt_remark112" class="form-control" value="<?= $result_seTenkobefore['TENKOJOBDETAILREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">13</td>
+                                                    <td>แจ้งสภาพถนน</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check113 ?> id="chk_113" name="chk_113"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">เข้าใจเนื้อหาที่แจ้ง</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1131 ?> style="transform: scale(2)" id="chk_rs1131" name="chk_rs1131" onchange="edit_rs1131()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1130 ?> style="transform: scale(2)" id="chk_rs1130" name="chk_rs1130" onchange="edit_rs1130()"/></td>
+                                                    <td colspan="4"   ><input type="text" id="txt_remark113" name="txt_remark113" class="form-control" value="<?= $result_seTenkobefore['TENKOLOADINFORMREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">14</td>
+                                                    <td>แจ้งสภาพอากาศ</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check114 ?> id="chk_114" name="chk_114"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">เข้าใจเนื้อหาที่แจ้ง</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1141 ?> style="transform: scale(2)" id="chk_rs1141" name="chk_rs1141" onchange="edit_rs1141()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1140 ?> style="transform: scale(2)" id="chk_rs1140" name="chk_rs1140" onchange="edit_rs1140()"/></td>
+                                                    <td colspan="4"   ><input type="text" id="txt_remark114" name="txt_remark114" class="form-control" value="<?= $result_seTenkobefore['TENKOAIRINFORMREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">15</td>
+                                                    <td>แจ้งเรื่องโยโกะเด็น</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check115 ?> id="chk_115" name="chk_115"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">เข้าใจเนื้อหาที่แจ้ง</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1151 ?> style="transform: scale(2)" id="chk_rs1151" name="chk_rs1151" onchange="edit_rs1151()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1150 ?> style="transform: scale(2)" id="chk_rs1150" name="chk_rs1150" onchange="edit_rs1150()"/></td>
+                                                    <td colspan="4"   ><input type="text" id="txt_remark115" name="txt_remark115" class="form-control" value="<?= $result_seTenkobefore['TENKOYOKOTENREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">16</td>
+                                                    <td>ตรวจสอบเป้าหมายการขับขี่จากเครื่องชิมูเลเตอร์</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check116 ?> id="chk_116" name="chk_116"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">ตรวจสอบกันทั้งสองฝ่าย</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1161 ?> style="transform: scale(2)" id="chk_rs1161" name="chk_rs1161" onchange="edit_rs1161()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1160 ?> style="transform: scale(2)" id="chk_rs1160" name="chk_rs1160" onchange="edit_rs1160()"/></td>
+                                                    <td colspan="4" ><input type="text" id="txt_remark116" name="txt_remark116" class="form-control" value="<?= $result_seTenkobefore['TENKOCHIMOLATORREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">17</td>
+                                                    <td>สามารถวิ่งงานได้หรือไม่</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check117 ?> id="chk_117" name="chk_117" style="transform: scale(2)"/></td>
+                                                    <td colspan="2">ไม่มีข้อบกพร่องต่อการวิ่งงาน</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1171 ?> style="transform: scale(2)" id="chk_rs1171" name="chk_rs1171" onchange="edit_rs1171()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1170 ?> style="transform: scale(2)" id="chk_rs1170" name="chk_rs1170" onchange="edit_rs1170()"/></td>
+                                                    <td colspan="4" ><input type="text" id="txt_remark117" name="txt_remark117" class="form-control" value="<?= $result_seTenkobefore['TENKOTRANSPORTREMARK'] ?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center">18</td>
+                                                    <td>การทักทายหลังทำเท็งโกะเสร็จ</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $check118 ?> id="chk_118" name="chk_118"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">ทักทายอย่างมีชีวิตชีวา</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rs1181 ?> style="transform: scale(2)" id="chk_rs1181" name="chk_rs1181" onchange="edit_rs1181()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rs1180 ?> style="transform: scale(2)" id="chk_rs1180" name="chk_rs1180" onchange="edit_rs1180()"/></td>
+                                                    <td colspan="4" ><input type="text" id="txt_remark118" name="txt_remark118" class="form-control" value="<?= $result_seTenkobefore['TENKOAFTERGREETREMARK'] ?>"></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td rowspan="1" style="text-align: center">***</td>
+                                                    <td rowspan="1">ตรวจเช็คออกซิเจนเลือด(Auto2)</td>
+                                                    <td rowspan="1" style="text-align: center"><input disabled="" type="checkbox" <?= $check119 ?> id="chk_119" name="chk_119"  style="transform: scale(2)"/></td>
+                                                    <td>ออกซิเจนในเลือดตั้งแต่ <?=$result_seTenkoSTD['OXYGEN']?>%</td>
+                                                    <!-- $result_seTenkobefore['TENKOOXYGENDATA'] -->
+                                                    <td><input type="text"
+                                                               onKeyUp="if (isNaN(this.value)) {
+                                                                           <!-- alert('กรุณากรอกตัวเลข'); -->
+                                                                           Swal.fire(
+                                                                                'Warning!',
+                                                                                'กรุณากรอกตัวเลข!!',
+                                                                                'warning'
+                                                                            )
+                                                                           this.value = '0';
+                                                                       } else {
+                                                                           edit_tenkobeforetxt8(this.value, 'TENKOOXYGENDATA', '<?= $result_seTenkobefore['TENKOBEFOREID'] ?>')
+                                                                           update_selfcheck(this.value, 'OXYGENVALUE', '<?= $result_seSelfCheck3['SELFCHECKID'] ?>')
+                                                                       }"
+                                                               class="form-control" id="txt_rs19" name="txt_rs19" value="<?= $OXYGEN3 ?>"></td>
+                                                    <td rowspan="1" style="text-align: center"><input disabled="" type="checkbox" <?= $rs1191 ?> style="transform: scale(2)" id="chk_rs1191" name="chk_rs1191" onchange="edit_rs1191()"/></td>
+                                                    <td rowspan="1" style="text-align: center"><input disabled="" type="checkbox" <?= $rs1190 ?> style="transform: scale(2)" id="chk_rs1190" name="chk_rs1190" onchange="edit_rs1190()"/></td>
+                                                    <td colspan="4" rowspan="2"  ><input type="text" id="txt_remark119" name="txt_remark119" class="form-control" value="<?= $result_seTenkobefore['TENKOOXYGENREMARK'] ?>"></td>
+
+                                                </tr>
+                                                <!-- สายตาพนักงานคนที่2 -->
+                                                <tr>
+                                                    <td colspan="12" style="text-align: center;background-color: #e7e7e7;font-size: 15px;">ตรวจสอบปัญหาสุขภาพสายตาพนักงานคนที่3 :<font style="color:red"> *หากตัวหนังสือมีสีแดง หมายถึงมีปัญหาสุขภาพ เจ้าหน้าที่ต้องเน้นย้ำ และตรวจสอบแว่นสายตาของพนักงาน </font></td>
+                                                    <input  class="form-control" type="hidden" id="txt_employeecode" name="txt_employeecode" value="<?=$_GET['employeecode3']?>">
+                                                </tr>     
+                                                <tr>
+                                                    <td colspan="1" style="text-align: center">19</td>
+                                                    <?php
+                                                    if ($result_sehealth['SHORTSIGHT'] == '1' || $result_sehealth['LONGSIGHT'] == '1' || $result_sehealth['OBLIQUESIGHT'] == '1') {
+                                                      ?>
+                                                        <td><font style="color:red"> มีปัญหาสายตา </font></td>
+                                                      <?php  
+                                                    }else{
+                                                        ?>
+                                                        <td>ไม่มีปัญหาสายตา</td>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    
+                                                    <td style="text-align: center"><input type="checkbox" <?= $checkeyeproblem ?> id="chk_eyeproblem" name="chk_eyeproblem"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">พนักงานพกแว่นสายตามาปฏิบัติงาน  <br><b><?=$textshortsight?><br>
+                                                                                                <b><?=$textlongsight?></b><br>
+                                                                                                <b><?=$textobliquesight?></b></td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $resulteyeproblemok ?> style="transform: scale(2)" id="chk_rseyeproblemok" name="chk_rseyeproblemok" onchange="edit_rseyeproblemok()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled=""  <?= $resulteyeproblemng ?> style="transform: scale(2)" id="chk_rseyeproblemng" name="chk_rseyeproblemng" onchange="edit_rseyeproblemng()"/></td>
+
+                                                    <td colspan="4" ><input type="text" id="txt_eyeproblemremark" name="txt_eyeproblemremark" class="form-control" value="<?= $remarkeyeproblem ?>"></td>
+                                                </tr>               
+                                                <!-- <tr>
+                                                    <td colspan="1" style="text-align: center">1</td>
+                                                    <?php
+                                                    if ($result_sehealth['SHORTSIGHT'] == '1') {
+                                                      ?>
+                                                        <td><font style="color:red"> สายตาสั้น </font></td>
+                                                      <?php  
+                                                    }else{
+                                                        ?>
+                                                        <td>สายตาสั้น</td>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $checkshortsight ?> id="chk_shortsight" name="chk_shortsight"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">พนักงานพกแว่นสายตามาปฏิบัติงาน</td>
+                                                    <td style="text-align: center"><input type="checkbox"  <?= $rsshortsightok ?> style="transform: scale(2)" id="chk_rsshortsightok" name="chk_rsshortsightok" onchange="edit_rsshortsightok()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rsshortsightng ?>  style="transform: scale(2)" id="chk_rsshortsightng" name="chk_rsshortsightng" onchange="edit_rsshortsightng()"/></td>
+
+                                                    <td colspan="4" ><input type="text" id="txt_shortsightremark" name="txt_shortsightremark" class="form-control" value="<?= $result_seTenkobefore['TENKOAFTERGREETREMARK'] ?>"></td>
+                                                </tr>                        -->
+                                                <!-- <tr>
+                                                    <td colspan="1" style="text-align: center">2</td>
+                                                    <?php
+                                                    if ($result_sehealth['LONGSIGHT'] == '1') {
+                                                      ?>
+                                                        <td><font style="color:red"> สายตายาว </font></td>
+                                                      <?php  
+                                                    }else{
+                                                        ?>
+                                                        <td>สายตายาว</td>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $checklongsight ?> id="chk_longsight" name="chk_longsight"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">พนักงานพกแว่นสายตามาปฏิบัติงาน</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rslongsightok ?> style="transform: scale(2)" id="chk_rslongsightok" name="chk_rslongsightok" onchange="edit_rslongsightok()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rslongsightng ?> style="transform: scale(2)" id="chk_rslongsightng" name="chk_rslongsightng" onchange="edit_rslongsightng()"/></td>
+
+                                                    <td colspan="4" ><input type="text" id="txt_longsightremark" name="txt_longsightremark" class="form-control" value="<?= $result_seTenkobefore['TENKOAFTERGREETREMARK'] ?>"></td>
+                                                </tr>                        -->
+                                                <!-- <tr>
+                                                    <td colspan="1" style="text-align: center">3</td>
+                                                    <?php
+                                                    if ($result_sehealth['OBLIQUESIGHT'] == '1') {
+                                                      ?>
+                                                        <td><font style="color:red"> สายตาเอียง </font></td>
+                                                      <?php  
+                                                    }else{
+                                                        ?>
+                                                        <td>สายตาเอียง</td>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $checkobliquesight ?> id="chk_obliquesight" name="chk_obliquesight"  style="transform: scale(2)"/></td>
+                                                    <td colspan="2">พนักงานพกแว่นสายตามาปฏิบัติงาน</td>
+                                                    <td style="text-align: center"><input type="checkbox" <?= $rsobliquesightok ?> style="transform: scale(2)" id="chk_rsobliquesightok" name="chk_rsobliquesightok" onchange="edit_rsobliquesightok()"/></td>
+                                                    <td style="text-align: center"><input type="checkbox" disabled="" <?= $rsobliquesightng ?> style="transform: scale(2)" id="chk_rsobliquesightng" name="chk_rsobliquesightng" onchange="edit_rsobliquesightng()"/></td>
+
+                                                    <td colspan="4" ><input type="text" id="txt_obliquesightremark" name="txt_obliquesightremark" class="form-control" value="<?= $result_seTenkobefore['TENKOAFTERGREETREMARK'] ?>"></td>
+                                                </tr>                         -->
+
+
+                                            </tbody>
+                                            <!--<tfoot>
+                                                <tr>
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="before_checknull()" value="ตรวจสอบ">
+                                                    </td>
+
+                                                </tr>
+                                            </tfoot>
+                                            -->
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="tab-pane fade" id="tenkotelcheck">
+                                        <table style="border: 1px solid black;border-collapse: collapse;">
+
+                                            <input type="hidden"  id="txt_selfcheckidD3"   name="txt_selfcheckidD3"    class="form-control" value="<?= $result_seSelfCheck3['SELFCHECKID'] ?>">
+                                            <input type="hidden"  id="txt_planidD3"        name="txt_planidD3"         class="form-control" value="<?= $_GET['vehicletransportplanid'] ?>">
+                                            <input type="hidden"  id="txt_tenkomasteridD3" name="txt_tenkomasteridD3"  class="form-control" value="<?= $result_seTenkomaster_temp['TENKOMASTERID'] ?>">
+                                            <input type="hidden"  id="txt_employeecodeD3"  name="txt_employeecodeD3"   class="form-control" value="<?= $_GET['employeecode3'] ?>">
+                                            
+                                            <tr>
+                                                <th colspan = "40" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left"><font style="color: black;font-size: 20px;">พนักงานขับรถ : <?=$sex?> <?= $result_sePlain['EMPLOYEENAME3'] ?> || รหัสพนักงาน : <?=$_GET['employeecode3']?> || ตำแหน่ง : <?=$result_seDriverData3['PositionNameT']?> || อายุงาน : <?= $result_CalculateWork['RS']?></font></th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan = "16" style="font-size:18px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ตรวจสอบข้อมูลการนอน(พขร.3)ข้อมูลจากระบบแจ้งสุขภาพตนเอง</th>  
+                                                <th colspan = "24" style="font-size:18px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ตรวจสอบชั่วโมงการใช้โทรศัพท์(พขร.3) *ลงข้อมูลทุกครั้ง</th>  
+                                            </tr>
+                                            <tr>
+                                                <?php
+                                                // เวลาเริ่มนอน
+                                                $SLEEPNORMALSTART_TELCHK3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPNORMALSTART']);
+                                                $SLEEPNORMALSTART_TELCHKDATA3 = str_replace("-","/",$SLEEPNORMALSTART_TELCHK3);
+                                                
+                                                // echo $SLEEPNORMALSTART_TELCHKDATA2;
+                                                // echo "<br>";
+                                                // เวลาตื่นนอน
+                                                $SLEEPNORMALEND_TELCHK3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPNORMALEND']);
+                                                $SLEEPNORMALEND_TELCHKDATA3 = str_replace("-","/",$SLEEPNORMALEND_TELCHK3);
+                                            
+                                                // echo $SLEEPNORMALEND_TELCHKDATA2;
+                                                // echo "<br>";
+                                            
+                                            
+                                                // เช็คเวลาการนอน
+                                                if (($result_seSelfCheck3['TIMESLEEPNORMAL'] == '' || $result_seSelfCheck3['TIMESLEEPNORMAL'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') ) {
+                                                    $TIMESLEEPNORMAL31 = '0';
+                                                    $TIMESLEEPNORMAL32 = '0';
+                                                }else {
+                                                    // เช็คชั่วโมง >= 6
+                                                    $TIMESLEEPNORMAL_TELCHK31 = substr($result_seSelfCheck3['TIMESLEEPNORMAL'],0,2);
+                                                    $TIMESLEEPNORMAL31 = str_replace(":"," ",$TIMESLEEPNORMAL_TELCHK31);
+
+                                                    // เช็คนาที >= 0
+                                                    $TIMESLEEPNORMAL_TELCHK32 = substr($result_seSelfCheck3['TIMESLEEPNORMAL'],3,5);
+                                                    $TIMESLEEPNORMAL32 = str_replace(":"," ",$TIMESLEEPNORMAL_TELCHK32);
+                                                }
+
+                                                // echo $TIMESLEEPNORMAL21;
+                                                // echo "<br>";
+                                                // echo $TIMESLEEPNORMAL22;
+
+                                                $sql_seTelcheckD3 = "SELECT TELCHECKID,SELFCHECKID, VEHICLETRANSPORTPLANID,TENKOMASTERID,EMPLOYEECODE,
+                                                CURRENTUSING_DATE,REPLACE(CONVERT(VARCHAR(16), CURRENTUSING_DATE, 120), '-', '/')  AS 'CURRENTUSING_DATE',
+                                                STOPUSING_DATE,REPLACE(CONVERT(VARCHAR(16), STOPUSING_DATE, 120), '-', '/')  AS 'STOPUSING_DATE',
+                                                ALLTIMEUSING,ALLTIMESLEEP,GROUP1,GROUP2,GROUP3,GROUP4,GROUP5,RANKDRIVER,REMARK
+                                                FROM DRIVERTELCHECK 
+                                                -- อันเดิมเช็ค planid ด้วย 
+                                                -- แต่เจอปัญหากรณีมีหลาย  JOB
+                                                -- อันใหม่ เช็คแค่ tenkomasterid เพราะ สามารถมีหลาย JOB(planid) ได้ แต่จะมี tenkomasterid ได้แค่ 1 ไอดี
+                                                -- WHERE VEHICLETRANSPORTPLANID ='" . $_GET['vehicletransportplanid'] . "'
+                                                WHERE TENKOMASTERID ='" . $result_seTenkomaster_temp['TENKOMASTERID'] . "'
+                                                AND EMPLOYEECODE = '" . $_GET['employeecode3'] . "'";
+                                                $query_seTelcheckD3  = sqlsrv_query($conn, $sql_seTelcheckD3, $params_seTelcheckD3);
+                                                $result_seTelcheckD3 = sqlsrv_fetch_array($query_seTelcheckD3, SQLSRV_FETCH_ASSOC);
+                                            
+                                                ?>
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>เวลาเริ่มนอน</u></label><br>
+                                                <input disabled = ""  class="form-control "  style="height:40px; width:240px;9background-color: #c9c9c;" id="sleepnormalstart_telchk2" name="sleepnormalstart_telchk2"  value="<?= $SLEEPNORMALSTART_TELCHKDATA3 ?>" min="" max="" autocomplete="off"></td>
+                                                
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>เวลาตื่นนอน</u></label><br>
+                                                <input disabled = ""  class="form-control "  style="height:40px; width:240px;9background-color: #c9c9c;"   id="sleepnormalend_telchk2"   name="sleepnormalend_telchk2"   value="<?= $SLEEPNORMALEND_TELCHKDATA3 ?>" min="" max="" autocomplete="off"></td>
+                                                    
+                                                
+                                                
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>รวมเวลา</u></label><br>
+                                                
+                                                <?php
+                                                if ($TIMESLEEPNORMAL31 == 0) {
+                                                    // echo '1sss';
+                                                ?>
+                                                    <!-- เวลา ชั่วโมง = 0 -->
+                                                    <!-- สีแดง -->
+                                                    <input readonly  style="background-color: #FA6767;"  type="text" class="form-control" id="timesleepnormal3" name="timesleepnormal3" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">    
+                                                <?php
+                                                }else if ($TIMESLEEPNORMAL31 > 6  && $TIMESLEEPNORMAL32 >= 0) {
+                                                    // echo '2sss';
+                                                ?>
+                                                    <!-- เวลา ชั่วโมง มากกว่า 6 และนาที มากกว่าหรือเท่ากับ 0 -->
+                                                    <!-- สีเขียว -->
+                                                    <input readonly style="background-color: #94FA67;"  type="text" class="form-control" id="timesleepnormal3" name="timesleepnormal3" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                <?php
+                                                }else if ($TIMESLEEPNORMAL31 == 6 ) {
+                                                    // echo '3sss';
+                                                    if ($TIMESLEEPNORMAL32 >= 0) {
+                                                    ?>
+                                                        <!-- เวลา ชั่วโมง เท่ากับ 6 และนาที >= 0 -->
+                                                        <!-- สีเขียว -->
+                                                        <input readonly style="background-color: #94FA67;"  type="text" class="form-control" id="timesleepnormal3" name="timesleepnormal3" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                    <?php
+                                                        }else {
+                                                    ?>  
+                                                        <!-- เวลา ชั่วโมง เท่ากับ 6 และนาที < 0 -->
+                                                        <!-- สีแดง -->
+                                                        <input readonly style="background-color: #FA6767;"  type="text" class="form-control" id="timesleepnormal3" name="timesleepnormal3" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                    <?php
+                                                        }
+                                                    ?>
+                                                
+                                                <?php
+                                                }else {
+                                                    // echo '4sss';
+                                                ?>
+                                                    <!-- สีแดง -->
+                                                    <input readonly style="background-color: #FA6767;"  type="text" class="form-control" id="timesleepnormal3" name="timesleepnormal3" value= "<?= $result_seSelfCheck3['TIMESLEEPNORMAL'] ?>" autocomplete="off">
+                                                <?php
+                                                }
+                                                ?>
+                                                <td colspan = "4" style="font-size:16px;width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left" ><label ><u>SelfCheckID:<?= $result_seSelfCheck3['SELFCHECKID'] ?></u></label><br>
+                                            
+                                                <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>ใช้งานล่าสุด</u></label><br>
+                                                <input  class="form-control datetelcheck"  style="height:40px; width:240px;9background-color: #c9c9c;"   id="currentusing_telchk3"   name="currentusing_telchk3"  onchange = "timesleepselfnormalcheckD3();" value="<?=$result_seTelcheckD3['CURRENTUSING_DATE']?>" min="" max="" autocomplete="off"></td>
+                                                
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>หยุดใช้งาน</u></label><br>
+                                                <input  class="form-control datetelcheck"  style="height:40px; width:240px;9background-color: #c9c9c;"   id="stopusing_telchk3"     name="stopusing_telchk3"      onchange = "timesleepselfnormalcheckD3();" value="<?=$result_seTelcheckD3['STOPUSING_DATE']?>" min="" max="" autocomplete="off"></td>
+                                            
+                                                <!-- เวลา ชั่วโมง = 0 -->
+                                                <!-- สีแดง -->
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>รวมใช้งาน</u></label><br>
+                                                <input readonly  style="background-color: #c9c9c;"  type="text" class="form-control" id="alltimeusing_telchk3" name="alltimeusing_telchk3" value= "<?=$result_seTelcheckD3['ALLTIMEUSING']?>" autocomplete="off">    
+                                                    
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left;color:red" ><label ><u>กดคำนวณเวลาทุกครั้ง</u></label><br>
+                                                <button type="button"  style= "height:35px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="cal_alltimesleepD3()">กดคำนวณเวลานอนจริง</button>
+
+                                                <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>เวลานอนจริง</u></label><br>
+                                                <input readonly  style="background-color: #c9c9c;"  type="text" class="form-control" id="alltimesleep_telchk3" name="alltimesleep_telchk3" value= "<?=$result_seTelcheckD3['ALLTIMESLEEP']?>" autocomplete="off">    
+                                                
+                                            
+                                                
+                                            </tr>
+                                            
+                                            
+                                        </table>     
+                                        <br><br>
+                                        <div id="data_tenkotelcheckemp3sr"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tenko2">
+                                        <div style="display:table; width:450px; margin:0 auto;">
+                                            <div style="display:table-row">
+                                                <table  width="10%" style= "border-collapse: collapse;" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" >
+                                                    <thead>
+                                                        <?php
+                                                        if ($result_seTelcheckD3['RANKDRIVER'] == 'ER') {
+                                                        ?>
+                                                            <tr>
+                                                                <th style="text-align: center;background-color: #349aff;border: 0.5px solid gray;padding: 7px;height:30px;width:50px;font-size:20px"><b>Rank ER</b></th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style="text-align: center;font-size:20px">เลือกข้อมูลไม่ถูกต้อง</th>
+                                                            </tr>
+                                                            <?php
+                                                        }else if ($result_seTelcheckD3['RANKDRIVER'] == 'A') {
+                                                        ?>
+                                                            <tr>
+                                                                <th style="text-align: center;background-color: #ff3434;border: 0.5px solid gray;padding: 7px;height:30px;width:50px;font-size:20px"><b>Rank A</b></th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style="text-align: center;font-size:20px">(วิ่งงานไม่ได้)</th>
+                                                            </tr>
+                                                        <?php
+                                                        }else if ($result_seTelcheckD3['RANKDRIVER'] == 'B') {
+                                                        ?>
+                                                            <tr>
+                                                                <th style="text-align: center;background-color: #ffad33;border: 0.5px solid gray;padding: 7px;height:30px;width:50px;font-size:20px"><b>Rank B</b></th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style="text-align: center;font-size:20px">(โทรติดตาม 6 ชั่วโมงแรก<br>หลังโหลดเสร็จหากขับขี่)</th>
+                                                            </tr>
+                                                        <?php
+                                                        }else if ($result_seTelcheckD3['RANKDRIVER'] == 'C') {
+                                                        ?>
+                                                            <tr>
+                                                                <th style="text-align: center;background-color: #ffff66;border: 0.5px solid gray;padding: 7px;height:30px;width:50px;font-size:20px"><b>Rank C</b></th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style="text-align: center;font-size:20px">(โทรติดตาม 3 ชั่วโมงแรก<br>หลังโหลดเสร็จหากขับขี่)</th>
+                                                            </tr>
+                                                        <?php
+                                                        }else if ($result_seTelcheckD3['RANKDRIVER'] == 'D') {
+                                                        ?>
+                                                            <tr>
+                                                                <th style="text-align: center;background-color: #5cd65c;border: 0.5px solid gray;padding: 7px;height:30px;width:50px;font-size:20px"><b>Rank D</b></th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style="text-align: center;font-size:20px">(ผ่าน)</th>
+                                                            </tr>
+                                                        <?php
+                                                        }else {
+                                                        ?>
+
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                        
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div id="data_tenko2emp3sr"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tenko3">
+                                            <table style="border: 1px solid black;border-collapse: collapse;">
+                                                <tr>
+                                                    <th colspan = "21" style="border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center">ลงข้อมูลเวลาวางกุญแจ หรือ เวลาพักผ่อน สำหรับพนักงานคนที่3
+                                                    &nbsp;&nbsp;<button type="button" class="btn btn-light" onclick="clear_keydroptime()">กดแก้ไขเวลา กรณีข้อมูลผิดพลาด พขร.3</button>
+                                                    <font style="color:red">  </font>
+                                                </th>  
+                                                    <!-- <th colspan = "8" style="border: 1px solid black;background-color: #a3a3a3;border-collapse: collapse;padding: 5px;text-align: center">ข้อมูลวันหมดอายุใบขับขี่ พขร.2</th> 
+                                                    <th colspan = "4" style="border: 1px solid black;background-color: #a3a3a3;border-collapse: collapse;padding: 5px;text-align: center">ตรวจสอบ พขร.2</th>
+                                                    <th colspan = "4" style="border: 1px solid black;background-color: #a3a3a3;border-collapse: collapse;padding: 5px;text-align: center">เอกสารเท็งโก๊ะ พขร.2</th> -->
+                                                </tr>
+                                                <tr>
+                                                    <?php
+
+                                                    $KEYDROPTIME3 = str_replace("T"," ",$result_seSelfCheck3['KEYDROPTIME']);
+                                                    $KEYDROPTIMEDATA3 = str_replace("-","/",$KEYDROPTIME3);
+                                                     //เวลาการพักผ่อน 8 ชั่วโมง
+                                                    $SLEEPRESTEND3 = str_replace("T"," ",$result_seSelfCheck3['SLEEPRESTEND']);
+                                                    $SLEEPRESTENDDATA3 = str_replace("-","/",$SLEEPRESTEND3);
+
+                                                    // วันที่และเวลาปัจจุบัน 
+                                                    // $CURRENTDATESHOW1 คือเวลาที่แสดงบนหน้าจอ รูปแบบ Y/m/d H:i Ex 2022/11/21 08:58
+                                                    // $CURRENTDATE1 คือ เวลาตามฟอแมทที่จะนำปคำนวณ รูปแบบ Y-m-dTH:i Ex 2022-11-21T08:58
+                                                    $CURRENTDATE3 = date("Y-m-d") ."T". date("H:i");
+                                                    $CURRENTDATESHOW3 = date("Y/m/d") ." ". date("H:i");
+                                                   
+                                                    // เวลาการทำงาน น้อยกว่า 14 ชั่วโมง
+                                                    if (($result_seSelfCheck3['TIMEWORKING'] == '' || $result_seSelfCheck3['TIMEWORKING'] == NULL || $result_seSelfCheck3['TIMEWORKING'] == '<br /><b>Warning</b>:  sqlsrv_fetch_array() expects parameter 1 to be resource, boolean given in <b>') ) {
+                                                        $TIMEWORKING31 = '0';
+                                                        $TIMEWORKING32 = '0';
+														// ใช้เช็คในกรณีที่ไม่ได้กดคำนวณเวลาการทำงาน
+                                                        $TIMEWORKING_CHK3 = '0';
+                                                    }else {
+														// ใช้เช็คในกรณีที่ไม่ได้กดคำนวณเวลาการทำงาน
+                                                        $TIMEWORKING_CHK3 = '1';
+                                                        // เช็คชั่วโมง < 14
+                                                        $TIMEWORKINGCHK31 = substr($result_seSelfCheck3['TIMEWORKING'],0,2);
+                                                        $TIMEWORKING31 = str_replace(":"," ",$TIMEWORKINGCHK31);
+
+                                                        // เช็คนาที < 1
+                                                        $TIMEWORKINGCHK32 = substr($result_seSelfCheck3['TIMEWORKING'],3,5);
+                                                        $TIMEWORKING32 = str_replace(":"," ",$TIMEWORKINGCHK32);
+                                                    }
+
+                                                    // echo $TIMEWORKING21;
+                                                    // echo "<br>";
+                                                    // echo $TIMEWORKING22;
+                                                    // echo $KEYDROPTIMEDATA1;
+                                                    // echo $SLEEPRESTENDDATA1;
+                                                   
+                                                    ?>
+                                                    <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>เวลาเริ่มปฏิบัติงาน</u></label><br>
+                                                    <input disabled = "" class="form-control daysleep_restend"  style="height:40px; width:240px;9background-color: #c9c9c;" id="daysleep_restend3" name="daysleep_restend3" value="<?= $SLEEPRESTENDDATA3 ?>" min="" max="" autocomplete="off"></td>
+                                                    
+                                                    
+                                                    <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>เวลาเลิกงาน</u></label><br>
+                                                    <?php
+                                                    // echo $CURRENTDATE;
+                                                    // เช็คว่าถ้า เวลาเลิกงาน = '' คือ ยังไม่มีการลงข้อมูลให้เอาเวลา CURRENTDATE แต่ถ้ามีเวลาเริ่มปฎิบัติงาน ให้ใช้เวลาเลิกงาน
+
+                                                    if ($KEYDROPTIMEDATA3 == '') {
+                                                        // echo "<br>";
+                                                        // echo "time_null";
+                                                    ?>
+                                                    
+                                                        <input class="form-control dateenkeydroptime"  disabled="" style="height:40px; width:240px;9background-color: #c9c9c;" id="keydroptimeshow3" name="keydroptimeshow3" value="<?= $CURRENTDATESHOW3 ?>" min="" max="" autocomplete="off"></td>
+                                                        <input class="form-control dateenkeydroptime"  style="height:40px; width:240px;9background-color: #c9c9c;display: none;" id="keydroptime3" name="keydroptime3" value="<?= $CURRENTDATE3 ?>" min="" max="" autocomplete="off"></td>
+                                                    <?php
+                                                    }else {
+                                                        // echo "<br>";
+                                                        // echo "time";
+                                                    ?>
+                                                        <input class="form-control dateenkeydroptime" disabled="" style="height:40px; width:240px;9background-color: #c9c9c;" id="keydroptime3" name="keydroptime3" value="<?= $KEYDROPTIMEDATA3 ?>" min="" max="" autocomplete="off"></td>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                    
+                                                    
+                                                    <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><label ><u>รวมเวลา</u></label><br>
+                                                    
+                                                    <?php
+                                                    if ($TIMEWORKING31 == 0) {
+                                                    ?>
+                                                    <input readonly   style="background-color: #FAEB67;"  type="text" class="form-control" id="timeworking3" name="timeworking3" value= "<?= $result_seSelfCheck3['TIMEWORKING'] ?>" autocomplete="off">    
+                                                    <?php
+                                                    }else if ($TIMEWORKING31 > 0 &&  $TIMEWORKING31 <14) {
+                                                    ?>
+                                                    <input readonly style="background-color: #94FA67;"  type="text" class="form-control" id="timeworking3" name="timeworking2" value= "<?= $result_seSelfCheck3['TIMEWORKING'] ?>" autocomplete="off">
+                                                    <?php
+                                                    }else if ($TIMEWORKING31 == 14) {
+
+                                                        if ($TIMEWORKING32 <= 0) {
+                                                     ?>
+                                                         <input readonly style="background-color: #94FA67;"  type="text" class="form-control" id="timeworking3" name="timeworking3" value= "<?= $result_seSelfCheck3['TIMEWORKING'] ?>" autocomplete="off">
+                                                     <?php
+                                                        }else {
+                                                     ?>
+                                                        <input readonly style="background-color: #FA6767;"  type="text" class="form-control" id="timeworking3" name="timeworking3" value= "<?= $result_seSelfCheck3['TIMEWORKING'] ?>" autocomplete="off">
+                                                     <?php
+                                                        }
+                                                     ?>
+                                                
+                                                   
+                                                    <?php
+                                                    }else {
+                                                    ?>
+                                                    <input readonly style="background-color: #FA6767;"  type="text" class="form-control" id="timeworking3" name="timeworking3" value= "<?= $result_seSelfCheck3['TIMEWORKING'] ?>" autocomplete="off">
+                                                    <?php
+                                                    }
+                                                    ?>
+
+                                                    <?php
+                                                    if ($KEYDROPTIMEDATA2 == '' || $KEYDROPTIMEDATA2 == NULL || $TIMEWORKING_CHK2 == '0' ) {
+                                                    ?>
+                                                        <td colspan = "3" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left" ><label ><u>กดคำนวณเวลาทุกครั้ง</u></label><br>
+                                                        <button type="button"  style= "height:35px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="save_keydroptime3()">กดคำนวณเวลา</button>
+                                                    <?php
+                                                    }else{
+                                                    ?>
+                                                        <td colspan = "3" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left" ><label ><u>กดคำนวณเวลาทุกครั้ง</u></label><br>
+                                                        <button type="button"  disabled style= "height:35px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn">คำนวณเวลาไปแล้ว</button>
+                                                        <!-- <button type="button"  style= "height:35px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="save_keydroptime_test(<?= $result_seSelfCheck2['SELFCHECKID'] ?>)">ปุ่มสำหรับทดสอบ</button> -->
+                                                    <?php
+                                                    }
+                                                    ?>
+
+                                                    <td colspan = "5" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left" ><label ><u>ลงสาเหตุทำงานเกิน</u></label><br>
+                                                    <button type="button" style= "height:35px;width:150px" class="btn btn-primary btn-md" name="myBtn" id ="myBtn" onclick="inserttimeworkingdata('<?=$_GET['employeecode3']?>','<?= $result_sePlain['EMPLOYEENAME3'] ?>','<?=$result_seSelfCheck3['SELFCHECKID']?>')">ลงข้อมูล</button>
+
+                                                    <td colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left" ><label ><u>SelfCheckID:<?= $result_seSelfCheck3['SELFCHECKID'] ?></u></label><br>
+                                                    <input type="hidden" class="form-control"  disabled = "" style="height:40px; width:240px;" id="keydrop_selfcheckid3" name="keydrop_selfcheckid3" value="<?= $result_seSelfCheck3['SELFCHECKID'] ?>" min="" max="" autocomplete="off">
+                                                    <?php
+                                                    if ($result_seSelfCheck3['SELFCHECKID'] == '') {
+                                                    ?>
+                                                       <!-- <input type="button" onclick="function warning(){alert('ไม่สามารถดูข้อมูลได้เนื่องจากพนักงานยังไม่ได้ทำการแจ้งสุขภาพตนเอง!!! หรือไม่มีการกดยืนยันข้อมูลการตรวจสุขภาพตนเองจากเจ้าหน้าที่!!!')};warning();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"> -->
+                                                       <input type="button" onclick="warning_selfcheck();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary">
+                                                    <?php
+                                                    }else {
+                                                    ?>
+                                                        <input type="button" onclick="se_selfcheck('<?=$result_seSelfCheck3['SELFCHECKID']?>','<?= $result_seEmployee3['nameT'] ?>','<?= $_GET['employeecode3'] ?>','<?=$dateself3?>','<?=$result_seDateSelfCheck3['DATERK'] ?>','<?=$result_seDateSelfCheck3['DATEPRESENT'] ?>','<?= $result_seEmployee['nameT']?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"></td>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                    
+                                                     
+                                                </tr>
+                                            </table>     
+                                            <br><br>           
+                                        <div id="data_tenko3emp3sr"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tenko4">    
+                                        <?php
+                                        if ($result_sePlain['COMPANYCODE'] == 'RRC' || $result_sePlain['COMPANYCODE'] == 'RCC' || $result_sePlain['COMPANYCODE'] == 'RATC') {
+                                            ?>
+                                            <div id="data_tenko4emp3sr-1"></div>
+                                            <?php
+                                        } else if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+                                            ?>
+                                            <div id="data_tenko4emp3sr-2"></div>
+                                            <?php
+                                        }
+                                        ?>
+
+                                    </div>
+
+                                    <div class="tab-pane fade" id="tenko5">
+                                        <div id="data_tenko5emp3sr"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tenko6">
+                                        <div id="data_tenko6emp3sr"></div>
+                                            <div style="text-align: center;">
+                                                <?php
+                                                    $sql_CheckPointEmp3 = "SELECT TENKOGPSSPEEDOVERAMOUNT,TENKOGPSBRAKEAMOUNT,TENKOGPSSPEEDMACHINEAMOUNT,
+                                                    TENKOGPSOUTLINEAMOUNT,TENKOGPSCONTINUOUSAMOUNT,GRADEDRIVER,POINTDRIVER,
+                                                    CONVERT(VARCHAR(16), CALCLICKDATE, 120) AS 'CALCLICKDATE'
+                                                    FROM TENKOGPS WHERE TENKOMASTERID ='".$result_seTenkomaster_temp['TENKOMASTERID']."'
+                                                    AND TENKOMASTERDIRVERCODE ='".$_GET['employeecode3']."'";
+                                                    $params_CheckPointEmp3 = array();
+                                                    $query_CheckPointEmp3 = sqlsrv_query($conn, $sql_CheckPointEmp3, $params_CheckPointEmp3);
+                                                    $result_CheckPointEmp3 = sqlsrv_fetch_array($query_CheckPointEmp3, SQLSRV_FETCH_ASSOC);
+
+                                            
+                                                    //	ความเร็วเกินกำหนด
+                                                    if ($result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'] == '' || $result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'] == NULL || $result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                                                        $speedoverpointEmp3 = '100';
+                                                    }else {
+                                                        $speedoverpointEmp3 = $result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'];
+                                                    }
+                                                    
+                                                    // 	เบรคกระทันหัน
+                                                    if ($result_CheckPointEmp3['TENKOGPSBRAKEAMOUNT'] == '' || $result_CheckPointEmp3['TENKOGPSBRAKEAMOUNT'] == NULL || $result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                                                        $gpsbrakepointEmp3 = '100';
+                                                    }else {
+                                                        $gpsbrakepointEmp3 = $result_CheckPointEmp3['TENKOGPSBRAKEAMOUNT'];
+                                                    }
+                                                    
+                                                    // รอบเครื่องเกินกำหนด
+                                                    if ($result_CheckPointEmp3['TENKOGPSSPEEDMACHINEAMOUNT'] == '' || $result_CheckPointEmp3['TENKOGPSSPEEDMACHINEAMOUNT'] == NULL || $result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                                                        $speedmechinepointEmp3 = '100';
+                                                    }else {
+                                                        $speedmechinepointEmp3 = $result_CheckPointEmp3['TENKOGPSSPEEDMACHINEAMOUNT'];
+                                                    }
+                                                    
+                                                    //	วิ่งนอกเส้นทาง
+                                                    if ($result_CheckPointEmp3['TENKOGPSOUTLINEAMOUNT'] == '' || $result_CheckPointEmp3['TENKOGPSOUTLINEAMOUNT'] == NULL || $result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                                                        $outlinepointEmp3 = '100';
+                                                    }else {
+                                                        $outlinepointEmp3 = $result_CheckPointEmp3['TENKOGPSOUTLINEAMOUNT'];
+                                                    }
+                                                    
+                                                    //	ขับรถต่อเนื่อง 4 ชม.
+                                                    if ($result_CheckPointEmp3['TENKOGPSCONTINUOUSAMOUNT'] == '' || $result_CheckPointEmp3['TENKOGPSCONTINUOUSAMOUNT'] == NULL || $result_CheckPointEmp3['TENKOGPSSPEEDOVERAMOUNT'] == '-') {
+                                                        $continuepointEmp3 = '100';
+                                                    }else {
+                                                        $continuepointEmp3 = $result_CheckPointEmp3['TENKOGPSCONTINUOUSAMOUNT'];
+                                                    }
+
+                                                    $maxpointEmp3 = 100;
+                                                    $sumpointEmp3 = ($speedoverpointEmp3+$gpsbrakepointEmp3+$speedmechinepointEmp3+$outlinepointEmp3+$continuepointEmp3)*2;
+                                                    
+                                                
+                                                    if($sumpointEmp3 == '1000'){
+                                                        $allpointEmp3 = 'ไม่มีผลคะแนน';
+                                                    }else {
+                                                        $allpointEmp3 = ($maxpointEmp3)-($sumpointEmp3);
+                                                    }
+
+                                                    
+
+                                                    if ($allpointEmp3 == '100') {
+                                                        $gradeEmp3 = 'A';
+                                                    }else if(($allpointEmp3 >= '80') && ($allpointEmp3 <= '99')){
+                                                        $gradeEmp3 = 'B';
+                                                    }else if(($allpointEmp3 >= '60') && ($allpointEmp3 <= '79')){
+                                                        $gradeEmp3 = 'C';
+                                                    }else if(($allpointEmp3 >= '40') && ($allpointEmp3 <= '59')){
+                                                        $gradeEmp3 = 'D';
+                                                    }else if(($allpointEmp3 >= '0') && ($allpointEmp3 <= '39')){
+                                                        $gradeEmp3 = 'E';
+                                                    }else {
+                                                        $gradeEmp3 = 'ไม่มีผลการประเมิน';
+                                                    }
+
+
+
+                                                ?>
+                                                <table style="width:500px;border: 1px solid black;border-collapse: collapse;">
+                                                    <tr>
+                                                        <th colspan = "8" style="border: 1px solid black;background-color: #a3a3a3;border-collapse: collapse;padding: 5px;text-align: center">คะแนนการขับขี่ประจำวัน พขร.3 
+                                                        <br>&nbsp;&nbsp;<button onclick="check_pointemp3('<?=$result_seTenkomaster_temp['TENKOMASTERID']?>','<?=$_GET['employeecode3']?>','emp3');" >คำนวณ พขร.3</button><font color="red">*กดคำนวณทุกครั้งเพื่อคำนวณคะแนน และบันทึกข้อมูล</font></th> 
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan = "8" style="border: 1px solid black;background-color: #a3a3a3;border-collapse: collapse;padding: 5px;text-align: left">กดคำนวณครั้งล่าสุด:&nbsp;<?=$result_CheckPointEmp3['CALCLICKDATE']?>
+                                                        </th> 
+                                                    </tr>
+                                                    <tr>
+                                                        <!-- สายตาสั้น -->
+                                                        <th colspan = "4" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center;">การประเมินผล</th>
+                                                        <th colspan = "4" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center;">คะแนนที่ได้</th>
+                                                    </tr>
+                                                    <div id="data_pointemp3sr"></div>
+                                                    <tr>
+                                                        <th colspan = "4" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center;"><input disabled="" style="text-align: center;" type="text" name="txt_gradeshowemp3" id="txt_gradeshowemp3" value="<?= $gradeEmp3 ?>" style=""></th>
+                                                        <th colspan = "4" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: center;"><input disabled="" style="text-align: center;" type="text" name="txt_pointshowemp3" id="txt_pointshowemp3" value="<?= $allpointEmp3 ?>" style=""></th>
+                                                        
+                                                        <input type="text" name="txt_gradesaveemp3" id="txt_gradesaveemp3" value="" style="display:none">
+                                                        <input type="text" name="txt_pointsaveemp3" id="txt_pointsaveemp3" value="" style="display:none">
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+
+
+
+
+
+
+
+
+                                    <?php
                                 }
                                 ?>
                             </div>
@@ -13990,7 +20446,9 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                 
                                                 function timesleepselfrestcheck(selfcheckid,employeecode)
                                                 {
-                                                    
+                                                        // alert(selfcheckid);
+                                                        // alert(employeecode);
+
                                                         //START REST
                                                         var startrestchk = document.getElementById('daysleep_reststart').value;
                                                         var startrestdata1  = startrestchk.replace(" ","T"); // replace " " เป็น "T"
@@ -14502,6 +20960,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                         allowOutsideClick: false,
                                                     });
                                                 }
+
                                                 // เงื่อนไขการตรวจสอบ การใช้งานโทรศัพท์ พนักงานคนที่1
                                                 function checkbox_telchkD1(){
                                                     // alert('sssss');  
@@ -15686,7 +22145,596 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     }
                                                 }
 
+                                                // เงื่อนไขการตรวจสอบ การใช้งานโทรศัพท์ พนักงานคนที่3
+                                                // 22036
+                                                function checkbox_telchkD3(){
+                                                    // alert('sssss');  
+                                                    // เมื่อกดเข้ามา จะ disable textbox ยกเว้น group1
 
+                                                    //group1 คือ ข้อ [A],[B]
+                                                    $("input.group1D3").attr("disabled", false);
+
+                                                    //group2 คือ ข้อ [C],[D]
+                                                    $("input.group2D3").attr("disabled", true);
+
+                                                    //group3 คือ ข้อ [E],[F]
+                                                    $("input.group3D3").attr("disabled", true);
+
+                                                    //group4 คือ ข้อ [G],[H],[I]
+                                                    $("input.group4D3").attr("disabled", true);
+
+                                                    //group5 คือ ข้อ [J],[K]
+                                                    $("input.group5D3").attr("disabled", true);
+                                                }
+                                               
+                                                //คำนวณชั่วโมงการนอนจริง พนักงานคนที่ 3
+                                                //เวลานอนปกติ - เวลาการใช้งาน
+                                                function cal_alltimesleepD3(){
+
+                                                    let allsleepCHKD3 = document.getElementById('timesleepnormal3').value;
+                                                    let alltimeusingCHKD3 = document.getElementById('alltimeusing_telchk3').value;
+
+                                                    if (allsleepCHKD3 == '') {
+                                                        swal.fire({
+                                                            title: "warning",
+                                                            text: "ไม่มีข้อมูล ''ใช้งานล่าสุด'' ",
+                                                            icon: "warning",
+                                                        });
+                                                    }else if(alltimeusingCHKD3 == ''){
+                                                        swal.fire({
+                                                            title: "warning",
+                                                            text: "ไม่มีข้อมูล ''หยุดใช้งาน'' ",
+                                                            icon: "warning",
+                                                        });
+                                                    }
+
+                                                    let allsleepdataD3  = allsleepCHKD3.replace(":","."); 
+                                                    let allusingdataD3  = alltimeusingCHKD3.replace(":","."); 
+
+                                                    //เวลาที่ลบกันแล้ว
+                                                    let alltimeCHKD3 = (allsleepdataD3-allusingdataD3);
+                                                    //ตัดทศนิยม 2 ตำแหน่ง
+                                                    let alltimeReplaceD3 = alltimeCHKD3.toFixed(2);
+                                                    // replace . -> : 
+                                                    let allsleepD3  = alltimeReplaceD3.replace(".",":"); 
+
+                                                    document.getElementById('alltimesleep_telchk3').value = allsleepD3;
+                                                    // alltimesleep_telchk3
+                                                    // alert(allsleepD1);
+
+                                                    // alert(9.30-8.00);
+                                                    // alert(9.09-8.00);
+                                                }
+
+                                                //เช็คชั่วโมงการใช้งานโทรศัพท์พนักงานคนที่ 3
+                                                function timesleepselfnormalcheckD3()
+                                                {
+                                                    // var startsleepchk = document.getElementById('daysleep_normalstart').value;
+                                                    // var endsleepchk = document.getElementById('daysleep_normalend').value;
+                                                    // alert(startsleepchk);
+                                                    // alert(endsleepchk);
+                                                    
+                                                        //START NORMAL
+                                                        var startrestchk = document.getElementById('currentusing_telchk3').value;
+                                                        var startrestdata1  = startrestchk.replace(" ","T"); // replave " " เป็น "T"
+                                                        var startrestdata2  = startrestdata1.replace("/","-");
+                                                        var startrestdata3  = startrestdata2.replace("/","-"); // replave "/" เป็น "-"
+                                                        var startsleepchk = startrestdata3;
+                                                        
+                                                        //END NORMAL
+                                                        var endrestchk = document.getElementById('stopusing_telchk3').value;
+                                                        var endrestdata1  = endrestchk.replace(" ","T"); // replave " " เป็น "T"
+                                                        var endrestdata2  = endrestdata1.replace("/","-");// replave "/" เป็น "-"
+                                                        var endrestdata3  = endrestdata2.replace("/","-");
+                                                        var endsleepchk = endrestdata3;
+                                                        // alert('normal');
+                                                        // alert(startsleepchk);
+                                                        // alert(endsleepchk);
+                                                    
+
+                                                        $.ajax({
+                                                        type: 'post',
+                                                        url: 'meg_data2.php',
+                                                        data: {
+                                                            txt_flg: "select_resttimeselfcheck", startsleep: startsleepchk, endsleep: endsleepchk
+                                                        },
+                                                        success: function (rs) {
+                                                            
+                                                                // alert(rs);
+
+                                                                let text = rs;
+                                                                
+                                                                // split เครื่องหมาย : และ เก็บค่านาทีเข้า array
+                                                                let result = text.split(':');
+                                                                let [first,second] = result;
+                                                                // alert(second);
+                                                                
+                                                                // เอาค่าของ array ตำแหน่งที่ 2 มา trim และนับ lenght 
+                                                                let trimtext = second.trim();
+                                                                let chklength = trimtext.length;
+                                                                // alert(chklength);
+                                                        
+                                                            
+                                                                // นับ lenght ของตัวอักษรจากการ trim 
+                                                                // ถ้าตำแหน่งเป็น 1 คือ นาทีเป็น 1 ตำแหน่งเช่่น 0:4,14:4 ให้ replace เครื่องหมาย : เป็น :0
+                                                                if (chklength == '1') {
+                                                                    // check len
+                                                                    // alert('chklength = 1')  
+                                                                    var replacetext = text.replace(":", ":0");
+                                                                    // alert(replacetext);
+
+                                                                }else{
+                                                                    // ถ้าตำแหน่ง !=1 ไม่ต้อง replace ค่าของนาที
+                                                                    // alert('chklength other')  
+                                                                    var replacetext = text;
+                                                                    // alert(replacetext); 
+                                                                }
+
+                                                                // alert(replacetext); 
+
+                                                                let result1 =  text.substring(0, 2);
+                                                                let replace1 = result1.replace(":", " ");
+
+                                                                let result2 =  text.substring(3, 5);
+                                                                let replace2 = result2.replace(":", " ");
+
+                                                                // alert(replace1);
+                                                                // alert(replace2);
+
+                                                                if (replace1 == 0) {
+
+                                                                    document.getElementById("alltimeusing_telchk3").style.backgroundColor = "#c9c9c";
+                                                                    document.getElementById('alltimeusing_telchk3').value = replacetext;
+                                                                    // save_timeworking1(selfcheckid,replacetext,'OK');
+                                                                    // alert('1');
+
+                                                                }else if ((replace1 > 0 && replace1 >= 6)) {
+                                                                    // alert('2');
+                                                                    document.getElementById("alltimeusing_telchk3").style.backgroundColor = "#c9c9c";
+                                                                    document.getElementById('alltimeusing_telchk3').value = replacetext;
+                                                                    // save_timeworking1(selfcheckid,replacetext,'OK');
+
+                                                                
+
+                                                                }else if (replace1 == 6) {
+                                                                
+
+                                                                    // document.getElementById("timeworking1").style.backgroundColor = "#94FA67";
+                                                                    // document.getElementById('timeworking1').value = text;
+                                                                    // save_timeworking1(selfcheckid,text);
+
+                                                                    if (replace2 <= 0) {
+                                                                        //  #94FA67 สีเขียว
+                                                                        document.getElementById("alltimeusing_telchk3").style.backgroundColor = "#c9c9c";
+                                                                        document.getElementById('alltimeusing_telchk3').value = replacetext;
+                                                                        // save_timeworking1(selfcheckid,replacetext,'OK');
+                                                                        // alert('3');
+                                                                    }else{
+                                                                        //  #FA6767 สีเแดง
+                                                                        document.getElementById("alltimeusing_telchk3").style.backgroundColor = "#c9c9c";
+                                                                        document.getElementById('alltimeusing_telchk3').value = replacetext;
+                                                                        // save_timeworking1(selfcheckid,replacetext,'NG');
+                                                                        // alert('4');
+                                                                    }
+                                                                
+
+                                                                }else{
+                                                                    //  #FA6767 สีเแดง
+                                                                    document.getElementById("alltimeusing_telchk3").style.backgroundColor = "#c9c9c";
+                                                                    document.getElementById('alltimeusing_telchk3').value = replacetext;
+                                                                    // save_timeworking1(selfcheckid,replacetext,'NG');
+                                                                    // alert('5');
+
+                                                                }
+
+                                                                // document.getElementById('timesleep_normal').value = rs;
+                                                                // save_selfcheckbefore('save');
+                                                            }
+                                                        });
+                                                }
+
+                                                // START GROUP1 Driver 3
+                                                //[A],[B]
+                                                function edit_telAD3(fieldname, ID) {
+                                                    if (chk_rstelAD3.checked == true)
+                                                    {
+                                                        // ถ้าเลือก [A] ข้อ [C],[D] จะเปิดใช้งาน
+                                                        // ถ้าเลือก [A] ข้อ [B] จะเลือกไม่ได้
+                                                        // alert("Tel A1 CHECK");
+                                                        $("input.group2D3").attr("disabled", false);
+                                                        document.getElementById('chk_rstelBD3').checked  = false;
+                                                        document.getElementById('chk_rstelBD3').disabled = false;
+                                                        document.getElementById('chk_rstelAD3').disabled = true;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+                                                    } else
+                                                    {
+                                                        // alert("Tel A1 UNCHECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+
+                                                function edit_telBD3(fieldname, ID) {
+                                                    if (chk_rstelBD3.checked == true)
+                                                    {
+                                                         
+                                                        // alert("Tel B1 CHECK");
+                                                        // ถ้าเลือก [B] ข้อ [A] จะเลือกไม่ได้
+                                                        $("input.group2D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelAD3').checked  = false;
+                                                        document.getElementById('chk_rstelAD3').disabled = false;
+                                                        document.getElementById('chk_rstelBD3').disabled = true;
+                                                        
+                                                        // ถ้าเลือก [B] ข้อ [C],[D],[E],[F],[G],[H],[I],[J],[K] จะถูกเครียค่า
+                                                        // ถ้าเลือก [B]  Group2,Group3,Group4,Group5 จะปิดใช้งาน
+                                                        $("input.group3D3").attr("disabled", true);
+                                                        $("input.group4D3").attr("disabled", true);
+                                                        $("input.group5D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelCD3').checked  = false;
+                                                        document.getElementById('chk_rstelDD3').checked  = false;
+                                                        document.getElementById('chk_rstelED3').checked  = false;
+                                                        document.getElementById('chk_rstelFD3').checked  = false;
+                                                        document.getElementById('chk_rstelGD3').checked  = false;
+                                                        document.getElementById('chk_rstelHD3').checked  = false;
+                                                        document.getElementById('chk_rstelID3').checked  = false;
+                                                        document.getElementById('chk_rstelJD3').checked  = false;
+                                                        document.getElementById('chk_rstelKD3').checked  = false;
+                                                        
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+                                                    } else
+                                                    {
+                                                        // alert("Tel B1 UNCKECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+                                                // END GROUP1 Driver 3
+
+                                                // START GROUP2 Driver 3
+                                                //[C],[D]
+                                                function edit_telCD3(fieldname, ID) {
+                                                    if (chk_rstelCD3.checked == true)
+                                                    {
+                                                        // ถ้าเลือก [C] ข้อ [E],[F] จะเปิดใช้งาน
+                                                        // ถ้าเลือก [C] ข้อ [D] จะเลือกไม่ได้
+                                                        // alert("Tel C1 CHECK");
+                                                        $("input.group3D3").attr("disabled", false);
+                                                        document.getElementById('chk_rstelDD3').checked  = false;
+                                                        document.getElementById('chk_rstelDD3').disabled = false;
+                                                        document.getElementById('chk_rstelCD3').disabled = true;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+                                                    } else
+                                                    {
+                                                        // alert("Tel C1 UNCHECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+
+                                                function edit_telDD3(fieldname, ID) {
+                                                    if (chk_rstelDD3.checked == true)
+                                                    {
+                                                         
+                                                        // alert("Tel D1 CHECK");
+                                                        // ถ้าเลือก [D] ข้อ [C] จะเลือกไม่ได้
+                                                        // ถ้าเลือก [D] ข้อ [E].[F] จะเลือกไม่ได้
+                                                        $("input.group3D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelCD3').checked  = false;
+                                                        document.getElementById('chk_rstelCD3').disabled = false;
+                                                        document.getElementById('chk_rstelDD3').disabled = true;
+
+                                                        // ถ้าเลือก [D] ข้อ [E],[F],[G],[H],[I],[J],[K] จะถูกเครียค่า
+                                                        // ถ้าเลือก [D] Group3,Group4,Group5 จะปิดใช้งาน
+                                                        $("input.group4D3").attr("disabled", true);
+                                                        $("input.group5D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelED3').checked  = false;
+                                                        document.getElementById('chk_rstelFD3').checked  = false;
+                                                        document.getElementById('chk_rstelGD3').checked  = false;
+                                                        document.getElementById('chk_rstelHD3').checked  = false;
+                                                        document.getElementById('chk_rstelID3').checked  = false;
+                                                        document.getElementById('chk_rstelJD3').checked  = false;
+                                                        document.getElementById('chk_rstelKD3').checked  = false;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                    } else
+                                                    {
+                                                        // alert("Tel C1 UNCKECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+                                                // END GROUP2 Driver 3
+
+                                                // START GROUP3 Driver 3
+                                                //[E],[F]
+                                                function edit_telED3(fieldname, ID) {
+                                                    if (chk_rstelED3.checked == true)
+                                                    {
+                                                        // ถ้าเลือก [E] ข้อ [G],[H],[I] จะเปิดใช้งาน
+                                                        // ถ้าเลือก [E] ข้อ [F] จะเลือกไม่ได้
+                                                        // alert("Tel E1 CHECK");
+                                                        $("input.group4D3").attr("disabled", false);
+                                                        document.getElementById('chk_rstelFD3').checked  = false;
+                                                        document.getElementById('chk_rstelFD3').disabled = false;
+                                                        document.getElementById('chk_rstelED3').disabled = true;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                    } else
+                                                    {
+                                                        // alert("Tel E1 UNCHECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+
+                                                function edit_telFD3(fieldname, ID) {
+                                                    if (chk_rstelFD3.checked == true)
+                                                    {
+                                                         
+                                                        // alert("Tel F1 CHECK");
+                                                        // ถ้าเลือก [F] ข้อ [E] จะเลือกไม่ได้
+                                                        // ถ้าเลือก [F] ข้อ [E] จะเลือกไม่ได้
+                                                        $("input.group4D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelED3').checked  = false;
+                                                        document.getElementById('chk_rstelED3').disabled = false;
+                                                        document.getElementById('chk_rstelFD3').disabled = true;
+
+                                                        // ถ้าเลือก [F] ข้อ [G],[H],[I],[J],[K] จะถูกเครียค่า
+                                                        // ถ้าเลือก [F] Group4,Group5 จะปิดใช้งาน
+                                                        $("input.group5D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelGD3').checked  = false;
+                                                        document.getElementById('chk_rstelHD3').checked  = false;
+                                                        document.getElementById('chk_rstelID3').checked  = false;
+                                                        document.getElementById('chk_rstelJD3').checked  = false;
+                                                        document.getElementById('chk_rstelKD3').checked  = false;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                    } else
+                                                    {
+                                                        // alert("Tel F1 UNCKECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+                                                // END GROUP3 Driver 3
+
+                                                // START GROUP4 Driver 3
+                                                // [G],[H],[I]
+                                                function edit_telGD3(fieldname, ID) {
+                                                    if (chk_rstelGD3.checked == true)
+                                                    {
+                                                        // ถ้าเลือก [G] ข้อ [J],[K] จะเปิดใช้งาน
+                                                        // ถ้าเลือก [G] ข้อ จะถูกล็อคการเลือกซ้ำ
+                                                        // ถ้าเลือก [G] ข้อ [H],[I] จะเปิดใช้งาน
+                                                        // alert("Tel G1 CHECK");
+                                                        $("input.group5D3").attr("disabled", false);
+                                                        document.getElementById('chk_rstelGD3').disabled = true;
+                                                        document.getElementById('chk_rstelHD3').checked  = false;
+                                                        document.getElementById('chk_rstelHD3').disabled = false;
+                                                        document.getElementById('chk_rstelID3').checked  = false;
+                                                        document.getElementById('chk_rstelID3').disabled = false;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                        
+                                                    } else
+                                                    {
+                                                        // alert("Tel G1 UNCHECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+
+                                                function edit_telHD3(fieldname, ID) {
+                                                    if (chk_rstelHD3.checked == true)
+                                                    {
+                                                         
+                                                        // alert("Tel H1 CHECK");
+                                                        // ถ้าเลือก [H] ข้อ [H] จะถูกล็อคการเลือกซ้ำ
+                                                        // ถ้าเลือก [H] ข้อ [G],[I] จะเปิดใช้งาน
+                                                        $("input.group5D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelHD3').disabled = true;
+                                                        document.getElementById('chk_rstelGD3').checked  = false;
+                                                        document.getElementById('chk_rstelGD3').disabled = false;
+                                                        document.getElementById('chk_rstelID3').checked  = false;
+                                                        document.getElementById('chk_rstelID3').disabled = false;
+
+                                                        // ถ้าเลือก [H] ข้อ [J],[K] จะเครียค่า
+                                                        // ถ้าเลือก [H] Group5 จะปิดใช้งาน
+                                                        document.getElementById('chk_rstelJD3').checked  = false;
+                                                        document.getElementById('chk_rstelKD3').checked  = false;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+                                                    } else
+                                                    {
+                                                        // alert("Tel H1 UNCKECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+                                                function edit_telID3(fieldname, ID) {
+                                                    if (chk_rstelID3.checked == true)
+                                                    {
+                                                         
+                                                        // alert("Tel F1 CHECK");
+                                                        // ถ้าเลือก [I] ข้อ [I] จะถูกล็อคการเลือกซ้ำ
+                                                        // ถ้าเลือก [I] ข้อ [G],[H] จะเปิดใช้งาน
+                                                        $("input.group5D3").attr("disabled", true);
+                                                        document.getElementById('chk_rstelID3').disabled = true;
+                                                        document.getElementById('chk_rstelGD3').checked  = false;
+                                                        document.getElementById('chk_rstelGD3').disabled = false;
+                                                        document.getElementById('chk_rstelHD3').checked  = false;
+                                                        document.getElementById('chk_rstelHD3').disabled = false;
+
+                                                        // ถ้าเลือก [I] ข้อ [J],[K] จะเครียค่า
+                                                        // ถ้าเลือก [I] Group5 จะปิดใช้งาน
+                                                        document.getElementById('chk_rstelJD3').checked  = false;
+                                                        document.getElementById('chk_rstelKD3').checked  = false;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                    } else
+                                                    {
+                                                        // alert("Tel F1 UNCKECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+                                                // END GROUP4 Driver 3
+
+                                                // START GROUP5 Driver 3
+                                                // [J],[K]
+                                                function edit_telJD3(fieldname, ID) {
+                                                    if (chk_rstelJD3.checked == true)
+                                                    {
+                                                        // ถ้าเลือก [J] ข้อ จะถูกล็อคการเลือกซ้ำ
+                                                        // ถ้าเลือก [J] ข้อ [K] จะเปิดใช้งาน
+                                                        // alert("Tel J1 CHECK");
+                                                        // $("input.group5D1").attr("disabled", false);
+                                                        document.getElementById('chk_rstelKD3').checked  = false;
+                                                        document.getElementById('chk_rstelKD3').disabled = false;
+                                                        document.getElementById('chk_rstelJD3').disabled = true;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                        
+                                                    } else
+                                                    {
+                                                        // alert("Tel J1 UNCHECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+
+                                                function edit_telKD3(fieldname, ID) {
+                                                    if (chk_rstelKD3.checked == true)
+                                                    {
+                                                         
+                                                        // alert("Tel K1 CHECK");
+                                                        // ถ้าเลือก [K] ข้อ [K] จะถูกล็อคการเลือกซ้ำ
+                                                        // ถ้าเลือก [K] ข้อ [J] จะเปิดใช้งาน
+                                                        // $("input.group5D1").attr("disabled", true);
+                                                        document.getElementById('chk_rstelJD3').checked  = false;
+                                                        document.getElementById('chk_rstelJD3').disabled = false;
+                                                        document.getElementById('chk_rstelKD3').disabled = true;
+
+                                                        // เครียค่า rank
+                                                        document.getElementById("rankD3").innerText = '';
+                                                        document.getElementById("rankD3").style.backgroundColor = "white";
+
+                                                    } else
+                                                    {
+                                                        // alert("Tel K1 UNCKECK");
+                                                        // $("input.group1").attr("disabled", true);
+                                                    }
+
+                                                }
+                                                // END GROUP5 Driver 3
+
+                                                function cal_telcheckD3(count,telcheckid) {
+                                                    
+                                                    if (chk_rstelAD3.checked == true && chk_rstelCD3.checked == true && chk_rstelFD3.checked == true) {
+
+                                                        // RANK D CASE1 [A],[C],[F]
+                                                        document.getElementById("rankD3").innerText = 'D';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#5cd65c";
+                                                        let rankdriver3 = 'D';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+                                                        
+                                                    }else if (chk_rstelAD3.checked == true && chk_rstelCD3.checked == true && 
+                                                              chk_rstelED3.checked == true && chk_rstelHD3.checked == true){
+
+                                                        // RANK D CASE2 [A],[C],[E],[H]
+                                                        document.getElementById("rankD3").innerText = 'D';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#5cd65c";
+                                                        let rankdriver3 = 'D';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+
+                                                    }else if (chk_rstelAD3.checked == true && chk_rstelCD3.checked == true && 
+                                                              chk_rstelED3.checked == true && chk_rstelGD3.checked == true &&
+                                                              chk_rstelKD3.checked == true){
+
+                                                        // RANK C CASE1 [A],[C],[E],[G],[K]
+                                                        document.getElementById("rankD3").innerText = 'C';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#ffff66";
+                                                        let rankdriver3 = 'C';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+                                                        
+                                                    }else if (chk_rstelAD3.checked == true && chk_rstelDD3.checked == true){
+
+                                                        // RANK C CASE2 [A],[D]
+                                                        document.getElementById("rankD3").innerText = 'C';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#ffff66";
+                                                        let rankdriver3 = 'C';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+                                                        
+                                                    }else if (chk_rstelAD3.checked == true && chk_rstelCD3.checked == true &&
+                                                              chk_rstelED3.checked == true && chk_rstelID3.checked == true){
+
+                                                        // RANK B CASE1 [A],[C],[E],[I]
+                                                        document.getElementById("rankD3").innerText = 'B';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#ffad33";
+                                                        let rankdriver3 = 'B';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+                                                        
+                                                    }else if (chk_rstelBD3.checked == true ){
+
+                                                        // RANK B CASE2 [B]
+                                                        document.getElementById("rankD3").innerText = 'B';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#ffad33";
+                                                        let rankdriver3 = 'B';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+                                                        
+                                                    }else if (chk_rstelAD3.checked == true && chk_rstelCD3.checked == true &&
+                                                              chk_rstelED3.checked == true && chk_rstelGD3.checked == true &&
+                                                              chk_rstelJD3.checked == true){
+
+                                                        // RANK A
+                                                        document.getElementById("rankD3").innerText = 'A';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#ff3434";
+                                                        let rankdriver3 = 'A';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+                                                        
+                                                    }else{
+
+                                                        // NO MATCH CONDITION
+                                                        document.getElementById("rankD3").innerText = 'ER';
+                                                        document.getElementById("rankD3").style.backgroundColor = "#349aff";
+                                                        let rankdriver3 = 'ER';
+                                                        save_telcheckD3(count,telcheckid,rankdriver3);
+                                                        
+                                                    }
+                                                }
+                                                /////////////////////////////////////////////////////////////////////////////
 
                                                 // save และ update ข้อมูลการใช้งานโทรศัพท์ พนักงานคนที่ 1
                                                 function save_telcheckD1(count,telcheckid,rankdriver1){
@@ -15949,7 +22997,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     }
                                                         
                                                 }
-
+                                                //////////////////////////////////////////////////////
                                                 // save และ update ข้อมูลการใช้งานโทรศัพท์ พนักงานคนที่ 2
                                                 function save_telcheckD2(count,telcheckid,rankdriver2){
                                                    
@@ -16210,6 +23258,266 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                }
                                                // END ฟังก์ชั่นการตรวจสอบการใช้งานโทรศัพท์
 
+                                               // save และ update ข้อมูลการใช้งานโทรศัพท์ พนักงานคนที่ 3
+                                               function save_telcheckD3(count,telcheckid,rankdriver3){
+                                                   
+
+                                                   //Group1
+                                                   if($("#chk_rstelAD3").is(':checked') ){
+                                                       //alert("A");
+
+                                                       group1D3 = 'A';
+                                                   }else if ($("#chk_rstelBD3").is(':checked')){
+                                                       //alert("B");
+                                                       group1D3 = 'B';
+
+                                                   }else{
+                                                       //alert("Group1D3 is NULL");
+                                                       group1D3 = '';
+                                                   }
+
+
+                                                   //Group2
+                                                   if($("#chk_rstelCD3").is(':checked') ){
+                                                       //alert("C");
+
+                                                       group2D3 = 'C';
+                                                   }else if ($("#chk_rstelDD3").is(':checked')){
+                                                       //alert("D");
+                                                       group2D3 = 'D';
+
+                                                   }else{
+                                                       //alert("Group2D1 is NULL");
+                                                       group2D3 = '';
+                                                   }
+
+
+                                                   //Group3
+                                                   if($("#chk_rstelED3").is(':checked') ){
+                                                       //alert("E");
+
+                                                       group3D3 = 'E';
+                                                   }else if ($("#chk_rstelFD3").is(':checked')){
+                                                       //alert("F");
+                                                       group3D3 = 'F';
+
+                                                   }else{
+                                                       //alert("Group3D3 is NULL");
+                                                       group3D3 = '';
+                                                   }
+
+
+                                                   //Group3
+                                                   if($("#chk_rstelGD3").is(':checked') ){
+                                                       //alert("G");
+
+                                                       group4D3 = 'G';
+                                                   }else if ($("#chk_rstelHD3").is(':checked')){
+                                                       //alert("H");
+                                                       group4D3 = 'H';
+
+                                                   }else if ($("#chk_rstelID3").is(':checked')){
+                                                       //alert("I");
+                                                       group4D3 = 'I';
+
+                                                   }else{
+                                                       //alert("Group4D3 is NULL");
+                                                       group4D3 = '';
+                                                   }
+
+                                                   //Group5
+                                                   if($("#chk_rstelJD3").is(':checked') ){
+                                                      //alert("J");
+
+                                                       group5D3 = 'J';
+                                                   }else if ($("#chk_rstelKD3").is(':checked')){
+                                                       //alert("K");
+                                                       group5D3 = 'K';
+
+                                                   }else{
+                                                       // alert("Group5D3 is NULL");
+                                                       group5D3 = '';
+                                                   }
+
+                                                   let remarkD3    = document.getElementById('txt_remarkD3').value;
+                                                  
+                                                   let selfcheckidD3CHK       = document.getElementById('txt_selfcheckidD3').value;
+                                                   if (selfcheckidD3CHK == '') {
+                                                        // alert('ไม่มีข้อมูลการ Self Check ไม่สามารถบันทึกข้อมูลได้ !!!');
+                                                        swal.fire({
+                                                            title: "Warning!",
+                                                            text: "ไม่มีข้อมูลการ Self Check ไม่สามารถบันทึกข้อมูลได้!!",
+                                                            icon: "warning",    
+                                                        });
+                                                    }else{
+                                                        selfcheckidD3 = selfcheckidD3CHK;
+                                                    }
+
+                                                   let planidD3            = document.getElementById('txt_planidD3').value;
+                                                   let tenkomasteridD3     = document.getElementById('txt_tenkomasteridD3').value;
+                                                   let employeecodeD3      = document.getElementById('txt_employeecodeD3').value;
+
+
+                                                   let currentusing_dateD3CHK = document.getElementById('currentusing_telchk3').value;
+                                                   if (currentusing_dateD3CHK == '') {
+                                                        // alert('ไม่มีข้อมูล การใช้งานโทรศัพท์ล่าสุด ไม่สามารถบันทึกข้อมูลได้ !!!');
+                                                        swal.fire({
+                                                            title: "Warning!",
+                                                            text: "ไม่มีข้อมูล การใช้งานโทรศัพท์ล่าสุด ไม่สามารถบันทึกข้อมูลได้!!",
+                                                            icon: "warning",    
+                                                        });
+                                                    }else{
+                                                        currentusing_dateD3 = currentusing_dateD3CHK;
+                                                    }
+
+                                                   let stopusing_dateD3CHK    = document.getElementById('stopusing_telchk3').value;
+                                                   if (stopusing_dateD3CHK == '') {
+                                                        // alert('ไม่มีข้อมูล การหยุดใช้งานโทรศัพท์ ไม่สามารถบันทึกข้อมูลได้ !!!');
+                                                        swal.fire({
+                                                            title: "Warning!",
+                                                            text: "ไม่มีข้อมูล การหยุดใช้งานโทรศัพท์ ไม่สามารถบันทึกข้อมูลได้!!",
+                                                            icon: "warning",    
+                                                        });
+                                                    }else{
+                                                        stopusing_dateD3 = stopusing_dateD3CHK;
+                                                    }
+
+                                                   let alltimeusingD3CHK      = document.getElementById('alltimeusing_telchk3').value;
+                                                   if (alltimeusingD3CHK == '') {
+                                                        // alert('ไม่มีข้อมูล รวมใช้งาน ไม่สามารถบันทึกข้อมูลได้ !!!');
+                                                        swal.fire({
+                                                            title: "Warning!",
+                                                            text: "ไม่มีข้อมูล รวมใช้งาน ไม่สามารถบันทึกข้อมูลได้!!",
+                                                            icon: "warning",    
+                                                        });
+                                                    }else{
+                                                        alltimeusingD3 = alltimeusingD3CHK;
+                                                    }
+
+                                                   let alltimesleepD3CHK      = document.getElementById('alltimesleep_telchk3').value;
+                                                   if (alltimesleepD3CHK == '') {
+                                                        // alert('ไม่มีข้อมูล เวลานอนจริง ไม่สามารถบันทึกข้อมูลได้ !!!');
+                                                        swal.fire({
+                                                            title: "Warning!",
+                                                            text: "ไม่มีข้อมูล เวลานอนจริง ไม่สามารถบันทึกข้อมูลได้!!",
+                                                            icon: "warning",    
+                                                        });
+                                                    }else{
+                                                        alltimesleepD3 = alltimesleepD3CHK;
+                                                    }
+
+                                                    let alltimenormalD3 = document.getElementById('timesleepnormal3').value;
+                                                    let rankD3 = rankdriver3;
+                                                    //alert(rankD3);
+                                                 
+                                                   if(count != ''){
+                                                       // count
+                                                       // เช็คข้อมูลใน DATABASE ถ้ามีข้อมูลของ PLANID,TENKOMASTERID,EMPLOYEECODE แล้ว ให้ UPDATE
+                                                    //    alert("UPDATE");
+
+                                                       $.ajax({
+                                                           type: 'post',
+                                                           url: 'meg_data_tenkotelcheck.php',
+                                                           data: {
+                                                               
+                                                               txt_flg: "update_telcheck",
+                                                               id:telcheckid, 
+                                                               selfcheckid: selfcheckidD3,
+                                                               planid: planidD3, 
+                                                               tenkomasterid: tenkomasteridD3,
+                                                               employeecode: employeecodeD3,
+                                                               currentusingdate: currentusing_dateD3,
+                                                               stopusingdate: stopusing_dateD3,
+                                                               alltimenormal: alltimenormalD3,
+                                                               alltimeusing: alltimeusingD3,
+                                                               alltimesleep: alltimesleepD3,
+                                                               group1: group1D3,
+                                                               group2: group2D3,
+                                                               group3: group3D3,
+                                                               group4: group4D3,
+                                                               group5: group5D3,
+                                                               rank: rankD3,
+                                                               remark: remarkD3,
+                                                               activestatus: '1',
+                                                               createby: '',
+                                                               createdate: '',
+                                                               modifiedby: '<?= $_SESSION["USERNAME"]?>',
+                                                               modifieddate: ''
+
+
+
+                                                           },
+                                                           success: function (rs) {
+                                                               
+                                                                //alert("แก้ไขข้อมูลเรียบร้อย");
+                                                                swal.fire({
+                                                                    title: "Good Job!",
+                                                                    text: "แก้ไขข้อมูลเรียบร้อย",
+                                                                    icon: "success",
+                                                                    showConfirmButton: false,
+                                                                    timer: 1500,
+                                                                });
+                                                               // alert(rs);   
+                                                               // window.location.reload();
+                                                           }
+                                                       });
+
+                                                   }else{
+                                                    //    alert("SAVE");
+
+                                                       $.ajax({
+                                                           type: 'post',
+                                                           url: 'meg_data_tenkotelcheck.php',
+                                                           data: {
+                                                               
+                                                               txt_flg: "save_telcheck",
+                                                               id:'', 
+                                                               selfcheckid: selfcheckidD3,
+                                                               planid: planidD3, 
+                                                               tenkomasterid: tenkomasteridD3,
+                                                               employeecode: employeecodeD3,
+                                                               currentusingdate: currentusing_dateD3,
+                                                               stopusingdate: stopusing_dateD3,
+                                                               alltimenormal: alltimenormalD3,
+                                                               alltimeusing: alltimeusingD3,
+                                                               alltimesleep: alltimesleepD3,
+                                                               group1: group1D3,
+                                                               group2: group2D3,
+                                                               group3: group3D3,
+                                                               group4: group4D3,
+                                                               group5: group5D3,
+                                                               rank: rankD3,
+                                                               remark: remarkD3,
+                                                               activestatus: '1',
+                                                               createby: '<?= $_SESSION["USERNAME"]?>',
+                                                               createdate: '',
+                                                               modifiedby: '',
+                                                               modifieddate: ''
+
+
+
+                                                           },
+                                                           success: function (rs) {
+                                                               
+                                                            //    alert("บันทึกข้อมูลเรียบร้อย");
+                                                               swal.fire({
+                                                                    title: "Good Job!",
+                                                                    text: "บันทึกข้อมูลเรียบร้อย",
+                                                                    icon: "success",
+                                                                    showConfirmButton: false,
+                                                                    timer: 1500,
+                                                                });
+                                                               // alert(rs);   
+                                                              // SAVE จะ reload หน้าต่าง 1 รอบเพื่ออัพเดทข้อมูล
+                                                               window.location.reload();
+                                                           }
+                                                       });
+
+                                                   }
+                                                       
+                                               }
+                                               // END ฟังก์ชั่นการตรวจสอบการใช้งานโทรศัพท์
+
                                                function se_graphteldataD1(employeecode){
                                                     // alert(employeename);
                                                     // alert(employeecode);
@@ -16248,7 +23556,25 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     window.open('meg_driverdatagraphtel_gw.php?employeecode=' + employeecode, '_blank');   
                                                     
                                                 }
+                                                function se_graphteldataD3(employeecode){
+                                                    // alert(employeename);
+                                                    // alert(employeecode);
+                                                    // alert(date);
+                                                    
 
+                                                    // let text = employeecode;
+                                                    // let empcodechk = text.substring(0, 2);
+                                                    // alert(empcodechk);
+                                                    
+                                                    // เช็คกรณีรหัสพนักงาน พื้นที่ GW
+                                                    // if (empcodechk == '04' || empcodechk == '05' || empcodechk == '09') {
+                                                    //      window.open('meg_driverdatagraph_gw.php?employeecode=' + employeecode, '_blank');
+                                                    // }else{
+                                                    //      window.open('meg_driverdatagraph_amt.php?employeecode=' + employeecode, '_blank');
+                                                    // }
+                                                    window.open('meg_driverdatagraphtel_gw.php?employeecode=' + employeecode, '_blank');   
+                                                    
+                                                }
                                                 // END ฟังก์ชั่นการตรวจสอบข้อมูลกราฟการใช้งานโทรศัพท์
 
                                                 function recheck_driver1(selfcheckid_chk,empchk){
@@ -16355,9 +23681,59 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                             }
                                                         });
                                                     }
+                                                }
+                                                function recheck_driver3(selfcheckid_chk,empchk){
                                                     
-                                                    
-                                                    
+                                                    var driver_selfcheckid = selfcheckid_chk;
+                                                    var driver_temp     = $('#txt_drivertemp3').val();
+                                                    var driver_sys      = $('#txt_driversys3').val();
+                                                    var driver_dia      = $('#txt_driverdia3').val();
+                                                    var driver_pulse    = $('#txt_driverpulse3').val();
+                                                    var driver_oxygen   = $('#txt_driveroxygen3').val();
+                                                    var driver_alcohol  = $('#txt_driveralcohol3').val();
+                                                  
+                                                    // alert(driver_selfcheckid);
+                                                    // alert(driver_temp);
+                                                    // alert(driver_sys);
+                                                    // alert(driver_dia);
+                                                    // alert(driver_pulse);
+                                                    // alert(driver_oxygen);
+                                                    // alert(driver_alcohol);
+
+                                                    if (driver_selfcheckid == '') {
+                                                        swal.fire({
+                                                            title: "warning",
+                                                            text: "ไม่สามารถตรวจสอบข้อมูลได้ เนื่องจากไม่พบหมายเลขการตรวจสุขภาพตนเอง !!!",
+                                                            icon: "warning",
+                                                            allowOutsideClick: false,
+                                                        });
+                                                    }else{
+                                                        $.ajax({
+                                                            url: 'meg_data2.php',
+                                                            type: 'POST',
+                                                            data: {
+                                                                txt_flg: "recheck_driver3", 
+                                                                selfcheckid  :driver_selfcheckid,
+                                                                temperature  :driver_temp, 
+                                                                sysvalue     :driver_sys,
+                                                                diavalue     :driver_dia,
+                                                                pulsevalue   :driver_pulse,
+                                                                oxygenvalue  :driver_oxygen,
+                                                                alcoholvalue :driver_alcohol
+                                                            },
+                                                            success: function () {
+                                                                // alert("ยืนยันการตรวจสอบข้อมูลรายละเอียดพนักงาน เรียบร้อย !!");
+                                                                swal.fire({
+                                                                    title: "Good Job!",
+                                                                    text: "ตรวจสอบข้อมูลใหม่เรียบร้อย !!",
+                                                                    icon: "success",
+                                                                    allowOutsideClick: false,
+                                                                });
+                                                                window.location.reload(true);
+                                                                
+                                                            }
+                                                        });
+                                                    } 
                                                 }
                                                 function confirm_chkdri(tenkomasterid,vehicletransportplanid,employeecode,empchk){
                                                     
@@ -16410,7 +23786,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                         var driver_alcohol  = $('#txt_driveralcohol1').val();
                                                         var officer_confirm = $('#txt_officerconfirm1').val();
 
-                                                    }else{
+                                                    }else if(empchk == 'EMP2'){
 
                                                         var driver_selfcheckid  = $('#txt_selfcheckid2').val();
                                                         var driver_dateworkandpre  = $('#txt_dateworkpre2').val();
@@ -16421,6 +23797,18 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                         var driver_oxygen   = $('#txt_driveroxygen2').val();
                                                         var driver_alcohol  = $('#txt_driveralcohol2').val();
                                                         var officer_confirm = $('#txt_officerconfirm2').val();
+
+                                                    }else{
+
+                                                        var driver_selfcheckid  = $('#txt_selfcheckid3').val();
+                                                        var driver_dateworkandpre  = $('#txt_dateworkpre3').val();
+                                                        var driver_temp     = $('#txt_drivertemp3').val();
+                                                        var driver_sys      = $('#txt_driversys3').val();
+                                                        var driver_dia      = $('#txt_driverdia3').val();
+                                                        var driver_pulse    = $('#txt_driverpulse3').val();
+                                                        var driver_oxygen   = $('#txt_driveroxygen3').val();
+                                                        var driver_alcohol  = $('#txt_driveralcohol3').val();
+                                                        var officer_confirm = $('#txt_officerconfirm3').val();
 
                                                     }
                                                     
@@ -16598,6 +23986,19 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     }
                                                 }
 
+                                                function se_truckdailycheck(employeecode){
+                                                    // alert(employeename);
+                                                    // alert(employeecode);
+                                                    // alert(date);
+                                                    let employeecodechk = employeecode;
+                                                    let officer =  document.getElementById('txt_officer_tdc').value;
+                                                    let vehicleregisnumber =  document.getElementById('txt_vehicleregisnumber_tdc').value;
+                                                    let area =  document.getElementById('txt_area_tdc').value;
+
+                                                    // alert(empcodechk);
+                                                    window.open('http://61.91.5.111:85/เช็ค_' + employeecodechk +'_' + officer +'_' + vehicleregisnumber +'_' + area +'.html', '_blank');
+                                                    
+                                                }
 
                                                 function select_tenkotelcheck()
                                                 {
@@ -16628,7 +24029,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                             
                                                         });
                                                         <?php
-                                                    } else {
+                                                    } else if($_GET['employeecode2'] != ''){
                                                         ?>
                                                         $.ajax({
                                                             url: 'meg_data_tenkotelcheck.php',
@@ -16649,6 +24050,30 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                 });
                                                                 // function สำหรับตรวจสอบการใช้งานโทรศัพท์
                                                                 checkbox_telchkD2();
+                                                            }
+                                                        });
+                                                        <?php
+                                                    } else {
+                                                        ?>
+                                                        $.ajax({
+                                                            url: 'meg_data_tenkotelcheck.php',
+                                                            type: 'POST',
+                                                            data: {
+                                                                txt_flg: "select_tenkotelcheckemp3", vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', employeecode3: '<?= $_GET['employeecode3'] ?>'
+                                                            },
+                                                            success: function (rs) {
+                                                                document.getElementById("data_tenkotelcheckemp3sr").innerHTML = rs;
+                                                                $(function () {
+                                                                    $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ. // กรณีใช้แบบ input
+                                                                    $(".timeen").datetimepicker({
+                                                                        datepicker: false,
+                                                                        format: 'H:i',
+                                                                        //mask: '29:59',
+                                                                        lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
+                                                                    });
+                                                                });
+                                                                // function สำหรับตรวจสอบการใช้งานโทรศัพท์
+                                                                checkbox_telchkD3();
                                                             }
                                                         });
                                                         <?php
@@ -16681,7 +24106,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                             }
                                                         });
                                                         <?php
-                                                    } else {
+                                                    } else if($_GET['employeecode2'] != ''){
                                                         ?>
                                                         $.ajax({
                                                             url: 'meg_data2.php',
@@ -16702,10 +24127,31 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                 });
                                                             }
                                                         });
-    <?php
-}
-?>
-
+                                                        <?php
+                                                    }else {
+                                                        ?>
+                                                        $.ajax({
+                                                            url: 'meg_data2.php',
+                                                            type: 'POST',
+                                                            data: {
+                                                                txt_flg: "select_tenko2emp3", vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', employeecode3: '<?= $_GET['employeecode3'] ?>'
+                                                            },
+                                                            success: function (rs) {
+                                                                document.getElementById("data_tenko2emp3sr").innerHTML = rs;
+                                                                $(function () {
+                                                                    $.datetimepicker.setLocale('th'); // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ. // กรณีใช้แบบ input
+                                                                    $(".timeen").datetimepicker({
+                                                                        datepicker: false,
+                                                                        format: 'H:i',
+                                                                        //mask: '29:59',
+                                                                        lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
+                                                                    });
+                                                                });
+                                                            }
+                                                        });
+                                                        <?php
+                                                    }
+                                                    ?>
                                                 }
                                                 function select_tenko3()
                                                 {
@@ -16724,7 +24170,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                             }
                                                         });
                                                         <?php
-                                                    } else {
+                                                    } else if($_GET['employeecode2'] != ''){
                                                         ?>
                                                         $.ajax({
                                                             url: 'meg_data2.php',
@@ -16734,6 +24180,20 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                             },
                                                             success: function (rs) {
                                                                 document.getElementById("data_tenko3emp2sr").innerHTML = rs;
+
+                                                            }
+                                                        });
+                                                        <?php
+                                                    } else {
+                                                        ?>
+                                                        $.ajax({
+                                                            url: 'meg_data2.php',
+                                                            type: 'POST',
+                                                            data: {
+                                                                txt_flg: "select_tenko3emp3", vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', employeecode3: '<?= $_GET['employeecode3'] ?>'
+                                                            },
+                                                            success: function (rs) {
+                                                                document.getElementById("data_tenko3emp3sr").innerHTML = rs;
 
                                                             }
                                                         });
@@ -16768,9 +24228,9 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
 
 
 
-                                                        <?php
-                                                    } else if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKL') {
-                                                        ?>
+                                                            <?php
+                                                        } else if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+                                                            ?>
 
 
                                                             $.ajax({
@@ -16787,7 +24247,7 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
 
                                                             <?php
                                                         }
-                                                    } else {
+                                                    } else if($_GET['employeecode2'] != ''){
                                                         if ($result_sePlain['COMPANYCODE'] == 'RRC' || $result_sePlain['COMPANYCODE'] == 'RCC' || $result_sePlain['COMPANYCODE'] == 'RATC') {
                                                             ?>
                                                             $.ajax({
@@ -16805,9 +24265,9 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
 
 
 
-        <?php
-    } else if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKL') {
-        ?>
+                                                            <?php
+                                                        } else if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+                                                            ?>
 
 
                                                             $.ajax({
@@ -16822,10 +24282,48 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                                 }
                                                             });
 
-        <?php
-    }
-}
-?>
+                                                            <?php
+                                                        }
+                                                    } else {
+                                                        // Tenko จุดเสี่ยงระหว่างทาง พขร.3
+                                                        if ($result_sePlain['COMPANYCODE'] == 'RRC' || $result_sePlain['COMPANYCODE'] == 'RCC' || $result_sePlain['COMPANYCODE'] == 'RATC') {
+                                                            ?>
+                                                            $.ajax({
+                                                                url: 'meg_data2.php',
+                                                                type: 'POST',
+                                                                data: {
+                                                                    txt_flg: "select_tenko4emp3-1", vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', employeecode3: '<?= $_GET['employeecode3'] ?>'
+                                                                },
+                                                                success: function (rs) {
+                                                                    document.getElementById("data_tenko4emp2sr-1").innerHTML = rs;
+
+                                                                }
+                                                            });
+
+
+
+
+                                                            <?php
+                                                        } else if ($result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+                                                            ?>
+
+
+                                                            $.ajax({
+                                                                url: 'meg_data2.php',
+                                                                type: 'POST',
+                                                                data: {
+                                                                    txt_flg: "select_tenko4emp3-2", vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', employeecode3: '<?= $_GET['employeecode3'] ?>'
+                                                                },
+                                                                success: function (rs) {
+                                                                    document.getElementById("data_tenko4emp3sr-2").innerHTML = rs;
+
+                                                                }
+                                                            });
+
+                                                            <?php
+                                                        }
+                                                    }
+                                                    ?>
 
 
 
@@ -16833,9 +24331,9 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                 }
                                                 function select_tenko5()
                                                 {
-<?php
-if ($_GET['employeecode1'] != '') {
-    ?>
+                                                    <?php
+                                                    if ($_GET['employeecode1'] != '') {
+                                                        ?>
                                                         $.ajax({
                                                             url: 'meg_data2.php',
                                                             type: 'POST',
@@ -16847,9 +24345,9 @@ if ($_GET['employeecode1'] != '') {
 
                                                             }
                                                         });
-    <?php
-} else {
-    ?>
+                                                        <?php
+                                                    } else if($_GET['employeecode2'] != ''){
+                                                        ?>
                                                         $.ajax({
                                                             url: 'meg_data2.php',
                                                             type: 'POST',
@@ -16861,16 +24359,31 @@ if ($_GET['employeecode1'] != '') {
 
                                                             }
                                                         });
-    <?php
-}
-?>
+                                                        <?php
+                                                    } else {
+                                                        ?>
+                                                        $.ajax({
+                                                            url: 'meg_data2.php',
+                                                            type: 'POST',
+                                                            data: {
+                                                                txt_flg: "select_tenko5emp3", vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', employeecode3: '<?= $_GET['employeecode3'] ?>'
+                                                            },
+                                                            success: function (rs) {
+                                                                document.getElementById("data_tenko5emp3sr").innerHTML = rs;
+
+                                                            }
+                                                        });
+                                                        <?php
+                                                    }
+                                                    ?>
 
                                                 }
+
                                                 function select_tenko6()
                                                 {
-                                            <?php
-                                            if ($_GET['employeecode1'] != '') {
-                                                ?>
+                                                        <?php
+                                                    if ($_GET['employeecode1'] != '') {
+                                                        ?>
                                                             $.ajax({
                                                             url: 'meg_data2.php',
                                                             type: 'POST',
@@ -16883,7 +24396,7 @@ if ($_GET['employeecode1'] != '') {
                                                             }
                                                         });
                                                         <?php
-                                                    } else {
+                                                    } else if($_GET['employeecode2'] != ''){
                                                         ?>
                                                         $.ajax({
                                                             url: 'meg_data2.php',
@@ -16896,17 +24409,25 @@ if ($_GET['employeecode1'] != '') {
 
                                                             }
                                                         });
-    <?php
-}
-?>
+                                                        <?php
+                                                    } else {
+                                                        ?>
+                                                        $.ajax({
+                                                            url: 'meg_data2.php',
+                                                            type: 'POST',
+                                                            data: {
+                                                                txt_flg: "select_tenko6emp3", vehicletransportplanid: '<?= $_GET['vehicletransportplanid'] ?>', employeecode3: '<?= $_GET['employeecode3'] ?>'
+                                                            },
+                                                            success: function (rs) {
+                                                                document.getElementById("data_tenko6emp3sr").innerHTML = rs;
+
+                                                            }
+                                                        });
+                                                        <?php
+                                                    }
+                                                    ?>
 
                                                 }
-
-
-
-
-
-
 
                                                 function save_tenkomastergw(vehicletransportplanid, employeecode, statusemp)
                                                 {
@@ -16930,9 +24451,10 @@ if ($_GET['employeecode1'] != '') {
                                                     if (statusemp == '1')
                                                     {
                                                         window.location.href = 'meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode1=' + employeecode;
-                                                    } else
-                                                    {
+                                                    }else if(statusemp == '2'){
                                                         window.location.href = 'meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode2=' + employeecode;
+                                                    } else{
+                                                        window.location.href = 'meg_tenkodocument1.php?vehicletransportplanid=' + vehicletransportplanid + '&employeecode3=' + employeecode;
                                                     }
 
 
@@ -16957,9 +24479,12 @@ if ($_GET['employeecode1'] != '') {
                                                     if ('<?= $_GET['employeecode1'] ?>' != '')
                                                     {
                                                         employeecode = '<?= $result_seTenkobefore1['TENKOBEFOREID'] ?>';
-                                                    } else
+                                                    } else if('<?= $_GET['employeecode2'] ?>' != '')
                                                     {
                                                         employeecode = '<?= $result_seTenkobefore2['TENKOBEFOREID'] ?>';
+                                                    } else
+                                                    {
+                                                        employeecode = '<?= $result_seTenkobefore3['TENKOBEFOREID'] ?>';
                                                     }
                                                     
                                                     $.ajax({
@@ -17019,9 +24544,12 @@ if ($_GET['employeecode1'] != '') {
                                                     if ('<?= $_GET['employeecode1'] ?>' != '')
                                                     {
                                                         employeecode = '<?= $result_seTenkobefore1['TENKOBEFOREID'] ?>';
-                                                    } else
+                                                    } else if ('<?= $_GET['employeecode2'] ?>' != '')
                                                     {
                                                         employeecode = '<?= $result_seTenkobefore2['TENKOBEFOREID'] ?>';
+                                                    } else
+                                                    {
+                                                        employeecode = '<?= $result_seTenkobefore3['TENKOBEFOREID'] ?>';
                                                     }
                                                     $.ajax({
                                                         type: 'post',
@@ -17088,10 +24616,21 @@ if ($_GET['employeecode1'] != '') {
                                                         //rs_checkdirveraffter1();
                                                         //rs_resultdirveraffter1();
 
-                                                    } else
+                                                    } else if('<?= $_GET['employeecode2'] ?>' != "")
                                                     {
                                                         rs_checkdirverbefore2();
                                                         rs_resultdirverbefore2();
+
+                                                        //rs_checkdirvertransport2();
+                                                        //rs_rsdirvertransport2();
+
+                                                        //rs_checkdirveraffter2();
+                                                        //rs_resultdirveraffter2();
+
+                                                    } else
+                                                    {
+                                                        rs_checkdirverbefore3();
+                                                        rs_resultdirverbefore3();
 
                                                         //rs_checkdirvertransport2();
                                                         //rs_rsdirvertransport2();
@@ -17118,7 +24657,7 @@ if ($_GET['employeecode1'] != '') {
                                                         save_datetenkobefore(tenkomasterid,tenkobeforeid,actualtenkoby,selfcheckid);
                                                       
 
-                                                    } else
+                                                    } else if('<?= $_GET['employeecode2'] ?>' != "")
                                                     {
                                                         // alert('DRI_2');
                                                         rs_checkdirverbefore2();
@@ -17126,7 +24665,16 @@ if ($_GET['employeecode1'] != '') {
                                                         save_datetenkobefore(tenkomasterid,tenkobeforeid,actualtenkoby,selfcheckid);
 
 
+                                                    } else
+                                                    {
+                                                        // alert('DRI_2');
+                                                        rs_checkdirverbefore3();
+                                                        rs_resultdirverbefore3();
+                                                        save_datetenkobefore(tenkomasterid,tenkobeforeid,actualtenkoby,selfcheckid);
+
+
                                                     }
+
 
                                                     // commit บันทึกข้อมูลเฉพาะใน Self Check 
                                                     commitupdate_selfcheck(selfcheckid);
@@ -17182,12 +24730,21 @@ if ($_GET['employeecode1'] != '') {
                                                         rs_rsdirvertransport1();
                                                         save_datetenkotransport(tenkomasterid,tenkotransportid,dateday,actualtenkoby);
 
-                                                    } else
+                                                    } else if ('<?= $_GET['employeecode2'] ?>' != "")
                                                     {
 
 
                                                         rs_checkdirvertransport2();
                                                         rs_rsdirvertransport2();
+                                                        save_datetenkotransport(tenkomasterid,tenkotransportid,dateday,actualtenkoby);
+
+
+                                                    } else
+                                                    {
+
+
+                                                        rs_checkdirvertransport3();
+                                                        rs_rsdirvertransport3();
                                                         save_datetenkotransport(tenkomasterid,tenkotransportid,dateday,actualtenkoby);
 
 
@@ -17225,6 +24782,7 @@ if ($_GET['employeecode1'] != '') {
                                                     });
 
                                                 }
+                                                
                                                 function commit_3(tenkomasterid,tenkoafterid,actualtenkoby)
                                                 {
                                                     if (chk_34.checked != true) {
@@ -17251,7 +24809,7 @@ if ($_GET['employeecode1'] != '') {
                                                             rs_checkdirveraffter1();
                                                             rs_resultdirveraffter1();
                                                             save_datetenkoafter(tenkomasterid,tenkoafterid,actualtenkoby);
-                                                        } else
+                                                        } else if('<?= $_GET['employeecode2'] ?>' != "")
                                                         {
 
 
@@ -17259,6 +24817,15 @@ if ($_GET['employeecode1'] != '') {
                                                             rs_resultdirveraffter2();
                                                             save_datetenkoafter(tenkomasterid,tenkoafterid,actualtenkoby);
                                                         }
+                                                        else
+                                                        {
+
+
+                                                            rs_checkdirveraffter3();
+                                                            rs_resultdirveraffter3();
+                                                            save_datetenkoafter(tenkomasterid,tenkoafterid,actualtenkoby);
+                                                        }
+
 
                                                         save_logprocess('Tenko', 'Commit', '<?= $result_seLogin['PersonCode'] ?>');
                                                     }
@@ -17526,6 +25093,9 @@ if ($_GET['employeecode1'] != '') {
                                                         lang: 'th', // ต้องกำหนดเสมอถ้าใช้ภาษาไทย และ เป็นปี พ.ศ.
                                                     });
                                                 });
+                                                
+                                                
+                                                // CHECK สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.1
                                                 function rs_checkdirverbefore1()
                                                 {
                                                     //  alert('CHK_1');   
@@ -17585,23 +25155,7 @@ if ($_GET['employeecode1'] != '') {
 
                                                 }
 
-                                                function edit_vehicletransportplan(editableObj, fieldname, ID)
-                                                {
-                                                    // alert(editableObj);
-                                                    // alert(fieldname);
-                                                    // alert(ID);
-                                                    
-                                                    $.ajax({
-                                                        url: 'meg_data.php',
-                                                        type: 'POST',
-                                                        data: {
-                                                            txt_flg: "edit_vehicletransportplan", editableObj: editableObj, ID: ID, fieldname: fieldname
-                                                        },
-                                                        success: function () {
-
-                                                        }
-                                                    });
-                                                }
+                                                // CHECK สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.2
                                                 function rs_checkdirverbefore2()
                                                 {
                                                     // alert('CHK_2');   
@@ -17655,10 +25209,67 @@ if ($_GET['employeecode1'] != '') {
                                                         }
                                                     }
 
+                                                }
+
+                                                // CHECK สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.3
+                                                function rs_checkdirverbefore3()
+                                                {
+                                                    // alert('CHK_2');   
+                                                    // chk_11 = ทักทายก่อนเท็งโก๊ะ,chk_12 = ตรวจเช็คยูนิฟอร์ม,chk_13 = สภาพร่างกาย,txt_rs14 = ชั่งโมงการพักผ่อน
+                                                    // txt_rs151 = ชั่วโมงการนอน,txt_rs16 = อุณภูมิ,txt_rs171 = ความดันบน,txt_rs172 = ความดันล่าง,txt_rs18 = แอลกอฮอล์
+                                                    // chk_19 = เรื่องกังวลใจ,chk_110 = ใบตรวจเทรลเลอร์,chk_111 = ตรวจสอบของที่พก,chk_112 = ตรวจสอบรายละเอียดการทำงาน
+                                                    // chk_113 = แจ้งสภาพถนน,chk_114 = แจ้งสภาพอากาศ,chk_115 = แจ้งเรื่องโยโกะเด็น,chk_116 = เป้าหมายจากซิมูเลเตอร์
+                                                    // chk_117 = สามารถวิ่งงานได้,chk_118 = ทักทายหลังเท็งโกะเสร็จ,chk_119 = ตรวจเช็คออกซิเจนเลือด,txt_rs19 = ค่าออกซิเจน
+                                                    if (
+                                                            chk_11.checked == true
+                                                            && chk_12.checked == true
+                                                            && chk_13.checked == true
+                                                            && document.getElementById('txt_rs14').value != ""
+                                                            && document.getElementById('txt_rs151').value != ""
+                                                            && document.getElementById('txt_rs16').value != ""
+                                                            && document.getElementById('txt_rs171').value != ""
+                                                            && document.getElementById('txt_rs172').value != ""
+                                                            && document.getElementById('txt_rs18').value != ""
+                                                            && chk_19.checked == true
+                                                            && chk_110.checked == true
+                                                            && chk_111.checked == true
+                                                            && chk_112.checked == true
+                                                            && chk_113.checked == true
+                                                            && chk_114.checked == true
+                                                            && chk_115.checked == true
+                                                            && chk_116.checked == true
+                                                            && chk_117.checked == true
+                                                            && chk_118.checked == true
+                                                            && chk_119.checked == true
+                                                            && chk_eyeproblem.checked == true
+                                                            && document.getElementById('txt_rs19').value != ""
+                                                            )
+                                                    {
+                                                        document.getElementById('icon_beforecheckok3').style.display = "";
+                                                        document.getElementById('icon_beforecheckno3').style.display = "none";
+                                                        if ('<?= $result_sePlain['STATUSNUMBER'] ?>' == 'O' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานยังไม่ถึงเวลารายงาน' || '<?= $result_sePlain['STATUSNUMBER'] ?>' == 'L' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานเลยเวลารายงานตัว')
+                                                        {
+                                                            // alert('P');
+                                                            edit_vehicletransportplan('แผนงานตรวจร่างกายเรียบร้อย', 'STATUS', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                            edit_vehicletransportplan('P', 'STATUSNUMBER', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        }
+                                                    } else
+                                                    {
+                                                        document.getElementById('icon_beforecheckok3').style.display = "none";
+                                                        document.getElementById('icon_beforecheckno3').style.display = "";
+                                                        if ('<?= $result_sePlain['STATUSNUMBER'] ?>' == 'O' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานยังไม่ถึงเวลารายงาน' || '<?= $result_sePlain['STATUSNUMBER'] ?>' == 'L' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานเลยเวลารายงานตัว')
+                                                        {
+
+                                                            edit_vehicletransportplan('แผนงานยังไม่ถึงเวลารายงาน', 'STATUS', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                            edit_vehicletransportplan('O', 'STATUSNUMBER', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        }
+                                                    }
+
 
 
                                                 }
 
+                                                // RESULT สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.1
                                                 function rs_resultdirverbefore1()
                                                 {
                                                 // alert('RESULT_1');
@@ -17739,11 +25350,12 @@ if ($_GET['employeecode1'] != '') {
                                                         }
                                                     }
                                                 }
+                                                
+                                                // RESULT สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.2
                                                 function rs_resultdirverbefore2()
                                                 {
                                                 
-                                                
-
+                                            
                                                 // console.log('<?=$areashow?>');
                                                 // console.log('<?=$checkArea?>');
                                                 // console.log('Temp: '+'<?=$result_seTenkoSTD['TEMP']?>');
@@ -17819,6 +25431,87 @@ if ($_GET['employeecode1'] != '') {
                                                     }
                                                 }
 
+                                                // RESULT สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.3
+                                                function rs_resultdirverbefore3()
+                                                {
+                                                
+                                            
+                                                // console.log('<?=$areashow?>');
+                                                // console.log('<?=$checkArea?>');
+                                                // console.log('Temp: '+'<?=$result_seTenkoSTD['TEMP']?>');
+                                                // console.log('MinSys: '+'<?=$result_seTenkoSTD['MINSYS']?>');
+                                                // console.log('MaxSys: '+'<?=$result_seTenkoSTD['MAXSYS']?>');
+                                                // console.log('MinDia: '+'<?=$result_seTenkoSTD['MINDIA']?>');
+                                                // console.log('MaxDia: '+'<?=$result_seTenkoSTD['MAXDIA']?>');
+                                                // console.log('MinPulse: '+'<?=$result_seTenkoSTD['MINPULSE']?>');
+                                                // console.log('MaxPulse: '+'<?=$result_seTenkoSTD['MAXPULSE']?>');
+                                                // console.log('Oxygen: '+'<?=$result_seTenkoSTD['OXYGEN']?>');
+                                                // console.log('Alcohol: '+'<?=$result_seTenkoSTD['ALCOHOL']?>');
+
+                                                <?php
+                                                // if ($result_sePlain['COMPANYCODE'] == 'RRC' || $result_sePlain['COMPANYCODE'] == 'RCC' || $result_sePlain['COMPANYCODE'] == 'RATC') {
+                                                //     $txtrs171_2 = '150';
+                                                //     $txtrs172_2 = '95';
+                                                // } else {
+                                                //     $txtrs171_2 = '150';
+                                                //     $txtrs172_2 = '95';
+                                                // }
+                                                ?>
+
+                                                // chk_rs111 = ทักทายอย่างมีชีวิตชีวา,chk_rs121 = สวมชุดที่สะอาด,chk_rs131 = สุขภาพร่างกายแข็งแรงดี,txt_rs14,[rs] = ชั่วโมงการพักผ่อน
+                                                // txt_rs16 = อุณภูมิ,txt_rs171 = ความดันบน,txt_rs172 = ความดันล่าง,txt_rs18 = ปริมาณแอลกอฮอล์,chk_rs191 = ไม่มีเรื่องกังวลใจ
+                                                // chk_rs1101 = ไม่มีหัวข้อผิดปกติ,chk_rs1111 =	ใบอนุญาติต่างๆ,chk_rs1121 = เข้าใจเส้นทาง,chk_rs1131 = สภาพถนนเข้าใจเนื้อหาที่แจ้ง	
+                                                // chk_rs1141 = สภาพอากาศเข้าใจเนื้อหาที่แจ้ง,chk_rs1151 = โยโกะเด็นเข้าใจเนื้อหาที่แจ้ง,chk_rs1161 = ตรวจสอบกันทั้งสองฝ่าย
+                                                // chk_rs1171 = ไม่มีข้อบกพร่องต่อการวิ่งงาน,chk_rs1181 = หลังทำเท็งโกะทักทายอย่างมีชีวิตชีวา,chk_rs1191 = เช็คออกซิเจนในเลือด,txt_rs19 = ค่าออกซิเจน
+
+                                                    var rs = document.getElementById('txt_rs14').value.split(":");
+                                                    if (
+                                                            chk_rs111.checked == true
+                                                            && chk_rs121.checked == true
+                                                            && chk_rs131.checked == true
+                                                            && rs[0] >= 8
+                                                            //&& document.getElementById('txt_rs151').value >= 6
+                                                            && document.getElementById('txt_rs16').value <= <?= $result_seTenkoSTD['TEMP'] ?>
+                                                            && (document.getElementById('txt_rs171').value >= <?= $result_seTenkoSTD['MINSYS'] ?> && document.getElementById('txt_rs171').value <= <?= $result_seTenkoSTD['MAXSYS'] ?>)
+                                                            && (document.getElementById('txt_rs172').value >= <?= $result_seTenkoSTD['MINDIA'] ?> && document.getElementById('txt_rs172').value <= <?= $result_seTenkoSTD['MAXDIA'] ?>)
+                                                            && document.getElementById('txt_rs18').value == <?=$result_seTenkoSTD['ALCOHOL']?>
+                                                            && chk_rs191.checked == true
+                                                            && chk_rs1101.checked == true
+                                                            && chk_rs1111.checked == true
+                                                            && chk_rs1121.checked == true
+                                                            && chk_rs1131.checked == true
+                                                            && chk_rs1141.checked == true
+                                                            && chk_rs1151.checked == true
+                                                            && chk_rs1161.checked == true
+                                                            && chk_rs1171.checked == true
+                                                            && chk_rs1181.checked == true
+                                                            && chk_rs1191.checked == true
+                                                            && chk_rseyeproblemok.checked == true
+                                                            && document.getElementById('txt_rs19').value != ""
+                                                            )
+                                                    {
+
+
+                                                        document.getElementById('icon_beforeresultok3').style.display = "";
+                                                        document.getElementById('icon_beforeresultno3').style.display = "none";
+                                                        if ('<?= $result_sePlain['STATUSNUMBER'] ?>' == 'O' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานยังไม่ถึงเวลารายงาน' || '<?= $result_sePlain['STATUSNUMBER'] ?>' == 'L' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานเลยเวลารายงานตัว')
+                                                        {
+                                                            edit_vehicletransportplan('แผนงานตรวจร่างกายเรียบร้อย', 'STATUS', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                            edit_vehicletransportplan('P', 'STATUSNUMBER', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        }
+                                                    } else
+                                                    {
+                                                        document.getElementById('icon_beforeresultok3').style.display = "none";
+                                                        document.getElementById('icon_beforeresultno3').style.display = "";
+                                                        if ('<?= $result_sePlain['STATUSNUMBER'] ?>' == 'O' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานยังไม่ถึงเวลารายงาน' || '<?= $result_sePlain['STATUSNUMBER'] ?>' == 'L' || '<?= $result_sePlain['STATUS'] ?>' == 'แผนงานเลยเวลารายงานตัว')
+                                                        {
+                                                            edit_vehicletransportplan('แผนงานยังไม่ถึงเวลารายงาน', 'STATUS', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                            edit_vehicletransportplan('O', 'STATUSNUMBER', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        }
+                                                    }
+                                                }
+
+                                                // CHECK สถานะการตรวจร่างกาย ระหว่างทาง พขร.1
                                                 function rs_checkdirvertransport1()
                                                 {
                                                     if (chk_1d1.checked == true && chk_2d1.checked == true && chk_3d1.checked == true && chk_4d1.checked == true && chk_5d1.checked == true && chk_6d1.checked == true && chk_7d1.checked == true)
@@ -17837,6 +25530,8 @@ if ($_GET['employeecode1'] != '') {
                                                         document.getElementById('icon_transportcheckno1').style.display = "";
                                                     }
                                                 }
+
+                                                // CHECK สถานะการตรวจร่างกาย ระหว่างทาง พขร.2
                                                 function rs_checkdirvertransport2()
                                                 {
                                                     if (
@@ -17862,6 +25557,35 @@ if ($_GET['employeecode1'] != '') {
                                                         document.getElementById('icon_transportcheckno2').style.display = "";
                                                     }
                                                 }
+
+                                                // CHECK สถานะการตรวจร่างกาย ระหว่างทาง พขร.3
+                                                function rs_checkdirvertransport3()
+                                                {
+                                                    if (
+                                                            chk_1d1.checked == true
+                                                            && chk_2d1.checked == true
+                                                            && chk_3d1.checked == true
+                                                            && chk_4d1.checked == true
+                                                            && chk_5d1.checked == true
+                                                            && chk_6d1.checked == true
+                                                            && chk_7d1.checked == true
+
+                                                            )
+                                                    {
+                                                        //edit_vehicletransportplan('แผนงานรอปิดงาน', 'STATUS', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        //edit_vehicletransportplan('T', 'STATUSNUMBER', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        document.getElementById('icon_transportcheckok3').style.display = "";
+                                                        document.getElementById('icon_transportcheckno3').style.display = "none";
+                                                    } else
+                                                    {
+                                                        edit_vehicletransportplan('แผนงานเปิดงาน', 'STATUS', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        edit_vehicletransportplan('1', 'STATUSNUMBER', '<?= $_GET['vehicletransportplanid'] ?>');
+                                                        document.getElementById('icon_transportcheckok3').style.display = "none";
+                                                        document.getElementById('icon_transportcheckno3').style.display = "";
+                                                    }
+                                                }
+
+                                                // CHECK สถานะการตรวจร่างกาย หลังเลิกงาน พขร.1
                                                 function rs_checkdirveraffter1()
                                                 {
                                                     if (
@@ -17892,6 +25616,8 @@ if ($_GET['employeecode1'] != '') {
                                                         document.getElementById('icon_afftercheckno1').style.display = "";
                                                     }
                                                 }
+
+                                                // CHECK สถานะการตรวจร่างกาย หลังเลิกงาน พขร.2
                                                 function rs_checkdirveraffter2()
                                                 {
                                                     if (
@@ -17922,7 +25648,38 @@ if ($_GET['employeecode1'] != '') {
                                                     }
                                                 }
 
+                                                // CHECK สถานะการตรวจร่างกาย หลังเลิกงาน พขร.3
+                                                function rs_checkdirveraffter3()
+                                                {
+                                                    if (
+                                                            chk_31.checked == true
+                                                            && chk_32.checked == true
+                                                            && chk_33.checked == true
+                                                            && chk_34.checked == true
+                                                            && chk_35.checked == true
+                                                            && chk_36.checked == true
+                                                            && chk_37.checked == true
+                                                            && chk_38.checked == true
+                                                            && chk_39.checked == true
+                                                            && chk_310.checked == true
+                                                            && chk_311.checked == true
+                                                            && chk_312.checked == true
+                                                            && chk_313.checked == true
 
+                                                            )
+                                                    {
+
+                                                        document.getElementById('icon_afftercheckok3').style.display = "";
+                                                        document.getElementById('icon_afftercheckno3').style.display = "none";
+                                                    } else
+                                                    {
+
+                                                        document.getElementById('icon_afftercheckok3').style.display = "none";
+                                                        document.getElementById('icon_afftercheckno3').style.display = "";
+                                                    }
+                                                }
+
+                                                // RESULT สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.1
                                                 function rs_resultdirveraffter1()
                                                 {
                                                     if (
@@ -17952,6 +25709,8 @@ if ($_GET['employeecode1'] != '') {
                                                         document.getElementById('icon_affterresultno1').style.display = "";
                                                     }
                                                 }
+                                                
+                                                 // RESULT สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.2
                                                 function rs_resultdirveraffter2()
                                                 {
                                                     if (
@@ -17982,6 +25741,57 @@ if ($_GET['employeecode1'] != '') {
                                                     }
                                                 }
 
+                                                 // RESULT สถานะการตรวจร่างกาย ก่อนเริ่มงาน พขร.3
+                                                 function rs_resultdirveraffter3()
+                                                {
+                                                    if (
+                                                            chk_rs311.checked == true
+                                                            && chk_rs321.checked == true
+                                                            && chk_rs331.checked == true
+                                                            && chk_rs341.checked == true
+                                                            && chk_rs351.checked == true
+                                                            && chk_rs361.checked == true
+                                                            && chk_rs371.checked == true
+                                                            && chk_rs381.checked == true
+                                                            && chk_rs391.checked == true
+                                                            && chk_rs3101.checked == true
+                                                            && chk_rs3111.checked == true
+                                                            && chk_rs3121.checked == true
+                                                            && chk_rs3131.checked == true
+
+                                                            )
+                                                    {
+
+                                                        document.getElementById('icon_affterresultok3').style.display = "";
+                                                        document.getElementById('icon_affterresultno3').style.display = "none";
+                                                    } else
+                                                    {
+
+                                                        document.getElementById('icon_affterresultok3').style.display = "none";
+                                                        document.getElementById('icon_affterresultno3').style.display = "";
+                                                    }
+                                                }
+
+
+
+                                                function edit_vehicletransportplan(editableObj, fieldname, ID)
+                                                {
+                                                    // alert(editableObj);
+                                                    // alert(fieldname);
+                                                    // alert(ID);
+                                                    
+                                                    $.ajax({
+                                                        url: 'meg_data.php',
+                                                        type: 'POST',
+                                                        data: {
+                                                            txt_flg: "edit_vehicletransportplan", editableObj: editableObj, ID: ID, fieldname: fieldname
+                                                        },
+                                                        success: function () {
+
+                                                        }
+                                                    });
+                                                }
+                                                
                                                 function edit_vehicletransportplanactualpresent(ID)
                                                 {
 
@@ -20096,8 +27906,10 @@ if ($_GET['employeecode1'] != '') {
 
             if ('<?=$_GET['employeecode1'] != ""?>') {
                 var selfcheckid = document.getElementById('keydrop_selfcheckid1').value;
-            }else{
+            }else if('<?=$_GET['employeecode2'] != ""?>'){
                 var selfcheckid = document.getElementById('keydrop_selfcheckid2').value;
+            }else{
+                var selfcheckid = document.getElementById('keydrop_selfcheckid3').value;
             }
             var clearby =  '<?=$_SESSION["USERNAME"]?>';
 
@@ -20489,6 +28301,169 @@ if ($_GET['employeecode1'] != '') {
 
 
         }
+        function save_keydroptime3(){
+            // alert('keydroptime2');
+            var selfcheckid = document.getElementById('keydrop_selfcheckid3').value;
+            var keydroptimechk = document.getElementById('keydroptime3').value;
+            var keydroptimedata1  = keydroptimechk.replace(" ","T"); // replave " " เป็น "T"
+            var keydroptimedata2  = keydroptimedata1.replace("/","-");
+            var keydroptimedata3  = keydroptimedata2.replace("/","-"); // replave "/" เป็น "-"
+            var keydroptime = keydroptimedata3;
+            
+            // alert(keydroptime);
+            // alert(selfcheckid);
+
+            $.ajax({
+                url: 'meg_data2.php',
+                type: 'POST',
+                data: {
+                    txt_flg: "save_keydroptime", ID: selfcheckid, fieldname: 'KEYDROPTIME', editableObj: keydroptime
+                },
+                success: function () {
+
+                    cal_timeworking3(selfcheckid,keydroptime);
+                }
+            });
+        }
+        function cal_timeworking3(selfcheckid,keydroptime){
+            // alert('คำนวณเวลาทำงานของพนักงานคนที่ 1');
+            // เวลาวางกุญแจ - เวลาเริ่มปฎิบัติงาน
+            // คำนวณแล้วบันทึกข้อมูล
+
+            var selfcheckid = document.getElementById('keydrop_selfcheckid3').value;
+            var daysleeprestendchk = document.getElementById('daysleep_restend3').value; //day sleeprestend = เวลาเริ่มปฎิบัติงาน
+            var daysleeprestenddata1  = daysleeprestendchk.replace(" ","T"); // replave " " เป็น "T"
+            var daysleeprestenddata2  = daysleeprestenddata1.replace("/","-");
+            var daysleeprestend3  = daysleeprestenddata2.replace("/","-"); // replave "/" เป็น "-"
+            var daysleeprestend = daysleeprestend3;
+
+            // alert(selfcheckid);
+            // alert(daysleeprestend);
+            // alert(keydroptime);
+
+            $.ajax({
+                type: 'post',
+                url: 'meg_data2.php',
+                data: {
+                    txt_flg: "select_resttimeselfcheck", startsleep: daysleeprestend, endsleep: keydroptime
+                },
+                success: function (rs) {
+                    // alert(rs);
+                    
+                    let text = rs;
+                    
+                    // split เครื่องหมาย : และ เก็บค่านาทีเข้า array
+                    let result = text.split(':');
+                    let [first,second] = result;
+                    // alert(second);
+                    
+                    // เอาค่าของ array ตำแหน่งที่ 2 มา trim และนับ lenght 
+                    let trimtext = second.trim();
+                    let chklength = trimtext.length;
+                    // alert(chklength);
+              
+                
+                    // นับ lenght ของตัวอักษรจากการ trim 
+                    // ถ้าตำแหน่งเป็น 1 คือ นาทีเป็น 1 ตำแหน่งเช่่น 0:4,14:4 ให้ replace เครื่องหมาย : เป็น :0
+                    if (chklength == '1') {
+                        // check len
+                        // alert('chklength = 1')  
+                        var replacetext = text.replace(":", ":0");
+                        // alert(replacetext);
+
+                    }else{
+                        // ถ้าตำแหน่ง !=1 ไม่ต้อง replace ค่าของนาที
+                        // alert('chklength other')  
+                        var replacetext = text;
+                        // alert(replacetext); 
+                    }
+
+                    // alert(replacetext); 
+
+                    let result1 =  text.substring(0, 2);
+                    let replace1 = result1.replace(":", " ");
+
+                    let result2 =  text.substring(3, 5);
+                    let replace2 = result2.replace(":", " ");
+
+                    // alert(replace1);
+                    // alert(replace2);
+
+                    if (replace1 == 0) {
+
+                        document.getElementById("timeworking3").style.backgroundColor = "#94FA67";
+                        document.getElementById('timeworking3').value = replacetext;
+                        save_timeworking1(selfcheckid,replacetext,'OK');
+                        // alert('1');
+
+                    }else if ((replace1 > 0 && replace1 < 14)) {
+                        // alert('2');
+                        document.getElementById("timeworking3").style.backgroundColor = "#94FA67";
+                        document.getElementById('timeworking3').value = replacetext;
+                        save_timeworking1(selfcheckid,replacetext,'OK');
+
+                      
+
+                    }else if (replace1 == 14) {
+                      
+
+                        // document.getElementById("timeworking1").style.backgroundColor = "#94FA67";
+                        // document.getElementById('timeworking1').value = text;
+                        // save_timeworking1(selfcheckid,text);
+
+                        if (replace2 <= 0) {
+                             //  #94FA67 สีเขียว
+                            document.getElementById("timeworking3").style.backgroundColor = "#94FA67";
+                            document.getElementById('timeworking3').value = replacetext;
+                            save_timeworking1(selfcheckid,replacetext,'OK');
+                            // alert('3');
+                        }else{
+                            //  #FA6767 สีเแดง
+                            document.getElementById("timeworking3").style.backgroundColor = "#FA6767";
+                            document.getElementById('timeworking3').value = replacetext;
+                            save_timeworking1(selfcheckid,replacetext,'NG');
+                            // alert('4');
+                        }
+                       
+
+                    }else{
+                        //  #FA6767 สีเแดง
+                        document.getElementById("timeworking3").style.backgroundColor = "#FA6767";
+                        document.getElementById('timeworking3').value = replacetext;
+                        save_timeworking1(selfcheckid,replacetext,'NG');
+                        // alert('5');
+
+                    }
+                    
+
+                    // save_timeworking1(selfcheckid,rs);
+                }
+            });
+
+
+        }
+        function save_timeworking3(selfcheckid,text,status){
+            // alert('คำนวณเวลาทำงานของพนักงานคนที่ 1');
+            // เวลาวางกุญแจ - เวลาเริ่มปฎิบัติงาน
+            //save_timeworking ใช้ร่วมกัน
+
+            // alert(rs);
+
+            $.ajax({
+                type: 'post',
+                url: 'meg_data2.php',
+                data: {
+                    txt_flg: "save_timeworking", selfcheckid: selfcheckid, value: text,status: status
+                },
+                success: function (rs) {
+                    // alert('sdsads');
+                    
+                    // window.location.reload();
+                }
+            });
+
+
+        }
     </script>
     <script>
         function edit_tenkoriskychk(editableObj, fieldname, ID)
@@ -20842,7 +28817,199 @@ if ($_GET['employeecode1'] != '') {
             //     document.getElementById('icon_transportrsok2').style.display = "";
             // }
         }
+        function rs_rsdirvertransport3()
+        {
+            // alert('rs drivertrans2')
+            
 
+            // check1
+            if(document.getElementById("TXT_TENKOLOADRESTRESULT0").value == 'x' || document.getElementById("TXT_TENKOLOADRESTRESULT0").value == '' 
+            || document.getElementById("TXT_TENKOLOADRESTRESULT1").value == 'x' || document.getElementById("TXT_TENKOLOADRESTRESULT1").value == ''
+            || document.getElementById("TXT_TENKOLOADRESTRESULT2").value == 'x' || document.getElementById("TXT_TENKOLOADRESTRESULT2").value == ''
+            || document.getElementById("TXT_TENKOLOADRESTRESULT3").value == 'x' || document.getElementById("TXT_TENKOLOADRESTRESULT3").value == ''
+            || document.getElementById("TXT_TENKOLOADRESTRESULT4").value == 'x' || document.getElementById("TXT_TENKOLOADRESTRESULT4").value == ''
+            || document.getElementById("TXT_TENKOLOADRESTRESULT5").value == 'x' || document.getElementById("TXT_TENKOLOADRESTRESULT5").value == ''
+            || document.getElementById("TXT_TENKOLOADRESTRESULT6").value == 'x' || document.getElementById("TXT_TENKOLOADRESTRESULT6").value == '')
+            {
+                var check1 = '0';
+                // alert(check1); 
+            }else{
+                var check1 = '1';
+                // alert(check1); 
+            }
+
+            // check2
+            if(document.getElementById("TXT_TENKOBODYSLEEPYRESULT0").value == 'x' || document.getElementById("TXT_TENKOBODYSLEEPYRESULT0").value == ''
+             || document.getElementById("TXT_TENKOBODYSLEEPYRESULT1").value == 'x' || document.getElementById("TXT_TENKOBODYSLEEPYRESULT1").value == ''
+             || document.getElementById("TXT_TENKOBODYSLEEPYRESULT2").value == 'x' || document.getElementById("TXT_TENKOBODYSLEEPYRESULT2").value == ''
+             || document.getElementById("TXT_TENKOBODYSLEEPYRESULT3").value == 'x' || document.getElementById("TXT_TENKOBODYSLEEPYRESULT3").value == ''
+             || document.getElementById("TXT_TENKOBODYSLEEPYRESULT4").value == 'x' || document.getElementById("TXT_TENKOBODYSLEEPYRESULT4").value == ''
+             || document.getElementById("TXT_TENKOBODYSLEEPYRESULT5").value == 'x' || document.getElementById("TXT_TENKOBODYSLEEPYRESULT5").value == ''
+             || document.getElementById("TXT_TENKOBODYSLEEPYRESULT6").value == 'x' || document.getElementById("TXT_TENKOBODYSLEEPYRESULT6").value == '')
+             {
+                var check2 = '0';
+                // alert(check2);
+            }else{
+                var check2 = '1';
+                // alert(check2);
+            }
+
+            // check3
+            if( document.getElementById("TXT_TENKOCARNEWRESULT0").value == 'x' || document.getElementById("TXT_TENKOCARNEWRESULT0").value == ''
+             || document.getElementById("TXT_TENKOCARNEWRESULT1").value == 'x' || document.getElementById("TXT_TENKOCARNEWRESULT1").value == ''
+             || document.getElementById("TXT_TENKOCARNEWRESULT2").value == 'x' || document.getElementById("TXT_TENKOCARNEWRESULT2").value == ''
+             || document.getElementById("TXT_TENKOCARNEWRESULT3").value == 'x' || document.getElementById("TXT_TENKOCARNEWRESULT3").value == ''
+             || document.getElementById("TXT_TENKOCARNEWRESULT4").value == 'x' || document.getElementById("TXT_TENKOCARNEWRESULT4").value == ''
+             || document.getElementById("TXT_TENKOCARNEWRESULT5").value == 'x' || document.getElementById("TXT_TENKOCARNEWRESULT5").value == ''
+             || document.getElementById("TXT_TENKOCARNEWRESULT6").value == 'x' || document.getElementById("TXT_TENKOCARNEWRESULT6").value == '')
+             {
+                var check3 = '0';
+                // alert(check3);
+            }else{
+                var check3 = '1';
+                // alert(check3);
+            }
+
+            // check4
+            if( document.getElementById("TXT_TENKOTRAILERRESULT0").value == 'x' || document.getElementById("TXT_TENKOTRAILERRESULT0").value == ''
+             || document.getElementById("TXT_TENKOTRAILERRESULT1").value == 'x' || document.getElementById("TXT_TENKOTRAILERRESULT1").value == ''
+             || document.getElementById("TXT_TENKOTRAILERRESULT2").value == 'x' || document.getElementById("TXT_TENKOTRAILERRESULT2").value == ''
+             || document.getElementById("TXT_TENKOTRAILERRESULT3").value == 'x' || document.getElementById("TXT_TENKOTRAILERRESULT3").value == ''
+             || document.getElementById("TXT_TENKOTRAILERRESULT4").value == 'x' || document.getElementById("TXT_TENKOTRAILERRESULT4").value == '' 
+             || document.getElementById("TXT_TENKOTRAILERRESULT5").value == 'x' || document.getElementById("TXT_TENKOTRAILERRESULT5").value == ''
+             || document.getElementById("TXT_TENKOTRAILERRESULT6").value == 'x' || document.getElementById("TXT_TENKOTRAILERRESULT6").value == '')
+             {
+                var check4 = '0';
+                // alert(check4);
+            }else{
+                var check4 = '1';
+                // alert(check4);
+            }
+
+            // check5
+            if(document.getElementById("TXT_TENKOROADRESULT0").value == 'x' || document.getElementById("TXT_TENKOROADRESULT0").value == ''
+             || document.getElementById("TXT_TENKOROADRESULT1").value == 'x' || document.getElementById("TXT_TENKOROADRESULT1").value == ''
+             || document.getElementById("TXT_TENKOROADRESULT2").value == 'x' || document.getElementById("TXT_TENKOROADRESULT2").value == ''
+             || document.getElementById("TXT_TENKOROADRESULT3").value == 'x' || document.getElementById("TXT_TENKOROADRESULT3").value == ''
+             || document.getElementById("TXT_TENKOROADRESULT4").value == 'x' || document.getElementById("TXT_TENKOROADRESULT4").value == ''
+             || document.getElementById("TXT_TENKOROADRESULT5").value == 'x' || document.getElementById("TXT_TENKOROADRESULT5").value == ''
+             || document.getElementById("TXT_TENKOROADRESULT6").value == 'x' || document.getElementById("TXT_TENKOROADRESULT6").value == '')
+             {
+                var check5 = '0';
+                // alert(check5);
+            }else{
+                var check5 = '1';
+                // alert(check5);
+            }
+
+            // check6
+            if(document.getElementById("TXT_TENKOAIRRESULT0").value == 'x' || document.getElementById("TXT_TENKOAIRRESULT0").value == ''
+             || document.getElementById("TXT_TENKOAIRRESULT1").value == 'x' || document.getElementById("TXT_TENKOAIRRESULT1").value == ''
+             || document.getElementById("TXT_TENKOAIRRESULT2").value == 'x' || document.getElementById("TXT_TENKOAIRRESULT2").value == ''
+             || document.getElementById("TXT_TENKOAIRRESULT3").value == 'x' || document.getElementById("TXT_TENKOAIRRESULT3").value == ''
+             || document.getElementById("TXT_TENKOAIRRESULT4").value == 'x' || document.getElementById("TXT_TENKOAIRRESULT4").value == ''
+             || document.getElementById("TXT_TENKOAIRRESULT5").value == 'x' || document.getElementById("TXT_TENKOAIRRESULT5").value == ''
+             || document.getElementById("TXT_TENKOAIRRESULT6").value == 'x' || document.getElementById("TXT_TENKOAIRRESULT6").value == '')
+             {
+                var check6 = '0';
+                // alert(check6);
+            }else{
+                var check6 = '1';
+                // alert(check6);
+            }
+
+            // check7
+            if( document.getElementById("TXT_TENKOSLEEPYRESULT0").value == 'x' || document.getElementById("TXT_TENKOSLEEPYRESULT0").value == ''
+             || document.getElementById("TXT_TENKOSLEEPYRESULT1").value == 'x' || document.getElementById("TXT_TENKOSLEEPYRESULT1").value == ''
+             || document.getElementById("TXT_TENKOSLEEPYRESULT2").value == 'x' || document.getElementById("TXT_TENKOSLEEPYRESULT2").value == ''
+             || document.getElementById("TXT_TENKOSLEEPYRESULT3").value == 'x' || document.getElementById("TXT_TENKOSLEEPYRESULT3").value == ''
+             || document.getElementById("TXT_TENKOSLEEPYRESULT4").value == 'x' || document.getElementById("TXT_TENKOSLEEPYRESULT4").value == ''
+             || document.getElementById("TXT_TENKOSLEEPYRESULT5").value == 'x' || document.getElementById("TXT_TENKOSLEEPYRESULT5").value == ''
+             || document.getElementById("TXT_TENKOSLEEPYRESULT6").value == 'x' || document.getElementById("TXT_TENKOSLEEPYRESULT6").value == '')
+             {
+                var check7 = '0';
+                // alert(check7);
+            }else{
+                var check7 = '1';
+                // alert(check7);
+            }
+
+
+            if (check1 == '1' || check2 == '1' || check3 == '1' || check4 == '1' || check5 == '1' || check6 == '1' || check7 == '1' ) {
+                // alert('ถูก');
+                document.getElementById('icon_transportrsno3').style.display = "none";
+                document.getElementById('icon_transportrsok3').style.display = "";    
+            }else{
+                // alert('กากบาท');
+                document.getElementById('icon_transportrsno3').style.display = "";
+                document.getElementById('icon_transportrsok3').style.display = "none";
+            }
+
+
+            // if (
+            //         document.getElementById("TXT_TENKOLOADRESTRESULT0").value == 'x'
+            //         || document.getElementById("TXT_TENKOLOADRESTRESULT1").value == 'x'
+            //         || document.getElementById("TXT_TENKOLOADRESTRESULT2").value == 'x'
+            //         || document.getElementById("TXT_TENKOLOADRESTRESULT3").value == 'x'
+            //         || document.getElementById("TXT_TENKOLOADRESTRESULT4").value == 'x'
+            //         || document.getElementById("TXT_TENKOLOADRESTRESULT5").value == 'x'
+            //         || document.getElementById("TXT_TENKOLOADRESTRESULT6").value == 'x'
+            //         || document.getElementById("TXT_TENKOBODYSLEEPYRESULT0").value == 'x'
+            //         || document.getElementById("TXT_TENKOBODYSLEEPYRESULT1").value == 'x'
+            //         || document.getElementById("TXT_TENKOBODYSLEEPYRESULT2").value == 'x'
+            //         || document.getElementById("TXT_TENKOBODYSLEEPYRESULT3").value == 'x'
+            //         || document.getElementById("TXT_TENKOBODYSLEEPYRESULT4").value == 'x'
+            //         || document.getElementById("TXT_TENKOBODYSLEEPYRESULT5").value == 'x'
+            //         || document.getElementById("TXT_TENKOBODYSLEEPYRESULT6").value == 'x'
+            //         || document.getElementById("TXT_TENKOCARNEWRESULT0").value == 'x'
+            //         || document.getElementById("TXT_TENKOCARNEWRESULT1").value == 'x'
+            //         || document.getElementById("TXT_TENKOCARNEWRESULT2").value == 'x'
+            //         || document.getElementById("TXT_TENKOCARNEWRESULT3").value == 'x'
+            //         || document.getElementById("TXT_TENKOCARNEWRESULT4").value == 'x'
+            //         || document.getElementById("TXT_TENKOCARNEWRESULT5").value == 'x'
+            //         || document.getElementById("TXT_TENKOCARNEWRESULT6").value == 'x'
+            //         || document.getElementById("TXT_TENKOTRAILERRESULT0").value == 'x'
+            //         || document.getElementById("TXT_TENKOTRAILERRESULT1").value == 'x'
+            //         || document.getElementById("TXT_TENKOTRAILERRESULT2").value == 'x'
+            //         || document.getElementById("TXT_TENKOTRAILERRESULT3").value == 'x'
+            //         || document.getElementById("TXT_TENKOTRAILERRESULT4").value == 'x'
+            //         || document.getElementById("TXT_TENKOTRAILERRESULT5").value == 'x'
+            //         || document.getElementById("TXT_TENKOTRAILERRESULT6").value == 'x'
+            //         || document.getElementById("TXT_TENKOROADRESULT0").value == 'x'
+            //         || document.getElementById("TXT_TENKOROADRESULT1").value == 'x'
+            //         || document.getElementById("TXT_TENKOROADRESULT2").value == 'x'
+            //         || document.getElementById("TXT_TENKOROADRESULT3").value == 'x'
+            //         || document.getElementById("TXT_TENKOROADRESULT4").value == 'x'
+            //         || document.getElementById("TXT_TENKOROADRESULT5").value == 'x'
+            //         || document.getElementById("TXT_TENKOROADRESULT6").value == 'x'
+            //         || document.getElementById("TXT_TENKOAIRRESULT0").value == 'x'
+            //         || document.getElementById("TXT_TENKOAIRRESULT1").value == 'x'
+            //         || document.getElementById("TXT_TENKOAIRRESULT2").value == 'x'
+            //         || document.getElementById("TXT_TENKOAIRRESULT3").value == 'x'
+            //         || document.getElementById("TXT_TENKOAIRRESULT4").value == 'x'
+            //         || document.getElementById("TXT_TENKOAIRRESULT5").value == 'x'
+            //         || document.getElementById("TXT_TENKOAIRRESULT6").value == 'x'
+            //         || document.getElementById("TXT_TENKOSLEEPYRESULT0").value == 'x'
+            //         || document.getElementById("TXT_TENKOSLEEPYRESULT1").value == 'x'
+            //         || document.getElementById("TXT_TENKOSLEEPYRESULT2").value == 'x'
+            //         || document.getElementById("TXT_TENKOSLEEPYRESULT3").value == 'x'
+            //         || document.getElementById("TXT_TENKOSLEEPYRESULT4").value == 'x'
+            //         || document.getElementById("TXT_TENKOSLEEPYRESULT5").value == 'x'
+            //         || document.getElementById("TXT_TENKOSLEEPYRESULT6").value == 'x'
+
+
+            //         )
+            // {
+
+            //     document.getElementById('icon_transportrsno2').style.display = "";
+            //     document.getElementById('icon_transportrsok2').style.display = "none";
+            // } else
+            // {
+
+            //     document.getElementById('icon_transportrsno2').style.display = "none";
+            //     document.getElementById('icon_transportrsok2').style.display = "";
+            // }
+        }
         function edit_tenkobeforetxt1()
         {
             if (document.getElementById("txt_rs14").value != "")
@@ -21044,7 +29211,7 @@ if ($_GET['employeecode1'] != '') {
 <?php
 if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
     ?>
-                    if (document.getElementById("txt_rs16").value > 37.0)
+                    if (document.getElementById("txt_rs16").value > '<?=$result_seTenkoSTD['TEMP']?>')
                     {
                         document.getElementById("chk_rs160").checked = true;
                         document.getElementById("chk_rs161").checked = false;
@@ -21056,7 +29223,7 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
     <?php
 } else {
     ?>
-                    if (document.getElementById("txt_rs16").value > 37.0)
+                    if (document.getElementById("txt_rs16").value > '<?=$result_seTenkoSTD['TEMP']?>')
                     {
                         document.getElementById("chk_rs160").checked = true;
                         document.getElementById("chk_rs161").checked = false;
@@ -21083,46 +29250,44 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
         }
         function edit_tenkobeforetxt5()
         {
-
-
-
-
-
+        // ค่าบนตัวที่ 1
+        // alert('<?=$result_seTenkoSTD['MINSYS']?>');
+        // alert("S1");
 
             if (document.getElementById("txt_rs171").value != "")
             {
-<?php
-if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
-    ?>
-                    if ((document.getElementById("txt_rs171").value >= 90 && document.getElementById("txt_rs171").value <= 150 && document.getElementById("txt_rs172").value >= 60 && document.getElementById("txt_rs172").value <= 95) && (document.getElementById('txt_rs173').value >= 60 && document.getElementById('txt_rs173').value <= 100))
-                    {
+                <?php
+                if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+                    ?>
+                        if ((document.getElementById("txt_rs171").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172").value <= '<?=$result_seTenkoSTD['MAXDIA']?>') && (document.getElementById('txt_rs173').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
+                        {
 
-                        document.getElementById("chk_rs170").checked = false;
-                        document.getElementById("chk_rs171").checked = true;
-                    } else
-                    {
+                            document.getElementById("chk_rs170").checked = false;
+                            document.getElementById("chk_rs171").checked = true;
+                        } else
+                        {
 
-                        document.getElementById("chk_rs171").checked = false;
-                        document.getElementById("chk_rs170").checked = true;
-                    }
-    <?php
-} else {
-    ?>
-                    if ((document.getElementById("txt_rs171").value >= 90 && document.getElementById("txt_rs171").value <= 150 && document.getElementById("txt_rs172").value >= 60 && document.getElementById("txt_rs172").value <= 95))
-                    {
+                            document.getElementById("chk_rs171").checked = false;
+                            document.getElementById("chk_rs170").checked = true;
+                        }
+                    <?php
+                } else {
+                    ?>
+                        if ((document.getElementById("txt_rs171").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172").value <= '<?=$result_seTenkoSTD['MAXDIA']?>') && (document.getElementById('txt_rs173').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
+                        {
 
-                        document.getElementById("chk_rs170").checked = false;
-                        document.getElementById("chk_rs171").checked = true;
-                    } else
-                    {
+                            document.getElementById("chk_rs170").checked = false;
+                            document.getElementById("chk_rs171").checked = true;
+                        } else
+                        {
 
-                        document.getElementById("chk_rs171").checked = false;
-                        document.getElementById("chk_rs170").checked = true;
-                    }
-    <?php
-}
-?>
-                document.getElementById("chk_17").checked = true;
+                            document.getElementById("chk_rs171").checked = false;
+                            document.getElementById("chk_rs170").checked = true;
+                        }
+                    <?php
+                }
+                ?>
+                    document.getElementById("chk_17").checked = true;
             } else
             {
                 document.getElementById("chk_17").checked = false;
@@ -21133,18 +29298,17 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 
 
         }
+
+        // ค่าความดันบนตัวที่2
         function edit_tenkobeforetxt5_2()
         {
-
-
-
 
             if (document.getElementById("txt_rs171_2").value != "")
             {
                 <?php
                 if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
                     ?>
-                    if ((document.getElementById("txt_rs171_2").value >= 90 && document.getElementById("txt_rs171_2").value <= 150 && document.getElementById("txt_rs172_2").value >= 60 && document.getElementById("txt_rs172_2").value <= 95) && (document.getElementById('txt_rs173_2').value >= 60 && document.getElementById('txt_rs173_2').value <= 100))
+                    if ((document.getElementById("txt_rs171_2").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_2").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_2").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_2").value <= '<?=$result_seTenkoSTD['MAXDIA']?>') && (document.getElementById('txt_rs173_2').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_2').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
 
                         document.getElementById("chk_rs170").checked = false;
@@ -21158,7 +29322,7 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
                 <?php
                 } else {
                 ?>
-                    if ((document.getElementById("txt_rs171_2").value >= 90 && document.getElementById("txt_rs171_2").value <= 150 && document.getElementById("txt_rs172_2").value >= 60 && document.getElementById("txt_rs172_2").value <= 95))
+                    if ((document.getElementById("txt_rs171_2").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_2").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_2").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_2").value <= '<?=$result_seTenkoSTD['MAXDIA']?>') && (document.getElementById('txt_rs173_2').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_2').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
 
                         document.getElementById("chk_rs170").checked = false;
@@ -21183,6 +29347,8 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 
 
         }
+
+        // ค่าความดันบนตัวที่ 3
         function edit_tenkobeforetxt5_3()
         {
 
@@ -21190,13 +29356,14 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 
 <?php
 if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+    
+
     ?>
-
-
+    
                 if (document.getElementById("txt_rs171_3").value != "")
                 {
 
-                    if ((document.getElementById("txt_rs171_2").value >= 90 && document.getElementById("txt_rs171_2").value <= 150 && document.getElementById("txt_rs172_2").value >= 60 && document.getElementById("txt_rs172_2").value <= 95) && (document.getElementById('txt_rs173_2').value >= 60 && document.getElementById('txt_rs173_2').value <= 100))
+                    if ((document.getElementById("txt_rs171_3").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_3").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_3").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_3").value <= '<?=$result_seTenkoSTD['MAXDIA']?>') && (document.getElementById('txt_rs173_3').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_3').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
 
                         document.getElementById("chk_rs170").checked = false;
@@ -21221,7 +29388,7 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
                 if (document.getElementById("txt_rs171_3").value != "")
                 {
 
-                    if ((document.getElementById("txt_rs171_2").value >= 90 && document.getElementById("txt_rs171_2").value <= 150 && document.getElementById("txt_rs172_2").value >= 60 && document.getElementById("txt_rs172_2").value <= 95))
+                    if ((document.getElementById("txt_rs171_3").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_3").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_3").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_3").value <= '<?=$result_seTenkoSTD['MAXDIA']?>') && (document.getElementById('txt_rs173_3').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_3').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
 
                         document.getElementById("chk_rs170").checked = false;
@@ -21244,6 +29411,8 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 ?>
 
         }
+
+        // ค่าความดันล่างตัวที่ 1
         function edit_tenkobeforetxt6()
         {
 
@@ -21253,7 +29422,7 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 <?php
 if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
     ?>
-                    if ((document.getElementById("txt_rs171").value >= 90 && document.getElementById("txt_rs171").value <= 150) && (document.getElementById("txt_rs172").value >= 60 && document.getElementById("txt_rs172").value <= 95) && (document.getElementById('txt_rs173').value >= 60 && document.getElementById('txt_rs173').value <= 100))
+                    if ((document.getElementById("txt_rs171").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171").value <= '<?=$result_seTenkoSTD['MAXSYS']?>') && (document.getElementById("txt_rs172").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172").value <= '<?=$result_seTenkoSTD['MINDIA']?>') && (document.getElementById('txt_rs173').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
                         document.getElementById("chk_rs170").checked = false;
                         document.getElementById("chk_rs171").checked = true;
@@ -21265,7 +29434,7 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
     <?php
 } else {
     ?>
-                    if ((document.getElementById("txt_rs171").value >= 90 && document.getElementById("txt_rs171").value <= 150) && (document.getElementById("txt_rs172").value >= 60 && document.getElementById("txt_rs172").value <= 95))
+                    if ((document.getElementById("txt_rs171").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171").value <= '<?=$result_seTenkoSTD['MAXSYS']?>') && (document.getElementById("txt_rs172").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172").value <= '<?=$result_seTenkoSTD['MINDIA']?>') && (document.getElementById('txt_rs173').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
                         document.getElementById("chk_rs170").checked = false;
                         document.getElementById("chk_rs171").checked = true;
@@ -21289,18 +29458,17 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 
 
         }
+
+        // ค่าล่างตัวที่2
         function edit_tenkobeforetxt6_2()
         {
 
-
-
-
-            if (document.getElementById("txt_rs171_2").value != "")
+            if (document.getElementById("txt_rs172_2").value != "")
             {
 <?php
 if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
     ?>
-                    if ((document.getElementById("txt_rs171_2").value >= 90 && document.getElementById("txt_rs171_2").value <= 150 && document.getElementById("txt_rs172_2").value >= 60 && document.getElementById("txt_rs172_2").value <= 95) && (document.getElementById('txt_rs173_2').value >= 60 && document.getElementById('txt_rs173_2').value <= 100))
+                    if ((document.getElementById("txt_rs171_2").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_2").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_2").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_2").value <= '<?=$result_seTenkoSTD['MINSYS']?>') && (document.getElementById('txt_rs173_2').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_2').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
 
                         document.getElementById("chk_rs170").checked = false;
@@ -21314,7 +29482,7 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
     <?php
 } else {
     ?>
-                    if ((document.getElementById("txt_rs171_2").value >= 90 && document.getElementById("txt_rs171_2").value <= 150 && document.getElementById("txt_rs172_2").value >= 60 && document.getElementById("txt_rs172_2").value <= 95))
+                    if ((document.getElementById("txt_rs171_2").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_2").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_2").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_2").value <= '<?=$result_seTenkoSTD['MINSYS']?>') && (document.getElementById('txt_rs173_2').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_2').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
                     {
 
                         document.getElementById("chk_rs170").checked = false;
@@ -21339,26 +29507,44 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 
 
         }
+
+        // ค่าล่างตัวที่ 3
         function edit_tenkobeforetxt6_3()
         {
 
-
-
-
-            if (document.getElementById("txt_rs171_3").value != "")
+            if (document.getElementById("txt_rs172_3").value != "")
             {
+<?php
+if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] == 'RKR' || $result_sePlain['COMPANYCODE'] == 'RKL') {
+    ?>
+                    if ((document.getElementById("txt_rs171_3").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_3").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_3").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_3").value <= '<?=$result_seTenkoSTD['MINSYS']?>') && (document.getElementById('txt_rs173_3').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_2').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
+                    {
 
-                if ((document.getElementById("txt_rs171_3").value >= 90 && document.getElementById("txt_rs171_3").value <= 150 && document.getElementById("txt_rs172_3").value >= 60 && document.getElementById("txt_rs172_3").value <= 95) && (document.getElementById('txt_rs173_3').value >= 60 && document.getElementById('txt_rs173_3').value <= 100))
-                {
+                        document.getElementById("chk_rs170").checked = false;
+                        document.getElementById("chk_rs171").checked = true;
+                    } else
+                    {
 
-                    document.getElementById("chk_rs170").checked = false;
-                    document.getElementById("chk_rs171").checked = true;
-                } else
-                {
+                        document.getElementById("chk_rs171").checked = false;
+                        document.getElementById("chk_rs170").checked = true;
+                    }
+    <?php
+} else {
+    ?>
+                    if ((document.getElementById("txt_rs171_3").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_3").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_3").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_3").value <= '<?=$result_seTenkoSTD['MINSYS']?>') && (document.getElementById('txt_rs173_3').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_2').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
+                    {
 
-                    document.getElementById("chk_rs171").checked = false;
-                    document.getElementById("chk_rs170").checked = true;
-                }
+                        document.getElementById("chk_rs170").checked = false;
+                        document.getElementById("chk_rs171").checked = true;
+                    } else
+                    {
+
+                        document.getElementById("chk_rs171").checked = false;
+                        document.getElementById("chk_rs170").checked = true;
+                    }
+    <?php
+}
+?>
                 document.getElementById("chk_17").checked = true;
             } else
             {
@@ -21368,7 +29554,37 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
             }
 
 
+
         }
+        // function edit_tenkobeforetxt6_3()
+        // {
+
+        //     if (document.getElementById("txt_rs172_3").value != "")
+        //     {
+
+        //         if ((document.getElementById("txt_rs171_3").value >= '<?=$result_seTenkoSTD['MINSYS']?>' && document.getElementById("txt_rs171_3").value <= '<?=$result_seTenkoSTD['MAXSYS']?>' && document.getElementById("txt_rs172_3").value >= '<?=$result_seTenkoSTD['MINDIA']?>' && document.getElementById("txt_rs172_3").value <= '<?=$result_seTenkoSTD['MAXDIA']?>') && (document.getElementById('txt_rs173_3').value >= '<?=$result_seTenkoSTD['MINPULSE']?>' && document.getElementById('txt_rs173_3').value <= '<?=$result_seTenkoSTD['MAXPULSE']?>'))
+        //         {
+
+        //             document.getElementById("chk_rs170").checked = false;
+        //             document.getElementById("chk_rs171").checked = true;
+        //         } else
+        //         {
+
+        //             document.getElementById("chk_rs171").checked = false;
+        //             document.getElementById("chk_rs170").checked = true;
+        //         }
+        //         document.getElementById("chk_17").checked = true;
+        //     } else
+        //     {
+        //         document.getElementById("chk_17").checked = false;
+        //         document.getElementById("chk_rs170").checked = true;
+        //         document.getElementById("chk_rs171").checked = false;
+        //     }
+
+
+        // }
+
+        // edit_tenkobeforetxt20 วัด PULSE
         function edit_tenkobeforetxt20()
         {
 
@@ -21546,9 +29762,13 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
             grade = document.getElementById("txt_gradesaveemp1").value;
             point = document.getElementById("txt_pointsaveemp1").value;
         
-        }else{
+        }else if(check == 'emp2'){
             grade = document.getElementById("txt_gradesaveemp2").value;
             point = document.getElementById("txt_pointsaveemp2").value;
+            
+        }else{
+            grade = document.getElementById("txt_gradesaveemp3").value;
+            point = document.getElementById("txt_pointsaveemp3").value;
             
         }
             $.ajax({
@@ -21629,7 +29849,29 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
             }); 
         }
 
-        
+        function check_pointemp3(tenkomasterid,employeecode){
+            // alert(tenkomasterid);
+            // alert(employeecode);
+            // alert('check point emp2');
+            $.ajax({
+                url: 'meg_data2.php',
+                type: 'POST',
+                data: {
+                    txt_flg: "check_gpspointemp3", tenkomasterid: tenkomasterid,employeecode: employeecode
+                },
+                success: function (rs) {
+                    document.getElementById("data_pointemp3sr").innerHTML = rs;
+                    document.getElementById("txt_gradeshowemp3").value = document.getElementById("txt_gradeemp3").value;
+                    document.getElementById("txt_pointshowemp3").value = document.getElementById("txt_pointemp3").value;
+
+                    document.getElementById("txt_gradesaveemp3").value = document.getElementById("txt_gradeemp3").value;
+                    document.getElementById("txt_pointsaveemp3").value = document.getElementById("txt_pointemp3").value;
+                    
+                    update_tenkogpsGradePoint(tenkomasterid,employeecode,'emp3');
+                }
+            }); 
+        }
+
         function edit_tenkorisky(editableObj, fieldname, ID)
         {
             save_logprocess('Tenko', 'Save Tenkorisky', '<?= $result_seLogin['PersonCode'] ?>');
@@ -21835,7 +30077,7 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
 
                     },
                     success: function (response) {
-                        if ('<?= $_GET['employeecode1'] ?>' != '' || '<?= $_GET['employeecode2'] ?>' != '')
+                        if ('<?= $_GET['employeecode1'] ?>' != '' || '<?= $_GET['employeecode2'] ?>' != '' || '<?= $_GET['employeecode3'] ?>' != '')
                         {
                             // edit_tenkobefore2 คือ บันทึกข้อมูลการตรวจร่างกาย
                             edit_tenkobefore2();
@@ -21852,12 +30094,34 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
                         } else
                         {
                             // alert('ไม่มีรหัสพนักงาน กรุณาตรวจสอบข้อมูล!!!');
-                            swal.fire({
-                                title: "Good Job!",
+                            // swal.fire({
+                            //     title: "Good Job!",
+                            //     text: "ไม่มีรหัสพนักงาน กรุณาตรวจสอบข้อมูล!!!",
+                            //     icon: "success",
+                            // });
+                            Swal.fire({
+                                title: 'Warning!',
                                 text: "ไม่มีรหัสพนักงาน กรุณาตรวจสอบข้อมูล!!!",
-                                icon: "success",
-                            });
-                            window.location.reload();
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'ตกลง',
+                                cancelButtonText: 'ยกเลิก'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // Swal.fire(
+                                    // 'Deleted!',
+                                    // 'Your file has been deleted.',
+                                    // 'success'
+                                    // )
+                                    window.location.reload();   
+                                }else{
+                                    
+                                }
+                            })
+
+                            // window.location.reload();
 
                         }
 
@@ -21946,9 +30210,13 @@ if ($result_sePlain['COMPANYCODE'] == 'RKS' || $result_sePlain['COMPANYCODE'] ==
             if ('<?= $_GET['employeecode1'] ?>' != '')
             {
                 employeecode = '<?= $result_seTenkobefore1['TENKOBEFOREID'] ?>';
-            } else
+            } else if ('<?= $_GET['employeecode2'] ?>' != '')
             {
                 employeecode = '<?= $result_seTenkobefore2['TENKOBEFOREID'] ?>';
+
+            } else
+            {
+                employeecode = '<?= $result_seTenkobefore3['TENKOBEFOREID'] ?>';
 
             }
 

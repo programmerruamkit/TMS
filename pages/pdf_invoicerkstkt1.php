@@ -81,12 +81,12 @@ $table_header3 = '<table style="width: 100%;">
             <td style="width: 50%;text-align:right">เลขที่ ' . $result_seInvoice['INVOICECODE'] . '</td>
        </tr>
        <tr>
-            <td style="width: 50%;">ที่อยู่ 700/742 หมู่ 1 ตำบลพานทอง <br>อำเภอพานทอง จังหวัดชลบุรี 20160</td>
+            <td style="width: 55%;">ที่อยู่ 700/742 หมู่ 1 ตำบลพานทอง อำเภอพานทอง จังหวัดชลบุรี 20160</td>
             <td style="width: 50%;text-align:right">วันที่ ' . $result_getDate['SYSDATE'] . ' เครดิต 30 วัน</td>
        </tr>
        <tr>
             <td style="width: 50%;">เลขประจำตัวผู้เสียภาษี 0105548105689</td>
-            <td style="width: 50%;text-align:right">วันที่ครบกำหนด -</td>
+            <td style="width: 50%;text-align:right"></td>   
        </tr>
     </tbody>
 </table>';
@@ -96,15 +96,16 @@ $thead3 = '<thead>
  
         <tr style="border:1px solid #000;padding:4px;">
        
-        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>ลำดับที่</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ลำดับที่</b></td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>วันที่</b></td>
-        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>หมายเลข DO</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 20%;"><b>หมายเลข DO</b></td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ทะเบียนรถ</b></td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 15%;"><b>พนักงาน</b></td>
-        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>เส้นทาง</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>ต้นทาง</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 25%;"><b>ปลายทาง</b></td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 5%;"><b>QT.</b></td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>ราคา</b></td>
-        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>จำนวนเงิน(บาท)</b></td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;width: 10%;"><b>จำนวนเงิน</b></td>
       </tr>
     </thead><tbody>';
 
@@ -139,6 +140,7 @@ while ($result_seBilling = sqlsrv_fetch_array($query_seBilling, SQLSRV_FETCH_ASS
         <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['THAINAME'] . '</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['EMPLOYEENAME1'] . '</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['JOBSTART'] . '</td>
+        <td style="border-right:1px solid #000;padding:4px;text-align:left;">' . $result_seBilling['JOBEND'] . '</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:right;">1.00</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($result_seBilling['ACTUALPRICE'], 2) . '</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($result_seBilling['ACTUALPRICE'], 2) . '</td>
@@ -151,11 +153,13 @@ while ($result_seBilling = sqlsrv_fetch_array($query_seBilling, SQLSRV_FETCH_ASS
 
 $tfoot3 = '</tbody><tfoot>
      <tr style="border:1px solid #000;">
-        <td colspan="7" style="border-right:1px solid #000;padding:4px;text-align:center;">' . convert($sumtotal) . '</td>
+     
+        <td style="border-right:1px solid #000;padding:4px;text-align:center;"></td>
         <td style="border-right:1px solid #000;padding:4px;text-align:center;">รวมสุทธิ</td>
+        <td colspan="7" style="border-right:1px solid #000;padding:4px;text-align:center;">' . convert($sumtotal) . '</td>
         <td style="border-right:1px solid #000;padding:4px;text-align:right;">' . number_format($sumtotal, 2) . '</td>
        
-            </tr>
+    </tr>
     </tfoot>';
 
 

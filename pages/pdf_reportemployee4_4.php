@@ -407,7 +407,7 @@ $thead2lastyear = '<thead>
         </tr>
         <tr style="border:1px solid #000;padding:10px;">
           <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">4.โรคหัวใจ</td>
-          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealth['HEARTDISEASE']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
+          <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.($result_sedataHealthlastyear['HEARTDISEASE']  == '0' ? 'ไม่มีโรค' : 'มีโรค').'</td>
           // โรคอื่นๆ
           <td colspan = "4" style="border-right:1px solid #000;padding:10px;text-align:left;font-size:14px">'.$result_sedataHealthlastyear['OTHERDISEASE4'].'</td>
         </tr>

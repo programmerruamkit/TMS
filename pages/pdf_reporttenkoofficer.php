@@ -6,7 +6,12 @@ require_once("../mpdf/autoload.php");
 $conn = connect("RTMS");
 //$mpdf = new mPDF();
 $mpdf = new mPDF('th', 'A4', '0', '');
-
+$mpdf->AddPageByArray([
+  'margin-left' => 5,
+  'margin-right' => 5,
+  'margin-top' => 5,
+  'margin-bottom' => 5,
+  ]);
 $employee = " AND a.PersonCode = '" . $_GET['employeecode'] . "'";
 $sql_seEmp = "{call megEmployeeEHR_v2(?,?)}";
 $params_seEmp = array(
@@ -43,7 +48,7 @@ $query_seSec = sqlsrv_query($conn, $sql_seSec, $params_seSec);
 $result_seSec = sqlsrv_fetch_array($query_seSec, SQLSRV_FETCH_ASSOC);
 
 // check Area หาค่ามาตรฐานข้อมูลตรวจร่างกาย
-$checkArea = substr($_GET['employeecode1'],0,2);
+$checkArea = substr($_GET['employeecode'],0,2);
 
 if ($checkArea == '01' || $checkArea == '02' || $checkArea == '07'|| $checkArea == '08'|| $checkArea == '10') {
     $areashow = '(AMT)';
@@ -174,98 +179,109 @@ array($conditionDir1officer, SQLSRV_PARAM_IN)
 $query_seDir1officer = sqlsrv_query($conn, $sql_seDir1officer, $params_seDir1officer);
 $result_seDir1officer = sqlsrv_fetch_array($query_seDir1officer, SQLSRV_FETCH_ASSOC);
 
-$sql_seCount = "SELECT COUNT(LABOTRONDATAID) AS 'COUNT'
-FROM LABOTRONWEBSERVICEDATA 
-WHERE CARDNUMBER='".$result_seDir1officer['TaxID']."'
-AND CONVERT(DATE,CREATEDATE) BETWEEN CONVERT(DATE,'".$_GET['datestart']."',103) AND CONVERT(DATE,'".$_GET['dateend']."',103) ";
+$sql_seCount = "SELECT COUNT(TENKOMASTERID) AS 'COUNT' FROM (
+	SELECT ROW_NUMBER() OVER( PARTITION BY CONVERT(DATE,b.CREATEDATE) ORDER BY b.CREATEDATE DESC) AS 'ROWNUM_CHK',
+	b.CREATEDATE AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+	,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+	,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+	,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+	,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+	FROM  TENKOBEFORE b
+	WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode']."'
+	AND CONVERT(DATE,b.CREATEDATE) BETWEEN CONVERT(DATE,'".$_GET['datestart']."',103) AND CONVERT(DATE,'".$_GET['dateend']."',103)
+	AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+	OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+	OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+	OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+	OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+	OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+	
+) AS A
+WHERE A.ROWNUM_CHK ='1'";
 $params_seCount = array();
 $query_seCount = sqlsrv_query($conn, $sql_seCount, $params_seCount);
 $result_seCount = sqlsrv_fetch_array($query_seCount, SQLSRV_FETCH_ASSOC);
 
+// $sql_seSelfCheckDataSYS = "SELECT DRIVER_TEMPERATURE,DRIVER_SYS,DRIVER_DIA,DRIVER_PULSE,DRIVER_OXYGEN,DRIVER_ALCOHOL,CREATEBY, CONVERT(VARCHAR(10),CREATEDATE,103) AS 'CREATEDATE'
+// FROM LABOTRONWEBSERVICEDATA 
+// WHERE CARDNUMBER='".$result_seDir1officer['TaxID']."'
+// AND CONVERT(DATE,CREATEDATE) BETWEEN CONVERT(DATE,'".$_GET['datestart']."',103) AND CONVERT(DATE,'".$_GET['dateend']."',103) 
+// AND (DRIVER_SYS !=''	OR DRIVER_SYS IS NOT NULL)
+// AND (DRIVER_DIA !=''	OR DRIVER_DIA IS NOT NULL)
+// AND (DRIVER_PULSE !=''	OR DRIVER_PULSE IS NOT NULL)
+// AND (DRIVER_TEMPERATURE !=''	OR DRIVER_TEMPERATURE IS NOT NULL)
+// AND (DRIVER_OXYGEN !=''	OR DRIVER_OXYGEN IS NOT NULL)
+// ORDER BY CREATEDATE DESC";
+// $params_seSelfCheckDataSYS = array();
+// $query_seSelfCheckDataSYS = sqlsrv_query($conn, $sql_seSelfCheckDataSYS, $params_seSelfCheckDataSYS);
+// while ($result_seSelfCheckDataSYS = sqlsrv_fetch_array($query_seSelfCheckDataSYS, SQLSRV_FETCH_ASSOC)) { 
+//   $SYSAVG     = $SYSAVG     + $result_seSelfCheckDataSYS['DRIVER_SYS'];
+//   $DIAAVG     = $DIAAVG     + $result_seSelfCheckDataSYS['DRIVER_DIA'];
+//   $PULSEAVG   = $PULSEAVG   + $result_seSelfCheckDataSYS['DRIVER_PULSE'];
+//   $TEMPAVG    = $TEMPAVG    + $result_seSelfCheckDataSYS['DRIVER_TEMPERATURE'];
+//   $ALCOAVG    = $ALCOAVG    + $result_seSelfCheckDataSYS['DRIVER_ALCOHOL'];
+//   $OXYGENAVG  = $OXYGENAVG  + $result_seSelfCheckDataSYS['DRIVER_OXYGEN'];
+// }
 
-$sql_seSelfCheckData = "SELECT DRIVER_TEMPERATURE,DRIVER_SYS,DRIVER_DIA,DRIVER_PULSE,DRIVER_OXYGEN,DRIVER_ALCOHOL,CREATEBY, CONVERT(VARCHAR(10),CREATEDATE,103) AS 'CREATEDATE'
-FROM LABOTRONWEBSERVICEDATA 
-WHERE CARDNUMBER='".$result_seDir1officer['TaxID']."'
-AND CONVERT(DATE,CREATEDATE) BETWEEN CONVERT(DATE,'".$_GET['datestart']."',103) AND CONVERT(DATE,'".$_GET['dateend']."',103) 
-ORDER BY CREATEDATE DESC";
+
+$sql_seSelfCheckData = "SELECT * FROM (
+	SELECT ROW_NUMBER() OVER( PARTITION BY CONVERT(DATE,b.CREATEDATE) ORDER BY b.CREATEDATE DESC) AS 'ROWNUM_CHK',
+	CONVERT(VARCHAR(10),b.CREATEDATE,121) AS 'TENKOCREATEDATE',b.TENKOMASTERID,b.TENKOTEMPERATUREDATA
+	,b.TENKOPRESSUREDATA_90160,b.TENKOPRESSUREDATA_90160_2,b.TENKOPRESSUREDATA_90160_3
+	,b.TENKOPRESSUREDATA_60100,b.TENKOPRESSUREDATA_60100_2,b.TENKOPRESSUREDATA_60100_3
+	,b.TENKOPRESSUREDATA_60110,b.TENKOPRESSUREDATA_60110_2,b.TENKOPRESSUREDATA_60110_3
+	,b.TENKOALCOHOLDATA,b.TENKOOXYGENDATA
+	FROM  TENKOBEFORE b
+	WHERE b.TENKOMASTERDIRVERCODE='".$_GET['employeecode']."'
+	AND CONVERT(DATE,b.CREATEDATE) BETWEEN CONVERT(DATE,'".$_GET['datestart']."',103) AND CONVERT(DATE,'".$_GET['dateend']."',103)
+	AND (b.TENKOTEMPERATUREDATA != NULL  OR  b.TENKOTEMPERATUREDATA != ''
+	OR b.TENKOPRESSUREDATA_90160 != NULL OR b.TENKOPRESSUREDATA_90160 != ''
+	OR b.TENKOPRESSUREDATA_60100 != NULL OR b.TENKOPRESSUREDATA_60100 != ''
+	OR b.TENKOPRESSUREDATA_60110 != NULL OR b.TENKOPRESSUREDATA_60110 != ''
+	OR b.TENKOALCOHOLDATA != NULL OR b.TENKOALCOHOLDATA != ''
+	OR b.TENKOOXYGENDATA != NULL  OR b.TENKOOXYGENDATA != '')
+	
+) AS A
+WHERE A.ROWNUM_CHK ='1'
+ORDER BY A.TENKOCREATEDATE DESC";
 $params_seSelfCheckData = array();
 $query_seSelfCheckData = sqlsrv_query($conn, $sql_seSelfCheckData, $params_seSelfCheckData);
-while ($result_seSelfCheckData = sqlsrv_fetch_array($query_seSelfCheckData, SQLSRV_FETCH_ASSOC)) {
-
+while ($result_seSelfCheckData = sqlsrv_fetch_array($query_seSelfCheckData, SQLSRV_FETCH_ASSOC)) {  
     //SYS ค่าความดันบน
-    $SYS = $result_seSelfCheckData['DRIVER_SYS'] ; 
-    /////////////////////////////////////////////////////////////////
-    //DIA ค่าความดันล่าง
-    $DIA = $result_seSelfCheckData['DRIVER_DIA'] ; 
-    /////////////////////////////////////////////////////////////////  
-    //PULSE อัตราเต้นหัวใจ
-    $PULSE = $result_seSelfCheckData['DRIVER_PULSE'] ;
-    //////////////////////////////////////////////////////////////////////
-
-    // SYS ค่าความดันบน
-  //   if($result_seSelfCheckData['DRIVER_SYS'] > $result_seTenkoSTD['MAXSYS']){
-  //     if ($result_seSelfCheckData['DRIVER_SYS'] > $result_seTenkoSTD['MAXSYS']) {
-  //         if ($result_seSelfCheckData['DRIVER_SYS'] > $result_seTenkoSTD['MAXSYS']) {
-  //             $SYS = '0'; // ความดันบนครั้งที่ 3 เกิน
-  //         }else {
-  //             $SYS = $result_seSelfCheckData['DRIVER_SYS'];
-  //         }
-          
-  //     }else {
-  //         $SYS = $result_seSelfCheckData['DRIVER_SYS'];
-  //     }
-      
-  // }else{
-  //         $SYS = $result_seSelfCheckData['DRIVER_SYS'] ; 
-          
-  // }
+    $SYS = $result_seSelfCheckData['TENKOPRESSUREDATA_90160'] ; 
 /////////////////////////////////////////////////////////////////
-  //DIA ค่าความดันล่าง
-  // if($result_seSelfCheckData['DRIVER_DIA'] > $result_seTenkoSTD['MAXDIA']){
-  //     if ($result_seSelfCheckData['DRIVER_DIA'] > $result_seTenkoSTD['MAXDIA']) {
-  //         if ($result_seSelfCheckData['DRIVER_DIA'] > $result_seTenkoSTD['MAXDIA']) {
-  //             $DIA = '0'; // ความดันล่างครั้งที่ 3 เกิน
-  //         }else {
-  //             $DIA = $result_seSelfCheckData['DRIVER_DIA'];
-  //         }
-          
-  //     }else {
-  //         $DIA = $result_seSelfCheckData['DRIVER_DIA'];
-  //     }
-      
-  // }else{
-  //         $DIA = $result_seSelfCheckData['DRIVER_DIA'] ; 
-  // }
+    //DIA ค่าความดันล่าง
+    $DIA = $result_seSelfCheckData['TENKOPRESSUREDATA_60100'] ; 
 /////////////////////////////////////////////////////////////////  
-  //PULSEDAY1
-  // if($result_seSelfCheckData['DRIVER_PULSE'] > $result_seTenkoSTD['MAXPULSE'] || $result_seSelfCheckData['DRIVER_PULSE'] < $result_seTenkoSTD['MINPULSE']){
-  //     if ($result_seSelfCheckData['DRIVER_PULSE'] > $result_seTenkoSTD['MAXPULSE']  || $result_seSelfCheckData['DRIVER_PULSE'] < $result_seTenkoSTD['MINPULSE']) {
-  //         if ($result_seSelfCheckData['DRIVER_PULSE'] > $result_seTenkoSTD['MAXPULSE'] || $result_seSelfCheckData['DRIVER_PULSE'] < $result_seTenkoSTD['MINPULSE']) {
-  //             $PULSE = ''; // ความอัตตราเต้นหัวใจครั้งที่ 3 เกิน
-  //         }else {
-  //             $PULSE = $result_seSelfCheckData['DRIVER_PULSE'];
-  //         }
-          
-  //     }else {
-  //         $PULSE = $result_seSelfCheckData['DRIVER_PULSE'];
-  //     }
-      
-  // }else{
-  //         $PULSE = $result_seSelfCheckData['DRIVER_PULSE'] ; 
-  // }
-  //////////////////////////////////////////////////////////////////////
+    //PULSE อัตราเต้นหัวใจ
+    $PULSE = $result_seSelfCheckData['TENKOPRESSUREDATA_60110'] ;
+//////////////////////////////////////////////////////////////////////
+    //TEMP อุณภูมิ
+    $TEMP = $result_seSelfCheckData['TENKOTEMPERATUREDATA'] ;
+//////////////////////////////////////////////////////////////////////
+    //ALCOHOL แอลกอฮอล์
+    $ALCOHOL = $result_seSelfCheckData['TENKOALCOHOLDATA'] ;
+//////////////////////////////////////////////////////////////////////
+    //OXYGEN ออกซิเจน
+    $OXYGEN = $result_seSelfCheckData['TENKOOXYGENDATA'] ;
+//////////////////////////////////////////////////////////////////////
 
+    if (($ALCOHOL !="") && ($SYS == "" && $DIA == "" && $PULSE == "" && $TEMP == "" && $OXYGEN == "")) {
+        $GORETURNCHK = "ขากลับ";
+    }else{
+        $GORETURNCHK = "";
+    }
 
     $tbody3 .= '
 
         <tr style="border:1px solid #000;font-size:10px">
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $result_seSelfCheckData['CREATEDATE'] . '</td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $result_seSelfCheckData['TENKOCREATEDATE'] . '</td>
         <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $SYS . '</td>
         <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $DIA . '</td>
         <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $PULSE . '</td>
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $result_seSelfCheckData['DRIVER_TEMPERATURE'] . '</td>
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $result_seSelfCheckData['DRIVER_ALCOHOL'] . '</td>
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $result_seSelfCheckData['DRIVER_OXYGEN'] . '</td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $TEMP . '</td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $ALCOHOL . '</td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px">' . $OXYGEN . '</td>
         <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px"></td>
         
       
@@ -275,22 +291,22 @@ while ($result_seSelfCheckData = sqlsrv_fetch_array($query_seSelfCheckData, SQLS
     $SYSAVG = $SYSAVG + $SYS;
     $DIAAVG = $DIAAVG + $DIA;
     $PULSEAVG = $PULSEAVG + $PULSE;
-    $TEMPAVG = $TEMPAVG + $result_seSelfCheckData['DRIVER_TEMPERATURE'];
-    $ALCOAVG = $ALCOAVG + $result_seSelfCheckData['DRIVER_ALCOHOL'];
-    $OXYGENAVG = $OXYGENAVG + $result_seSelfCheckData['DRIVER_OXYGEN'];
+    $TEMPAVG = $TEMPAVG + $result_seSelfCheckData['TENKOTEMPERATUREDATA'];
+    $ALCOAVG = $ALCOAVG + $result_seSelfCheckData['TENKOALCOHOLDATA'];
+    $OXYGENAVG = $OXYGENAVG + $result_seSelfCheckData['TENKOOXYGENDATA'];
 }
 
 
 $tfoot3 = '</tbody><tfoot>
-     <tr style="border:1px solid #000;font-size:10px">
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b>ค่าเฉลี่ย</b></td>
-        <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b>' . ($SYSAVG/$result_seCount['COUNT']) . '</b></td>
-        <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b>' . ($DIAAVG/$result_seCount['COUNT']) . '</b></td>
-        <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b>' . ($PULSEAVG/$result_seCount['COUNT']) . '</b></td>
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b>' . ($TEMPAVG/$result_seCount['COUNT']) . '</b></td>
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b>' . ($ALCOAVG/$result_seCount['COUNT']) . '</b></td>
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b>' . ($OXYGENAVG/$result_seCount['COUNT']) . '</b></td>
-        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:10px;background-color:#ccc"><b></b></td>
+     <tr style="border:1px solid #000;font-size:14px">
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b>ค่าเฉลี่ย</b></td>
+        <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b>' . number_format(($SYSAVG/$result_seCount['COUNT']),2) . '</b></td>
+        <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b>' . number_format(($DIAAVG/$result_seCount['COUNT']),2) . '</b></td>
+        <td colspan="2" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b>' . number_format(($PULSEAVG/$result_seCount['COUNT']),2) . '</b></td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b>' . number_format(($TEMPAVG/$result_seCount['COUNT']),2) . '</b></td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b>' . number_format(($ALCOAVG/$result_seCount['COUNT']),2) . '</b></td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b>' . number_format(($OXYGENAVG/$result_seCount['COUNT']),2) . '</b></td>
+        <td colspan="1" style="border-right:1px solid #000;padding:13px;text-align:center;font-size:14px;background-color:#ccc"><b></b></td>
 
       </tr>
     </tfoot>';
@@ -337,6 +353,7 @@ $mpdf->WriteHTML($thead3);
 $mpdf->WriteHTML($tbody3);
 $mpdf->WriteHTML($tfoot3);
 $mpdf->WriteHTML($table_end3);
+
 // $mpdf->WriteHTML($table_footer3);
 
 $mpdf->Output();

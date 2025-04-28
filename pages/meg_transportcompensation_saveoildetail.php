@@ -500,44 +500,44 @@
 		if( $stmt4  === false ) {
 			die( print_r( sqlsrv_errors(), true));
 		}else{
-			$chkplan="SELECT a.VEHICLETRANSPORTPLANID,a.COMPANYCODE,b.OIL_BILLNUMBER OBLNB,a.EMPLOYEECODE1,a.EMPLOYEENAME1,a.EMPLOYEECODE2,a.EMPLOYEENAME2,b.OIL_AMOUNT OAM,a.O4,a.C3,a.JOBNO,a.SUBMITBUTTON SMBT,
-				CONVERT(VARCHAR(10),b.REFUELINGDATE,20) REFUEL20,
-				CONVERT(VARCHAR(10),b.REFUELINGDATE,103) REFUEL103,
-				CONVERT(VARCHAR(10),a.DATEWORKING,20) DWK20,
-				CONVERT(VARCHAR(10),a.DATEWORKING,103) DWK103,	
-				CASE WHEN a.SUBMITBUTTON = 1 THEN 'บันทึกค่าตอบแทนแล้ว' ELSE 'ยังไม่บันทึกค่าตอบแทน' END SUBMITBUTTON
-				FROM TEMP_TATSUNODATA.dbo.OIL_TATSUNO b
-				LEFT JOIN VEHICLETRANSPORTPLAN a ON a.JOBNO = b.JOBNO COLLATE Thai_CI_AI
-				WHERE a.VEHICLETRANSPORTPLANID = '$realVHCTPPID' AND a.SUBMITBUTTON = 1 AND a.O4 IS NULL AND NOT a.JOBEND = 'คลังโคราช' AND NOT a.JOBSTART LIKE '%IP%'";
-			$query_chkplan = sqlsrv_query($conn, $chkplan);
-			$result_chkplan = sqlsrv_fetch_array($query_chkplan, SQLSRV_FETCH_ASSOC);	
-			if(isset($result_chkplan['VEHICLETRANSPORTPLANID'])){
-				if(($result_chkplan['COMPANYCODE']=='RKL')||($result_chkplan['COMPANYCODE']=='RKR')||($result_chkplan['COMPANYCODE']=='RKS')){
-					$TOKEN="3icwuJ6YIpooT0DUcl0pVlyghmAHVqgxvL9xrYTof2y";  
-				}else{
-					$TOKEN="Dy59wHwNNH6z8zpVwilRLFTRf5SIMFZGOmtcAgEWJNL";  
-				}
-				$NOTI_LINE1=" ❌ ไม่กดคำนวณค่าเฉลี่ยน้ำมัน"."\n";
-				$NOTI_LINE2="วันที่วิ่งงาน : ".$result_chkplan['DWK103'].""."\n";
-				$NOTI_LINE3="หมายเลขแผน : ".$result_chkplan['JOBNO'].""."\n";
-				$NOTI_LINE4="พขร.1 : ".$result_chkplan['EMPLOYEECODE1'].' - '.$result_chkplan['EMPLOYEENAME1'].""."\n";
-				$NOTI_LINE5="พขร.2 : ".$result_chkplan['EMPLOYEECODE2'].' - '.$result_chkplan['EMPLOYEENAME2'].""."\n";
-				$NOTI_LINE6="ค่าเฉลี่ยน้ำมัน : ❌ ไม่กดคำนวณค่าเฉลี่ยน้ำมัน"."\n";   
-				$NOTI_LINE7="คีย์ค่าตอบแทน : ✅ ".$result_chkplan['SUBMITBUTTON']."";   
-				$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7;	
+			// $chkplan="SELECT a.VEHICLETRANSPORTPLANID,a.COMPANYCODE,b.OIL_BILLNUMBER OBLNB,a.EMPLOYEECODE1,a.EMPLOYEENAME1,a.EMPLOYEECODE2,a.EMPLOYEENAME2,b.OIL_AMOUNT OAM,a.O4,a.C3,a.JOBNO,a.SUBMITBUTTON SMBT,
+			// 	CONVERT(VARCHAR(10),b.REFUELINGDATE,20) REFUEL20,
+			// 	CONVERT(VARCHAR(10),b.REFUELINGDATE,103) REFUEL103,
+			// 	CONVERT(VARCHAR(10),a.DATEWORKING,20) DWK20,
+			// 	CONVERT(VARCHAR(10),a.DATEWORKING,103) DWK103,	
+			// 	CASE WHEN a.SUBMITBUTTON = 1 THEN 'บันทึกค่าตอบแทนแล้ว' ELSE 'ยังไม่บันทึกค่าตอบแทน' END SUBMITBUTTON
+			// 	FROM TEMP_TATSUNODATA.dbo.OIL_TATSUNO b
+			// 	LEFT JOIN VEHICLETRANSPORTPLAN a ON a.JOBNO = b.JOBNO COLLATE Thai_CI_AI
+			// 	WHERE a.VEHICLETRANSPORTPLANID = '$realVHCTPPID' AND a.SUBMITBUTTON = 1 AND a.O4 IS NULL AND NOT a.JOBEND = 'คลังโคราช' AND NOT a.JOBSTART LIKE '%IP%'";
+			// $query_chkplan = sqlsrv_query($conn, $chkplan);
+			// $result_chkplan = sqlsrv_fetch_array($query_chkplan, SQLSRV_FETCH_ASSOC);	
+			// if(isset($result_chkplan['VEHICLETRANSPORTPLANID'])){
+			// 	if(($result_chkplan['COMPANYCODE']=='RKL')||($result_chkplan['COMPANYCODE']=='RKR')||($result_chkplan['COMPANYCODE']=='RKS')){
+			// 		$TOKEN="3icwuJ6YIpooT0DUcl0pVlyghmAHVqgxvL9xrYTof2y";  
+			// 	}else{
+			// 		$TOKEN="Dy59wHwNNH6z8zpVwilRLFTRf5SIMFZGOmtcAgEWJNL";  
+			// 	}
+			// 	$NOTI_LINE1=" ❌ ไม่กดคำนวณค่าเฉลี่ยน้ำมัน"."\n";
+			// 	$NOTI_LINE2="วันที่วิ่งงาน : ".$result_chkplan['DWK103'].""."\n";
+			// 	$NOTI_LINE3="หมายเลขแผน : ".$result_chkplan['JOBNO'].""."\n";
+			// 	$NOTI_LINE4="พขร.1 : ".$result_chkplan['EMPLOYEECODE1'].' - '.$result_chkplan['EMPLOYEENAME1'].""."\n";
+			// 	$NOTI_LINE5="พขร.2 : ".$result_chkplan['EMPLOYEECODE2'].' - '.$result_chkplan['EMPLOYEENAME2'].""."\n";
+			// 	$NOTI_LINE6="ค่าเฉลี่ยน้ำมัน : ❌ ไม่กดคำนวณค่าเฉลี่ยน้ำมัน"."\n";   
+			// 	$NOTI_LINE7="คีย์ค่าตอบแทน : ✅ ".$result_chkplan['SUBMITBUTTON']."";   
+			// 	$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7;	
 					
-				$chOne = curl_init(); 
-				curl_setopt( $chOne, CURLOPT_URL, "https://notify-api.line.me/api/notify"); 
-				curl_setopt( $chOne, CURLOPT_SSL_VERIFYHOST, 0); 
-				curl_setopt( $chOne, CURLOPT_SSL_VERIFYPEER, 0); 
-				curl_setopt( $chOne, CURLOPT_POST, 1); 
-				curl_setopt( $chOne, CURLOPT_POSTFIELDS, "message=".$MESSAGE_NOTI_LINE); 
-				$headers = array( 'Content-type: application/x-www-form-urlencoded', 'Authorization: Bearer '.$TOKEN.'', );
-				curl_setopt($chOne, CURLOPT_HTTPHEADER, $headers); 
-				curl_setopt( $chOne, CURLOPT_RETURNTRANSFER, 1); 
-				$result = curl_exec( $chOne ); 					
-				curl_close($chOne);   
-			}
+			// 	$chOne = curl_init(); 
+			// 	curl_setopt( $chOne, CURLOPT_URL, "https://notify-api.line.me/api/notify"); 
+			// 	curl_setopt( $chOne, CURLOPT_SSL_VERIFYHOST, 0); 
+			// 	curl_setopt( $chOne, CURLOPT_SSL_VERIFYPEER, 0); 
+			// 	curl_setopt( $chOne, CURLOPT_POST, 1); 
+			// 	curl_setopt( $chOne, CURLOPT_POSTFIELDS, "message=".$MESSAGE_NOTI_LINE); 
+			// 	$headers = array( 'Content-type: application/x-www-form-urlencoded', 'Authorization: Bearer '.$TOKEN.'', );
+			// 	curl_setopt($chOne, CURLOPT_HTTPHEADER, $headers); 
+			// 	curl_setopt( $chOne, CURLOPT_RETURNTRANSFER, 1); 
+			// 	$result = curl_exec( $chOne ); 					
+			// 	curl_close($chOne);   
+			// }
 		}
 	}
 

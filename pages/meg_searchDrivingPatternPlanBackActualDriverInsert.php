@@ -510,7 +510,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p1" name="txt_location_actual_4hur_p1" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P1'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p1" name="txt_location_actual_4hur_p1" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P1'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -562,7 +562,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p1" name="txt_location_actual_2hur_p1" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P1'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p1" name="txt_location_actual_2hur_p1" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P1'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -705,7 +705,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p2" name="txt_location_actual_4hur_p2" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P2'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p2" name="txt_location_actual_4hur_p2" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P2'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -757,7 +757,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p2" name="txt_location_actual_2hur_p2" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P2'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p2" name="txt_location_actual_2hur_p2" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P2'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -899,7 +899,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p3" name="txt_location_actual_4hur_p3" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P3'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p3" name="txt_location_actual_4hur_p3" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P3'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -951,7 +951,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p3" name="txt_location_actual_2hur_p3" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P3'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p3" name="txt_location_actual_2hur_p3" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P3'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1093,7 +1093,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p4" name="txt_location_actual_4hur_p4" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P4'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p4" name="txt_location_actual_4hur_p4" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P4'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1145,7 +1145,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p4" name="txt_location_actual_2hur_p4" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P4'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p4" name="txt_location_actual_2hur_p4" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P4'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1287,7 +1287,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p5" name="txt_location_actual_4hur_p5" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P5'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p5" name="txt_location_actual_4hur_p5" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P5'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1339,7 +1339,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p5" name="txt_location_actual_2hur_p5" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P5'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p5" name="txt_location_actual_2hur_p5" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P5'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1481,7 +1481,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p6" name="txt_location_actual_4hur_p6" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P6'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_4hur_p6" name="txt_location_actual_4hur_p6" value="<?= $result_seData['LOCATION_ACTUAL_4HUR_P6'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1533,7 +1533,7 @@ switch ($section) {
                                                                     </div>
                                                                     <div class="col-lg-4">
                                                                         <label ><u>สถานที่</u></label><br>
-                                                                        <input  class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p6" name="txt_location_actual_2hur_p6" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P6'] ?>" min="" max=""  autocomplete="off">
+                                                                        <input   class="form-control" type="text"  style="height:40px;width:240px" id="txt_location_actual_2hur_p6" name="txt_location_actual_2hur_p6" value="<?= $result_seData['LOCATION_ACTUAL_2HUR_P6'] ?>" min="" max=""  autocomplete="off">
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1871,6 +1871,17 @@ switch ($section) {
             <!-- /.col-lg-12 -->
         </div>
         <!-- END -->
+        <?php
+        $dealer = select_dealerautocomplate('megDrivingPatternDriver', 'select_dealer', '','','','','','');
+
+        $sql_seAPIKey = "SELECT TOP 1 KEY_DATA AS 'KEY' FROM [dbo].[GOOGLEMAP_APIKEY] WHERE ACTIVESTATUS ='1' AND [STATUS] ='USE'";
+        $params_seAPIKey = array();
+        $query_seAPIKey  = sqlsrv_query($conn, $sql_seAPIKey, $params_seAPIKey);
+        $result_seAPIKey = sqlsrv_fetch_array($query_seAPIKey, SQLSRV_FETCH_ASSOC);
+
+        
+        ?>
+
         <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
         <script src="../vendor/metisMenu/metisMenu.min.js"></script>
         <script src="../dist/js/sb-admin-2.js"></script>
@@ -1894,11 +1905,9 @@ switch ($section) {
         <script src="../vendor/datatables-responsive/dataTables.responsive.js"></script> -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
         <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbbjIb5paVwA7uyWGtvanhvwnz6zuUK98&loading=async">
+                src="https://maps.googleapis.com/maps/api/js?key=<?=$result_seAPIKey['KEY']?>&loading=async">
         </script>
-        <?php
-        $dealer = select_dealerautocomplate('megDrivingPatternDriver', 'select_dealer', '','','','','','');
-        ?>
+        
         <script type="text/javascript">
             
             $(function () {
@@ -6009,22 +6018,22 @@ switch ($section) {
                 });
 
                 
-            }else if(locationactual4hurp1 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(locationactual2hurp1 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
+            // }else if(locationactual4hurp1 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(locationactual2hurp1 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
             }else{
 
 
@@ -6136,22 +6145,22 @@ switch ($section) {
                 });
 
                 
-            }else if(locationactual4hurp2 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(locationactual2hurp2 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
+            // }else if(locationactual4hurp2 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(locationactual2hurp2 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
             }else{
 
 
@@ -6262,22 +6271,22 @@ switch ($section) {
                 });
 
                 
-            }else if(locationactual4hurp3 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(locationactual2hurp3 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
+            // }else if(locationactual4hurp3 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(locationactual2hurp3 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
             }else{
 
 
@@ -6389,22 +6398,22 @@ switch ($section) {
                 });
 
                 
-            }else if(locationactual4hurp4 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(locationactual2hurp4 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
+            // }else if(locationactual4hurp4 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(locationactual2hurp4 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
             }else{
 
 
@@ -6515,22 +6524,22 @@ switch ($section) {
                 });
 
                 
-            }else if(locationactual4hurp5 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(locationactual2hurp5 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
+            // }else if(locationactual4hurp5 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(locationactual2hurp5 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
             }else{
 
 
@@ -6642,22 +6651,22 @@ switch ($section) {
                 });
 
                 
-            }else if(locationactual4hurp6 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }else if(locationactual2hurp6 == ''){
-                swal.fire({
-                    title: "Warning!",
-                    text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
+            // }else if(locationactual4hurp6 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 4 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
+            // }else if(locationactual2hurp6 == ''){
+            //     swal.fire({
+            //         title: "Warning!",
+            //         text: "ยังไม่ได้ลงข้อมูลสถานที่ เวลาจอด 2 ชั่วโมง !!!",
+            //         icon: "warning",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     });
             }else{
 
 
@@ -6717,7 +6726,7 @@ switch ($section) {
         // FUNCTION สำหรับปุ่ม ยืนยันข้อมูล ALL LOAD
         function save_actualload_new(checkClient) {
             
-            alert('actual save actual load');
+            // alert('actual save actual load');
             
             // Parameter ของ PLAN
             var confirmby                   = $("#txt_username").val();
