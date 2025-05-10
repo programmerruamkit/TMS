@@ -19088,14 +19088,14 @@ if ($result_checkSexT['SexT'] == 'หญิง') {
                                                     <th colspan = "4" style="width:100px;border: 1px solid black;background-color: #c9c9c9;border-collapse: collapse;padding: 5px;text-align: left">เลขที่ใบขับขี่</th>
                                                     <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><?=$result_seCarData3['CarLicenceID']?></th>
                                                     <?php
-                                                    if ($result_seSelfCheck2['SELFCHECKID'] == '') {
+                                                    if ($result_seSelfCheck3['SELFCHECKID'] == '') {
                                                     ?>
                                                         <!-- <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="function warning(){alert('ไม่สามารถดูข้อมูลได้เนื่องจากพนักงานยังไม่ได้ทำการแจ้งสุขภาพตนเอง!!!\nหรือไม่มีการกดยืนยันข้อมูลการตรวจสุขภาพตนเองจากเจ้าหน้าที่!!!!!!')};warning();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"></th> -->
                                                         <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="warning_selfcheck();" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check" class="btn btn-primary"></th>
                                                     <?php
                                                     }else {
                                                     ?>
-                                                        <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="se_selfcheck('<?=$result_seSelfCheck2['SELFCHECKID']?>','<?= $result_seEmployee3['nameT'] ?>','<?= $_GET['employeecode3'] ?>','<?=$dateself3?>','<?=$result_seDateSelfCheck3['DATERK']?>','<?=$result_seDateSelfCheck3['DATEPRESENT']?>','<?= $result_seEmployee['nameT']?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check3" class="btn btn-primary"></th>
+                                                        <th colspan = "4" style="width:160px;border: 1px solid black;border-collapse: collapse;padding: 5px;text-align: left"><input type="button" onclick="se_selfcheck('<?=$result_seSelfCheck3['SELFCHECKID']?>','<?= $result_seEmployee3['nameT'] ?>','<?= $_GET['employeecode3'] ?>','<?=$dateself3?>','<?=$result_seDateSelfCheck3['DATERK']?>','<?=$result_seDateSelfCheck3['DATEPRESENT']?>','<?= $result_seEmployee['nameT']?>');" name="btnSend" id="btnSend" value="ดูข้อมูลการ Self Check3" class="btn btn-primary"></th>
                                                     <?php
                                                     }
                                                     ?>

@@ -333,6 +333,9 @@
                         }else if(($JOBONE=='โลหะกิจ->GMT 2')){
                             $MONEYTOTAL='0';
                             $REMARK='ไม่คิดเรทน้ำมัน';
+                        }else if(($JOBONE=='CH รับพาเลทเปล่า->TTAST')){
+                            $MONEYTOTAL='0';
+                            $REMARK='ไม่คิดเรทน้ำมัน';
                         }else{
                             $MONEYTOTAL=$RSC3;
                             $REMARK='';
