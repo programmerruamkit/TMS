@@ -485,6 +485,13 @@
 
 <?php
 if ($_GET["type"] == "table") {
+    echo "<h1>Connect</h1>";
+    $conn  = connect('RTMS');
+    echo "Server Name: $serverName<br>";
+    echo "Username: $userName<br>";
+    echo "Password: $userPassword<br>";
+    echo "Database Name: $dbName<br>";
+
     $sqlTables = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' ORDER BY TABLE_NAME ASC";
     $queryTables = sqlsrv_query($conn, $sqlTables);
 
@@ -588,7 +595,7 @@ if ($_GET["type"] == "rand") {
         </form>
     ';
     
-    echo '<br><a href="meg_cashoilaverage_report.php?type=enb">โหลดหน้าใหม่</a>';
+    echo '<br><a href="meg_cashoilaverage_report.php?type=rand">โหลดหน้าใหม่</a>';
 }
 ?>
 
