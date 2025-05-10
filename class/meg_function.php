@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // function connectEHR($db) {
 //     $serverName = "203.150.225.30";
 //     $userName = "sa";
@@ -9,7 +9,7 @@
 //     return $conn;
 // }
 function connect($db) {
-
+    global $serverName, $userName, $userPassword, $dbName;
     $serverName = "RK01";
     $userName = "sa";
     $userPassword = 'Fpce#9084';
