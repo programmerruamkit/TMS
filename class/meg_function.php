@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // function connectEHR($db) {
 //     $serverName = "203.150.225.30";
 //     $userName = "sa";
