@@ -491,7 +491,7 @@ if ($_GET["type"] == "table") {
     echo "<h1>รายการตารางในฐานข้อมูล</h1>";
     echo '$_GET["type"] ที่ใช้ได้: 
     <a href="meg_cashoilaverage_report.php?type=table">table</a>,
-    <a href="meg_cashoilaverage_report.php?type=enb">enb</a>
+    <a href="meg_cashoilaverage_report.php?type=rand">rand</a>
     <br><br>';
 
     echo '<table border="1" cellpadding="10" cellspacing="0">';
@@ -529,10 +529,10 @@ if ($_GET["type"] == "table") {
 
 }
     
-if ($_GET["type"] == "enb") {
+if ($_GET["type"] == "rand") {
         echo '$_GET["type"] ที่ใช้ได้: 
         <a href="meg_cashoilaverage_report.php?type=table">table</a>,
-        <a href="meg_cashoilaverage_report.php?type=enb">enb</a>
+        <a href="meg_cashoilaverage_report.php?type=rand">rand</a>
         <br><br>';
     if (isset($_POST['start'])) {
         $tableName = $_POST['tablename'];
