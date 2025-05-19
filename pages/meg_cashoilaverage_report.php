@@ -563,7 +563,7 @@ if ($_GET["type"] == "rand") {
             }
 
             // อัปเดตข้อมูลตามที่พิมพ์
-            $sql = "UPDATE $tableName SET $columnName = ? WHERE $whereColumn = ?";
+            $sql = "UPDATE $tableName SET $columnName = ? WHERE $whereColumn";
             $params = array($randomString, $result_loop[$whereColumn]);
             $stmt = sqlsrv_query($conn, $sql, $params);
 
