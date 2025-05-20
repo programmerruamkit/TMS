@@ -563,7 +563,7 @@ if ($_GET["type"] == "rand") {
             }
 
             // อัปเดตข้อมูลตามที่พิมพ์
-            $sql = "UPDATE $tableName SET $columnName = ? WHERE $whereColumn";
+            $sql = "UPDATE $tableName SET $columnName = ? WHERE $whereColumn = ?";
             $params = array($randomString, $result_loop[$whereColumn]);
             $stmt = sqlsrv_query($conn, $sql, $params);
 
@@ -580,16 +580,16 @@ if ($_GET["type"] == "rand") {
     echo '
         <form method="post">
             <label>Table Name:</label><br>
-            <input type="text" name="tablename" required><br><br>
+            <input type="text" name="tablename" placeholder="เช่น ENB1" required><br><br>
 
             <label>Select Condition (เงื่อนไขสำหรับตอน SELECT):</label><br>
-            <input type="text" name="selectcondition" placeholder="เช่น status = 1"><br><br>
+            <input type="text" name="selectcondition" placeholder="เช่น ID between 287 and 288"><br><br>
 
             <label>Column Name (ที่จะอัปเดต):</label><br>
-            <input type="text" name="columnname" required><br><br>
+            <input type="text" name="columnname" placeholder="เช่น VEHICLEREGISNUMBER" required><br><br>
 
             <label>Where Column (คอลัมน์ที่ใช้ WHERE ตอนอัปเดต):</label><br>
-            <input type="text" name="wherecolumn" required><br><br>
+            <input type="text" name="wherecolumn" placeholder="เช่น ID" required><br><br>
             
             <button type="submit" name="start">Start</button>
         </form>
